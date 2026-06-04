@@ -37,7 +37,6 @@ public class RetreatPackage extends BaseEntity {
     private String description;
 
     @Column(name = "is_active")
-    @Builder.Default
     private Boolean isActive = true;
 
     @Column(name = "price")

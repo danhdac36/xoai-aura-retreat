@@ -28,6 +28,5 @@ public class VillaType {
     private BigDecimal pricePerDay;
 
     @Column(name = "is_delete")
-    @Builder.Default
     private Boolean isDelete = false;
 }
