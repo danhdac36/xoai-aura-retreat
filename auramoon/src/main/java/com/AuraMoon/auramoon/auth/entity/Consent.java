@@ -26,6 +26,7 @@ public class Consent extends BaseEntity {
     private User user;
 
     @Column(name = "consent_status")
+    @Builder.Default
     private Boolean consentStatus = false;
 
     @Column(name = "consent_version", length = 8)
