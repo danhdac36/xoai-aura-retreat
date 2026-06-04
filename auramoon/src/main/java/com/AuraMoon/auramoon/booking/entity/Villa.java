@@ -33,5 +33,6 @@ public class Villa {
     private String cleaningStatus;
 
     @Column(name = "is_delete")
+    @Builder.Default
     private Boolean isDelete = false;
 }

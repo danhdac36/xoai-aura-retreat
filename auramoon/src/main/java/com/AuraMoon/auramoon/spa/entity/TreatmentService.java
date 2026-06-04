@@ -30,8 +30,10 @@ public class TreatmentService {
     private BigDecimal price;
 
     @Column(name = "is_available")
+    @Builder.Default
     private Boolean isAvailable = true;
 
     @Column(name = "is_delete")
+    @Builder.Default
     private Boolean isDelete = false;
 }

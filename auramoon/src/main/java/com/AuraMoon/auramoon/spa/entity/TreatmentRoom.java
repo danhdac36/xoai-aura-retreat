@@ -30,5 +30,6 @@ public class TreatmentRoom {
     private String status;
 
     @Column(name = "is_delete")
+    @Builder.Default
     private Boolean isDelete = false;
 }
