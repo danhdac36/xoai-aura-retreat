@@ -37,6 +37,5 @@ public class Schedule {
     private LocalDateTime endTime;
 
     @Column(name = "is_delete")
-    @Builder.Default
     private Boolean isDelete = false;
 }

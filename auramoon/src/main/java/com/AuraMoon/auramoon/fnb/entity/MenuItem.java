@@ -35,6 +35,5 @@ public class MenuItem extends BaseEntity {
     private String ingredient;
 
     @Column(name = "is_available")
-    @Builder.Default
     private Boolean isAvailable = true;
 }
