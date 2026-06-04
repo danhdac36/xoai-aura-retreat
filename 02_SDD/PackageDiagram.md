@@ -63,7 +63,7 @@ Hệ thống được chia thành 6 gói chức năng/module chính:
 *   **`spa` (Màu cam nhạt - #FFF3E0):** Quản lý các dịch vụ Spa, trị liệu, chăm sóc sức khỏe.
 *   **`fnb` (Food and Beverage - Màu vàng nhạt - #FFF8E1):** Quản lý dịch vụ ăn uống, nhà hàng.
 *   **`billing` (Màu đỏ/hồng nhạt - #FCE8E6):** Quản lý hóa đơn, thanh toán và tính tổng tiền.
-*   **`common` (Màu xám nhạt - #F3F3F3):** Chứa các thư viện, tiện ích dùng chung (Utilities, DTOs, Exceptions, Constants, Configurations).
+*   **`common` (Màu xám nhạt - #F3F3F3):** Chứa các thư viện, tiện ích dùng chung (Utilities, DTOs, Exceptions, Constants, Configurations). **LƯU Ý THIẾT KẾ (DDD):** Hệ thống được cấu trúc theo Domain-Driven Design (Package by Feature). Do đó, `Entity` của module nào sẽ được đặt trực tiếp bên trong package `entity` của module đó. Với các quan hệ khóa ngoại (Foreign Key) xuyên module, chúng ta sử dụng **Loose Coupling** (chỉ lưu ID dưới dạng `Integer`) thay vì ánh xạ object (`@ManyToOne`) để bảo đảm tính độc lập và tránh lỗi vòng lặp phụ thuộc (Circular Dependency).
 
 ---
 
