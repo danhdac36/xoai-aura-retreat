@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div th:fragment="sidebar" class="sidebar">
+        <link rel="stylesheet" th:href="@{/css/home/sidebar.css}">
+
+        <div class="sidebar-logo">
+            Xoài Aura
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#">Quản lý Phòng</a></li>
+            <li><a href="#">Dịch vụ Spa</a></li>
+            <li><a href="#">Ẩm thực (F&B)</a></li>
+            <li class="active"><a href="/billing/checkout">Thanh toán & Check-out</a></li>
+            <li><a href="#">Báo cáo Doanh thu</a></li>
+        </ul>
+    </div>
+</body>
+</html>

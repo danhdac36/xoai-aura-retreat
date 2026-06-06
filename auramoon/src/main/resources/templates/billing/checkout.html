@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::.checkout-container})}">
+<body>
+    <div class="checkout-container">
+        <link rel="stylesheet" th:href="@{/css/billing/checkout.css}">
+
+        <div class="page-header">
+            <h1 class="page-title">Hóa đơn Gộp & Check-out</h1>
+            <p style="color: #666;">Khách hàng: <strong>Trịnh Quốc Huy</strong> | Phòng: <strong>402</strong></p>
+        </div>
+
+        <div class="grid-container">
+            <!-- Left Column: Details -->
+            <div class="column-left">
+                
+                <!-- 1. Room Bill -->
+                <div class="card">
+                    <h3 class="card-title">1. Phòng & Gói Nghỉ dưỡng</h3>
+                    <table class="table-bill">
+                        <tr>
+                            <td>
+                                <strong>7-Day Detox Journey</strong><br>
+                                <span style="font-size: 0.85rem; color: #666;">Phòng Garden View Suite • 6 đêm</span>
+                            </td>
+                            <td class="amount">12.600.000 VND</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- 2. Spa Bill -->
+                <div class="card">
+                    <h3 class="card-title">2. Dịch vụ Spa Phát sinh</h3>
+                    <table class="table-bill">
+                        <thead>
+                            <tr>
+                                <th>Dịch vụ</th>
+                                <th>Ngày & Giờ</th>
+                                <th class="amount">Đơn giá</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Massage đá nóng phục hồi</td>
+                                <td>14/05/2024 • 15:30</td>
+                                <td class="amount">1.850.000 VND</td>
+                            </tr>
+                            <tr>
+                                <td>Trị liệu thảo dược toàn thân</td>
+                                <td>16/05/2024 • 10:00</td>
+                                <td class="amount">2.200.000 VND</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 3. F&B Bill -->
+                <div class="card">
+                    <h3 class="card-title">3. Ẩm thực Phát sinh</h3>
+                    <table class="table-bill">
+                        <thead>
+                            <tr>
+                                <th>Mục</th>
+                                <th>Ngày & Giờ</th>
+                                <th class="amount">Đơn giá</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Dinner A-la-carte (Vegan Fusion)</td>
+                                <td>15/05/2024 • 19:45</td>
+                                <td class="amount">1.250.000 VND</td>
+                            </tr>
+                            <tr>
+                                <td>Rượu vang hữu cơ (Organic Red)</td>
+                                <td>17/05/2024 • 20:30</td>
+                                <td class="amount">1.500.000 VND</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Summary & Checkout -->
+            <div class="column-right">
+                <div class="card summary-card">
+                    <h3 class="card-title">Tóm tắt thanh toán</h3>
+                    
+                    <div style="margin-top: 1.5rem;">
+                        <div class="summary-row">
+                            <span>Tiền phòng (còn lại)</span>
+                            <strong>12.600.000 VND</strong>
+                        </div>
+                        <div class="summary-row">
+                            <span>Dịch vụ Spa</span>
+                            <strong>4.050.000 VND</strong>
+                        </div>
+                        <div class="summary-row">
+                            <span>Dịch vụ Ẩm thực</span>
+                            <strong>2.750.000 VND</strong>
+                        </div>
+                        <div class="summary-row" style="color: #666;">
+                            <span>Thuế & Phí dịch vụ (15%)</span>
+                            <strong>2.910.000 VND</strong>
+                        </div>
+
+                        <div class="summary-total">
+                            <span>TỔNG CỘNG</span>
+                            <span>22.310.000 VND</span>
+                        </div>
+                    </div>
+
+                    <div class="payment-methods">
+                        <p style="font-weight: 600; margin-bottom: 0.5rem;">Phương thức thanh toán:</p>
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod" checked> Thẻ tín dụng
+                        </label>
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod"> Chuyển khoản
+                        </label>
+                    </div>
+
+                    <form action="#" method="POST" style="margin-top: 1rem;">
+                        <button type="button" class="btn-checkout" onclick="alert('Thực hiện xử lý thanh toán và check-out (Call API)')">
+                            Thanh toán & Check-out
+                        </button>
+                    </form>
+                    <p style="font-size: 0.8rem; color: #888; text-align: center; margin-top: 1rem;">
+                        Bằng cách xác nhận, hệ thống sẽ tự động cấp nhật trạng thái phòng thành "Sẵn sàng vệ sinh".
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

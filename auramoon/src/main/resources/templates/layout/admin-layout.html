@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} ?: 'AuraMoon Management'">AuraMoon</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+    <!-- Vanilla CSS for Layout -->
+    <link rel="stylesheet" th:href="@{/css/home/admin-layout.css}">
+</head>
+<body>
+
+    <!-- Insert Sidebar -->
+    <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
+
+    <div class="main-content">
+        <!-- Insert Header -->
+        <th:block th:replace="~{fragments/header :: header}"></th:block>
+
+        <!-- Content Area: The specific page content will be injected here -->
+        <div class="content-area">
+            <th:block th:replace="${content}"></th:block>
+        </div>
+    </div>
+
+</body>
+</html>
