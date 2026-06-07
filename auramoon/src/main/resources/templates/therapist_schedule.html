@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lịch Làm Việc Chuyên Viên</title>
+</head>
+<body>
+    <h2>Lịch trình của chuyên viên: <span th:text="${therapistCode}">T001</span></h2>
+    <p>Ngày: <span th:text="${selectedDate}">2026-06-08</span></p>
+
+    <hr> <h3>Danh sách các ca trị liệu:</h3>
+    <table border="1" cellpadding="10">
+        <thead>
+            <tr>
+                <th>ID Lịch</th>
+                <th>Giờ bắt đầu</th>
+                <th>Giờ kết thúc</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="schedule : ${schedules}">
+                <td th:text="${schedule.id}">1</td>
+                <td th:text="${schedule.startTime}">08:00</td>
+                <td th:text="${schedule.endTime}">09:00</td>
+                <td th:text="${schedule.status}">SCHEDULED</td>
+            </tr>
+            
+            <tr th:if="${#lists.isEmpty(schedules)}">
+                <td colspan="4" style="text-align: center;">Hôm nay bạn không có lịch làm việc nào!</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
