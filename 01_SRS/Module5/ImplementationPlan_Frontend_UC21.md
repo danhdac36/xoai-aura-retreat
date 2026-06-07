@@ -21,11 +21,12 @@ Chúng ta sẽ tạo một bộ khung (shell) chuẩn cho toàn bộ phân hệ 
 
 ### 2. Triển khai Giao diện UC21 & UC22 (Module Billing)
 
-#### [NEW] `src/main/resources/templates/billing/checkout.html`
+#### [MODIFY] `src/main/resources/templates/billing/checkout.html`
 - Kế thừa từ khung `admin-layout.html`.
-- Triển khai cấu trúc chia 2 cột (Tỷ lệ 7:3) giống bản vẽ UC21_22:
-  - **Cột trái (Chi tiết nợ):** Chia thành 3 khối bảng liệt kê (Tiền phòng, Dịch vụ Spa phát sinh, Ẩm thực phát sinh).
-  - **Cột phải (Tóm tắt & Hành động):** Bảng tính tổng tiền, tùy chọn Phương thức thanh toán (Radio button), và Nút bấm kích hoạt "Thanh toán & Check-out".
+- Triển khai toàn bộ bằng **Tailwind CSS** với thiết kế lấy trực tiếp từ hệ thống Stitch.
+- Cấu trúc sử dụng hệ thống Grid 12 cột (`grid-cols-12`):
+  - **Cột trái (8 phần - Chi tiết nợ):** Chia thành các khối bảng liệt kê (Tiền phòng, Dịch vụ Spa, Ẩm thực phát sinh...) với giao diện tự động sinh ra từ danh sách dịch vụ.
+  - **Cột phải (4 phần - Tóm tắt & Hành động):** Bảng tính tổng tiền, lựa chọn Phương thức thanh toán (dùng Custom Radio với CSS Tailwind), Nút thanh toán và tích hợp JavaScript hiển thị Modal (Popup) báo cáo thành công.
 
 #### [NEW] `src/main/java/com/AuraMoon/auramoon/billing/controller/CheckoutController.java`
 - Một Controller Spring MVC đơn giản để map đường dẫn `/billing/checkout` tới file giao diện `billing/checkout.html`.

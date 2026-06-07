@@ -10,3 +10,8 @@ Mọi file mà người dùng yêu cầu tạo ra đều phải được tạo d
 
 ## Nguyên tắc 3: Báo cáo trước khi thay thế code
 Sau khi tôi yêu cầu bạn làm gì thì bạn đều phải báo cáo cái mà bạn phân tích và đọc được cho tôi. Sau khi tôi chấp nhận mới được phép thay thế code trong dự án.
+
+## Nguyên tắc 4: Tuân thủ cấu trúc Layout và Module của dự án
+Khi thiết kế và xây dựng giao diện (UI), tuyệt đối không viết code Javascript (`<script>`) hay CSS (`<style>`) nội tuyến trực tiếp bên trong file HTML. 
+Mọi mã nguồn phụ trợ phải được tách riêng vào các thư mục tĩnh (`static`) và **BẮT BUỘC phải được chia nhỏ theo từng module chuyên biệt**.
+Ví dụ: Các file của module Thanh toán (Billing) phải nằm trong đúng đường dẫn module của nó như `static/js/billing/` hoặc `static/css/billing/`. Từ đó mới được nhúng (link) vào file HTML tương ứng.
