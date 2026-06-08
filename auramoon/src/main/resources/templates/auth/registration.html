@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html class="light" lang="vi" style="" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Xoai Aura - Đăng ký</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@400;500;700&amp;display=swap"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+          rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#a5d2a2",
+                        "inverse-primary": "#c9c6c2",
+                        "on-secondary-fixed-variant": "#3f4b2c",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container": "#f0eded",
+                        "surface-tint": "#5f5e5b",
+                        "background": "#fbf9f8",
+                        "tertiary-fixed": "#c1eebc",
+                        "surface-dim": "#dcd9d9",
+                        "on-tertiary-fixed-variant": "#284f2a",
+                        "inverse-on-surface": "#f3f0f0",
+                        "surface-bright": "#fbf9f8",
+                        "secondary-fixed-dim": "#becca3",
+                        "error-container": "#ffdad6",
+                        "on-background": "#1b1c1c",
+                        "outline": "#787770",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#dae8be",
+                        "on-surface-variant": "#474741",
+                        "primary": "#5f5e5b",
+                        "surface": "#fbf9f8",
+                        "on-primary-fixed": "#1c1c19",
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-container": "#5a6745",
+                        "on-primary-fixed-variant": "#474743",
+                        "secondary": "#566342",
+                        "on-secondary-fixed": "#141f05",
+                        "primary-container": "#f5f2ed",
+                        "tertiary-container": "#d1ffcb",
+                        "primary-fixed": "#e5e2dd",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#4f784f",
+                        "surface-container-highest": "#e4e2e1",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#c9c6c2",
+                        "tertiary": "#406840",
+                        "surface-variant": "#e4e2e1",
+                        "secondary-container": "#d7e5bb",
+                        "on-tertiary-fixed": "#002106",
+                        "on-surface": "#1b1c1c",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#6f6e6a",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#303030",
+                        "outline-variant": "#c8c7be",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "stack-sm": "8px",
+                        "gutter": "24px",
+                        "stack-lg": "32px",
+                        "margin-desktop": "80px",
+                        "section-gap": "120px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Playfair Display"],
+                        "headline-lg": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
+                        "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .luxury-input {
+            background-color: #fbf9f8; /* sand-light */
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-bottom: 2px solid #e4e2e1;
+            transition: border-color 0.3s ease;
+        }
+
+        .luxury-input:focus {
+            outline: none;
+            box-shadow: none;
+            border-color: #566342; /* sage-green/secondary */
+        }
+
+        .split-screen-container {
+            height: 100vh;
+            display: flex;
+        }
+
+        .brand-panel {
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .form-panel {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 80px;
+        }
+
+        @media (max-width: 1024px) {
+            .brand-panel {
+                display: none;
+            }
+
+            .form-panel {
+                width: 100%;
+                padding: 0 40px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-hidden">
+<main class="split-screen-container">
+    <!-- Left Side: Brand Imagery -->
+    <section class="brand-panel">
+        <div class="absolute inset-0 z-10 bg-on-background/10"></div>
+        <img alt="Luxury wellness retreat scene" class="w-full h-full object-cover"
+             data-alt="A cinematic, high-end wellness resort in Vietnam featuring a pristine infinity pool overlooking misty, verdant mountains at sunrise. The atmosphere is serene and tranquil, with soft morning light illuminating architectural lines of natural stone and wood. The color palette is composed of organic neutrals, soft sage greens, and earthy beiges, creating a sophisticated and atmospheric stillness. A light morning mist clings to the distant peaks, emphasizing depth and tranquility."
+             src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEOZN_X4oRbPTtTYWiC6c3X9b9FlfssRtrtZbV8pVNGc2rWtO0QuYxSsn3j1grqaKM0-sEkrA344VzH_owDxvp4LkHIor8VpwIXiLj7WY1tDCwz31g2HejNCdZ2-yG0oz6_id87vEAJ1tqolKYkEZpzSbbmCgs2E4n0pMb3DzalwKjBNdpDErbgkiigfGgYbP5N4Y31qUpN8zZ3DBhhyfVNZfeWDfIiGJ5TXSdBZKRhXP73EMruxzrbrF0IDQNsU5Uff0wDY_aJv0">
+        <!-- Logo Overlay -->
+        <div class="absolute top-10 left-10 z-20">
+            <span class="font-headline-sm text-headline-sm text-surface-container-lowest tracking-tight">Xoai Aura</span>
+        </div>
+        <!-- Quote Overlay -->
+        <div class="absolute bottom-20 left-10 z-20 max-w-md">
+            <p class="font-headline-sm text-headline-sm text-surface-container-lowest mb-4 leading-relaxed">
+                "Sự tĩnh lặng là khởi đầu của mọi trí tuệ."
+            </p>
+            <div class="h-1 w-12 bg-secondary-fixed"></div>
+        </div>
+    </section>
+    <!-- Right Side: Registration Form -->
+    <section class="form-panel bg-surface-bright">
+        <div class="w-full max-w-[440px]">
+            <!-- Header -->
+            <div class="mb-stack-lg text-center md:text-left">
+                <h1 class="font-headline-lg text-headline-lg text-primary mb-stack-sm leading-tight">&nbsp; &nbsp;
+                    &nbsp; &nbsp; &nbsp; &nbsp;Đăng ký</h1>
+                <p class="font-body-md text-on-surface-variant">
+                    Tham gia cộng đồng Xoai Aura để trải nghiệm sự cân bằng tuyệt đối.
+                </p>
+            </div>
+            <!-- Registration Form -->
+            <form class="space-y-stack-lg">
+                <!-- Full Name -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest"
+                           for="full-name">Họ và tên</label>
+                    <input class="luxury-input py-3 px-1 text-body-md text-on-surface" id="full-name"
+                           placeholder="Nguyễn Văn A" type="text">
+                </div>
+                <!-- Email -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest"
+                           for="email">Email</label>
+                    <input class="luxury-input py-3 px-1 text-body-md text-on-surface" id="email"
+                           placeholder="example@xoai-aura.com" type="email">
+                </div>
+                <!-- Password -->
+                <div class="flex flex-col gap-2 relative">
+                    <label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest"
+                           for="password">Mật khẩu</label>
+                    <div class="relative">
+                        <input class="luxury-input w-full py-3 px-1 text-body-md text-on-surface pr-10" id="password"
+                               placeholder="••••••••" type="password">
+                        <button class="absolute right-1 bottom-3 text-on-surface-variant" type="button">
+                            <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Confirm Password -->
+                <div class="flex flex-col gap-2 relative">
+                    <label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest"
+                           for="confirm-password">Xác nhận mật khẩu</label>
+                    <div class="relative">
+                        <input class="luxury-input w-full py-3 px-1 text-body-md text-on-surface pr-10"
+                               id="confirm-password" placeholder="••••••••" type="password">
+                    </div>
+                </div>
+                <!-- Submit Button -->
+                <div class="pt-stack-sm">
+                    <button class="w-full bg-secondary text-surface-white font-label-md text-label-md uppercase tracking-[0.2em] py-5 rounded-lg hover:opacity-90 transition-all shadow-sm active:scale-[0.98]"
+                            type="submit">
+                        Đăng ký
+                    </button>
+                </div>
+            </form>
+            <!-- Navigation Back to Login -->
+            <div class="mt-section-gap/4 text-center">
+                <p class="font-body-md text-on-surface-variant">
+                    Đã có tài khoản?
+                    <a class="text-secondary font-semibold underline underline-offset-4 ml-1 hover:text-on-secondary-container transition-colors"
+                       href="#">
+                        Đăng nhập ngay
+                    </a>
+                </p>
+            </div>
+            <!-- Footer Links -->
+            <div class="mt-stack-lg pt-12 border-t border-outline-variant/30 flex justify-center gap-stack-lg">
+                <a class="font-label-md text-[12px] text-on-surface-variant/60 uppercase tracking-widest hover:text-on-surface transition-colors"
+                   href="#">Điều khoản</a>
+                <a class="font-label-md text-[12px] text-on-surface-variant/60 uppercase tracking-widest hover:text-on-surface transition-colors"
+                   href="#">Bảo mật</a>
+            </div>
+        </div>
+    </section>
+</main>
+<!-- Subtle Background Shader Effect for Atmosphere -->
+<div class="fixed inset-0 pointer-events-none opacity-20 z-[-1]">
+
+</div>
+<script>
+    // Micro-interactions for form inputs
+    document.querySelectorAll('.luxury-input').forEach(input => {
+        input.addEventListener('focus', () => {
+            input.parentElement.querySelector('label').classList.add('text-secondary');
+        });
+        input.addEventListener('blur', () => {
+            input.parentElement.querySelector('label').classList.remove('text-secondary');
+        });
+    });
+
+    // Basic password visibility toggle logic
+    const toggleBtn = document.querySelector('button .material-symbols-outlined');
+    if (toggleBtn) {
+        toggleBtn.parentElement.addEventListener('click', () => {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            toggleBtn.textContent = type === 'password' ? 'visibility_off' : 'visibility';
+        });
+    }
+</script>
+
+
+</body>
+</html>
