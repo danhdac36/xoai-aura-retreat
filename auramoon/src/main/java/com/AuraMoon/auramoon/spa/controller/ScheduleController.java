@@ -11,15 +11,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
-@RequestMapping("/spa/therapists") // Đổi link một chút cho giống giao diện web
+@RequestMapping("/spa/therapists")
 public class ScheduleController {
 
     @Autowired
     private ScheduleService scheduleService;
 
-    /**
-     * Trả về giao diện web xem lịch của Therapist
-     */
     @GetMapping("/{code}/schedules")
     public String getDailySchedule(
             @PathVariable("code") String therapistCode,
