@@ -38,9 +38,10 @@
 | --- | --- | --- | --- |
 | TC-COND-001 | Thanh toán CASH thành công | `processPayment` | `BIL-TC-001` |
 | TC-COND-002 | Khách còn đơn hàng Pending -> Báo lỗi | `initiatePayment` | `BIL-TC-002` |
-| TC-COND-003 | Thanh toán VNPAY -> Sinh URL Redirect | `processPayment` | `BIL-TC-003` |
-| TC-COND-004 | VNPAY Callback: Thành công (`00`) | `vnpayReturn` | `BIL-TC-004` |
+| TC-COND-003 | Thanh toán VNPAY -> Sinh URL Redirect chứa `vnp_SecureHash` | `processPayment` | `BIL-TC-003` |
+| TC-COND-004 | VNPAY Callback: Thành công (`00`) với chữ ký hợp lệ | `vnpayReturn` | `BIL-TC-004` |
 | TC-COND-005 | VNPAY Callback: Thất bại / Hủy (`24`) | `vnpayReturn` | `BIL-TC-005` |
+| TC-COND-006 | VNPAY Callback: Sai chữ ký (Hash Mismatch) | `vnpayReturn` | `BIL-TC-006` |
 
 # 4. Test Case Specification
 
@@ -108,3 +109,16 @@
    - `flash().attributeExists("errorMessage")`.
    - DB: Payment ID 101 cập nhật thành `FAILED`.
    - DB: Trạng thái Booking/Villa/Folio KHÔNG ĐỔI.
+
+## BIL-TC-006 — VNPay Callback Sai Chữ Ký (Hash Mismatch)
+
+**Feature Under Test:** `CheckoutController.vnpayReturn()`
+**TDD Phase:** 🔴 RED
+
+**Test Steps:**
+1. Arrange: Tạo Payment có id=102 đang `PENDING`. Mock `verifySignature` trả về `false`.
+2. Act: Gọi `mockMvc.perform(get("/checkout/vnpay-return").param("vnp_ResponseCode", "00").param("vnp_TxnRef", "102"))`.
+3. Assert:
+   - HTTP Status `302 Found` tới trang checkout cũ.
+   - `flash().attribute("errorMessage", "Lỗi bảo mật chữ ký VNPay!")`.
+   - DB: Trạng thái Payment/Booking KHÔNG ĐỔI (Vẫn PENDING).

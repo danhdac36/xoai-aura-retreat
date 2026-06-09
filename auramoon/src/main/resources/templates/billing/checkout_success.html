@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::.checkout-success-container})}">
+<body>
+    <div class="checkout-success-container flex items-center justify-center min-h-[70vh]">
+        <div class="bg-white max-w-md w-full p-10 rounded-xl shadow-2xl text-center space-y-6">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                <span class="material-symbols-outlined text-green-600 text-5xl" data-icon="task_alt">task_alt</span>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-headline-sm text-primary">Giao dịch thành công</h3>
+                <p class="text-on-surface-variant px-4" th:text="${successMessage}">Thanh toán thành công. Check-out hoàn tất!</p>
+                <p class="text-xs text-on-surface-variant mt-2" th:if="${param.paymentId}">Mã giao dịch: <span class="font-bold" th:text="${param.paymentId}"></span></p>
+            </div>
+            <div class="flex flex-col gap-3 mt-8">
+                <button class="w-full bg-secondary text-on-primary py-3 rounded-lg font-medium" onclick="window.print()">In Hóa đơn</button>
+                <a th:href="@{/}" class="w-full border border-outline-variant py-3 rounded-lg font-medium hover:bg-surface-container inline-block">Quay lại Trang chủ</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

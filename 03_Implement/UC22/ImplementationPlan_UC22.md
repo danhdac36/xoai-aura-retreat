@@ -29,9 +29,12 @@ Chia làm 2 service tách biệt để đảm bảo tính Single Responsibility:
 *   **`markPaymentAsFailed(Integer paymentId)`**:
     * Sửa Payment status thành `FAILED`.
 
-**2. `VNPayService`:**
-*   `createPaymentUrl(BigDecimal amount, Integer paymentId, String returnUrl)`: Tạo mã hash HMAC SHA512 và sinh URL VNPay.
-*   `verifySignature(Map<String, String> params)`: Xác minh IPN / Return URL.
+**2. `VNPayService` và cấu hình hệ thống:**
+*   **`application-secret.properties`**: Yêu cầu khai báo cấu hình môi trường Sandbox: `vnp_TmnCode` và `vnp_HashSecret` do VNPay cấp vào file bí mật này. Phải sử dụng `.gitignore` để tránh lộ API Key lên git. File `application.properties` sẽ dùng `spring.config.import` để nạp các biến môi trường này.
+*   **`VNPayConfig.java`**: Lớp tiện ích (Utility) độc lập, chứa thuật toán mã hóa dữ liệu `hmacSHA512` theo chuẩn VNPay, và các hàm sắp xếp mảng dữ liệu (Alphabetical Sort) để đảm bảo chữ ký tạo ra chính xác.
+*   **`VNPayService.java`**: 
+    *   `createPaymentUrl(...)`: Khởi tạo Map dữ liệu với ít nhất 12 tham số bắt buộc của hệ thống (`vnp_Version`, `vnp_Command`, `vnp_TmnCode`, `vnp_Amount`, `vnp_CreateDate`, `vnp_TxnRef`,...). Mã hóa toàn bộ chuỗi này để sinh ra trường `vnp_SecureHash` hợp lệ và nối vào cuối URL.
+    *   `verifySignature(...)`: Băm lại (Re-hash) toàn bộ chuỗi query param do IPN/Return trả về và đem so sánh với chữ ký `vnp_SecureHash` trong request để xác nhận tính toàn vẹn.
 
 ### Bước 3. Exceptions & Error Handling
 Tạo Custom Exception:
@@ -54,8 +57,14 @@ public String processPayment(@PathVariable Integer bookingId, @RequestParam Stri
             redirectAttributes.addFlashAttribute("successMessage", "Thanh toán Tiền mặt thành công!");
             return "redirect:/checkout/" + bookingId + "/success";
         } else {
-            // VNPay: Sinh URL và Redirect
-            String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+            // VNPay: Sinh URL và Redirect (Hỗ trợ Reverse Proxy / Ngrok)
+            String scheme = request.getHeader("X-Forwarded-Proto") != null ? request.getHeader("X-Forwarded-Proto") : request.getScheme();
+            String host = request.getHeader("X-Forwarded-Host") != null ? request.getHeader("X-Forwarded-Host") : request.getServerName();
+            String port = "";
+            if (request.getHeader("X-Forwarded-Host") == null && request.getServerPort() != 80 && request.getServerPort() != 443) {
+                port = ":" + request.getServerPort();
+            }
+            String baseUrl = scheme + "://" + host + port;
             String returnUrl = baseUrl + "/checkout/vnpay-return";
             String vnpayUrl = vnPayService.createPaymentUrl(payment.getAmount(), payment.getId(), returnUrl);
             return "redirect:" + vnpayUrl;

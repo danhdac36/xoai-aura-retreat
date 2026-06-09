@@ -18,12 +18,12 @@
 # CHANGELOG
 > **Policy 4.4 — Immutable History:** Không bao giờ xóa thông tin cũ. Mọi thay đổi phải ghi vào bảng này.
 
-| Ngày | Người thực hiện | Nội dung thay đổi |
-| --- | --- | --- |
-| 2026-06-08 | AI Assistant | Tạo tài liệu lần đầu cho UC22 - Process Final Payment |
-| 2026-06-09 | AI Assistant | Refactor sang kiến trúc Spring Boot MVC (Controller trả về View) |
-| 2026-06-09 | AI Assistant | Cập nhật cấu trúc Entity Payment ở phần 5.2 để khớp với mã nguồn thực tế |
-| 2026-06-09 | AI Assistant | Thiết kế lại luồng thanh toán VNPay thành quy trình 2 bước (Redirect & Callback) |
+| Ngày       | Người thực hiện | Nội dung thay đổi                                                                |
+| ------------| -----------------| ----------------------------------------------------------------------------------|
+| 2026-06-08 | AI Assistant    | Tạo tài liệu lần đầu cho UC22 - Process Final Payment                            |
+| 2026-06-09 | AI Assistant    | Refactor sang kiến trúc Spring Boot MVC (Controller trả về View)                 |
+| 2026-06-09 | AI Assistant    | Cập nhật cấu trúc Entity Payment ở phần 5.2 để khớp với mã nguồn thực tế         |
+| 2026-06-09 | AI Assistant    | Thiết kế lại luồng thanh toán VNPay thành quy trình 2 bước (Redirect & Callback) |
 
 # MỤC LỤC
 1. Tổng quan Module
@@ -85,7 +85,9 @@
 
 | Category | Requirement | Target SLA | Measurement Method | Compliance Basis |
 | --- | --- | --- | --- | --- |
-| Security | Hash Verification | Bắt buộc kiểm tra `vnp_SecureHash` | Code Review | VNPay Security Standard |
+| Security | Hash Verification | Bắt buộc mã hóa HMAC-SHA512 để sinh và kiểm tra `vnp_SecureHash` | Code Review | VNPay Security Standard |
+| Security | API Key Protection | Cấu hình `vnp_TmnCode` và `vnp_HashSecret` phải nằm trong `application-secret.properties` và bị loại trừ bởi `.gitignore`. File chính nạp qua `spring.config.import` | Code Review | OWASP Secret Management |
+| Configuration | Reverse Proxy Support | Endpoint tạo URL phải xử lý đúng `X-Forwarded-Host` và `X-Forwarded-Proto` để chạy qua Ngrok / Nginx | Integration Test | Deployment Standards |
 | Consistency | Invoice & Payment sync | 100% | Database Transaction | — |
 
 # 5. Static Modeling (Mô hình Tĩnh)
@@ -210,8 +212,20 @@ public interface ICheckoutService {
 }
 
 public interface IVNPayService {
+    /**
+     * Tạo URL thanh toán VNPay bằng cách ghép tối thiểu 12 tham số bắt buộc (vnp_Version, vnp_Command, vnp_TmnCode, vnp_Amount...)
+     * sau đó sắp xếp theo Alphabet và mã hóa HMAC-SHA512 để sinh ra vnp_SecureHash.
+     */
     String createPaymentUrl(BigDecimal amount, Integer paymentId, String returnUrl);
+    
+    /**
+     * Tách vnp_SecureHash từ request, tái mã hóa HMAC-SHA512 các tham số còn lại và so sánh.
+     */
     boolean verifySignature(Map<String, String> requestParams);
+}
+
+public class VNPayConfig {
+    // Chứa hàm hmacSHA512(String key, String data) và các util như hashAllFields(Map fields)
 }
 ```
 
@@ -236,7 +250,14 @@ public String processPayment(@PathVariable Integer bookingId, @RequestParam Stri
         checkoutService.completePaymentAndCheckout(paymentId, null);
         return "redirect:/checkout/" + bookingId + "/success";
     } else if ("VNPAY".equals(paymentMethod)) {
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        // Hỗ trợ Reverse Proxy (Ngrok / Nginx)
+        String scheme = request.getHeader("X-Forwarded-Proto") != null ? request.getHeader("X-Forwarded-Proto") : request.getScheme();
+        String host = request.getHeader("X-Forwarded-Host") != null ? request.getHeader("X-Forwarded-Host") : request.getServerName();
+        String port = "";
+        if (request.getHeader("X-Forwarded-Host") == null && request.getServerPort() != 80 && request.getServerPort() != 443) {
+            port = ":" + request.getServerPort();
+        }
+        String baseUrl = scheme + "://" + host + port;
         String returnUrl = baseUrl + "/checkout/vnpay-return";
         String vnpayUrl = vnpayService.createPaymentUrl(amount, paymentId, returnUrl);
         return "redirect:" + vnpayUrl;
