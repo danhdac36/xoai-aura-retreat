@@ -22,7 +22,7 @@ public class MealOrderController {
 
     @PutMapping("/{orderId}/status")
     public MealOrderResponse updateMealOrderStatus(
-            @PathVariable Long orderId,
+            @PathVariable Integer orderId,
             @RequestParam String status
     ) {
         return mealOrderService.updateMealOrderStatus(orderId, status);

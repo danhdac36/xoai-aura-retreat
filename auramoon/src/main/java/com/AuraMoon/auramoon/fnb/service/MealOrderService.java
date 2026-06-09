@@ -24,7 +24,7 @@ public class MealOrderService {
         return new MealOrderResponse("Meal order has been recorded successfully.", "SUCCESS");
     }
 
-    public MealOrderResponse updateMealOrderStatus(Long orderId, String status) {
+    public MealOrderResponse updateMealOrderStatus(Integer orderId, String status) {
 
         if (orderId == null) {
             return new MealOrderResponse("Meal order ID is required", "FAILED");

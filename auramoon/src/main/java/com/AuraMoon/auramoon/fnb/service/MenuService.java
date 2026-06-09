@@ -19,7 +19,7 @@ public class MenuService {
         return menuItemRepository.findAll();
     }
 
-    public MenuItem getMenuItemById(Long id) {
+    public MenuItem getMenuItemById(Integer id) {
         return menuItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Menu item not found"));
     }

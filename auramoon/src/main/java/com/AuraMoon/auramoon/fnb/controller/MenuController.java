@@ -22,7 +22,7 @@ public class MenuController {
     }
 
     @GetMapping("/{id}")
-    public MenuItem getMenuItemById(@PathVariable Long id) {
+    public MenuItem getMenuItemById(@PathVariable Integer id) {
         return menuService.getMenuItemById(id);
     }
 }
