@@ -99,7 +99,11 @@ public class CheckoutController {
 
     @GetMapping("/checkout/success")
     public String checkoutSuccess(@RequestParam Integer paymentId, Model model) {
+        Payment payment = billingService.getPaymentById(paymentId);
+        Integer bookingId = payment.getGuestFolio().getBookingId();
+
         model.addAttribute("successMessage", "Thanh toán thành công. Check-out hoàn tất!");
-        return "billing/checkout_success";
+        model.addAttribute("bookingId", bookingId);
+        return "billing/checkout/checkout_success";
     }
 }

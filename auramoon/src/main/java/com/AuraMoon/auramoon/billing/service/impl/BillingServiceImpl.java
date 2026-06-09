@@ -4,7 +4,6 @@ import com.AuraMoon.auramoon.billing.dto.CheckoutViewDTO;
 import com.AuraMoon.auramoon.billing.entity.FolioItem;
 import com.AuraMoon.auramoon.billing.entity.GuestFolio;
 import com.AuraMoon.auramoon.billing.entity.Payment;
-import com.AuraMoon.auramoon.billing.exception.PendingOrdersExistException;
 import com.AuraMoon.auramoon.billing.repository.FolioItemRepository;
 import com.AuraMoon.auramoon.billing.repository.GuestFolioRepository;
 import com.AuraMoon.auramoon.billing.repository.PaymentRepository;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,34 +57,33 @@ public class BillingServiceImpl implements BillingService {
         return CheckoutViewDTO.builder()
                 .folio(folio)
                 .payments(payments)
-                .totalPaid(totalPaid)
                 .groupedExtraServices(groupedServices)
                 .totalCost(totalCost)
+                .totalPaid(totalPaid)
                 .balanceDue(balanceDue)
                 .build();
     }
 
     @Override
     @Transactional
-    public Payment initiatePayment(Integer bookingId, String paymentMethod, String paymentGateway) {
-        CheckoutViewDTO data = getCheckoutData(bookingId);
-        GuestFolio folio = data.getFolio();
+    public Payment initiatePayment(Integer bookingId, String method, String gateway) {
+        GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new RuntimeException("Folio not found"));
 
-        // Kiểm tra BR-12: Có đơn PENDING hoặc PREPARING không
-        boolean hasPending = folioItemRepository.existsByGuestFolioIdAndStatusIn(
-                folio.getId(), Arrays.asList("PENDING", "PREPARING"));
-        
-        if (hasPending) {
-            throw new PendingOrdersExistException("Cannot checkout because there are pending Spa or F&B orders.");
+        CheckoutViewDTO data = getCheckoutData(bookingId);
+        BigDecimal amountToPay = data.getBalanceDue();
+
+        if (amountToPay.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("No balance due");
         }
 
         Payment payment = Payment.builder()
                 .guestFolio(folio)
-                .amount(data.getBalanceDue())
-                .paymentMethod(paymentMethod)
-                .paymentGateway(paymentGateway)
-                .status("PENDING")
+                .amount(amountToPay)
+                .paymentMethod(method)
+                .paymentGateway(gateway)
                 .paymentDate(LocalDateTime.now())
+                .status("PENDING")
                 .build();
 
         return paymentRepository.save(payment);
@@ -128,5 +125,17 @@ public class BillingServiceImpl implements BillingService {
         payment.setStatus("FAILED");
         payment.setPaymentDate(LocalDateTime.now());
         paymentRepository.save(payment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Payment getPaymentById(Integer paymentId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new RuntimeException("Payment not found with id: " + paymentId));
+        // Initialize lazy association
+        if (payment.getGuestFolio() != null) {
+            payment.getGuestFolio().getBookingId();
+        }
+        return payment;
     }
 }

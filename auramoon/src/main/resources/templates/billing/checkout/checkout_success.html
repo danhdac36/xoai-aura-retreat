@@ -12,6 +12,7 @@
                 <p class="text-xs text-on-surface-variant mt-2" th:if="${param.paymentId}">Mã giao dịch: <span class="font-bold" th:text="${param.paymentId}"></span></p>
             </div>
             <div class="flex flex-col gap-3 mt-8">
+                <a th:href="@{/review(bookingId=${bookingId})}" class="w-full bg-primary text-on-primary py-3 rounded-lg font-medium hover:bg-primary-container hover:text-on-primary-container inline-block">Đánh giá trải nghiệm của bạn</a>
                 <button class="w-full bg-secondary text-on-primary py-3 rounded-lg font-medium" onclick="window.print()">In Hóa đơn</button>
                 <a th:href="@{/}" class="w-full border border-outline-variant py-3 rounded-lg font-medium hover:bg-surface-container inline-block">Quay lại Trang chủ</a>
             </div>

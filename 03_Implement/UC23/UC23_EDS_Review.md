@@ -92,6 +92,36 @@
 **Tiêu cực / Trade-offs:**
 * Tăng thêm 1 query kiểm tra (SELECT COUNT) trước khi INSERT. Tuy nhiên impact lên hiệu năng là không đáng kể do bảng Review ít bị read lock.
 
+## ADR-003 — Luồng chuyển hướng từ Thanh toán sang Đánh giá (Navigation Flow)
+
+| Field | Value |
+| --- | --- |
+| **Status** | Accepted |
+| **Deciders** | `User (Product Owner) & System Architect` |
+| **Date** | `2026-06-09` |
+
+**Bối cảnh (Context)**
+> Sau khi thanh toán và check-out thành công, hệ thống cần đưa khách hàng đến màn hình đánh giá trải nghiệm. Cần quyết định phương thức điều hướng hợp lý nhất.
+
+**Các phương án đã xem xét (Options Considered)**
+
+| Phương án | Mô tả | Ưu điểm | Nhược điểm |
+| --- | --- | --- | --- |
+| A (Nút Đánh giá) | Đặt nút "Đánh giá ngay" trên trang Checkout Success | + Rõ ràng, cho phép khách tự quyết định thời điểm đánh giá. Phù hợp cho việc test UI. | - Khách có thể bỏ qua không bấm. |
+| B (Auto-Redirect) | Tự động chuyển trang sang Review sau 5 giây | + Ép buộc khách nhìn thấy form | - Có thể gây phiền toái nếu khách đang vội |
+| C (Email) | Chỉ gửi link đánh giá qua Email | + Chuyên nghiệp, thực tế nhất | - Khó test end-to-end ngay trên giao diện |
+
+**Quyết định (Decision)**
+> Chọn **Phương án A (Nút Đánh giá)**. Sửa đổi màn hình `checkout_success.html` của UC22 để gắn thêm nút bấm điều hướng sang `GET /review?bookingId=X`.
+
+**Hệ quả (Consequences)**
+
+**Tích cực:**
+* Dễ dàng test end-to-end trên trình duyệt. Trải nghiệm người dùng không bị gián đoạn.
+
+**Tiêu cực / Trade-offs:**
+* Đòi hỏi sửa đổi file `CheckoutController.java` để fetch `bookingId` từ `paymentId`.
+
 # 4. Non-Functional Requirements & SLA
 
 ## 4.1. Performance & Availability
