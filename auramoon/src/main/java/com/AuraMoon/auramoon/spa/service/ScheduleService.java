@@ -1,9 +1,11 @@
 package com.AuraMoon.auramoon.spa.service;
 
+import com.AuraMoon.auramoon.spa.dto.ScheduleDto;
 import com.AuraMoon.auramoon.spa.entity.Schedule;
 import com.AuraMoon.auramoon.spa.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,14 +18,28 @@ public class ScheduleService {
     @Autowired
     private ScheduleRepository scheduleRepository;
 
-    public List<Schedule> getScheduleForTherapist(String therapistCode, LocalDate date) {
-        // 1. Biến đổi ngày (LocalDate) thành mốc bắt đầu ngày lúc 00:00:00
+    public List<ScheduleDto> getScheduleForTherapist(String therapistCode, LocalDate date) {
         LocalDateTime startOfDay = date.atStartOfDay();
-
-        // 2. Biến đổi ngày (LocalDate) thành mốc kết thúc ngày lúc 23:59:59.999999999
         LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 
-        // 3. Gọi xuống tầng Repository để truy vấn DB
-        return scheduleRepository.findByTherapist_TherapistCodeAndStartTimeBetween(therapistCode, startOfDay, endOfDay);
+        return scheduleRepository.findScheduleDtoForTherapist(therapistCode, startOfDay, endOfDay);
+    }
+
+    @Transactional
+    public void updateScheduleStatus(Integer scheduleId, String newStatus) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
+        if (schedule != null && schedule.getTreatmentBooking() != null) {
+            schedule.getTreatmentBooking().setStatus(newStatus);
+            scheduleRepository.save(schedule);
+        }
+    }
+
+    @Transactional
+    public void updateScheduleNote(Integer scheduleId, String note) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
+        if (schedule != null && schedule.getTreatmentBooking() != null) {
+            schedule.getTreatmentBooking().setNote(note);
+            scheduleRepository.save(schedule);
+        }
     }
 }

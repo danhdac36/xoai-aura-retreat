@@ -1,10 +1,11 @@
 package com.AuraMoon.auramoon.spa.controller;
 
-import com.AuraMoon.auramoon.spa.entity.Schedule;
+import com.AuraMoon.auramoon.spa.dto.ScheduleDto;
 import com.AuraMoon.auramoon.spa.service.ScheduleService;
+import com.AuraMoon.auramoon.spa.repository.TherapistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller; // Chú ý: Dùng Controller, không dùng RestController
-import org.springframework.ui.Model; // Dùng Model của Spring UI
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -17,29 +18,46 @@ public class ScheduleController {
     @Autowired
     private ScheduleService scheduleService;
 
+    @Autowired
+    private TherapistRepository therapistRepository;
+
     @GetMapping("/{code}/schedules")
     public String getDailySchedule(
             @PathVariable("code") String therapistCode,
             @RequestParam(value = "date", required = false) LocalDate date,
             Model model) {
 
-        // Nếu người dùng không chọn ngày, mặc định lấy ngày hôm nay
         if (date == null) {
             date = LocalDate.now();
         }
 
-        // 1. Lấy dữ liệu từ Service
-        List<Schedule> schedules = scheduleService.getScheduleForTherapist(therapistCode, date);
+        // Gọi List DTO thay vì Entity
+        List<ScheduleDto> schedules = scheduleService.getScheduleForTherapist(therapistCode, date);
 
-        // 2. Ném dữ liệu vào Model để gửi sang file HTML (Thymeleaf/JSP)
+        // Lấy tên chuyên viên
+        String therapistName = therapistRepository.findTherapistNameByCode(therapistCode);
+        model.addAttribute("therapistName", therapistName != null ? therapistName : "Không xác định");
+
         model.addAttribute("schedules", schedules);
         model.addAttribute("therapistCode", therapistCode);
         model.addAttribute("selectedDate", date);
         model.addAttribute("previousDate", date.minusDays(1));
         model.addAttribute("nextDate", date.plusDays(1));
 
-        // 3. Trả về tên của file HTML giao diện (nằm trong thư mục
-        // src/main/resources/templates/spa/)
         return "therapist_schedule";
+    }
+
+    // API xử lý khi người dùng đổi trạng thái trên giao diện
+    @PostMapping("/{code}/schedules/{scheduleId}/status")
+    public String updateStatus(
+            @PathVariable("code") String therapistCode,
+            @PathVariable("scheduleId") Integer scheduleId,
+            @RequestParam("status") String status,
+            @RequestParam("date") String date) {
+
+        scheduleService.updateScheduleStatus(scheduleId, status);
+
+        // Đổi xong thì load lại trang và giữ nguyên ngày đang xem
+        return "redirect:/spa/therapists/" + therapistCode + "/schedules?date=" + date;
     }
 }
