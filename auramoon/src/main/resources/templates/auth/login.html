@@ -152,13 +152,15 @@
                 <h1 class="font-headline-lg text-headline-lg text-on-surface mb-stack-sm">Chào mừng trở lại</h1>
                 <p class="font-body-md text-on-surface-variant">Đăng nhập để tiếp tục hành trình tỉnh thức của bạn.</p>
             </div>
-            <form class="space-y-stack-lg" onsubmit="event.preventDefault();">
+
+            <form class="space-y-stack-lg"
+                  method="post" th:action="@{/auth}">
                 <!-- Email Field -->
                 <div class="space-y-stack-sm">
                     <label class="font-label-md text-label-md text-on-surface-variant uppercase"
                            for="email">Email</label>
                     <input class="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors px-0 py-3 input-minimal font-body-md text-on-surface placeholder-outline-variant"
-                           id="email" placeholder="email@example.com" type="email">
+                           id="email" name="email" placeholder="email@example.com" required type="email">
                 </div>
                 <!-- Password Field -->
                 <div class="space-y-stack-sm">
@@ -169,7 +171,7 @@
                            href="#">Quên mật khẩu?</a>
                     </div>
                     <input class="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-secondary transition-colors px-0 py-3 input-minimal font-body-md text-on-surface placeholder-outline-variant"
-                           id="password" placeholder="••••••••" type="password">
+                           id="password" name="password" placeholder="••••••••" required type="password">
                 </div>
                 <!-- Main Login Button -->
                 <button class="w-full bg-secondary text-surface-white py-4 font-label-md text-label-md rounded-lg shadow-sm hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-stack-sm"
@@ -178,6 +180,10 @@
                     <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
                 </button>
             </form>
+            <!--            Notification sign in successfull-->
+            <div>
+                <p class="text-red-500" th:if="${error}" th:text="${error}"></p>
+            </div>
             <!-- Divider -->
             <div class="relative flex items-center my-stack-lg">
                 <div class="flex-grow border-t border-outline-variant/30"></div>
@@ -206,7 +212,7 @@
                 <p class="font-body-md text-on-surface-variant">
                     Chưa có tài khoản?
                     <a class="text-secondary font-label-md text-label-md hover:underline underline-offset-4 ml-1"
-                       href="#">Đăng ký ngay</a>
+                       href="/register">Đăng ký ngay</a> <!--LINK TO REGISTRATION PAGE-->->
                 </p>
             </div>
         </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="light" lang="vi" style="" xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -178,7 +178,7 @@
     </section>
     <!-- Right Side: Registration Form -->
     <section class="form-panel bg-surface-bright">
-        <div class="w-full max-w-[440px]">
+        <div class="w-full max-w-[440px]" style="margin-top: 100px">
             <!-- Header -->
             <div class="mb-stack-lg text-center md:text-left">
                 <h1 class="font-headline-lg text-headline-lg text-primary mb-stack-sm leading-tight">&nbsp; &nbsp;
@@ -187,21 +187,25 @@
                     Tham gia cộng đồng Xoai Aura để trải nghiệm sự cân bằng tuyệt đối.
                 </p>
             </div>
+            <!-- Error Message -->
+            <div th:if="${error}" class="mb-4 px-4 py-3 bg-error-container text-on-error-container rounded-lg text-body-md" th:text="${error}"></div>
+
             <!-- Registration Form -->
-            <form class="space-y-stack-lg">
+            <form class="space-y-stack-lg"
+            th:action="@{/register}" method="post" th:object="${registerDto}">
                 <!-- Full Name -->
                 <div class="flex flex-col gap-2">
                     <label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest"
                            for="full-name">Họ và tên</label>
                     <input class="luxury-input py-3 px-1 text-body-md text-on-surface" id="full-name"
-                           placeholder="Nguyễn Văn A" type="text">
+                           placeholder="Nguyễn Văn A" type="text" th:field="*{fullName}">
                 </div>
                 <!-- Email -->
                 <div class="flex flex-col gap-2">
                     <label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest"
                            for="email">Email</label>
                     <input class="luxury-input py-3 px-1 text-body-md text-on-surface" id="email"
-                           placeholder="example@xoai-aura.com" type="email">
+                           placeholder="example@xoai-aura.com" type="email" th:field="*{email}">
                 </div>
                 <!-- Password -->
                 <div class="flex flex-col gap-2 relative">
@@ -209,7 +213,7 @@
                            for="password">Mật khẩu</label>
                     <div class="relative">
                         <input class="luxury-input w-full py-3 px-1 text-body-md text-on-surface pr-10" id="password"
-                               placeholder="••••••••" type="password">
+                               placeholder="••••••••" type="password" th:field="*{password}">
                         <button class="absolute right-1 bottom-3 text-on-surface-variant" type="button">
                             <span class="material-symbols-outlined text-[20px]">visibility_off</span>
                         </button>
@@ -221,7 +225,7 @@
                            for="confirm-password">Xác nhận mật khẩu</label>
                     <div class="relative">
                         <input class="luxury-input w-full py-3 px-1 text-body-md text-on-surface pr-10"
-                               id="confirm-password" placeholder="••••••••" type="password">
+                               id="confirm-password" placeholder="••••••••" type="password" th:field="*{confirmPassword}">
                     </div>
                 </div>
                 <!-- Submit Button -->
@@ -237,7 +241,7 @@
                 <p class="font-body-md text-on-surface-variant">
                     Đã có tài khoản?
                     <a class="text-secondary font-semibold underline underline-offset-4 ml-1 hover:text-on-secondary-container transition-colors"
-                       href="#">
+                       th:href="@{/login}">
                         Đăng nhập ngay
                     </a>
                 </p>
