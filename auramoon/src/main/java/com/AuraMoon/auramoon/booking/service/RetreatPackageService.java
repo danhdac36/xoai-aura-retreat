@@ -6,6 +6,10 @@ import java.util.List;
 
 public interface RetreatPackageService {
     List<RetreatPackageDTO> getAllActivePackages();
+
     List<RetreatPackageDTO> getPackagesByType(String typePackage);
+
     List<String> getAllActivePackageTypes();
+
+    List<RetreatPackageDTO> searchPackages(String typePackage, Integer durationDays, String priceRange);
 }

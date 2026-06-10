@@ -19,18 +19,24 @@ public class RetreatPackageController {
     private final RetreatPackageService retreatPackageService;
 
     @GetMapping
-    public String listPackages(@RequestParam(value = "type", required = false) String type, Model model) {
-        List<RetreatPackageDTO> packages;
-        if (type != null && !type.trim().isEmpty()) {
-            packages = retreatPackageService.getPackagesByType(type);
-            model.addAttribute("selectedType", type);
-        } else {
-            packages = retreatPackageService.getAllActivePackages();
-            model.addAttribute("selectedType", "All");
-        }
+    public String listPackages(
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "durationDays", required = false) Integer durationDays,
+            @RequestParam(value = "priceRange", required = false) String priceRange,
+            Model model) {
+
+        List<RetreatPackageDTO> packages = retreatPackageService.searchPackages(
+                type,
+                durationDays,
+                priceRange);
 
         model.addAttribute("packages", packages);
         model.addAttribute("types", retreatPackageService.getAllActivePackageTypes());
+
+        model.addAttribute("selectedType", type == null || type.trim().isEmpty() ? "All" : type);
+        model.addAttribute("selectedDurationDays", durationDays);
+        model.addAttribute("selectedPriceRange", priceRange);
+
         return "booking/packages";
     }
 }

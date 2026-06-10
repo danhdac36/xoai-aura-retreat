@@ -1,436 +1,343 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xoài Aura Retreat - Gói Trị Liệu</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Retreat Package Booking | Xoai Aura Retreat</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@300;400;500;600&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
     <style>
-        /* Modern CSS Reset & Variables */
-        :root {
-            --primary: #c5a880; /* Soft Warm Gold */
-            --primary-dark: #b39366;
-            --bg-dark: #0f171e; /* Deep luxurious dark slate */
-            --bg-card: rgba(30, 41, 51, 0.45); /* Glass card */
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border: rgba(197, 168, 128, 0.2);
-            --border-hover: rgba(197, 168, 128, 0.5);
-            --gradient: linear-gradient(135deg, #0f171e 0%, #1e2933 100%);
-            --accent: #5ddcff;
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-dark);
-            background-image: var(--gradient);
-            color: var(--text-main);
-            min-height: 100vh;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, .font-display {
-            font-family: 'Outfit', sans-serif;
-        }
-
-        /* Container & Layout */
-        .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Header Section */
-        header {
-            text-align: center;
-            margin-bottom: 3.5rem;
-            position: relative;
-        }
-
-        header::after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 3px;
-            background: var(--primary);
-            margin: 1.5rem auto 0;
-            border-radius: 2px;
-            box-shadow: 0 0 10px rgba(197, 168, 128, 0.5);
-        }
-
-        header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(to right, #f3f4f6, var(--primary), #f3f4f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-        }
-
-        header p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            font-weight: 300;
-        }
-
-        /* Main Section: Sidebar + Grid */
-        .main-content {
+        .calendar-grid {
             display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 2.5rem;
+            grid-template-columns: repeat(7, 1fr);
         }
 
-        /* Sidebar Filter */
-        .sidebar {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 1.8rem;
-            height: fit-content;
-            position: sticky;
-            top: 2rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
         }
 
-        .sidebar h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-        }
-
-        .filter-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .filter-item a {
-            display: block;
-            padding: 0.8rem 1rem;
-            border-radius: 10px;
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid transparent;
-        }
-
-        .filter-item a:hover {
-            background: rgba(197, 168, 128, 0.1);
-            color: var(--primary);
-            padding-left: 1.25rem;
-        }
-
-        .filter-item.active a {
-            background: var(--primary);
-            color: var(--bg-dark);
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(197, 168, 128, 0.3);
-        }
-
-        /* Package Grid */
-        .package-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-        }
-
-        /* Package Card with Glassmorphism */
-        .package-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-            position: relative;
-        }
-
-        .package-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--border-hover);
-            box-shadow: 0 12px 40px 0 rgba(197, 168, 128, 0.15);
-        }
-
-        .card-header {
-            padding: 1.8rem;
-            border-bottom: 1px solid var(--border);
-            position: relative;
-        }
-
-        .goal-tag {
-            display: inline-block;
-            background: rgba(197, 168, 128, 0.15);
-            color: var(--primary);
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            padding: 0.3rem 0.8rem;
-            border-radius: 30px;
-            margin-bottom: 1rem;
-            border: 1px solid var(--border);
-            letter-spacing: 0.05em;
-        }
-
-        .package-name {
-            font-size: 1.6rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #ffffff;
-            line-height: 1.25;
-        }
-
-        .duration-badge {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .card-body {
-            padding: 1.8rem;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .description {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            font-weight: 300;
-            min-height: 4.5rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .services-included {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .services-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .service-list {
-            list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .service-tag {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            font-size: 0.8rem;
-            color: var(--text-main);
-            padding: 0.25rem 0.6rem;
-            border-radius: 6px;
-        }
-
-        .card-footer {
-            padding: 1.8rem;
-            border-top: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .price-section {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .price-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 0.05em;
-        }
-
-        .price-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        /* Premium Button */
-        .btn-book {
-            background: var(--primary);
-            color: var(--bg-dark);
-            border: none;
-            padding: 0.8rem 1.5rem;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-decoration: none;
-            box-shadow: 0 4px 15px rgba(197, 168, 128, 0.2);
-        }
-
-        .btn-book:hover {
-            background: #ffffff;
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
-        }
-
-        /* Empty State */
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 5rem 2rem;
-            background: var(--bg-card);
-            border: 1px dashed var(--border);
-            border-radius: 16px;
-            backdrop-filter: blur(12px);
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-state p {
-            color: var(--text-muted);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                position: static;
-                width: 100%;
-            }
-            .filter-list {
-                flex-direction: row;
-                flex-wrap: wrap;
-            }
-        }
-
-        @media (max-width: 640px) {
-            header h1 {
-                font-size: 2.2rem;
-            }
-            .app-container {
-                padding: 1rem;
-            }
-            .card-footer {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-                text-align: center;
-            }
-            .btn-book {
-                width: 100%;
-            }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#284f2a",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#f5f2ed",
+                        "on-surface": "#1b1c1c",
+                        "surface-variant": "#e4e2e1",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-dim": "#dcd9d9",
+                        "outline": "#787770",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#002106",
+                        "on-background": "#1b1c1c",
+                        "primary-fixed": "#e5e2dd",
+                        "on-secondary-fixed": "#141f05",
+                        "secondary-fixed-dim": "#becca3",
+                        "primary": "#5f5e5b",
+                        "on-primary-container": "#6f6e6a",
+                        "surface-container-high": "#eae8e7",
+                        "secondary": "#566342",
+                        "on-surface-variant": "#474741",
+                        "tertiary-fixed": "#c1eebc",
+                        "surface-tint": "#5f5e5b",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#474743",
+                        "surface": "#fbf9f8",
+                        "primary-fixed-dim": "#c9c6c2",
+                        "tertiary-container": "#d1ffcb",
+                        "on-secondary-container": "#5a6745",
+                        "tertiary-fixed-dim": "#a5d2a2",
+                        "background": "#fbf9f8",
+                        "on-tertiary-container": "#4f784f",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#dae8be",
+                        "surface-container-highest": "#e4e2e1",
+                        "surface-container": "#f0eded",
+                        "on-secondary-fixed-variant": "#3f4b2c",
+                        "on-primary-fixed": "#1c1c19",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#c8c7be",
+                        "inverse-on-surface": "#f3f0f0",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fbf9f8",
+                        "secondary-container": "#d7e5bb",
+                        "inverse-surface": "#303030",
+                        "tertiary": "#406840",
+                        "inverse-primary": "#c9c6c2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "section-gap": "120px",
+                        "margin-desktop": "80px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Playfair Display"],
+                        "headline-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Playfair Display"],
+                        "headline-sm": ["Playfair Display"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["40px", { "lineHeight": "48px", "fontWeight": "400" }],
+                        "headline-lg": ["40px", { "lineHeight": "48px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "display-lg": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-sm": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
 </head>
-<body>
 
-    <div class="app-container">
-        <!-- Header -->
-        <header>
-            <h1 class="font-display">Xoài Aura Retreat</h1>
-            <p>Khám phá các gói trị liệu chăm sóc sức khỏe toàn diện thiết kế riêng cho bạn</p>
-        </header>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+    <!-- Top Navigation Bar -->
+    <header
+        class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-desktop py-stack-md bg-surface/90 backdrop-blur-md">
+        <div class="font-headline-sm text-headline-sm text-secondary italic">Xoai Aura Retreat</div>
+        <nav class="hidden md:flex items-center gap-stack-lg"><a
+                class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-300"
+                href="#">Hành trình</a><a
+                class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-300"
+                href="#">Spa</a><a
+                class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-300"
+                href="#">Ẩm thực</a></nav>
+        <button
+            class="bg-secondary text-on-secondary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-80 transition-opacity active:scale-95 duration-200">Đặt
+            ngay</button>
+    </header>
+    <main class="pt-32 pb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
+        <!-- Search & Filter Bar -->
+        <section class="mb-16">
+            <h1 class="font-headline-lg text-headline-lg mb-8 text-on-surface">
+                Danh Sách Gói Retreat
+            </h1>
 
-        <!-- Main Workspace -->
-        <div class="main-content">
-            <!-- Sidebar Filters -->
-            <aside class="sidebar">
-                <h3>Mục tiêu sức khỏe</h3>
-                <ul class="filter-list">
-                    <li class="filter-item" th:classappend="${selectedType == 'All'} ? 'active' : ''">
-                        <a th:href="@{/packages}">Tất cả gói</a>
-                    </li>
-                    <li class="filter-item" th:each="type : ${types}" th:classappend="${selectedType == type} ? 'active' : ''">
-                        <a th:href="@{/packages(type=${type})}" th:text="${type}">Type</a>
-                    </li>
-                </ul>
-            </aside>
+            <form th:action="@{/packages}" method="get">
 
-            <!-- Packages Grid -->
-            <main class="package-grid">
-                <!-- If packages list is empty -->
-                <div class="empty-state" th:if="${packages == null || #lists.isEmpty(packages)}">
-                    <h3>Không tìm thấy gói trị liệu nào</h3>
-                    <p>Vui lòng chọn mục tiêu sức khỏe khác hoặc quay lại sau.</p>
+                <div
+                    class="grid grid-cols-1 md:grid-cols-4 gap-gutter bg-surface-container-lowest p-6 border border-outline-variant rounded shadow-sm">
+
+                    <div class="flex flex-col gap-2">
+                        <label class="font-label-md text-label-md text-on-surface-variant">
+                            Thời gian
+                        </label>
+
+                        <select name="durationDays"
+                            class="bg-transparent border-b-2 border-secondary py-2 border-t-0 border-x-0 outline-none">
+
+                            <option value="">Tất cả</option>
+                            <option value="3" th:selected="${selectedDurationDays == 3}">3 ngày</option>
+                            <option value="5" th:selected="${selectedDurationDays == 5}">5 ngày</option>
+                            <option value="7" th:selected="${selectedDurationDays == 7}">7 ngày</option>
+
+                        </select>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+
+                        <label class="font-label-md text-label-md text-on-surface-variant">
+                            Loại Retreat
+                        </label>
+
+                        <select name="type"
+                            class="bg-transparent border-b-2 border-secondary py-2 border-t-0 border-x-0 outline-none">
+
+                            <option value="" th:selected="${selectedType == 'All'}">Tất cả</option>
+
+                            <option th:each="type : ${types}" th:value="${type}" th:text="${type}"
+                                th:selected="${type == selectedType}">
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label class="font-label-md text-label-md text-on-surface-variant">
+                            Mức giá
+                        </label>
+
+                        <select name="priceRange"
+                            class="bg-transparent border-b-2 border-secondary py-2 border-t-0 border-x-0 outline-none">
+
+                            <option value="">Tất cả</option>
+                            <option value="UNDER_40" th:selected="${selectedPriceRange == 'UNDER_40'}">Dưới 40.000.000đ
+                            </option>
+                            <option value="FROM_40_TO_80" th:selected="${selectedPriceRange == 'FROM_40_TO_80'}">
+                                40.000.000đ - 80.000.000đ</option>
+                            <option value="OVER_80" th:selected="${selectedPriceRange == 'OVER_80'}">Trên 80.000.000đ
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div class="flex items-end">
+
+                        <button type="submit"
+                            class="w-full bg-secondary text-on-secondary h-12 rounded font-label-md text-label-md uppercase tracking-wider hover:opacity-90 transition-opacity">
+
+                            Tìm kiếm
+
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <!-- Loop through packages -->
-                <div class="package-card" th:each="pkg : ${packages}">
-                    <div class="card-header">
-                        <span class="goal-tag" th:text="${pkg.typePackage}">Detox</span>
-                        <h2 class="package-name" th:text="${pkg.packageName}">Detox Journey</h2>
-                        <div class="duration-badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle;">
-                                <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                            </svg>
-                            <span th:text="${pkg.durationDays} + ' ngày ' + (${pkg.durationDays} - 1) + ' đêm'">3 ngày 2 đêm</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <p class="description" th:text="${pkg.description}">Mô tả chi tiết về liệu trình chăm sóc...</p>
-                        
-                        <div class="services-included" th:if="${pkg.services != null && !#strings.isEmpty(pkg.services)}">
-                            <h4 class="services-title">Dịch vụ bao gồm</h4>
-                            <ul class="service-list">
-                                <!-- Thymeleaf code to parse comma-separated services -->
-                                <li class="service-tag" th:each="service : ${#strings.arraySplit(pkg.services, ',')}" th:text="${#strings.trim(service)}">Spa</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="price-section">
-                            <span class="price-label">Giá trọn gói</span>
-                            <span class="price-value" th:text="${#numbers.formatDecimal(pkg.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">10,000,000 VNĐ</span>
-                        </div>
-                        <a th:href="@{/bookings/new(packageId=${pkg.id})}" class="btn-book">Đặt ngay</a>
-                    </div>
+            </form>
+
+        </section>
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+
+            <article th:each="pkg : ${packages}" class="bg-surface-container-lowest overflow-hidden group">
+
+                <div class="relative h-80 overflow-hidden">
+
+                    <img th:src="${pkg.typePackage == 'Stress Relief'} ? @{/img/stress-relief.jpg} :
+             (${pkg.typePackage == 'Weight Loss'} ? @{/img/detox-retreat.jpg} :
+             (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
+             @{/img/spa-retreat.jpg}))" alt="Retreat Package"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+
+                    <div class="absolute inset-0 bg-secondary/10"></div>
+
                 </div>
-            </main>
+
+                <div class="p-8 border border-t-0 border-outline-variant">
+
+                    <h2 class="font-headline-sm text-headline-sm mb-4" th:text="${pkg.packageName}">
+                    </h2>
+
+                    <div class="mb-3 text-secondary">
+
+                        <span th:text="${pkg.durationDays}">
+                        </span>
+
+                        ngày
+
+                    </div>
+
+                    <p class="font-body-md text-body-md text-on-surface-variant mb-4 leading-relaxed"
+                        th:text="${pkg.description}">
+                    </p>
+
+                    <div class="mb-5">
+
+                        <div class="font-semibold mb-2">
+                            Dịch vụ bao gồm
+                        </div>
+
+                        <p class="text-sm text-on-surface-variant" th:text="${pkg.services}">
+                        </p>
+
+                    </div>
+
+                    <div class="flex justify-between items-end">
+
+                        <div>
+
+                            <span class="font-label-md text-label-md text-on-surface-variant block uppercase">
+                                Giá từ
+                            </span>
+
+                            <span class="font-headline-sm text-headline-sm text-secondary"
+                                th:text="${#numbers.formatDecimal(pkg.price,0,'COMMA',0,'POINT')} + ' đ'">
+                            </span>
+
+                        </div>
+
+                        <a th:href="@{/packages/{id}(id=${pkg.id})}"
+                            class="px-6 py-3 border border-secondary text-secondary font-label-md hover:bg-secondary hover:text-on-secondary transition-all duration-300">
+
+                            Xem chi tiết
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </section>
+        <div th:if="${#lists.isEmpty(packages)}" class="text-center py-20">
+
+            <h2 class="text-2xl text-secondary">
+                Không tìm thấy gói retreat phù hợp
+            </h2>
+
         </div>
-    </div>
+    </main>
+    <!-- Booking Modal -->
+    <!-- Footer -->
+    <footer
+        class="w-full px-margin-desktop py-section-gap flex flex-col md:flex-row justify-between items-start gap-gutter bg-surface-container-low border-t border-outline-variant">
+        <div class="space-y-4">
+            <div class="font-headline-sm text-headline-sm text-secondary">Xoai Aura Retreat</div>
+            <p class="font-body-md text-body-md text-on-surface-variant max-w-xs">Nơi trú ẩn cho tâm hồn, sự kết hợp
+                giữa di sản Việt Nam và sự sang trọng hiện đại.</p>
+        </div>
+        <div class="flex flex-col md:flex-row gap-stack-lg">
+            <div class="flex flex-col gap-2">
+                <span class="font-label-md text-label-md text-secondary uppercase mb-2">Khám phá</span>
+                <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-4"
+                    href="#">Hành trình</a>
+                <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-4"
+                    href="#">Bền vững</a>
+            </div>
+            <div class="flex flex-col gap-2">
+                <span class="font-label-md text-label-md text-secondary uppercase mb-2">Pháp lý</span>
+                <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-4"
+                    href="#">Chính sách Bảo mật</a>
+                <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-4"
+                    href="#">Cổng thông tin nhân viên</a>
+            </div>
+        </div>
+        <div class="text-on-surface-variant font-body-md text-sm md:self-end">© 2024 Xoai Aura Retreat. Tuân thủ Quy
+            định Bảo vệ Dữ liệu Việt Nam.</div>
+    </footer>
+
+
 
 </body>
+
 </html>

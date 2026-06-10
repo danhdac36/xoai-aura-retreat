@@ -48,4 +48,12 @@ public class RetreatPackageServiceImpl implements RetreatPackageService {
                 .price(retreatPackage.getPrice())
                 .build();
     }
+
+    @Override
+    public List<RetreatPackageDTO> searchPackages(String typePackage, Integer durationDays, String priceRange) {
+        return retreatPackageRepository.searchPackages(typePackage, durationDays, priceRange)
+                .stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
 }
