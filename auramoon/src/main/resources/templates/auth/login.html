@@ -183,6 +183,7 @@
             <!--            Notification sign in successfull-->
             <div>
                 <p class="text-red-500" th:if="${error}" th:text="${error}"></p>
+                <p class="text-green-600" th:if="${param.logout}">Bạn đã đăng xuất thành công.</p>
             </div>
             <!-- Divider -->
             <div class="relative flex items-center my-stack-lg">
