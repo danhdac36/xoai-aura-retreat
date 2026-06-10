@@ -22,7 +22,7 @@ public class ScheduleController {
             @PathVariable("code") String therapistCode,
             @RequestParam(value = "date", required = false) LocalDate date,
             Model model) {
-        
+
         // Nếu người dùng không chọn ngày, mặc định lấy ngày hôm nay
         if (date == null) {
             date = LocalDate.now();
@@ -30,13 +30,16 @@ public class ScheduleController {
 
         // 1. Lấy dữ liệu từ Service
         List<Schedule> schedules = scheduleService.getScheduleForTherapist(therapistCode, date);
-        
+
         // 2. Ném dữ liệu vào Model để gửi sang file HTML (Thymeleaf/JSP)
         model.addAttribute("schedules", schedules);
         model.addAttribute("therapistCode", therapistCode);
         model.addAttribute("selectedDate", date);
-        
-        // 3. Trả về tên của file HTML giao diện (nằm trong thư mục src/main/resources/templates/spa/)
+        model.addAttribute("previousDate", date.minusDays(1));
+        model.addAttribute("nextDate", date.plusDays(1));
+
+        // 3. Trả về tên của file HTML giao diện (nằm trong thư mục
+        // src/main/resources/templates/spa/)
         return "therapist_schedule";
     }
 }

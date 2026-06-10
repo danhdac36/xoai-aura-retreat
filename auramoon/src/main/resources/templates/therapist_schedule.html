@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Lịch Làm Việc Chuyên Viên</title>
 </head>
+
 <body>
     <h2>Lịch trình của chuyên viên: <span th:text="${therapistCode}">T001</span></h2>
-    <p>Ngày: <span th:text="${selectedDate}">2026-06-08</span></p>
-
-    <hr> <h3>Danh sách các ca trị liệu:</h3>
+    <div style="margin-bottom: 20px;">
+        <a th:href="@{/spa/therapists/{code}/schedules(code=${therapistCode}, date=${previousDate})}">&laquo; Ngày trước</a>
+        
+        <form th:action="@{/spa/therapists/{code}/schedules(code=${therapistCode})}" method="get" style="display:inline; margin: 0 15px;">
+            <label for="datePicker">Chọn ngày:</label>
+            <input type="date" id="datePicker" name="date" th:value="${selectedDate}" onchange="this.form.submit()" />
+        </form>
+        
+        <a th:href="@{/spa/therapists/{code}/schedules(code=${therapistCode}, date=${nextDate})}">Ngày sau &raquo;</a>
+    </div>
+    <hr>
+    <h3>Danh sách các ca trị liệu:</h3>
     <table border="1" cellpadding="10">
         <thead>
             <tr>
@@ -24,16 +35,21 @@
                 <td th:text="${schedule.startTime}"></td>
                 <td th:text="${schedule.endTime}"></td>
                 <td>
-                    <b th:if="${#strings.equalsIgnoreCase(schedule.treatmentBooking.status, 'COMPLETED')}" style="color: green;">Hoàn thành</b> 
-                    <b th:if="${#strings.equalsIgnoreCase(schedule.treatmentBooking.status, 'SCHEDULED')}" style="color: blue;">Đang chờ</b>
-                    <b th:if="${#strings.equalsIgnoreCase(schedule.treatmentBooking.status, 'NO_SHOW')}" style="color: red;">Vắng mặt</b>
+                    <b th:if="${#strings.equalsIgnoreCase(schedule.treatmentBooking.status, 'COMPLETED')}"
+                        style="color: green;">Hoàn thành</b>
+                    <b th:if="${#strings.equalsIgnoreCase(schedule.treatmentBooking.status, 'SCHEDULED')}"
+                        style="color: blue;">Đang chờ</b>
+                    <b th:if="${#strings.equalsIgnoreCase(schedule.treatmentBooking.status, 'NO_SHOW')}"
+                        style="color: red;">Vắng mặt</b>
                     <i th:if="${schedule.treatmentBooking.status == null}">Chưa cập nhật</i>
+                </td>
             </tr>
-            
+
             <tr th:if="${#lists.isEmpty(schedules)}">
                 <td colspan="4" style="text-align: center;">Hôm nay bạn không có lịch làm việc nào!</td>
             </tr>
         </tbody>
     </table>
 </body>
+
 </html>
