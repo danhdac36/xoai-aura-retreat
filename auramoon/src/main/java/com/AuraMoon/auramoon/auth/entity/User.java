@@ -10,17 +10,21 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "[USER]")
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@AttributeOverride(name = "updatedAt", column = @Column(name = "last_update"))
-public class User extends BaseEntity {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Integer id;
+
+    @Column(name = "created_at", updatable = false)
+    private java.time.LocalDateTime createdAt;
+
+    @Column(name = "last_update")
+    private java.time.LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)

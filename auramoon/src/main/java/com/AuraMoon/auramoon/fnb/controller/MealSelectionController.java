@@ -19,7 +19,7 @@ public class MealSelectionController {
     }
 
     @GetMapping("/menu")
-    public List<MenuItem> getFilteredMenu(@RequestParam Integer guestId) {
+    public List<com.AuraMoon.auramoon.fnb.dto.MenuItemResponse> getFilteredMenu(@RequestParam Integer guestId) {
         return mealSelectionService.getFilteredMenuForGuest(guestId);
     }
 

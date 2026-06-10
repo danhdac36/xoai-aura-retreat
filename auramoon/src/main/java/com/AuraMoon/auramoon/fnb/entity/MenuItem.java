@@ -24,7 +24,7 @@ public class MenuItem extends BaseEntity {
     @Column(name = "menu_item_id")
     private Integer id;
 
-    @Column(name = "item_name", nullable = false, length = 20)
+    @Column(name = "item_name", nullable = false, length = 100)
     private String itemName;
 
     @Column(name = "price")

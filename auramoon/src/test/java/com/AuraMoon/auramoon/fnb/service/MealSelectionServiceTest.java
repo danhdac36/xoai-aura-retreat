@@ -2,6 +2,7 @@ package com.AuraMoon.auramoon.fnb.service;
 
 import com.AuraMoon.auramoon.fnb.dto.MealSelectionRequest;
 import com.AuraMoon.auramoon.fnb.dto.MealSelectionResponse;
+import com.AuraMoon.auramoon.fnb.dto.MenuItemResponse;
 import com.AuraMoon.auramoon.fnb.entity.DietaryProfile;
 import com.AuraMoon.auramoon.fnb.entity.MealOrder;
 import com.AuraMoon.auramoon.fnb.entity.MealOrderItem;
@@ -92,12 +93,11 @@ public class MealSelectionServiceTest {
         when(menuItemRepository.findAll()).thenReturn(Arrays.asList(itemNormal, itemAllergy, itemMeat));
         when(dietaryProfileRepository.findByUserId(1)).thenReturn(Optional.empty());
 
-        List<MenuItem> result = mealSelectionService.getFilteredMenuForGuest(1);
+        List<MenuItemResponse> result = mealSelectionService.getFilteredMenuForGuest(1);
 
         assertEquals(3, result.size());
-        assertTrue(result.contains(itemNormal));
-        assertTrue(result.contains(itemAllergy));
-        assertTrue(result.contains(itemMeat));
+        assertTrue(result.stream().allMatch(MenuItemResponse::getIsAvailableForGuest));
+        assertTrue(result.stream().allMatch(item -> item.getWarningMessage() == null));
     }
 
     @Test
@@ -111,12 +111,20 @@ public class MealSelectionServiceTest {
         when(menuItemRepository.findAll()).thenReturn(Arrays.asList(itemNormal, itemAllergy, itemMeat));
         when(dietaryProfileRepository.findByUserId(1)).thenReturn(Optional.of(profile));
 
-        List<MenuItem> result = mealSelectionService.getFilteredMenuForGuest(1);
+        List<MenuItemResponse> result = mealSelectionService.getFilteredMenuForGuest(1);
 
-        assertEquals(2, result.size());
-        assertTrue(result.contains(itemNormal));
-        assertFalse(result.contains(itemAllergy)); // Filtered out due to peanut
-        assertTrue(result.contains(itemMeat));
+        assertEquals(3, result.size());
+        
+        // Find normal item (rice)
+        MenuItemResponse normalRes = result.stream().filter(item -> item.getId() == 1).findFirst().orElseThrow();
+        assertTrue(normalRes.getIsAvailableForGuest());
+        assertNull(normalRes.getWarningMessage());
+
+        // Find allergy item (peanut toast)
+        MenuItemResponse allergyRes = result.stream().filter(item -> item.getId() == 2).findFirst().orElseThrow();
+        assertFalse(allergyRes.getIsAvailableForGuest()); // Should be blocked
+        assertNotNull(allergyRes.getWarningMessage());
+        assertTrue(allergyRes.getWarningMessage().contains("dị ứng"));
     }
 
     @Test
@@ -130,12 +138,17 @@ public class MealSelectionServiceTest {
         when(menuItemRepository.findAll()).thenReturn(Arrays.asList(itemNormal, itemAllergy, itemMeat));
         when(dietaryProfileRepository.findByUserId(1)).thenReturn(Optional.of(profile));
 
-        List<MenuItem> result = mealSelectionService.getFilteredMenuForGuest(1);
+        List<MenuItemResponse> result = mealSelectionService.getFilteredMenuForGuest(1);
 
-        assertEquals(2, result.size());
-        assertTrue(result.contains(itemNormal));
-        assertTrue(result.contains(itemAllergy));
-        assertFalse(result.contains(itemMeat)); // Filtered out due to beef
+        assertEquals(3, result.size());
+
+        // Normal rice should be recommended (vegan)
+        MenuItemResponse normalRes = result.stream().filter(item -> item.getId() == 1).findFirst().orElseThrow();
+        assertTrue(normalRes.getIsRecommended());
+
+        // Beef noodles should NOT be recommended
+        MenuItemResponse meatRes = result.stream().filter(item -> item.getId() == 3).findFirst().orElseThrow();
+        assertFalse(meatRes.getIsRecommended());
     }
 
     @Test
@@ -171,9 +184,50 @@ public class MealSelectionServiceTest {
         assertEquals("SUCCESS", response.getStatus());
         verify(mealOrderRepository, times(1)).save(any(MealOrder.class));
         verify(mealOrderItemRepository, times(1)).save(any(MealOrderItem.class));
+        
+        // Billed to package, so extra F&B should remain zero
+        verify(guestFolioRepository, never()).save(any(GuestFolio.class));
+        assertEquals(BigDecimal.ZERO, folio.getTotalExtraFb());
+    }
+
+    @Test
+    void testSelectDailyMeals_ALaCarte_Success() {
+        MealSelectionRequest request = new MealSelectionRequest();
+        request.setGuestId(1);
+        request.setBookingId(10);
+        request.setMealDate(LocalDate.of(2026, 6, 10));
+        request.setMealType("A-La-Carte"); // UC19 context
+        request.setMenuItemIds(Collections.singletonList(1)); // price = 10.00
+        request.setNote("Extra spicy");
+
+        Booking booking = Booking.builder().guestId(1).build();
+        booking.setId(10);
+
+        GuestFolio folio = GuestFolio.builder()
+                .bookingId(10)
+                .totalExtraFb(BigDecimal.ZERO)
+                .totalPackageAmount(new BigDecimal("500.00"))
+                .build();
+        folio.setId(20);
+
+        when(bookingRepository.findById(10)).thenReturn(Optional.of(booking));
+        when(guestFolioRepository.findByBookingId(10)).thenReturn(Optional.of(folio));
+        when(dietaryProfileRepository.findByUserId(1)).thenReturn(Optional.empty());
+        when(menuItemRepository.findById(1)).thenReturn(Optional.of(itemNormal));
+
+        MealOrder savedOrder = MealOrder.builder().id(100).build();
+        when(mealOrderRepository.save(any(MealOrder.class))).thenReturn(savedOrder);
+
+        MealSelectionResponse response = mealSelectionService.selectDailyMeals(request);
+
+        assertEquals("SUCCESS", response.getStatus());
+        verify(mealOrderRepository, times(1)).save(any(MealOrder.class));
+        verify(mealOrderItemRepository, times(1)).save(any(MealOrderItem.class));
         verify(guestFolioRepository, times(1)).save(any(GuestFolio.class));
-        assertEquals(new BigDecimal("10.00"), folio.getTotalExtraFb());
-        assertEquals(new BigDecimal("510.00"), folio.getFinalAmount());
+        
+        // 10.00 + 5% service charge (0.50) = 10.50
+        assertEquals(new BigDecimal("10.50"), folio.getTotalExtraFb());
+        assertEquals(new BigDecimal("510.50"), folio.getFinalAmount());
     }
 
     @Test
@@ -205,7 +259,7 @@ public class MealSelectionServiceTest {
         assertEquals("ALLERGY_VIOLATION", response.getStatus());
         assertNotNull(response.getDetails());
         assertEquals(1, response.getDetails().size());
-        assertTrue(response.getDetails().get(0).contains("violating allergy: peanut"));
+        assertTrue(response.getDetails().get(0).contains("chất gây dị ứng"));
         verify(mealOrderRepository, never()).save(any(MealOrder.class));
     }
 }

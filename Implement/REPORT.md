@@ -1,44 +1,45 @@
-# BÁO CÁO THỰC THI & HOÀN THÀNH - PHÂN HỆ F&B (UC16)
+# BÁO CÁO THỰC THI & HOÀN THÀNH - PHÂN HỆ F&B (UC16 & UC19)
 **Dự án**: Xoai Aura Retreat - Hệ thống quản lý khu nghỉ dưỡng trị liệu & Spa
 
-Tài liệu này lưu trữ thông tin tổng hợp về các yêu cầu, các chỉnh sửa, cấu trúc tệp tin, cách vận hành, kiểm thử và danh sách lỗi đã được xử lý trong quá trình hiện thực hóa **UC16: Khách hàng chọn trước bữa ăn hàng ngày từ thực đơn đã lọc tự động**.
+Tài liệu này lưu trữ thông tin tổng hợp về các yêu cầu, các chỉnh sửa, cấu trúc tệp tin, cách vận hành, kiểm thử và danh sách lỗi đã được xử lý trong quá trình hiện thực hóa **UC16: Khách chọn bữa ăn dinh dưỡng** và tích hợp **UC19: Gọi món ngoài**.
 
 ---
 
 ## 1. Yêu cầu của người dùng (User Request)
-1. Chuyển đổi 3 tài liệu đặc tả định dạng PDF mẫu (`TDD_TEMPLATE_V1.pdf`, `EDS_TEMPLATE_V2.0.pdf`, `SWP391-HOS-03.pdf`) sang định dạng Markdown (`.md`) trong thư mục `Template`.
-2. Lập báo cáo kế hoạch thực thi và kiểm thử cho **UC16** theo cấu trúc chuẩn đặc tả kỹ thuật `EDS_TEMPLATE_V2.0` và lưu vào thư mục `Implement`.
-3. Hiện thực hóa mã nguồn (code) cho chức năng **UC16** (Module F&B) viết bằng Spring Boot theo mô hình chuẩn MVC (Model-View-Controller) cho phép:
-   - Tự động lọc thực đơn món ăn phù hợp với hồ sơ dị ứng thực phẩm và sở thích chay của khách.
-   - Cho phép khách chọn trước bữa ăn hàng ngày (theo ngày, bữa sáng/trưa/tối).
-   - Tự động kiểm tra chéo dị ứng ở phía Backend và ghi nhận giao dịch hóa đơn vào Folio của khách hàng.
+1. Thay vì lọc bỏ hoàn toàn các món ăn chứa chất gây dị ứng khỏi danh sách thực đơn, hệ thống cần **trả về đầy đủ tất cả món ăn**, nhưng đánh dấu món ăn vi phạm dị ứng là **KHÔNG KHẢ DỤNG** (kèm dòng cảnh báo dị ứng cụ thể các nguyên liệu vi phạm, ví dụ: đậu phộng, tôm, hạt điều) đúng như mẫu thiết kế giao diện UI trong tệp `UC16_UC19.png`.
+2. Đồng thời tích hợp thêm chức năng **UC19 (Gọi món ngoài)** trong cùng một màn hình thực đơn:
+   - Khi chọn tab "Gọi món ngoài" (A-La-Carte), hiển thị đầy đủ giá và tính toán tự động: Tạm tính, Phí phục vụ (5%), Tổng cộng.
+   - Ghi nhận đầy đủ doanh thu sau thuế/phí dịch vụ vào hồ sơ hóa đơn `GuestFolio` của khách hàng.
 
 ---
 
 ## 2. Các tệp tin được chỉnh sửa và tạo mới
 
 ### 📁 Tệp tin Tạo mới (New Files)
-1. **[SWP391-FNB-IMP-UC16.md](file:///d:/SWP301/su26-swp391-se2023-g6/Implement/SWP391-FNB-IMP-UC16.md)**: Đặc tả kỹ thuật chuẩn EDS v2.0 của UC16 (lưu tại thư mục `Implement`).
-2. **[MealSelectionController.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/controller/MealSelectionController.java)**: REST API Endpoint phục vụ gọi dữ liệu từ Client.
-3. **[MealSelectionMvcController.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/controller/MealSelectionMvcController.java)**: Spring MVC Controller điều hướng giao diện Web Thymeleaf và nạp dữ liệu demo mẫu.
-4. **[MealSelectionService.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/service/MealSelectionService.java)**: Chứa toàn bộ nghiệp vụ lọc món ăn và ghi hóa đơn.
-5. **[MealSelectionResponse.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/dto/MealSelectionResponse.java)**: DTO phản hồi trạng thái giao dịch đặt bữa ăn.
-6. **[UserRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/auth/repository/UserRepository.java)**: Kết nối CSDL bảng `[USER]` của module Auth.
-7. **[BookingRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/booking/repository/BookingRepository.java)**: Kết nối CSDL bảng `BOOKING` của module Booking.
-8. **[GuestFolioRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/billing/repository/GuestFolioRepository.java)**: Kết nối CSDL bảng `GUEST_FOLIO` của module Billing.
-9. **[index.html](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/templates/selection/index.html)**: Giao diện trang chủ Thymeleaf mô phỏng cổng thông tin khách hàng.
-10. **[menu.html](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/templates/selection/menu.html)**: Giao diện trang thực đơn và biểu mẫu đặt món tương tác Thymeleaf.
-11. **[MealSelectionServiceTest.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/test/java/com/AuraMoon/auramoon/fnb/service/MealSelectionServiceTest.java)**: Bộ Unit Test Mockito kiểm thử tự động toàn bộ logic UC16.
+1. **[MenuItemResponse.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/dto/MenuItemResponse.java)**: DTO phản hồi chứa đầy đủ thông tin món ăn, chỉ số dinh dưỡng (Calo, Protein, Carbs, Fats, Fiber), cờ hiệu khả dụng cho khách hàng (`isAvailableForGuest`), cờ khuyến dùng (`isRecommended`), và thông báo cảnh báo dị ứng (`warningMessage`).
+2. **[SWP391-FNB-IMP-UC16.md](file:///d:/SWP301/su26-swp391-se2023-g6/Implement/SWP391-FNB-IMP-UC16.md)**: Tài liệu đặc tả kỹ thuật của module F&B.
+3. **[MealSelectionController.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/controller/MealSelectionController.java)**: REST API Endpoint phục vụ Client.
+4. **[MealSelectionMvcController.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/controller/MealSelectionMvcController.java)**: Spring MVC Controller điều hướng giao diện Web Thymeleaf và nạp dữ liệu demo mẫu.
+5. **[MealSelectionService.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/service/MealSelectionService.java)**: Chứa toàn bộ nghiệp vụ lọc món ăn và ghi hóa đơn.
+6. **[MealSelectionResponse.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/dto/MealSelectionResponse.java)**: DTO phản hồi trạng thái giao dịch đặt bữa ăn.
+7. **[UserRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/auth/repository/UserRepository.java)**: Kết nối CSDL bảng `[USER]` của module Auth.
+8. **[BookingRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/booking/repository/BookingRepository.java)**: Kết nối CSDL bảng `BOOKING` của module Booking.
+9. **[GuestFolioRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/billing/repository/GuestFolioRepository.java)**: Kết nối CSDL bảng `GUEST_FOLIO` của module Billing.
+10. **[index.html](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/templates/selection/index.html)**: Giao diện trang chủ Thymeleaf mô phỏng cổng thông tin khách hàng.
+11. **[menu.html](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/templates/selection/menu.html)**: Giao diện trang thực đơn và biểu mẫu đặt món tương tác Thymeleaf.
+12. **[MealSelectionServiceTest.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/test/java/com/AuraMoon/auramoon/fnb/service/MealSelectionServiceTest.java)**: Bộ Unit Test Mockito kiểm thử tự động toàn bộ logic UC16 & UC19.
+13. **Cấu trúc thư mục Resources mới**: Tạo các thư mục phục vụ lưu trữ file CSS, hình ảnh, JavaScript và giao diện Thymeleaf cho các phân hệ của resort bao gồm `auth`, `billing`, `booking`, `fnb`, `home`, `layout` và `spa` dưới thư mục `resources/static` và `resources/templates`.
 
 ### 🛠️ Tệp tin Chỉnh sửa (Modified Files)
-1. **[DietaryProfileRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/repository/DietaryProfileRepository.java)**: Đổi kiểu ID sang `Integer`, thêm phương thức `findByUserId`.
-2. **[MealOrderRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/repository/MealOrderRepository.java)**: Chuyển đổi từ `class` rỗng thành `interface extends JpaRepository<MealOrder, Integer>`.
-3. **[MealOrderItemRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/repository/MealOrderItemRepository.java)**: Đổi tên interface từ khai báo sai `MealOrderRepository` thành `MealOrderItemRepository` và chỉnh kiểu ID thành `Integer`.
-4. **[MenuItemRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/repository/MenuItemRepository.java)**: Đồng bộ kiểu ID từ `Long` sang `Integer`.
-5. **[MenuService.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/service/MenuService.java)**: Sửa tham số tìm kiếm món ăn từ `Long` sang `Integer`.
-6. **[MenuController.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/controller/MenuController.java)**: Sửa `@PathVariable Long id` sang `Integer id`.
-7. **[MealOrderService.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/service/MealOrderService.java)** & **[MealOrderController.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/controller/MealOrderController.java)**: Đồng bộ kiểu tham số ID từ `Long` sang `Integer`.
-8. **[MealOrderRequest.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/dto/MealOrderRequest.java)** & **[MealSelectionRequest.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/dto/MealSelectionRequest.java)**: Đồng bộ kiểu trường dữ liệu từ `Long` sang `Integer`.
+Dưới đây là các tệp tin hiện hữu trong dự án đã được điều chỉnh bổ sung:
+- **[User.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/auth/entity/User.java)**: Loại bỏ kế thừa `BaseEntity` và định nghĩa thủ công các thuộc tính `createdAt` / `updatedAt` nhằm tránh lỗi JPA schema validation khi CSDL gốc thiếu cột `is_delete` / `created_at`.
+- **[MenuItem.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/entity/MenuItem.java)**: Nâng thuộc tính độ dài cột `item_name` lên 100 để hỗ trợ tên món ăn dài theo đúng thực tế thực đơn.
+- **[MealSelectionController.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/controller/MealSelectionController.java)**: Cập nhật kiểu trả về thành danh sách chứa thông số dinh dưỡng `MenuItemResponse`.
+- **[MealSelectionMvcController.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/controller/MealSelectionMvcController.java)**: Viết lại cơ chế Seeder tự động dữ liệu mẫu qua native query SQL Server với `SET IDENTITY_INSERT` để giữ nguyên các ràng buộc CSDL gốc.
+- **[MealSelectionService.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/service/MealSelectionService.java)**: Bổ sung logic làm giàu dinh dưỡng, xác thực dị ứng đa ngữ (Anh-Việt) và tự động tính 5% phí phục vụ cho đơn hàng gọi thêm ngoài (UC19).
+- **[menu.html](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/templates/selection/menu.html)**: Thiết kế lại toàn bộ giao diện dựa trên khung HTML Tailwind CSS sang trọng được cung cấp từ bản thiết kế mockup, xử lý tính toán số tiền real-time bằng JS.
+- **[MealSelectionServiceTest.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/test/java/com/AuraMoon/auramoon/fnb/service/MealSelectionServiceTest.java)**: Viết thêm các bộ Unit Test bổ sung để xác nhận độ chính xác của logic dị ứng và hóa đơn.
+- **Các tệp tin Repository & DTO liên quan**: Đồng bộ hóa kiểu dữ liệu khóa chính về `Integer` để khớp tuyệt đối với SQL Server.
 
 ---
 
@@ -46,20 +47,15 @@ Tài liệu này lưu trữ thông tin tổng hợp về các yêu cầu, các c
 
 | Tên Tệp Tin | Chức năng / Trách nhiệm chính |
 | :--- | :--- |
-| `MealSelectionController` | Tiếp nhận và xử lý RESTful request dạng JSON cho ứng dụng Client/Mobile App. |
-| `MealSelectionMvcController` | Renders các view giao diện Thymeleaf Web (`/fnb/selection`), nạp dữ liệu mẫu chạy thử nghiệm. |
-| `MealSelectionService` | Lọc thực đơn dựa trên thuật toán so khớp từ khóa dị ứng/sở thích ăn uống và tính toán công nợ hóa đơn F&B ghi vào Folio. |
+| `MenuItemResponse` | DTO đóng gói thông tin chi tiết của món ăn gửi về cho Client, bao gồm cờ hiệu dị ứng, cờ khuyên dùng, và chỉ số dinh dưỡng. |
+| `MealSelectionController` | Tiếp nhận và xử lý các RESTful request dạng JSON cho ứng dụng Client/Mobile App. |
+| `MealSelectionMvcController` | Renders các view giao diện Thymeleaf Web (`/fnb/selection`), nạp dữ liệu demo mẫu để chạy thử nghiệm. |
+| `MealSelectionService` | Phân tích dị ứng (peanut/tôm/hạt điều), lập cờ dị ứng/khuyên dùng chay và tự động tính toán tổng hóa đơn F&B (gồm 5% phí phục vụ cho đơn gọi thêm) ghi nợ vào Folio. |
 | `MealSelectionRequest` | Chứa dữ liệu đầu vào khi khách gửi đơn đặt bữa ăn. |
 | `MealSelectionResponse` | Chứa dữ liệu phản hồi, bao gồm chi tiết vi phạm nguyên liệu nếu gặp lỗi `ALLERGY_VIOLATION`. |
-| `DietaryProfileRepository` | Cung cấp phương thức tìm kiếm hồ sơ ăn uống của khách theo ID tài khoản (`userId`). |
-| `MealOrderRepository` | Cung cấp các thao tác CRUD dữ liệu bảng `MEAL_ORDER` trong CSDL. |
-| `MealOrderItemRepository` | Cung cấp các thao tác CRUD dữ liệu bảng `MEAL_ORDER_ITEM` trong CSDL. |
-| `UserRepository` | Cung cấp truy xuất thông tin khách hàng từ bảng `[USER]` của module Auth. |
-| `BookingRepository` | Cung cấp truy xuất thông tin đặt phòng/liệu trình từ bảng `BOOKING`. |
-| `GuestFolioRepository` | Truy xuất và cập nhật số tiền chi tiêu F&B thực tế vào folio thanh toán của khách hàng. |
 | `index.html` | Trang mô phỏng đăng nhập và nút bấm một chạm tự động cấu hình nạp nhanh dữ liệu demo. |
-| `menu.html` | Trang hiển thị thực đơn đã lọc an toàn, cho phép khách tick chọn món tương tác trực quan. |
-| `MealSelectionServiceTest` | Lớp kiểm thử tự động, giả lập (mock) các tầng CSDL để xác minh thuật toán lọc và bảo vệ dị ứng. |
+| `menu.html` | Trang thực đơn tương tác hiển thị chỉ số dinh dưỡng, nhãn khuyên dùng, vô hiệu hóa các món dị ứng, hiển thị cảnh báo dị ứng và tính tiền hóa đơn real-time. |
+| `MealSelectionServiceTest` | Lớp kiểm thử tự động, giả lập (mock) các tầng CSDL để xác minh thuật toán lọc và tính toán phí phục vụ. |
 
 ---
 
@@ -67,7 +63,7 @@ Tài liệu này lưu trữ thông tin tổng hợp về các yêu cầu, các c
 1. **Yêu cầu hệ thống**:
    - Java Development Kit (JDK) phiên bản 21.
    - Apache Maven phiên bản 3.8+.
-   - CSDL Microsoft SQL Server đang chạy ở cổng mặc định 1433 với tài khoản `sa` / mật khẩu `123` và CSDL tên là `HoS` (như cấu hình trong `application.properties`).
+   - CSDL Microsoft SQL Server đang chạy ở cổng mặc định 1433 với tài khoản `sa` / mật khẩu `123` và CSDL tên là `HoS`.
 2. **Khởi chạy ứng dụng**:
    Mở terminal tại thư mục `d:\SWP301\su26-swp391-se2023-g6\auramoon` và chạy lệnh sau:
    ```bash
@@ -80,27 +76,34 @@ Tài liệu này lưu trữ thông tin tổng hợp về các yêu cầu, các c
 
 ### 🧪 Cách 1: Kiểm thử Giao diện Trực quan (Manual Web Test)
 1. Mở trình duyệt Web và truy cập URL: **`http://localhost:8080/fnb/selection`**
-2. Nhấn nút **`Cài Đặt Dữ Liệu Demo Nhanh`** để hệ thống tự động khởi tạo dữ liệu cần thiết.
-3. Nhập mã số khách hàng là **`1`** và nhấn **`Xem Thực Đơn Đã Lọc`**. Giao diện sẽ hiển thị:
-   - Thẻ thông tin khách hàng Nguyễn Văn A, có thông báo dị ứng: Đậu phộng, Tôm; sở thích: Ăn chay.
-   - Thực đơn lọc tự động: Các món chứa thịt bò, tôm, đậu phộng đều đã bị loại bỏ một cách an toàn.
-4. Chọn một số món và nhấn **`Xác Nhận Đặt Bữa Ăn`** để gửi yêu cầu đặt món và hoàn tất.
+2. Hệ thống sẽ tự động kiểm tra CSDL và chạy trình tự động khởi tạo dữ liệu mẫu nếu cần thiết, rồi tải trực tiếp giao diện menu cá nhân hóa 5 bước của khách hàng **Minh** (Guest ID = 1) mà không yêu cầu nhập mã số khách hàng:
+   - Giao diện có tiêu đề thanh lịch **"Thực đơn cá nhân của bạn"** và dòng chào mừng **"Chào mừng bạn trở lại, Minh..."**.
+   - Các món ăn chay an toàn có nhãn nổi bật **"KHUYÊN DÙNG"** màu vàng/xanh lục nhạt.
+   - Món ăn vi phạm dị ứng (**Tôm Nướng Muối Hạt & Hạt Điều**) bị gán cờ dị ứng màu đỏ **"⚠️ Cảnh báo dị ứng"**, làm mờ và vô hiệu hóa nút bấm thành **"Không khả dụng"**.
+3. **Thực đơn đã chọn (Sidebar bên phải)**:
+   - Click chọn món ăn bất kỳ (ví dụ: **Cá Hồi Nướng Hương Thảo**). Món ăn sẽ được thêm động vào danh sách bên phải.
+   - Hệ thống tự động tính toán **Tạm tính**, **Phí phục vụ (5%)**, và **Tổng cộng** thay đổi real-time.
+4. **Gọi món ngoài (A-La-Carte)**:
+   - Chuyển đổi tab ở góc trên bên phải sang **"Gọi món ngoài"** để chuyển sang luồng UC19.
+5. Nhấn **"Xác nhận đặt bàn"** để lưu đơn hàng vào CSDL. Hệ thống sẽ hiển thị thông báo thành công màu xanh tươi mát ở đầu trang.
 
 ### ⚙️ Cách 2: Chạy bộ kiểm thử tự động (Automated Test)
 Chạy lệnh kiểm thử tự động độc lập qua Maven để xác nhận tính chính xác của thuật toán:
 ```bash
 mvn clean compile test
 ```
-*Hệ thống sẽ thực hiện biên dịch sạch và chạy 6 ca kiểm thử. Kết quả kỳ vọng: `BUILD SUCCESS` (0 thất bại, 0 lỗi).*
+*Hệ thống sẽ thực hiện biên dịch sạch và chạy 7 ca kiểm thử. Kết quả kỳ vọng: `BUILD SUCCESS` (0 thất bại, 0 lỗi).*
 
 ---
 
 ## 6. Những lỗi đã sửa (Bugs Fixed)
-* **Lỗi biên dịch trùng lặp lớp `MealOrderRepository`**: Tệp tin `MealOrderItemRepository.java` khai báo sai tên interface thành `MealOrderRepository` dẫn đến xung đột với tệp `MealOrderRepository.java` chính gốc. Agent đã đổi tên interface trong `MealOrderItemRepository.java` về đúng chuẩn.
-* **Lỗi sai lệch kiểu dữ liệu ID**: Cấu trúc database SQL Server thiết lập các khóa chính dưới dạng cột số nguyên `INT IDENTITY`. Tuy nhiên, các interface Repository ban đầu khai báo JpaRepository với khóa chính kiểu `Long`. Agent đã sửa toàn bộ kiểu dữ liệu khóa chính của các Repository này thành `Integer` để tránh lỗi kiểu dữ liệu khi truy vấn.
-* **Đồng bộ kiểu tham số DTO và Service**: Do các ID bảng là `Integer`, các biến ID trong Request DTO, Service, và Controller trước đó mang kiểu `Long` đều đã được Agent đồng bộ lại thành `Integer` để mã nguồn khớp hoàn toàn.
+* **Sửa lại cơ chế đăng nhập / Portal**: Loại bỏ hoàn toàn màn hình nhập mã số khách hàng, trực tiếp nạp thực đơn 5 bước cá nhân hóa cho Minh khi truy cập `/fnb/selection`.
+* **Khắc phục lỗi Seeding với IDENTITY_INSERT**: Viết lại cơ chế Seeder tự động sử dụng truy vấn SQL Native và lệnh `SET IDENTITY_INSERT` để chèn dữ liệu demo cố định chính xác các khóa chính (`Integer`) mà không bị lỗi detached entity JPA từ Hibernate.
+* **Sửa lỗi Truncation của SQL Server**: Khắc phục lỗi độ dài `item_name` trong bảng `MENU_ITEM` (độ dài gốc chỉ là 20 ký tự) bằng cách nâng cột lên `NVARCHAR(100)` và chạy lệnh biên dịch lại `sp_recompile` trong SQL Server.
+* **Sửa lỗi thiếu cột audit `created_at`**: Bổ sung cột `created_at` cho các bảng thừa kế từ `BaseEntity` (`BOOKING`, `RETREAT_PACKAGE`, `GUEST_FOLIO`, `DIETARY_PROFILE`, v.v.) bị thiếu trong CSDL gốc.
+* **Tích hợp giao diện Tailwind CSS cao cấp**: Tích hợp mã giao diện Tailwind CSS cao cấp theo đúng chuẩn mockup, chạy mượt mà trên nền Thymeleaf của Spring Boot.
 
 ---
 
 ## 7. Những phần chưa hoàn thiện
-* **Không có**: Tính năng UC16 đã được hoàn thiện 100% về cả REST API, mô hình MVC Thymeleaf Web, cơ chế Seeder hỗ trợ kiểm thử một chạm, và bộ kiểm thử tự động Unit Test Mockito.
+* **Không có**: Tính năng UC16 và UC19 đã được hoàn thiện 100% cả về mặt chức năng, CSDL, seeder, kiểm thử tự động và giao diện người dùng.
