@@ -53,7 +53,6 @@ public class MealSelectionService {
     public List<MenuItemResponse> getFilteredMenuForGuest(Integer guestId) {
         List<MenuItem> allItems = menuItemRepository.findAll().stream()
                 .filter(MenuItem::getIsAvailable)
-                .filter(item -> item.getIsDelete() == null || !item.getIsDelete())
                 .collect(Collectors.toList());
 
         Optional<DietaryProfile> profileOpt = dietaryProfileRepository.findByUserId(guestId);
@@ -255,7 +254,7 @@ public class MealSelectionService {
                 return new MealSelectionResponse("Menu item with ID " + itemId + " not found", "FAILED");
             }
             MenuItem item = itemOpt.get();
-            if (!item.getIsAvailable() || (item.getIsDelete() != null && item.getIsDelete())) {
+            if (!item.getIsAvailable()) {
                 return new MealSelectionResponse("Menu item '" + item.getItemName() + "' is not available", "FAILED");
             }
 

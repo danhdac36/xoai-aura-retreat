@@ -141,16 +141,6 @@ public class MealSelectionMvcController {
     }
 
     private void seedDemoDataInternal() {
-        // Run migrations/alters just in case
-        try {
-            entityManager.createNativeQuery("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('[USER]') AND name = 'is_delete') ALTER TABLE [USER] ADD is_delete BIT DEFAULT 0;").executeUpdate();
-            entityManager.createNativeQuery("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('MENU_ITEM') AND name = 'is_delete') ALTER TABLE MENU_ITEM ADD is_delete BIT DEFAULT 0;").executeUpdate();
-            entityManager.createNativeQuery("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('PHYSICAL_HEALTH_PROFILE') AND name = 'is_delete') ALTER TABLE PHYSICAL_HEALTH_PROFILE ADD is_delete BIT DEFAULT 0;").executeUpdate();
-            entityManager.createNativeQuery("IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('DIETARY_PROFILE') AND name = 'is_delete') ALTER TABLE DIETARY_PROFILE ADD is_delete BIT DEFAULT 0;").executeUpdate();
-        } catch (Exception e) {
-            // Ignore if columns already exist
-        }
-
         // Clean tables to prevent constraint violations
         entityManager.createNativeQuery("DELETE FROM MEAL_ORDER_ITEM").executeUpdate();
         entityManager.createNativeQuery("DELETE FROM MEAL_ORDER").executeUpdate();
@@ -169,19 +159,19 @@ public class MealSelectionMvcController {
         entityManager.createNativeQuery("SET IDENTITY_INSERT [ROLE] ON; INSERT INTO [ROLE] (role_id, role_name) VALUES (1, 'GUEST'); SET IDENTITY_INSERT [ROLE] OFF;").executeUpdate();
 
         // Seed [USER]
-        entityManager.createNativeQuery("SET IDENTITY_INSERT [USER] ON; INSERT INTO [USER] (user_id, role_id, email, password_hash, full_name, gender, date_of_birth, phone, Identify_code, status, last_login, is_delete) VALUES (1, 1, 'guest@fpt.edu.vn', 'password_hash_placeholder', 'Minh', 'Nam', '1995-08-15', '0987654321', 'ID123456789', 'Active', GETDATE(), 0); SET IDENTITY_INSERT [USER] OFF;").executeUpdate();
+        entityManager.createNativeQuery("SET IDENTITY_INSERT [USER] ON; INSERT INTO [USER] (user_id, role_id, email, password_hash, full_name, gender, date_of_birth, phone, Identify_code, status, last_login) VALUES (1, 1, 'guest@fpt.edu.vn', 'password_hash_placeholder', 'Minh', 'Nam', '1995-08-15', '0987654321', 'ID123456789', 'Active', GETDATE()); SET IDENTITY_INSERT [USER] OFF;").executeUpdate();
 
         // Seed DIETARY_PROFILE
-        entityManager.createNativeQuery("SET IDENTITY_INSERT DIETARY_PROFILE ON; INSERT INTO DIETARY_PROFILE (dietary_id, user_id, food_allergies, diatary_preference, update_at, is_delete) VALUES (1, 1, N'hải sản, hạt điều', N'vegan', GETDATE(), 0); SET IDENTITY_INSERT DIETARY_PROFILE OFF;").executeUpdate();
+        entityManager.createNativeQuery("SET IDENTITY_INSERT DIETARY_PROFILE ON; INSERT INTO DIETARY_PROFILE (dietary_id, user_id, food_allergies, diatary_preference, update_at) VALUES (1, 1, N'hải sản, hạt điều', N'vegan', GETDATE()); SET IDENTITY_INSERT DIETARY_PROFILE OFF;").executeUpdate();
 
         // Seed MENU_ITEM matching the mockup ingredients, prices, and status exactly
         entityManager.createNativeQuery("SET IDENTITY_INSERT MENU_ITEM ON; " +
-                "INSERT INTO MENU_ITEM (menu_item_id, item_name, price, ingredient, is_available, create_at, update_at, is_delete) VALUES " +
-                "(1, N'Cá Hồi Nướng Hương Thảo', 420.00, N'Cá hồi Na Uy nướng chậm cùng các loại rau củ hữu cơ từ vườn Aura, phục vụ kèm sốt bơ chanh thảo mộc.', 1, GETDATE(), GETDATE(), 0), " +
-                "(2, N'Salad Aura Thanh Lọc', 280.00, N'Tổng hợp hạt quinoa, bơ sáp Đắk Lắk và rau mầm tươi, cung cấp đầy đủ chất xơ và vitamin cho buổi trưa nhẹ nhàng.', 1, GETDATE(), GETDATE(), 0), " +
-                "(3, N'Tôm Nướng Muối Hạt & Hạt Điều', 320.00, N'Món ăn này có chứa hải sản và hạt điều, nằm trong danh sách dị ứng của bạn.', 1, GETDATE(), GETDATE(), 0), " +
-                "(4, N'Bát Cơm Gạo Lứt Chay', 240.00, N'Sự kết hợp cân bằng giữa tinh bột phức hợp, nấm rừng và đậu hũ hữu cơ nướng tương.', 1, GETDATE(), GETDATE(), 0), " +
-                "(5, N'Nước Ép Cần Tây Hữu Cơ', 80.00, N'Cần tây nguyên chất, táo xanh hữu cơ giúp lọc cơ thể.', 1, GETDATE(), GETDATE(), 0); " +
+                "INSERT INTO MENU_ITEM (menu_item_id, item_name, price, ingredient, is_available, create_at, update_at) VALUES " +
+                "(1, N'Cá Hồi Nướng Hương Thảo', 420.00, N'Cá hồi Na Uy nướng chậm cùng các loại rau củ hữu cơ từ vườn Aura, phục vụ kèm sốt bơ chanh thảo mộc.', 1, GETDATE(), GETDATE()), " +
+                "(2, N'Salad Aura Thanh Lọc', 280.00, N'Tổng hợp hạt quinoa, bơ sáp Đắk Lắk và rau mầm tươi, cung cấp đầy đủ chất xơ và vitamin cho buổi trưa nhẹ nhàng.', 1, GETDATE(), GETDATE()), " +
+                "(3, N'Tôm Nướng Muối Hạt & Hạt Điều', 320.00, N'Món ăn này có chứa hải sản và hạt điều, nằm trong danh sách dị ứng của bạn.', 1, GETDATE(), GETDATE()), " +
+                "(4, N'Bát Cơm Gạo Lứt Chay', 240.00, N'Sự kết hợp cân bằng giữa tinh bột phức hợp, nấm rừng và đậu hũ hữu cơ nướng tương.', 1, GETDATE(), GETDATE()), " +
+                "(5, N'Nước Ép Cần Tây Hữu Cơ', 80.00, N'Cần tây nguyên chất, táo xanh hữu cơ giúp lọc cơ thể.', 1, GETDATE(), GETDATE()); " +
                 "SET IDENTITY_INSERT MENU_ITEM OFF;").executeUpdate();
 
         // Seed RETREAT_PACKAGE

@@ -1,21 +1,16 @@
 package com.AuraMoon.auramoon.spa.entity;
 
-import com.AuraMoon.auramoon.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "TREATMENT_BOOKING")
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@AttributeOverrides({
-    @AttributeOverride(name = "createdAt", column = @Column(name = "create_at", updatable = false)),
-    @AttributeOverride(name = "updatedAt", column = @Column(name = "update_at"))
-})
-public class TreatmentBooking extends BaseEntity {
+public class TreatmentBooking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +33,14 @@ public class TreatmentBooking extends BaseEntity {
 
     @Column(name = "status", length = 10)
     private String status;
+
+    @Column(name = "create_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "update_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "is_delete")
+    @Builder.Default
+    private Boolean isDelete = false;
 }

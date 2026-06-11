@@ -1,23 +1,18 @@
 package com.AuraMoon.auramoon.fnb.entity;
 
-import com.AuraMoon.auramoon.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "MENU_ITEM")
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@AttributeOverrides({
-    @AttributeOverride(name = "createdAt", column = @Column(name = "create_at", updatable = false)),
-    @AttributeOverride(name = "updatedAt", column = @Column(name = "update_at"))
-})
-public class MenuItem extends BaseEntity {
+public class MenuItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,4 +32,10 @@ public class MenuItem extends BaseEntity {
     @Column(name = "is_available")
     @Builder.Default
     private Boolean isAvailable = true;
+
+    @Column(name = "create_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "update_at")
+    private LocalDateTime updatedAt;
 }

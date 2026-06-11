@@ -1,20 +1,16 @@
 package com.AuraMoon.auramoon.fnb.entity;
 
-import com.AuraMoon.auramoon.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "DIETARY_PROFILE")
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@AttributeOverrides({
-    @AttributeOverride(name = "updatedAt", column = @Column(name = "update_at"))
-})
-public class DietaryProfile extends BaseEntity {
+public class DietaryProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,5 +26,8 @@ public class DietaryProfile extends BaseEntity {
 
     @Lob
     @Column(name = "diatary_preference")
-    private String dietaryPreference; // DB has 'diatary_preference', java uses 'dietaryPreference'
+    private String dietaryPreference;
+
+    @Column(name = "update_at")
+    private LocalDateTime updatedAt;
 }

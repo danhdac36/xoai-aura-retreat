@@ -1,26 +1,24 @@
 package com.AuraMoon.auramoon.booking.entity;
 
-import com.AuraMoon.auramoon.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "BOOKING")
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Booking extends BaseEntity {
+public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "booking_id")
     private Integer id;
 
-    // Cross-module relation to auth.User
     @Column(name = "guest_id", nullable = false)
     private Integer guestId;
 
@@ -46,4 +44,14 @@ public class Booking extends BaseEntity {
 
     @Column(name = "payment_status", length = 10)
     private String paymentStatus;
+
+    @Column(name = "create_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "update_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "is_delete")
+    @Builder.Default
+    private Boolean isDelete = false;
 }
