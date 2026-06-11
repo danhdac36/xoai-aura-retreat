@@ -1,0 +1,17 @@
+/* Stylings for receptionist dashboard */
+
+.glass-card {
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
+}
+
+table th {
+    font-family: 'Inter', sans-serif;
+}
+
+table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+input:focus, select:focus {
+    box-shadow: 0 0 0 3px rgba(86, 99, 66, 0.15);
+}

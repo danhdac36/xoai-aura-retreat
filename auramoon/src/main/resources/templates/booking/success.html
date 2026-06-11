@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Đặt Phòng Thành Công | Xoai Aura Retreat</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/booking/booking-form.css}">
+</head>
+<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans flex items-center justify-center min-h-screen">
+    <main class="w-full max-w-md p-6">
+        <div class="glass-card bg-white/70 backdrop-blur-md border border-white/20 p-8 rounded-2xl shadow-xl text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full text-green-600 mb-6">
+                <span class="material-symbols-outlined text-4xl">check_circle</span>
+            </div>
+            
+            <h1 class="text-3xl font-serif text-gray-900 mb-2">Thanh toán thành công!</h1>
+            <p class="text-gray-500 mb-6">Đơn đặt gói trị liệu của bạn đã được xác nhận đặt cọc thành công.</p>
+
+            <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-8 text-left space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-gray-400">Mã đặt phòng:</span>
+                    <span class="font-semibold text-gray-900" th:text="'#' + ${bookingId}">#100</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">Mã giao dịch:</span>
+                    <span class="font-mono text-gray-600" th:text="${transactionCode}">TX_AURA_123</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-400">Trạng thái đặt phòng:</span>
+                    <span class="text-green-600 font-semibold">Đã xác nhận (CONFIRMED)</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <a th:href="@{/itinerary}" class="w-full py-3 bg-[#566342] text-white rounded-lg font-semibold hover:bg-[#566342]/90 transition-colors shadow-md flex items-center justify-center gap-2">
+                    Xem lịch trình Wellness <span class="material-symbols-outlined">calendar_today</span>
+                </a>
+                <a th:href="@{/packages}" class="w-full py-3 border border-[#566342] text-[#566342] rounded-lg font-semibold hover:bg-[#566342]/5 transition-colors">
+                    Quay lại Trang chủ
+                </a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
