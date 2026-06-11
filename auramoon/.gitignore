@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+.idea
+*.iml
+/01_SRS/
+/02_SDS/
+/Document/
+/Template/
