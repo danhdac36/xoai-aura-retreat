@@ -32,7 +32,7 @@ public class CheckoutController {
         }
 
         model.addAttribute("pageTitle", "Hóa đơn Gộp & Check-out");
-        return "billing/checkout";
+        return "billing/checkout/checkout";
     }
 
     @PostMapping("/checkout/{bookingId}/pay")

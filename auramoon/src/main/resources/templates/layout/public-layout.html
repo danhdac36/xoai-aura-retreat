@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle : 'Xoai Aura Retreat'}">Xoai Aura Retreat</title>
+    
+    <!-- Tailwind CSS & Fonts -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <script th:src="@{/js/public/tailwind-config.js}"></script>
+    <!-- CSS dùng chung -->
+    <style>
+        body {
+            background-color: #fbf9f8;
+            color: #1b1c1c;
+        }
+    </style>
+    <!-- CSS riêng của từng trang -->
+    <th:block layout:fragment="styles"></th:block>
+</head>
+<body class="antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+    
+    <!-- Header -->
+    <th:block th:replace="~{fragments/public-header :: public-header}"></th:block>
+    
+    <!-- Main Content -->
+    <div layout:fragment="content"></div>
+    
+    <!-- Footer -->
+    <th:block th:replace="~{fragments/public-footer :: public-footer}"></th:block>
+
+    <!-- JS riêng của từng trang -->
+    <th:block layout:fragment="scripts"></th:block>
+</body>
+</html>
