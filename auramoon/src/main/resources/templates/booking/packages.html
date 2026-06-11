@@ -130,21 +130,8 @@
 
 <body class="bg-background text-on-background font-body-md overflow-x-hidden">
     <!-- Top Navigation Bar -->
-    <header
-        class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-desktop py-stack-md bg-surface/90 backdrop-blur-md">
-        <div class="font-headline-sm text-headline-sm text-secondary italic">Xoai Aura Retreat</div>
-        <nav class="hidden md:flex items-center gap-stack-lg"><a
-                class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-300"
-                href="#">Hành trình</a><a
-                class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-300"
-                href="#">Spa</a><a
-                class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors duration-300"
-                href="#">Ẩm thực</a></nav>
-        <button
-            class="bg-secondary text-on-secondary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-80 transition-opacity active:scale-95 duration-200">Đặt
-            ngay</button>
-    </header>
-    <main class="pt-32 pb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
+
+    <main class="pt-12 pb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
         <!-- Search & Filter Bar -->
         <section class="mb-16">
             <h1 class="font-headline-lg text-headline-lg mb-8 text-on-surface">
@@ -165,10 +152,12 @@
                             class="bg-transparent border-b-2 border-secondary py-2 border-t-0 border-x-0 outline-none">
 
                             <option value="">Tất cả</option>
+                            <option value="2" th:selected="${selectedDurationDays == 2}">2 ngày</option>
                             <option value="3" th:selected="${selectedDurationDays == 3}">3 ngày</option>
+                            <option value="4" th:selected="${selectedDurationDays == 4}">4 ngày</option>
                             <option value="5" th:selected="${selectedDurationDays == 5}">5 ngày</option>
+                            <option value="6" th:selected="${selectedDurationDays == 6}">6 ngày</option>
                             <option value="7" th:selected="${selectedDurationDays == 7}">7 ngày</option>
-
                         </select>
                     </div>
 
@@ -200,11 +189,11 @@
                             class="bg-transparent border-b-2 border-secondary py-2 border-t-0 border-x-0 outline-none">
 
                             <option value="">Tất cả</option>
-                            <option value="UNDER_40" th:selected="${selectedPriceRange == 'UNDER_40'}">Dưới 40.000.000đ
+                            <option value="UNDER_5" th:selected="${selectedPriceRange == 'UNDER_5'}">Dưới 5.000.000đ
                             </option>
-                            <option value="FROM_40_TO_80" th:selected="${selectedPriceRange == 'FROM_40_TO_80'}">
-                                40.000.000đ - 80.000.000đ</option>
-                            <option value="OVER_80" th:selected="${selectedPriceRange == 'OVER_80'}">Trên 80.000.000đ
+                            <option value="FROM_5_TO_10" th:selected="${selectedPriceRange == 'FROM_5_TO_10'}">
+                                5.000.000đ - 10.000.000đ</option>
+                            <option value="OVER_10" th:selected="${selectedPriceRange == 'OVER_10'}">Trên 10.000.000đ
                             </option>
 
                         </select>
@@ -232,10 +221,10 @@
 
                 <div class="relative h-80 overflow-hidden">
 
-                    <img th:src="${pkg.typePackage == 'Stress Relief'} ? @{/img/stress-relief.jpg} :
+                    <img th:src="${pkg.typePackage == 'Stress Relief'} ? @{/img/spa-retreat.jpg} :
              (${pkg.typePackage == 'Weight Loss'} ? @{/img/detox-retreat.jpg} :
              (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
-             @{/img/spa-retreat.jpg}))" alt="Retreat Package"
+              @{/img/retreat-default.jpg}))" alt="Retreat Package"
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
 
                     <div class="absolute inset-0 bg-secondary/10"></div>
@@ -299,11 +288,71 @@
             </article>
 
         </section>
-        <div th:if="${#lists.isEmpty(packages)}" class="text-center py-20">
+        <div th:if="${#lists.isEmpty(packages)}" class="py-20">
 
-            <h2 class="text-2xl text-secondary">
-                Không tìm thấy gói retreat phù hợp
-            </h2>
+            <div class="text-center mb-10">
+                <h2 class="text-2xl text-secondary">
+                    Không tìm thấy gói phù hợp
+                </h2>
+
+                <p class="text-on-surface-variant mt-2">
+                    Gợi ý các gói phổ biến dưới đây
+                </p>
+            </div>
+
+            <section th:if="${popularPackages != null}"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+
+                <article th:each="pkg : ${popularPackages}" class="bg-surface-container-lowest overflow-hidden group">
+
+                    <div class="relative h-80 overflow-hidden">
+
+                        <img th:src="${pkg.typePackage == 'Stress Relief'} ? @{/img/spa-retreat.jpg} :
+                             (${pkg.typePackage == 'Weight Loss'} ? @{/img/detox-retreat.jpg} :
+                             (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
+                             @{/img/retreat-default.jpg}))" alt="Retreat Package"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+
+                        <div class="absolute inset-0 bg-secondary/10"></div>
+                    </div>
+
+                    <div class="p-8 border border-t-0 border-outline-variant">
+
+                        <h2 class="font-headline-sm text-headline-sm mb-4" th:text="${pkg.packageName}">
+                        </h2>
+
+                        <div class="mb-3 text-secondary">
+                            <span th:text="${pkg.durationDays}"></span> ngày
+                        </div>
+
+                        <p class="font-body-md text-body-md text-on-surface-variant mb-4 leading-relaxed"
+                            th:text="${pkg.description}">
+                        </p>
+
+                        <div class="flex justify-between items-end">
+
+                            <div>
+                                <span class="font-label-md text-label-md text-on-surface-variant block uppercase">
+                                    Giá từ
+                                </span>
+
+                                <span class="font-headline-sm text-headline-sm text-secondary"
+                                    th:text="${#numbers.formatDecimal(pkg.price,0,'COMMA',0,'POINT')} + ' đ'">
+                                </span>
+                            </div>
+
+                            <a th:href="@{/packages/{id}(id=${pkg.id})}"
+                                class="px-6 py-3 border border-secondary text-secondary font-label-md hover:bg-secondary hover:text-on-secondary transition-all duration-300">
+                                Xem chi tiết
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            </section>
 
         </div>
     </main>

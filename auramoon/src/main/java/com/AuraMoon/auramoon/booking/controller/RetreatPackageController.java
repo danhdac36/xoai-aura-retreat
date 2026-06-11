@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 
 @Controller
@@ -37,6 +37,17 @@ public class RetreatPackageController {
         model.addAttribute("selectedDurationDays", durationDays);
         model.addAttribute("selectedPriceRange", priceRange);
 
+        if (packages.isEmpty()) {
+            model.addAttribute("popularPackages", retreatPackageService.getPopularPackages());
+        }
+
         return "booking/packages";
+    }
+
+    @GetMapping("/{id}")
+    public String packageDetail(@PathVariable("id") Integer id, Model model) {
+        RetreatPackageDTO retreatPackage = retreatPackageService.getPackageById(id);
+        model.addAttribute("pkg", retreatPackage);
+        return "booking/package-detail";
     }
 }

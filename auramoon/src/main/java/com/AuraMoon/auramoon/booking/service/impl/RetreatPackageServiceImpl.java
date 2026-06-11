@@ -18,7 +18,7 @@ public class RetreatPackageServiceImpl implements RetreatPackageService {
 
     @Override
     public List<RetreatPackageDTO> getAllActivePackages() {
-        return retreatPackageRepository.findByIsActiveTrue()
+        return retreatPackageRepository.findByIsActiveTrueAndIsDeleteFalse()
                 .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -26,7 +26,7 @@ public class RetreatPackageServiceImpl implements RetreatPackageService {
 
     @Override
     public List<RetreatPackageDTO> getPackagesByType(String typePackage) {
-        return retreatPackageRepository.findByTypePackageAndIsActiveTrue(typePackage)
+        return retreatPackageRepository.findByTypePackageAndIsActiveTrueAndIsDeleteFalse(typePackage)
                 .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -55,5 +55,21 @@ public class RetreatPackageServiceImpl implements RetreatPackageService {
                 .stream()
                 .map(this::convertToDTO)
                 .toList();
+    }
+
+    @Override
+    public RetreatPackageDTO getPackageById(Integer id) {
+        RetreatPackage retreatPackage = retreatPackageRepository.findByIdAndIsActiveTrueAndIsDeleteFalse(id)
+                .orElseThrow(() -> new RuntimeException("Retreat package not found"));
+
+        return convertToDTO(retreatPackage);
+    }
+
+    @Override
+    public List<RetreatPackageDTO> getPopularPackages() {
+        return retreatPackageRepository.findTop3ByIsActiveTrueAndIsDeleteFalseOrderByIdAsc()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 }

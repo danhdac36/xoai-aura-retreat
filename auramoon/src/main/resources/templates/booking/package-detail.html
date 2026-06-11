@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Package Detail | AuraMoon Retreat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#fbf9f8] text-[#1b1c1c]">
+
+    <main class="max-w-6xl mx-auto px-8 py-12">
+
+        <a th:href="@{/packages}" class="text-[#566342] hover:underline">
+            ← Quay lại danh sách gói
+        </a>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-10 mt-8">
+
+            <div class="h-[420px] overflow-hidden rounded-lg">
+                <img th:src="${pkg.typePackage == 'Stress Relief'} ? @{/img/spa-retreat.jpg} :
+                         (${pkg.typePackage == 'Weight Loss'} ? @{/img/detox-retreat.jpg} :
+                         (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
+                         @{/img/retreat-default.jpg}))" alt="Retreat Package" class="w-full h-full object-cover">
+            </div>
+
+            <div>
+                <p class="uppercase tracking-widest text-sm text-[#566342]" th:text="${pkg.typePackage}">
+                    Yoga
+                </p>
+
+                <h1 class="text-4xl font-serif mt-3 mb-4" th:text="${pkg.packageName}">
+                    Retreat Package Name
+                </h1>
+
+                <p class="text-lg text-gray-700 mb-6" th:text="${pkg.description}">
+                    Package description
+                </p>
+
+                <div class="space-y-3 mb-8">
+                    <p>
+                        <strong>Thời gian:</strong>
+                        <span th:text="${pkg.durationDays}"></span> ngày
+                    </p>
+
+                    <p>
+                        <strong>Giá từ:</strong>
+                        <span th:text="${#numbers.formatDecimal(pkg.price,0,'COMMA',0,'POINT')} + ' đ'"></span>
+                    </p>
+
+                    <p>
+                        <strong>Dịch vụ bao gồm:</strong>
+                        <span th:text="${pkg.services}"></span>
+                    </p>
+                </div>
+
+                <a href="#" class="inline-block px-8 py-3 bg-[#566342] text-white rounded hover:opacity-90">
+                    Tiến hành đặt gói
+                </a>
+            </div>
+
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-14">
+
+            <div class="bg-white p-6 border rounded">
+                <h2 class="text-xl font-semibold mb-3">Lịch trình mẫu</h2>
+                <p th:if="${pkg.typePackage == 'Yoga'}">
+                    Buổi sáng: Yoga & thở chánh niệm. Buổi chiều: thiền dẫn và thư giãn cơ thể.
+                </p>
+                <p th:if="${pkg.typePackage == 'Stress Relief'}">
+                    Buổi sáng: thiền nhẹ. Buổi chiều: spa thư giãn, tắm thảo mộc và trà đạo.
+                </p>
+                <p th:if="${pkg.typePackage == 'Weight Loss'}">
+                    Buổi sáng: vận động nhẹ. Buổi chiều: tư vấn dinh dưỡng và thực đơn detox.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 border rounded">
+                <h2 class="text-xl font-semibold mb-3">Dịch vụ spa đi kèm</h2>
+                <p th:if="${pkg.typePackage == 'Yoga'}">
+                    Foot bath, herbal therapy, sound healing hoặc massage thư giãn nhẹ.
+                </p>
+                <p th:if="${pkg.typePackage == 'Stress Relief'}">
+                    Aromatherapy massage, sauna, herbal bath và liệu pháp phục hồi giấc ngủ.
+                </p>
+                <p th:if="${pkg.typePackage == 'Weight Loss'}">
+                    Body recovery massage, detox herbal bath và liệu pháp phục hồi sau vận động.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 border rounded">
+                <h2 class="text-xl font-semibold mb-3">Thực đơn dinh dưỡng</h2>
+                <p th:if="${pkg.typePackage == 'Yoga'}">
+                    Thực đơn vegetarian/wellness meal, trà thảo mộc, bữa sáng lành mạnh.
+                </p>
+                <p th:if="${pkg.typePackage == 'Stress Relief'}">
+                    Thực đơn nhẹ, ít caffeine, trà ngủ ngon, món ăn hỗ trợ thư giãn.
+                </p>
+                <p th:if="${pkg.typePackage == 'Weight Loss'}">
+                    Detox meal, low-calorie healthy menu, nước ép rau củ và tư vấn khẩu phần.
+                </p>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
