@@ -13,6 +13,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@AttributeOverrides({
+    @AttributeOverride(name = "createdAt", column = @Column(name = "create_at", updatable = false)),
+    @AttributeOverride(name = "updatedAt", column = @Column(name = "update_at"))
+})
 public class Booking extends BaseEntity {
 
     @Id

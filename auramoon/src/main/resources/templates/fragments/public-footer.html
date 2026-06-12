@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <th:block th:fragment="public-footer">
+        <footer class="w-full px-margin-desktop py-section-gap flex flex-col md:flex-row justify-between items-start gap-gutter bg-sand-light border-t border-outline-variant/30">
+            <div class="flex flex-col gap-stack-sm">
+                <span class="font-headline-sm text-headline-sm text-primary italic">
+                    Xoai Aura Retreat
+                </span>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-sm text-sm">
+                    © 2024 Xoai Aura Retreat. Tuân thủ Quy định Bảo vệ Dữ liệu Việt Nam.
+                </p>
+            </div>
+            <div class="flex flex-col md:flex-row gap-8 md:gap-16">
+                <div class="flex flex-col gap-4">
+                    <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-8 duration-300 uppercase tracking-widest">Liên hệ</a>
+                    <a th:href="@{/login}" class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-8 duration-300 uppercase tracking-widest">Cổng thông tin Khách hàng</a>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-8 duration-300 uppercase tracking-widest">Chính sách Bảo mật</a>
+                    <a href="#" class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-8 duration-300 uppercase tracking-widest">Phát triển Bền vững</a>
+                </div>
+            </div>
+        </footer>
+    </th:block>
+</body>
+</html>
