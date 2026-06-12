@@ -1,4 +1,4 @@
-# Hướng Dẫn Sử Dụng AI Trong Project SWP391 — Ngũ Sơn Resort & Spa
+# Hướng Dẫn Sử Dụng AI Trong Project SWP391 — Resort & Spa
 
 > **Tài liệu này tổng hợp từ thực tế sử dụng AI (Antigravity / Gemini) trong dự án.**
 > Mục tiêu: giúp mọi thành viên biết cách prompt AI hiệu quả — từ đọc tài liệu, viết EDS/TDD, đến sinh code và chạy kiểm thử.

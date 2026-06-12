@@ -34,6 +34,14 @@ public class CheckInServiceImpl implements CheckInService {
         Villa villa = villaRepository.findById(request.getVillaId())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy Villa với ID: " + request.getVillaId()));
 
+        // Ràng buộc sức chứa: Tổng số lượng khách không được vượt quá limitPerson của Villa
+        if (booking.getTotalGuests() != null && villa.getLimitPerson() != null 
+                && booking.getTotalGuests() > villa.getLimitPerson()) {
+            throw new com.AuraMoon.auramoon.booking.exception.InvalidVillaAssignmentException(
+                "Biệt thự được chọn (sức chứa " + villa.getLimitPerson() + " người) không đủ chỗ cho đoàn khách (" + booking.getTotalGuests() + " người)!"
+            );
+        }
+
         User guest = userRepository.findById(booking.getGuestId())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy khách hàng với ID: " + booking.getGuestId()));
 

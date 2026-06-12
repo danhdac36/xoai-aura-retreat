@@ -1,19 +1,19 @@
 # KẾ HOẠCH TRIỂN KHAI CHI TIẾT MODULE 2: ĐẶT GÓI TRỊ LIỆU & PHÒNG Ở
 ## (Áp dụng tiêu chuẩn kỹ thuật EDS v2.0 & Đặc tả kiểm thử TDD v1.0)
 
-| Field | Value |
-| --- | --- |
-| **Document ID** | `AURAMOON-BOOKING-IMP-002` |
-| **Version** | 1.0 |
-| **Date** | 2026-06-11 |
-| **Status** | In Review |
-| **Document Owner** | Sinh viên 2 (Module 2 Owner) |
-| **Author** | Antigravity AI Assistant |
-| **Reviewed by** | [Tech Lead / Principal Architect] |
-| **DPO Sign-off** | [ ] Pending (Bắt buộc do có xử lý thông tin định danh CCCD/Passport) |
-| **Approved by** | [Principal Architect] |
-| **Last Review** | 2026-06-11 |
-| **Based on Templates**| EDS v2.0 & TDD v1.0 |
+| Field                  | Value                                                                |
+| ------------------------| ----------------------------------------------------------------------|
+| **Document ID**        | `AURAMOON-BOOKING-IMP-002`                                           |
+| **Version**            | 1.0                                                                  |
+| **Date**               | 2026-06-11                                                           |
+| **Status**             | In Review                                                            |
+| **Document Owner**     | Lê Trà My (Module 2 Owner)                                           |
+| **Author**             | Antigravity AI Assistant                                             |
+| **Reviewed by**        | [Tech Lead / Principal Architect]                                    |
+| **DPO Sign-off**       | [ ] Pending (Bắt buộc do có xử lý thông tin định danh CCCD/Passport) |
+| **Approved by**        | [Principal Architect]                                                |
+| **Last Review**        | 2026-06-11                                                           |
+| **Based on Templates** | EDS v2.0 & TDD v1.0                                                  |
 
 ---
 

@@ -10,8 +10,8 @@ Chúng tôi đã hoàn thành toàn bộ các bước triển khai trong thiết
 - [EncryptionServiceImpl.java](file:///d:/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/common/service/impl/EncryptionServiceImpl.java): Triển khai thuật toán mã hóa AES-256 để bảo vệ số CCCD/Passport thô của khách.
 - [VillaServiceImpl.java](file:///d:/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/impl/VillaServiceImpl.java): Triển khai logic kiểm tra phòng trống thực tế và cập nhật trạng thái phòng.
 - [BookingServiceImpl.java](file:///d:/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/impl/BookingServiceImpl.java): Triển khai logic đặt phòng (UC07) và confirm đặt cọc thành công, tạo hóa đơn nợ trung tâm `GuestFolio`.
-- [CheckInServiceImpl.java](file:///d:/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/impl/CheckInServiceImpl.java): Triển khai nghiệp vụ check-in của lễ tân (UC08), mã hóa CCCD lưu DB, đổi trạng thái Villa thành `Occupied`.
-- [ItineraryServiceImpl.java](file:///d:/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/impl/ItineraryServiceImpl.java): Triển khai tổng hợp dòng thời gian chuyến đi (UC10) bao gồm check-in, yoga sáng, spa trị liệu, các bữa ăn dinh dưỡng, và check-out.
+- [CheckInServiceImpl.java](file:///d:/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/impl/CheckInServiceImpl.java): Triển khai nghiệp vụ check-in của lễ tân (UC08), mã hóa CCCD lưu DB, đổi trạng thái Villa thành `Occupied`. **Đã bổ sung ràng buộc kiểm tra sức chứa phòng vật lý (`limitPerson` của Villa so với `totalGuests` của đơn đặt phòng).**
+- [ItineraryServiceImpl.java](file:///d:/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/impl/ItineraryServiceImpl.java): Triển khai tổng hợp dòng thời gian chuyến đi (UC10) bao gồm check-in, yoga sáng, spa trị liệu, các bữa ăn dinh dưỡng, và check-out. **Đã bổ sung logic cá nhân hóa dòng thời gian hoạt động động dựa trên từng loại gói trị liệu khách đã đặt (`Yoga`, `Detox`/`Weight Loss` hoặc `Stress Relief`).**
 - [BookingRepository.java](file:///d:/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/booking/repository/BookingRepository.java): Thêm phương thức truy vấn `findByGuestId` lấy danh sách đơn của một khách hàng.
 
 ### Tầng Controller (New)
@@ -41,17 +41,17 @@ Chúng tôi đã chạy toàn bộ các tests và xác nhận kết quả thành
 
 ### Lệnh chạy kiểm thử:
 ```powershell
-$env:JAVA_HOME="C:\Program Files\Java\jdk-21.0.11"; .\mvnw.cmd test
+$env:JAVA_HOME="C:\Program Files\Java\jdk-21.0.11"; .\mvnw.cmd clean test
 ```
 
 ### Kết quả (Console Output):
 ```text
 [INFO] Running com.AuraMoon.auramoon.booking.service.BookingServiceTest
-[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.487 s -- in com.AuraMoon.auramoon.booking.service.BookingServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.981 s -- in com.AuraMoon.auramoon.booking.service.BookingServiceTest
 [INFO] Running com.AuraMoon.auramoon.booking.service.CheckInServiceTest
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.118 s -- in com.AuraMoon.auramoon.booking.service.CheckInServiceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.149 s -- in com.AuraMoon.auramoon.booking.service.CheckInServiceTest
 [INFO] Running com.AuraMoon.auramoon.AuramoonApplicationTests
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.420 s -- in com.AuraMoon.auramoon.AuramoonApplicationTests
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.524 s -- in com.AuraMoon.auramoon.AuramoonApplicationTests
 [INFO] 
 [INFO] Results:
 [INFO] 
