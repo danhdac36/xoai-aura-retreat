@@ -20,22 +20,22 @@ public class UserService implements IUserService {
     @Autowired
     private IRoleRepository roleRepository;
 
-    public User  authenticate(String email, String passwordHash){
+    public User authenticate(String email, String passwordHash) {
         User user = userRepository.findByEmail(email);
-        if(user==null){
+        if (user == null) {
             return null;
         }
-        if(!user.getPasswordHash().equals(passwordHash)){
+        if (!user.getPasswordHash().equals(passwordHash)) {
             return null;
         }
-        if( user.getStatus().equals("BLOCKED")){
+        if (user.getStatus().equals("BLOCKED")) {
             return null;
         }
         return user;
     }
 
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
+    // @Autowired
+    // private PasswordEncoder passwordEncoder;
 
     @Override
     public User createUser(User user) {
@@ -69,19 +69,16 @@ public class UserService implements IUserService {
         Role guestRole = roleRepository.findByRoleName("GUEST")
                 .orElseThrow(() -> new RuntimeException("Role GUEST không tồn tại trong hệ thống!"));
 
-
         User user = new User();
         user.setFullName(register.getFullName());
         user.setEmail(register.getEmail());
         user.setPasswordHash(register.getPassword());
         user.setRole(guestRole);
         user.setStatus("ACTIVE");
-        user.setIsDelete(false);
+        // user.setIsDelete(false);
 
         return userRepository.save(user);
     }
-
-
 
     @Override
     public User updateUser(Long id, User user) {

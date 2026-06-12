@@ -16,8 +16,10 @@
             font-family: 'Playfair Display', serif !important;
         }
     </style>
+    <th:block th:replace="~{fragments/tailwind-config :: tailwind-config}"></th:block>
 </head>
-<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans">
+<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans md:pl-64">
+    <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
     <main class="min-h-screen py-16 px-4 md:px-8 max-w-4xl mx-auto">
         <a th:href="@{/packages/{id}(id=${pkg.id})}" class="inline-flex items-center gap-1.5 text-[#566342] hover:text-[#3f4b2c] font-medium transition-colors mb-8 group">
             <span class="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">arrow_back</span>

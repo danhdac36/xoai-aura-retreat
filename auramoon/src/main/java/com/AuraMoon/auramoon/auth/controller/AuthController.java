@@ -35,7 +35,7 @@ public class AuthController {
             userService.registerUser(registerDto);
             logger.info("User registered successfully: " + registerDto.getEmail());
             model.addAttribute("success", "Đăng ký thành công!");
-            return "redirect:/auth/login";
+            return "redirect:/login";
         } catch (Exception e) {
             logger.warning("Registration error: " + e.getMessage());
             model.addAttribute("error", e.getMessage());

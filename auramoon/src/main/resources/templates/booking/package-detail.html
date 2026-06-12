@@ -23,8 +23,10 @@
             font-family: 'Playfair Display', serif !important;
         }
     </style>
+    <th:block th:replace="~{fragments/tailwind-config :: tailwind-config}"></th:block>
 </head>
-<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans antialiased">
+<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans antialiased md:pl-64">
+    <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 
     <main class="max-w-6xl mx-auto px-8 py-12">
         <a th:href="@{/packages}" class="inline-flex items-center gap-1.5 text-[#566342] hover:text-[#3f4b2c] font-medium transition-colors mb-8 group">
