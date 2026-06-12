@@ -80,6 +80,7 @@ Review & Rating bao gồm các layer:
 | TC-COND-001 | Đánh giá hợp lệ | `ReviewService.submitReview()` | `REV-TC-001` |
 | TC-COND-002 | Booking chưa hoàn tất | `ReviewService.canSubmitReview()` | `REV-TC-002` |
 | TC-COND-003 | Đánh giá trùng lặp | `ReviewService.canSubmitReview()` | `REV-TC-003` |
+| TC-COND-004 | XSS trong comment | `ReviewService.submitReview()` | `REV-TC-XSS` |
 
 ## TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
 
@@ -122,6 +123,7 @@ Review & Rating bao gồm các layer:
 **Severity:** `HIGH`
 **Feature Under Test:** `ReviewService.canSubmitReview()`
 **TDD Phase:** 🔴 RED
+**Condition Ref:** `TC-COND-002`
 
 **Preconditions:**
 * Booking ID = 2 (PENDING).
@@ -130,38 +132,80 @@ Review & Rating bao gồm các layer:
 1. Gọi `canSubmitReview(2)`.
 
 **Expected Result (PASS):**
-* Trả về `false` hoặc throw `BookingNotCompletedException`.
+* Throw `BookingNotCompletedException` (Đơn chưa hoàn tất).
+
+**Expected Result (FAIL):**
+* Hàm pass bình thường cho phép khách chưa ở đã đánh giá.
 
 ## REV-TC-003 — Chặn spam đánh giá 2 lần
 **Severity:** `HIGH`
 **Feature Under Test:** `ReviewService.canSubmitReview()`
 **TDD Phase:** 🔴 RED
+**Condition Ref:** `TC-COND-003`
 
 **Preconditions:**
 * Booking ID = 1 (COMPLETED).
-* Đã có 1 bản ghi Review cho Booking ID = 1 trong DB.
+* Tồn tại 1 bản ghi Review cho Booking ID = 1.
 
 **Test Steps:**
 1. Gọi `canSubmitReview(1)`.
 
 **Expected Result (PASS):**
-* Trả về `false` hoặc throw `ReviewAlreadyExistsException`.
+* Throw `ReviewAlreadyExistsException`.
+
+**Expected Result (FAIL):**
+* Cho phép đánh giá đè lên hoặc tạo bản ghi mới (Race Condition / Spam).
+
+## REV-TC-XSS — XSS trong comment (Security Test)
+**Severity:** `CRITICAL`
+**CWE:** `CWE-79`
+**Feature Under Test:** `ReviewService.submitReview()`
+**TDD Phase:** 🔴 RED
+**Condition Ref:** `TC-COND-004`
+
+**Preconditions:**
+* Booking ID = 3 (COMPLETED).
+
+**Test Steps:**
+1. Gọi `submitReview(3, 5, "<script>alert(1)</script>")`.
+2. Kiểm tra chuỗi trả về / lưu ở DB.
+
+**Expected Result (PASS):**
+* Dữ liệu lưu xuống DB được escape HTML, hoặc UI render dùng `th:text` thay vì `th:utext`.
+
+**Expected Result (FAIL):**
+* Script tag giữ nguyên và được render trực tiếp ra UI.
 
 # 5. Red-Green-Refactor Tracker
 
 | TC ID | Test File | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note |
 | --- | --- | --- | --- | --- |
 | `REV-TC-001` | `ReviewServiceTest.java` | `[ ]` | `[ ]` |  |
+| `REV-TC-002` | `ReviewServiceTest.java` | `[ ]` | `[ ]` |  |
+| `REV-TC-003` | `ReviewServiceTest.java` | `[ ]` | `[ ]` |  |
+| `REV-TC-XSS` | `ReviewServiceTest.java` | `[ ]` | `[ ]` |  |
 
 # 6. Entry / Exit Criteria
 
 ## Entry Criteria (Điều kiện bắt đầu)
 - [x] Spec kỹ thuật đã duyệt.
 - [x] Template HTML Stitch đã có sẵn.
+- [x] Entity `Review` và `Booking` có mapping đúng với CSDL.
 
 ## Exit Criteria (Điều kiện kết thúc — DoD)
 - [ ] Tất cả unit tests xanh.
+- [ ] Logic chặn đánh giá 2 lần hoạt động 100%.
 - [ ] Tích hợp giao diện TailwindCSS mượt mà.
+- [ ] Bấm nút đánh giá trên trang Checkout Success truyền đúng `bookingId`.
+
+## Suspension Criteria (Điều kiện tạm dừng)
+* Thymeleaf escape rules không tương thích gây lỗi hiển thị
+* Thiếu template UI từ team Design
 
 # 7. Rollback Plan
-- Revert code commits nếu gây lỗi xung đột với Booking entity.
+- **Rủi ro:** Mã lỗi khi redirect trên `ReviewController` có thể gây loop redirect.
+- **Rollback:**
+```bash
+git checkout -- auramoon/src/main/java/com/AuraMoon/auramoon/booking/controller/ReviewController.java
+git checkout -- auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/impl/ReviewServiceImpl.java
+```

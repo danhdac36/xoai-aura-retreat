@@ -32,9 +32,15 @@
 4. Non-Functional Requirements & SLA
 5. Static Modeling (Mô hình Tĩnh)
 6. Dynamic Modeling (Mô hình Động)
+7. Domain Event Catalog
 8. Interface Specification (Đặc tả Giao diện)
 9. Web MVC Specification (Đặc tả MVC)
 10. Bảng mã lỗi (Error Codes)
+11. Quy trình Triển khai (Step-by-Step)
+12. Rollback & Incident Runbook
+13. Kịch bản Kiểm thử Chi tiết
+14. Phương pháp Xác minh
+15. Mẫu thử thực tế (MVC Verification Samples)
 16. Bảng tổng hợp phân quyền (Authorization Matrix)
 
 # 1. Tổng quan Module
@@ -83,14 +89,88 @@
 
 # 4. Non-Functional Requirements & SLA
 
+## 4.1. Performance & Availability
 | Category | Requirement | Target SLA | Measurement Method | Compliance Basis |
 | --- | --- | --- | --- | --- |
-| Security | Hash Verification | Bắt buộc mã hóa HMAC-SHA512 để sinh và kiểm tra `vnp_SecureHash` | Code Review | VNPay Security Standard |
-| Security | API Key Protection | Cấu hình `vnp_TmnCode` và `vnp_HashSecret` phải nằm trong `application-secret.properties` và bị loại trừ bởi `.gitignore`. File chính nạp qua `spring.config.import` | Code Review | OWASP Secret Management |
-| Configuration | Reverse Proxy Support | Endpoint tạo URL phải xử lý đúng `X-Forwarded-Host` và `X-Forwarded-Proto` để chạy qua Ngrok / Nginx | Integration Test | Deployment Standards |
-| Consistency | Invoice & Payment sync | 100% | Database Transaction | — |
+| Latency | Thanh toán VNPay (Giai đoạn 1) | `< 2s` | Manual Test | N/A |
+| Latency | Xử lý Callback (Giai đoạn 2) | `< 1s` | Postman | N/A |
+
+## 4.2. Data Integrity & Retention
+| Category | Requirement | Target | Verification Method | Compliance Basis |
+| --- | --- | --- | --- | --- |
+| Consistency | Invoice & Payment sync | 100% | Database Transaction | ACID Properties |
+| Constraint | Chặn check-out pending orders | 100% | Unit/Integration Test | BR-12 |
+
+## 4.3. Security
+| Category | Requirement | Target | Verification Method | Compliance Basis |
+| --- | --- | --- | --- | --- |
+| Integrity | Hash Verification | 100% | Code Review | VNPay Security Standard (HMAC-SHA512) |
+| Secret Mgmt | API Key Protection | No keys in Git | Code Review | OWASP Secret Management |
+| Availability | Reverse Proxy Support | `X-Forwarded-*` | Integration Test | Deployment Standards |
+
+## 4.4. Scalability & Capacity Planning
+> Hệ thống thanh toán chỉ xử lý một lượng nhỏ giao dịch mỗi ngày (tương ứng với số lượng Booking check-out). Không yêu cầu scale đặc biệt, sử dụng RDBMS Transaction cục bộ.
 
 # 5. Static Modeling (Mô hình Tĩnh)
+
+## 5.1. Class Diagram (PlantUML)
+
+```plantuml
+@startuml
+class Payment <<Entity>> {
+  +id: Integer
+  +guestFolio: GuestFolio
+  +amount: BigDecimal
+  +paymentMethod: String
+  +paymentGateway: String
+  +transactionCode: String
+  +paymentDate: LocalDateTime
+  +status: String
+}
+
+Payment *-- GuestFolio : belongs to
+
+interface BillingService <<interface>> {
+  +initiatePayment(bookingId, method, gateway): Payment
+  +completePaymentAndCheckout(paymentId, txnCode): void
+  +markPaymentAsFailed(paymentId): void
+}
+
+class BillingServiceImpl {
+  -guestFolioRepository: GuestFolioRepository
+  -paymentRepository: PaymentRepository
+  -bookingRepository: BookingRepository
+  -villaRepository: VillaRepository
+}
+
+BillingService <|.. BillingServiceImpl
+
+class VNPayService {
+  -vnp_TmnCode: String
+  -vnp_HashSecret: String
+  -vnp_PayUrl: String
+  +createPaymentUrl(amount, paymentId, returnUrl): String
+  +verifySignature(requestParams): boolean
+}
+
+class VNPayConfig <<Utility>> {
+  +{static} hmacSHA512(key, data): String
+}
+
+VNPayService --> VNPayConfig : uses
+
+class CheckoutController {
+  -billingService: BillingService
+  -vnPayService: VNPayService
+  +processPayment(bookingId, method, request): String
+  +vnpayReturn(params, bookingId): String
+  +checkoutSuccess(paymentId, model): String
+}
+
+CheckoutController --> BillingService : uses
+CheckoutController --> VNPayService : uses
+@enduml
+```
 
 ## 5.2. Data Structure (Java JPA Entity)
 
@@ -185,6 +265,10 @@ Controller --> View: HTTP 302 Redirect tới trang /checkout/{bookingId}/success
 deactivate Controller
 @enduml
 ```
+
+# 7. Domain Event Catalog
+
+N/A — UC22 là luồng MVC đồng bộ (POST → redirect). Tuy nhiên, hành động `completePaymentAndCheckout()` cập nhật 4 entity (Payment, Folio, Booking, Villa) trong cùng một `@Transactional`. Không sử dụng message queue hay async events.
 
 # 8. Interface Specification (Đặc tả Giao diện)
 
@@ -294,3 +378,179 @@ public String vnpayReturn(@RequestParam Map<String, String> params, RedirectAttr
 | `PendingOrdersExistException` | `errorMessage` | Khách không thể check-out vì còn đơn Spa/F&B đang chờ xử lý. | Bị chặn ở Giai đoạn 1 (BR-12) |
 | (VNPay Failed) | `errorMessage` | Thanh toán VNPay thất bại hoặc khách hàng hủy giao dịch. | Giai đoạn 2: `vnp_ResponseCode != 00` |
 | (VNPay Signature Invalid) | `errorMessage` | Chữ ký bảo mật VNPay không hợp lệ. Giao dịch bị từ chối. | Giai đoạn 2: `verifySignature == false` |
+| `RuntimeException` | `errorMessage` | No balance due | Balance Due ≤ 0 (đã thanh toán đủ) |
+
+# 11. Quy trình Triển khai (Step-by-Step)
+
+## 11.1. Prerequisites
+- [x] UC21 (Consolidated Invoice) đã hoàn thành và chạy ổn định
+- [x] Tài khoản VNPay Sandbox đã đăng ký (`vnp_TmnCode`, `vnp_HashSecret`)
+- [x] Ngrok đã cài đặt để test VNPay callback trên local
+- [x] File `application-secret.properties` đã được tạo với mã VNPay
+
+## 11.2. Pre-deployment Checklist
+- [x] `application-secret.properties` đã nằm trong `.gitignore`
+- [x] VNPay Return URL đã được khai báo trên VNPay Merchant Dashboard
+
+## 11.3. Implementation Steps
+
+### Chặng 1 — VNPay Configuration
+1. Tạo `VNPayConfig.java` chứa hàm `hmacSHA512(key, data)`.
+2. Tạo `VNPayService.java` chứa `createPaymentUrl()` và `verifySignature()`.
+3. Cấu hình `application.properties`:
+```properties
+spring.config.import=optional:classpath:application-secret.properties
+vnp_TmnCode=${vnp_TmnCode_Secret}
+vnp_HashSecret=${vnp_HashSecret_Secret}
+vnp_PayUrl=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+```
+
+### Chặng 2 — Service Layer (2 bước thanh toán)
+1. `BillingServiceImpl.initiatePayment()` — Tạo Payment PENDING + validate BR-12
+2. `BillingServiceImpl.completePaymentAndCheckout()` — Cập nhật Payment → Folio → Booking → Villa (trong `@Transactional`)
+3. `BillingServiceImpl.markPaymentAsFailed()` — Đánh dấu thất bại
+
+### Chặng 3 — Controller Layer
+1. `POST /billing/checkout/{bookingId}/pay` — Phân luồng CASH vs VNPAY
+2. `GET /billing/checkout/vnpay-return` — Xử lý callback từ VNPay
+
+### Chặng 4 — UI Integration
+1. Bổ sung Flash Messages (success/error alerts) vào `checkout.html`
+2. Chuyển khối thanh toán thành `<form>` POST với radio buttons CASH/VNPAY
+
+## 11.4. Deployment Checklist
+- [x] CASH: Click thanh toán → redirect thành công
+- [x] VNPAY: Click → redirect sang VNPay → quét QR → callback thành công
+- [x] BR-12: Nếu có pending orders → flash error message
+- [x] VNPay signature verification hoạt động
+
+# 12. Rollback & Incident Runbook
+
+## 12.1. Điều kiện kích hoạt Rollback
+
+| Điều kiện | Ngưỡng | Người quyết định |
+| --- | --- | --- |
+| Payment SUCCESS nhưng Booking/Villa chưa cập nhật | Bất kỳ case nào | Tech Lead |
+| VNPay callback trả sai paymentId | Bất kỳ case nào | Tech Lead |
+| Secret key bị lộ trên Git | Ngay lập tức | Toàn team |
+
+## 12.2. Rollback Procedure
+```bash
+# Bước 1: Revert code
+git checkout -- auramoon/src/main/java/com/AuraMoon/auramoon/billing/
+
+# Bước 2: Kiểm tra Payment records bất thường
+SELECT payment_id, status, transaction_code
+FROM PAYMENT WHERE status = 'PENDING' AND payment_date < DATEADD(HOUR, -1, GETDATE());
+-- Nếu có PENDING > 1 giờ → đánh dấu FAILED thủ công
+
+# Bước 3: Nếu secret bị lộ → Đổi mã VNPay ngay trên Dashboard
+```
+
+# 13. Kịch bản Kiểm thử Chi tiết
+
+> Chi tiết đầy đủ tại `UC22_TDD_Process_Final_Payment.md`. Tóm tắt:
+
+| TC ID | Tên | Mức độ | Kết quả mong đợi |
+| --- | --- | --- | --- |
+| BIL-TC-001 | Thanh toán CASH thành công | HIGH | Redirect → success, Booking = COMPLETED |
+| BIL-TC-002 | Chặn checkout nếu pending orders (BR-12) | CRITICAL | Flash error message, không thay đổi DB |
+| BIL-TC-003 | Sinh URL VNPay & Redirect | HIGH | Redirect tới `sandbox.vnpayment.vn` |
+| BIL-TC-004 | VNPay Callback thành công (00) | CRITICAL | Payment = SUCCESS, Booking = COMPLETED |
+| BIL-TC-005 | VNPay Callback thất bại (24) | HIGH | Payment = FAILED, Booking không đổi |
+| BIL-TC-006 | VNPay sai chữ ký | CRITICAL | Flash error, Payment không đổi |
+
+# 14. Phương pháp Xác minh
+
+## 14.1. Database Inspection
+```sql
+-- Verify Payment đã chuyển sang SUCCESS sau thanh toán
+SELECT payment_id, amount, payment_method, transaction_code, status
+FROM PAYMENT WHERE folio_id = 1 ORDER BY payment_date DESC;
+
+-- Verify Booking đã COMPLETED
+SELECT booking_id, booking_status, payment_status
+FROM BOOKING WHERE booking_id = 1;
+
+-- Verify Villa đã đổi trạng thái
+SELECT villa_id, villa_status, cleaning_status
+FROM VILLA WHERE villa_id = (SELECT assigned_villa_id FROM BOOKING WHERE booking_id = 1);
+
+-- Verify Folio đã PAID
+SELECT folio_id, status FROM GUEST_FOLIO WHERE booking_id = 1;
+```
+
+## 14.2. VNPay Signature Verification
+```bash
+# Kiểm tra trong log server sau khi VNPay callback:
+# Expected: verifySignature() trả về true
+# Check return params chứa vnp_ResponseCode=00
+```
+
+# 15. Mẫu thử thực tế (MVC Verification Samples)
+
+## 15.1. CASH Payment — Happy Path
+```
+Bước 1: Mở http://localhost:8080/billing/checkout?bookingId=1
+Bước 2: Chọn radio "Tiền mặt" → Click "Hoàn tất Thanh toán"
+Bước 3: Form submit POST /billing/checkout/1/pay?paymentMethod=CASH
+Bước 4: Redirect → /billing/checkout/success?paymentId={id}
+Bước 5: Trang hiển thị "Thanh toán thành công. Check-out hoàn tất!"
+```
+
+## 15.2. VNPay Payment — Happy Path (qua Ngrok)
+```
+Bước 1: Chạy Ngrok: ngrok http 8080
+Bước 2: Mở https://xxxx.ngrok-free.app/billing/checkout?bookingId=1
+Bước 3: Chọn radio "VNPay" → Click "Hoàn tất Thanh toán"
+Bước 4: Redirect → https://sandbox.vnpayment.vn/paymentv2/...
+Bước 5: Quét QR hoặc nhập thẻ test
+Bước 6: VNPay callback → /billing/checkout/vnpay-return?vnp_ResponseCode=00
+Bước 7: Redirect → /billing/checkout/success?paymentId={id}
+```
+
+## 15.3. Error Path — Pending Orders
+```
+Bước 1: Tạo FolioItem với status = 'PENDING' cho bookingId=1
+Bước 2: Thử thanh toán → POST /billing/checkout/1/pay
+Bước 3: Redirect quay lại checkout page
+Bước 4: Flash message: "Không thể Check-out: Khách còn đơn hàng Spa/F&B đang thực hiện."
+```
+
+# 16. Bảng tổng hợp phân quyền (Authorization Matrix)
+
+| Endpoint | GUEST | RECEPTIONIST | THERAPIST | CHEF | ADMIN |
+| --- | --- | --- | --- | --- | --- |
+| `GET /billing/checkout` | ❌ | ✅ | ❌ | ❌ | ✅ |
+| `POST /billing/checkout/{id}/pay` | ❌ | ✅ | ❌ | ❌ | ✅ |
+| `GET /billing/checkout/vnpay-return` | ❌ | ✅ (auto) | ❌ | ❌ | ❌ |
+| `GET /billing/checkout/success` | ❌ | ✅ | ❌ | ❌ | ✅ |
+
+**Chú thích:**
+* ✅ = Được phép
+* ❌ = Bị từ chối
+* `auto` = Endpoint được VNPay gọi tự động, không cần người dùng truy cập trực tiếp
+
+# PHỤ LỤC
+
+## A. Glossary (Thuật ngữ)
+
+| Thuật ngữ | Định nghĩa |
+| --- | --- |
+| VNPay | Cổng thanh toán trực tuyến phổ biến tại Việt Nam |
+| vnp_SecureHash | Chữ ký HMAC-SHA512 đảm bảo tính toàn vẹn dữ liệu VNPay |
+| vnp_TxnRef | Mã giao dịch tham chiếu (= Payment ID trong hệ thống) |
+| vnp_ResponseCode | Mã kết quả giao dịch VNPay (00 = thành công) |
+| Ngrok | Công cụ tạo tunnel để VNPay callback về localhost |
+| Flash Attribute | Cơ chế Spring MVC truyền message qua redirect |
+| Balance Due | Số tiền còn lại cần thanh toán |
+
+## B. Tài liệu tham chiếu
+
+| Document | Link / Path |
+| --- | --- |
+| SRS UC22 | `01_SRS/SRS_Document_SWP391_G6.md` — Section 3.1.12 |
+| VNPay Integration Docs | `https://sandbox.vnpayment.vn/apis/` |
+| VNPay Setup Guide | `03_Implement/UC22/VNPay_Setup_Guide.md` |
+| Database Schema | `Database/DB.sql` — Table: PAYMENT |
+

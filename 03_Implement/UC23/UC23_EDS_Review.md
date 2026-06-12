@@ -25,16 +25,16 @@
 # MỤC LỤC
 1. Tổng quan Module
 2. Ma trận Truy vết (Traceability Matrix)
-3. Architecture Decision Records (ADR) ⭐️ *Mới*
-4. Non-Functional Requirements & SLA ⭐️ *Mới*
+3. Architecture Decision Records (ADR)
+4. Non-Functional Requirements & SLA
 5. Static Modeling (Mô hình Tĩnh)
 6. Dynamic Modeling (Mô hình Động)
-7. Domain Event Catalog ⭐️ *Mới*
+7. Domain Event Catalog
 8. Interface Specification (Đặc tả Giao diện)
 9. API Specification
 10. Bảng mã lỗi (Error Codes)
 11. Quy trình Triển khai (Step-by-Step)
-12. Rollback & Incident Runbook ⭐️ *Mới*
+12. Rollback & Incident Runbook
 13. Kịch bản Kiểm thử Chi tiết
 14. Phương pháp Xác minh
 15. Mẫu thử thực tế (API Verification Samples)
@@ -192,7 +192,7 @@ actor "Customer" as User
 participant "ReviewController" as Controller
 participant "ReviewService" as Service
 participant "ReviewRepository" as Repository
-database "PostgreSQL" as DB
+database "SQL Server" as DB
 
 User -> Controller: POST /review/submit
 activate Controller
@@ -256,22 +256,84 @@ public interface IReviewService {
 | `REV-003` | 403 | Booking not completed | Đơn chưa hoàn tất | Booking chưa Check-out |
 
 # 11. Quy trình Triển khai (Step-by-Step)
-1. Thêm `ReviewRepository` và `ReviewService`.
-2. Tích hợp giao diện Frontend HTML từ Stitch và gắn TailwindCSS.
-3. Liên kết Controller với View (Thymeleaf).
-4. Run integration tests.
+
+## 11.1. Prerequisites
+- [x] Database table `REVIEW` đã được tạo.
+- [x] Module Booking (UC05) đã hoàn thiện để xác nhận trạng thái `COMPLETED`.
+
+## 11.2. Implementation Steps
+1. Tạo `ReviewRepository` với method `existsByBookingId`.
+2. Tạo `ReviewService` để handle rule BR-REV-001, BR-REV-002.
+3. Liên kết `ReviewController` nhận submit form POST và GET.
+4. Tích hợp UI `submit.html` dùng TailwindCSS (thiết kế Stitch).
+5. Sửa `CheckoutController` (UC22) để truyền `bookingId` sang màn review.
+
+## 11.3. Deployment Checklist
+- [x] Test GET `/review?bookingId=1` load được form.
+- [x] Test POST `/review/submit` lưu thành công vào DB.
+- [x] CSS/JS không bị inline (Nguyên tắc 4).
 
 # 12. Rollback & Incident Runbook
-N/A (Chức năng đọc và ghi cơ bản, không thay đổi cấu trúc bảng cũ nên không cần rollback migration).
+
+## 12.1. Đánh giá rủi ro
+> Module Review không tác động đến các core object khác (Booking, Payment), nên rủi ro là thấp. Tuy nhiên lỗi syntax có thể làm sập trang.
+
+## 12.2. Rollback Procedure
+```bash
+git checkout -- auramoon/src/main/java/com/AuraMoon/auramoon/booking/controller/ReviewController.java
+git checkout -- auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/ReviewService.java
+```
 
 # 13. Kịch bản Kiểm thử Chi tiết
-(Đã được định nghĩa chi tiết trong tài liệu `UC23_TDD_Review.md`)
+
+> Chi tiết tại tài liệu `UC23_TDD_Review.md`. Tóm tắt:
+
+| TC ID | Tên | Mức độ | Kết quả mong đợi |
+| --- | --- | --- | --- |
+| REV-TC-001 | Đánh giá hợp lệ | HIGH | Review được lưu xuống DB. |
+| REV-TC-002 | Booking chưa hoàn tất | HIGH | Ném exception `BookingNotCompletedException`. |
+| REV-TC-003 | Đánh giá 2 lần (spam) | HIGH | Ném exception `ReviewAlreadyExistsException`. |
+| REV-TC-XSS | XSS trong comment | CRITICAL | Script tag bị escape. |
 
 # 14. Phương pháp Xác minh
-Sử dụng Unit Test và MockMvc cho Controller.
 
-# 15. Mẫu thử thực tế (API Verification Samples)
-N/A (MVC Form Submission).
+## 14.1. Database Inspection
+```sql
+-- Xác minh Review được lưu
+SELECT review_id, booking_id, rating, comment FROM REVIEW WHERE booking_id = 1;
+```
+
+## 14.2. Log Verification
+Kiểm tra Tomcat logs để tìm các cảnh báo khi spam request.
+
+# 15. Mẫu thử thực tế (MVC Verification Samples)
+
+## 15.1. Happy Path
+```
+Bước 1: Truy cập GET /review?bookingId=1
+Bước 2: Chọn 5 sao, nhập "Tuyệt vời".
+Bước 3: Submit POST /review/submit
+Bước 4: Redirect về trang chủ với Flash message "Cảm ơn bạn đã đánh giá!".
+```
 
 # 16. Bảng tổng hợp phân quyền (Authorization Matrix)
-Tính năng đánh giá dựa vào `bookingId` truyền từ email sau check-out, do đó Endpoint là Public. Bảo mật dựa vào Validation của ID đơn phòng đã check-out.
+
+| Endpoint | GUEST | RECEPTIONIST | THERAPIST | CHEF | ADMIN |
+| --- | --- | --- | --- | --- | --- |
+| `GET /review` | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `POST /review/submit` | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+**Chú thích:** Tính năng đánh giá là PUBLIC (do khách hàng nhận link qua email/trang checkout success), nhưng được bảo mật thông qua việc kiểm tra trạng thái và lịch sử của `bookingId`.
+
+# PHỤ LỤC
+
+## A. Glossary (Thuật ngữ)
+| Thuật ngữ | Định nghĩa |
+| --- | --- |
+| Review | Đánh giá dịch vụ của khách |
+| Star Rating | Xếp hạng số sao (1-5) |
+
+## B. Tài liệu tham chiếu
+| Document | Path |
+| --- | --- |
+| TDD Spec | `03_Implement/UC23/UC23_TDD_Review.md` |
