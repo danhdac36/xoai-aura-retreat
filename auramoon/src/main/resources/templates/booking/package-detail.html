@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Chi Tiết Gói Trị Liệu | Xoai Aura Retreat</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@300;400;500;600&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif !important;
+        }
+        h1, h2, h3, h4, h5, h6, .font-serif {
+            font-family: 'Playfair Display', serif !important;
+        }
+    </style>
+</head>
+<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans antialiased">
+
+    <main class="max-w-6xl mx-auto px-8 py-12">
+        <a th:href="@{/packages}" class="inline-flex items-center gap-1.5 text-[#566342] hover:text-[#3f4b2c] font-medium transition-colors mb-8 group">
+            <span class="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">arrow_back</span>
+            <span>Quay lại danh sách gói</span>
+        </a>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-10">
+
+            <div class="h-[420px] overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
+                <img th:src="${pkg.typePackage == 'Stress Relief' || pkg.typePackage == 'Spa'} ? @{/img/spa-retreat.jpg} :
+                         (${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'} ? @{/img/detox-retreat.jpg} :
+                         (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
+                         @{/img/retreat-default.jpg}))" alt="Retreat Package" class="w-full h-full object-cover animate-fade-in">
+            </div>
+
+            <div class="flex flex-col justify-between">
+                <div>
+                    <p class="uppercase tracking-widest text-xs font-semibold text-[#566342] bg-[#566342]/10 px-3 py-1 rounded-full w-fit mb-3" th:text="${pkg.typePackage}">
+                        Yoga
+                    </p>
+
+                    <h1 class="text-4xl font-serif font-bold text-gray-900 mb-4" th:text="${pkg.packageName}">
+                        Retreat Package Name
+                    </h1>
+
+                    <p class="text-gray-600 leading-relaxed mb-6" th:text="${pkg.description}">
+                        Package description
+                    </p>
+
+                    <!-- Premium Stats Grid -->
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm">
+                            <span class="material-symbols-outlined text-[#566342] text-xl mb-1 block">schedule</span>
+                            <span class="text-[10px] text-gray-400 block uppercase tracking-wider font-semibold">Thời lượng</span>
+                            <span class="font-serif font-bold text-base text-gray-800" th:text="${pkg.durationDays} + ' Ngày'">3 Ngày</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm">
+                            <span class="material-symbols-outlined text-[#566342] text-xl mb-1 block">payments</span>
+                            <span class="text-[10px] text-gray-400 block uppercase tracking-wider font-semibold">Giá từ</span>
+                            <span class="font-serif font-bold text-base text-gray-800" th:text="${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">15.000.000 đ</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm">
+                            <span class="material-symbols-outlined text-[#566342] text-xl mb-1 block">spa</span>
+                            <span class="text-[10px] text-gray-400 block uppercase tracking-wider font-semibold">Trị liệu</span>
+                            <span class="font-serif font-bold text-base text-gray-800 truncate block px-1" th:text="${pkg.typePackage}">Yoga</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Service Pills -->
+                    <div class="mb-6 bg-[#566342]/5 p-5 rounded-xl border border-[#566342]/10">
+                        <h3 class="text-xs font-bold text-[#566342] mb-3 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-base">verified</span> Dịch vụ đi kèm
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span th:each="service : ${#strings.arraySplit(pkg.services, ',')}" 
+                                  class="bg-white border border-[#566342]/10 text-[#566342] text-xs px-3 py-1.5 rounded-full font-medium shadow-sm flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px] text-[#566342]">check_circle</span>
+                                <span th:text="${#strings.trim(service)}">Yoga</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <a th:href="@{/booking/create(packageId=${pkg.id})}" class="w-full md:w-auto text-center inline-block px-8 py-3.5 bg-[#566342] text-white font-medium rounded-xl hover:bg-[#3f4b2c] transition-colors duration-300 shadow-md shadow-[#566342]/10 hover:shadow-lg">
+                    Tiến hành đặt gói ngay
+                </a>
+            </div>
+
+        </section>
+
+        <!-- Unified Premium Tab Component -->
+        <div class="mt-14 bg-white border border-[#c8c7be]/60 rounded-2xl shadow-sm overflow-hidden">
+            <!-- Tab Headers -->
+            <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-100 bg-[#fdfbf9]">
+                <!-- Tab Header 1: Itinerary -->
+                <button onclick="switchTab('itinerary')" id="tab-btn-itinerary" class="p-6 text-left border-b border-gray-100 md:border-b-0 md:border-r border-gray-100 transition-all duration-300 focus:outline-none hover:bg-white bg-white border-t-4 border-t-[#566342]">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-[#566342] text-xl" id="tab-icon-itinerary">event_note</span>
+                        <span class="font-serif font-bold text-lg text-[#566342]" id="tab-title-itinerary">Lịch trình mẫu</span>
+                    </div>
+                    <p class="text-xs text-gray-500 leading-relaxed">Lộ trình ngày đêm chi tiết được thiết kế khoa học từ chánh niệm sớm đến thư giãn tối, tối ưu hóa theo số ngày thực tế.</p>
+                </button>
+                
+                <!-- Tab Header 2: Spa Services -->
+                <button onclick="switchTab('spa')" id="tab-btn-spa" class="p-6 text-left border-b border-gray-100 md:border-b-0 md:border-r border-gray-100 transition-all duration-300 focus:outline-none hover:bg-[#566342]/5 bg-transparent border-t-4 border-t-transparent">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-gray-400 text-xl" id="tab-icon-spa">spa</span>
+                        <span class="font-serif font-bold text-lg text-gray-700" id="tab-title-spa">Dịch vụ spa đi kèm</span>
+                    </div>
+                    <p class="text-xs text-gray-400 leading-relaxed">Trải nghiệm liệu trình phục hồi cao cấp: massage thảo dược, xông đá muối Himalaya, ngâm bồn lá thuốc Dao đỏ và chuông xoay.</p>
+                </button>
+                
+                <!-- Tab Header 3: Nutrition Menu -->
+                <button onclick="switchTab('nutrition')" id="tab-btn-nutrition" class="p-6 text-left transition-all duration-300 focus:outline-none hover:bg-[#566342]/5 bg-transparent border-t-4 border-t-transparent">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-gray-400 text-xl" id="tab-icon-nutrition">restaurant</span>
+                        <span class="font-serif font-bold text-lg text-gray-700" id="tab-title-nutrition">Thực đơn dinh dưỡng</span>
+                    </div>
+                    <p class="text-xs text-gray-400 leading-relaxed">Chế độ ăn lành mạnh 100% Organic & Farm-to-Table, được tính toán calo và thiết kế khoa học bổ trợ đắc lực cho liệu trình sức khỏe.</p>
+                </button>
+            </div>
+            
+            <!-- Tab Contents Area -->
+            <div class="p-8">
+                <!-- Panel 1: Detailed Itinerary -->
+                <div id="panel-itinerary" class="space-y-8">
+                    <h2 class="text-2xl font-serif text-[#566342] mb-6 border-b border-gray-100 pb-3 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[#566342] text-2xl">event_note</span> Lộ Trình Chi Tiết Kỳ Nghỉ Mẫu
+                    </h2>
+                    
+                    <div class="space-y-8">
+                        <!-- Loop through each day -->
+                        <div th:each="dayNum : ${#numbers.sequence(1, pkg.durationDays)}" class="relative border-l-2 border-[#566342]/20 pl-6 pb-4 last:pb-0">
+                            <!-- Day marker dot -->
+                            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-[#566342] border-2 border-white shadow-sm"></div>
+                            
+                            <h3 class="text-lg font-serif font-bold text-[#566342] mb-3" th:text="'Ngày ' + ${dayNum}">Ngày 1</h3>
+                            
+                            <div class="space-y-4 bg-[#fbf9f8] p-5 rounded-xl border border-gray-100 shadow-sm">
+                                <!-- Day 1 Schedule (Arrival) -->
+                                <div th:if="${dayNum == 1}" class="space-y-4">
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">14:00</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">Check-in & Trà Chào Mừng (Welcome Tea)</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Làm thủ tục nhận phòng Villa và thưởng thức trà thảo mộc organic tại phòng chờ.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">15:30</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">Tư Vấn Sức Khỏe & Thiết Lập Lộ Trình</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Gặp gỡ chuyên gia trị liệu để đo chỉ số sinh học và tối ưu hóa liệu trình cá nhân.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">18:30</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">Bữa Tối Dinh Dưỡng Hữu Cơ</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Thực đơn nhẹ nhàng, thanh đạm phục hồi cơ thể sau chuyến đi.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Mid Days Schedule (Full Retreat Program) -->
+                                <div th:if="${dayNum > 1 && dayNum < pkg.durationDays}" class="space-y-4">
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">06:30</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900" 
+                                                th:text="${pkg.typePackage == 'Yoga' ? 'Luyện Tập Yoga Đón Bình Minh' : (pkg.typePackage == 'Stress Relief' ? 'Thiền Định Chánh Niệm' : 'Vận Động Cardio Nhẹ Nhàng')}">
+                                                Luyện Tập Yoga Đón Bình Minh
+                                            </h4>
+                                            <p class="text-sm text-gray-600 mt-1"
+                                               th:text="${pkg.typePackage == 'Yoga' ? 'Lớp Yoga khởi động khớp và kéo giãn cơ thể dưới ánh ban mai.' : (pkg.typePackage == 'Stress Relief' ? 'Lớp thiền thở kết chuông xoay giải phóng lo âu, làm dịu hệ thần kinh.' : 'Hoạt động đi bộ nhanh hoặc chạy bộ nhẹ nhàng kích hoạt cơ chế đốt mỡ.')}">
+                                                Hoạt động đánh thức năng lượng thể chất.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">08:00</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">Bữa Sáng Dinh Dưỡng</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Thực đơn sinh tố xanh và ngũ cốc nguyên cám phục hồi năng lượng.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">12:00</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900"
+                                                th:text="${pkg.typePackage == 'Detox' || pkg.typePackage == 'Weight Loss' ? 'Bữa Trưa Detox & Low-Cal' : 'Bữa Trưa Thanh Nhẹ'}">
+                                                Bữa Trưa Dinh Dưỡng
+                                            </h4>
+                                            <p class="text-sm text-gray-600 mt-1"
+                                               th:text="${pkg.typePackage == 'Detox' || pkg.typePackage == 'Weight Loss' ? 'Thực đơn súp rau củ hữu cơ, giàu vitamin đào thải độc tố và kiểm soát cân nặng.' : 'Bữa ăn lành mạnh cân bằng đạm và dưỡng chất thực vật.'}">
+                                                Thưởng thức ẩm thực dưỡng sinh.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">15:30</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900"
+                                                th:text="${pkg.typePackage == 'Spa' || pkg.typePackage == 'Stress Relief' ? 'Trị Liệu Massage & Thảo Dược' : 'Ngâm Khoáng Thải Độc & Xông Đá Muối'}">
+                                                Liệu Trình Spa Tự Nhiên
+                                            </h4>
+                                            <p class="text-sm text-gray-600 mt-1"
+                                               th:text="${pkg.typePackage == 'Spa' || pkg.typePackage == 'Stress Relief' ? 'Liệu trình massage tinh dầu thảo dược và tắm bồn thảo mộc ngủ ngon.' : 'Trải nghiệm xông hơi hồng ngoại và ngâm chân khoáng nóng thúc đẩy khí huyết.'}">
+                                                Nuôi dưỡng làn da và thư giãn gân cốt.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">18:30</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">Thưởng Trà Tĩnh Lặng & Bữa Tối Nhẹ</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Trà chamomile organic giúp cơ thể thư giãn sâu và sẵn sàng cho giấc ngủ trọn vẹn.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Last Day Schedule (Departure) -->
+                                <div th:if="${dayNum == pkg.durationDays}" class="space-y-4">
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">06:30</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">Thiền Sớm Nhẹ Nhàng & Đi Bộ Tắm Rừng</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Kết nối lại với thiên nhiên trong lành của resort trước khi kết thúc hành trình.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">08:00</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">Bữa Sáng Tạm Biệt</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Thực đơn trà thảo mộc cùng bánh ngũ cốc organic tươi.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">10:00</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">Tổng Kết Lộ Trình & Tư Vấn Sau Kỳ Nghỉ</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Đánh giá lại kết quả sức khỏe và nhận cẩm nang chăm sóc tại nhà từ chuyên gia.</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4">
+                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">12:00</span>
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">Làm Thủ Tục Check-out</h4>
+                                            <p class="text-sm text-gray-600 mt-1">Hoàn tất hóa đơn Folio và kết thúc kỳ nghỉ dưỡng tốt đẹp.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 2: Detailed Spa Services -->
+                <div id="panel-spa" class="hidden space-y-8">
+                    <h2 class="text-2xl font-serif text-[#566342] mb-6 border-b border-gray-100 pb-3 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[#566342] text-2xl">spa</span> Chi Tiết Liệu Trình Spa Trị Liệu & Phục Hồi
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- If package is Yoga -->
+                        <th:block th:if="${pkg.typePackage == 'Yoga'}">
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">graphic_eq</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Liệu Pháp Chuông Xoay Tây Tạng (Sound Healing)</h3>
+                                    <p class="text-sm text-gray-600">Sử dụng tần số âm thanh từ chuông xoay để xoa dịu hệ thần kinh, giải phóng tắc nghẽn năng lượng và mang lại sự tĩnh lặng sâu sắc.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">60 phút</span>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">self_improvement</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Tắm Thảo Dược Cổ Truyền Tây Bắc</h3>
+                                    <p class="text-sm text-gray-600">Ngâm mình trong bồn gỗ sồi với nước lá thuốc Dao đỏ giúp giãn cơ, kích thích tuần hoàn máu và đào thải độc tố toàn thân.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">45 phút</span>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">airline_seat_recline_normal</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Massage Khí Huyết & Bấm Huyệt</h3>
+                                    <p class="text-sm text-gray-600">Liệu pháp massage ấn huyệt nhẹ nhàng tập trung vào vùng lưng và đầu, giải tỏa sự mệt mỏi thể chất sau các bài tập Yoga.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">60 phút</span>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">footprint</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Trị Liệu Phản Xạ Bàn Chân (Foot Reflexology)</h3>
+                                    <p class="text-sm text-gray-600">Massage bấm huyệt lòng bàn chân kết hợp thảo dược ngâm chân hỗ trợ cân bằng lục phủ ngũ tạng và giúp ngủ sâu giấc.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">30 phút</span>
+                                </div>
+                            </div>
+                        </th:block>
+
+                        <!-- If package is Stress Relief -->
+                        <th:block th:if="${pkg.typePackage == 'Stress Relief'}">
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">energy_savings_leaf</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Aromatherapy Massage Thụy Điển</h3>
+                                    <p class="text-sm text-gray-600">Kỹ thuật vuốt miết thư giãn cơ kết hợp tinh dầu oải hương ấm hữu cơ tác động êm dịu lên toàn bộ các nhóm cơ căng mỏi.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">75 phút</span>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">thermostat</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Xông Hơi Đá Muối Himalaya Hồng Ngoại</h3>
+                                    <p class="text-sm text-gray-600">Nhiệt hồng ngoại kết hợp ion âm từ đá muối Himalaya tự nhiên giúp giảm stress, khai thông đường hô hấp và cải thiện giấc ngủ.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">45 phút</span>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">water_drop</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Tắm Bồn Sữa & Thảo Dược Dưỡng Thể</h3>
+                                    <p class="text-sm text-gray-600">Ngâm bồn nước ấm chứa sữa dê tươi và tinh chất thảo mộc giúp làn da mềm mại, giải tỏa toàn bộ căng thẳng trí não.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">30 phút</span>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">mode_night</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Liệu Pháp Giấc Ngủ Vàng (Deep Sleep)</h3>
+                                    <p class="text-sm text-gray-600">Ấn huyệt nhẹ nhàng vùng đầu và mặt, kết hợp đắp túi thảo dược ấm ở mắt giúp giải tỏa mỏi mắt và chứng mất ngủ kinh niên.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">60 phút</span>
+                                </div>
+                            </div>
+                        </th:block>
+
+                        <!-- If package is Weight Loss / Detox -->
+                        <th:block th:if="${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'}">
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">water_lux</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Massage Đào Thải Độc Tố Hệ Bạch Huyết</h3>
+                                    <p class="text-sm text-gray-600">Massage chuyên biệt thúc đẩy hệ bạch huyết hoạt động mạnh mẽ, hỗ trợ cơ thể bài tiết mỡ thừa và các chất cặn bã.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">75 phút</span>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">hot_tub</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Tắm Thảo Dược Tăng Trao Đổi Chất</h3>
+                                    <p class="text-sm text-gray-600">Ngâm bồn khoáng với tinh chất gừng, quế ấm kích thích nhiệt lượng nội sinh, thúc đẩy đốt cháy mỡ thừa qua da.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">30 phút</span>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">oven_gen</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Xông Khô Đá Nóng Thảo Dược</h3>
+                                    <p class="text-sm text-gray-600">Kích hoạt quá trình bài tiết tuyến mồ hôi tối đa, tiêu hao lượng calo dư thừa và hỗ trợ tuần hoàn khí huyết.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">45 phút</span>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">layers</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Liệu Pháp Quấn Săn Chắc Tảo Biển & Bùn Khoáng</h3>
+                                    <p class="text-sm text-gray-600">Ủ cơ thể bằng bùn khoáng thiên nhiên kết hợp tảo biển giúp làm săn chắc các mô mỡ, cấp ẩm sâu và làm mịn da.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">60 phút</span>
+                                </div>
+                            </div>
+                        </th:block>
+
+                        <!-- If package is anything else (default) -->
+                        <th:block th:if="${pkg.typePackage != 'Yoga' && pkg.typePackage != 'Stress Relief' && pkg.typePackage != 'Weight Loss' && pkg.typePackage != 'Detox'}">
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">spa</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Massage Trị Liệu Chuyên Sâu Aura Moon</h3>
+                                    <p class="text-sm text-gray-600">Liệu trình trị liệu độc quyền kết hợp đá nóng bazan và tinh dầu thiên nhiên Aura Moon giúp phục hồi năng lượng thể chất toàn diện.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">75 phút</span>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">thermostat</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Xông Hơi Phục Hồi Thể Lực</h3>
+                                    <p class="text-sm text-gray-600">Kích thích hệ tuần hoàn, mở rộng lỗ chân lông giúp làm sạch sâu và thư giãn hệ cơ khớp.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">45 phút</span>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
+                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">water_drop</span>
+                                <div>
+                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Ngâm Bồn Thảo Mộc Thư Giãn</h3>
+                                    <p class="text-sm text-gray-600">Thư giãn cơ thể trong làn nước ấm ngâm các vị thuốc bắc cổ truyền và lá thơm tự nhiên.</p>
+                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">30 phút</span>
+                                </div>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+
+                <!-- Panel 3: Detailed Nutrition Menu -->
+                <div id="panel-nutrition" class="hidden space-y-8">
+                    <h2 class="text-2xl font-serif text-[#566342] mb-6 border-b border-gray-100 pb-3 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[#566342] text-3xl">restaurant</span> Chi Tiết Thực Đơn Dinh Dưỡng Dưỡng Sinh
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Philosophy Column -->
+                        <div class="lg:col-span-1 p-6 bg-[#566342]/5 rounded-xl border border-[#566342]/10 h-fit">
+                            <h3 class="font-serif font-bold text-xl text-[#566342] mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined">psychology</span> Triết Lý Ẩm Thực
+                            </h3>
+                            <ul class="space-y-4 text-sm text-gray-700">
+                                <li class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined text-[#566342] text-lg mt-0.5">check_circle</span>
+                                    <span><strong>100% Organic & Farm-to-Table:</strong> Nguyên liệu rau củ quả hữu cơ sạch, thu hoạch trực tiếp từ vườn sinh thái Aura Moon.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined text-[#566342] text-lg mt-0.5">check_circle</span>
+                                    <span><strong>Nói không với hóa chất:</strong> Hoàn toàn hạn chế gia vị hóa học và chất bảo quản, không dùng đường tinh luyện.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined text-[#566342] text-lg mt-0.5">check_circle</span>
+                                    <span><strong>Thiết kế cân bằng:</strong> Menu đo ni đóng giày bởi chuyên gia dinh dưỡng để hỗ trợ tốt nhất cho quá trình phục hồi cơ thể.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Daily Menu Plan Column -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <h3 class="font-serif font-bold text-xl text-gray-900 mb-2">Thực Đơn Dinh Dưỡng Mẫu Trong Ngày</h3>
+                            
+                            <!-- Breakfast -->
+                            <div class="p-5 bg-[#fbf9f8] rounded-xl border border-gray-100 flex items-start gap-4 shadow-sm">
+                                <div class="bg-[#dae8be] text-[#3f4b2c] text-xs font-semibold px-3 py-1 rounded flex-shrink-0 mt-0.5">08:00</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-1">Bữa Sáng Lành Mạnh (Breakfast)</h4>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Yoga'}">
+                                        Sinh tố cải Kale, bơ chín & hạt chia organic. Ăn kèm bánh mì Sourdough ngũ cốc phết bơ hạnh nhân tự nhiên.
+                                    </p>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Stress Relief'}">
+                                        Cháo yến mạch ấm kết hợp hạt sen, hạt điều, kỷ tử và long nhãn giúp an thần, thư thái tâm hồn. Kèm ly trà gừng mật ong.
+                                    </p>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'}">
+                                        Smoothie bowl quả mọng (Berry Bowl) rắc hạt chia, hạt lanh và chuối lát. Kèm 1 ly nước ép cần tây & táo xanh nguyên chất.
+                                    </p>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage != 'Yoga' && pkg.typePackage != 'Stress Relief' && pkg.typePackage != 'Weight Loss' && pkg.typePackage != 'Detox'}">
+                                        Trứng chần hữu cơ kèm măng tây áp chảo nhẹ và cà chua bi nướng. Kèm ly nước ép trái cây theo mùa.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Lunch -->
+                            <div class="p-5 bg-[#fbf9f8] rounded-xl border border-gray-100 flex items-start gap-4 shadow-sm">
+                                <div class="bg-[#dae8be] text-[#3f4b2c] text-xs font-semibold px-3 py-1 rounded flex-shrink-0 mt-0.5">12:00</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-1">Bữa Trưa Thanh Dưỡng (Lunch)</h4>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Yoga'}">
+                                        Salad Quinoa ngũ sắc cầu vồng, đậu hũ áp chảo sốt mè rang organic, ăn cùng hạt điều và dưa chuột baby.
+                                    </p>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Stress Relief'}">
+                                        Cá hồi áp chảo sốt cam tươi thanh dịu, măng tây nướng tỏi, súp bí đỏ hạt sen ấm nóng bổ sung Omega-3 dồi dào.
+                                    </p>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'}">
+                                        Salad ức gà áp chảo sốt chanh leo, bông cải xanh hấp, canh rau củ thập cẩm thanh đạm không muối hỗ trợ giảm mỡ tích cực.
+                                    </p>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage != 'Yoga' && pkg.typePackage != 'Stress Relief' && pkg.typePackage != 'Weight Loss' && pkg.typePackage != 'Detox'}">
+                                        Cơm gạo lứt hạt sen, phi lê cá chẽm hấp hành gừng, bông cải xanh và cà rốt luộc chấm kho quẹt organic.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Afternoon Tea -->
+                            <div class="p-5 bg-[#fbf9f8] rounded-xl border border-gray-100 flex items-start gap-4 shadow-sm">
+                                <div class="bg-[#dae8be] text-[#3f4b2c] text-xs font-semibold px-3 py-1 rounded flex-shrink-0 mt-0.5">15:00</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-1">Bữa Trà Chiều Tĩnh Tâm (Wellness Tea)</h4>
+                                    <p class="text-sm text-gray-600">
+                                        Thưởng trà thảo mộc ấm (trà hoa cúc, trà hoa nhài hoặc trà cỏ ngọt) kèm một đĩa nhỏ các loại hạt sấy khô nguyên vị (hạnh nhân, óc chó, hạt bí).
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Dinner -->
+                            <div class="p-5 bg-[#fbf9f8] rounded-xl border border-gray-100 flex items-start gap-4 shadow-sm">
+                                <div class="bg-[#dae8be] text-[#3f4b2c] text-xs font-semibold px-3 py-1 rounded flex-shrink-0 mt-0.5">18:30</div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-1">Bữa Tối Dưỡng Sinh (Dinner)</h4>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Yoga'}">
+                                        Súp rau củ mùa đông ăn kèm bánh mì nguyên cám nướng giòn và đậu hũ non hấp hành lá.
+                                    </p>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Stress Relief'}">
+                                        Canh dưỡng nhan thảo mộc, cá tuyết hấp xì dầu nhẹ và nấm đông cô, ăn kèm một phần nhỏ cơm lứt dẻo thơm.
+                                    </p>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'}">
+                                        Súp bí đỏ kem dừa rắc hạt chia, rau củ luộc thập cẩm chấm muối vừng. Hạn chế tối đa tinh bột trắng.
+                                    </p>
+                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage != 'Yoga' && pkg.typePackage != 'Stress Relief' && pkg.typePackage != 'Weight Loss' && pkg.typePackage != 'Detox'}">
+                                        Canh sườn non hầm củ sen bách hợp, cơm lứt đỏ hạt sen và rau xanh luộc.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function switchTab(tabId) {
+            // Hide all panels
+            document.getElementById('panel-itinerary').classList.add('hidden');
+            document.getElementById('panel-spa').classList.add('hidden');
+            document.getElementById('panel-nutrition').classList.add('hidden');
+            
+            // Reset all buttons style
+            const tabs = ['itinerary', 'spa', 'nutrition'];
+            tabs.forEach(id => {
+                const btn = document.getElementById('tab-btn-' + id);
+                const icon = document.getElementById('tab-icon-' + id);
+                const title = document.getElementById('tab-title-' + id);
+                const desc = btn.querySelector('p');
+                
+                btn.className = "p-6 text-left border-b border-gray-100 md:border-b-0 md:border-r last:border-r-0 transition-all duration-300 focus:outline-none hover:bg-[#566342]/5 bg-transparent border-t-4 border-t-transparent";
+                icon.className = "material-symbols-outlined text-gray-400 text-xl";
+                title.className = "font-serif font-bold text-lg text-gray-700";
+                desc.className = "text-xs text-gray-400 leading-relaxed";
+            });
+            
+            // Show selected panel
+            document.getElementById('panel-' + tabId).classList.remove('hidden');
+            
+            // Set active button style
+            const activeBtn = document.getElementById('tab-btn-' + tabId);
+            const activeIcon = document.getElementById('tab-icon-' + tabId);
+            const activeTitle = document.getElementById('tab-title-' + tabId);
+            const activeDesc = activeBtn.querySelector('p');
+            
+            activeBtn.className = "p-6 text-left border-b border-gray-100 md:border-b-0 md:border-r last:border-r-0 transition-all duration-300 focus:outline-none hover:bg-white bg-white border-t-4 border-t-[#566342]";
+            activeIcon.className = "material-symbols-outlined text-[#566342] text-xl";
+            activeTitle.className = "font-serif font-bold text-lg text-[#566342]";
+            activeDesc.className = "text-xs text-gray-500 leading-relaxed";
+        }
+    </script>
+</body>
+
+</html>
