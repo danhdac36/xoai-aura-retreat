@@ -1,8 +1,8 @@
 package com.AuraMoon.auramoon.fnb.service;
 
-import com.AuraMoon.auramoon.fnb.dto.MealSelectionRequest;
+import com.AuraMoon.auramoon.fnb.dto.MealSelectionForm;
 import com.AuraMoon.auramoon.fnb.dto.MealSelectionResponse;
-import com.AuraMoon.auramoon.fnb.dto.MenuItemResponse;
+import com.AuraMoon.auramoon.fnb.dto.MenuItemViewModel;
 import com.AuraMoon.auramoon.fnb.entity.DietaryProfile;
 import com.AuraMoon.auramoon.fnb.entity.MealOrder;
 import com.AuraMoon.auramoon.fnb.entity.MealOrderItem;
@@ -15,6 +15,7 @@ import com.AuraMoon.auramoon.booking.entity.Booking;
 import com.AuraMoon.auramoon.booking.repository.BookingRepository;
 import com.AuraMoon.auramoon.billing.entity.GuestFolio;
 import com.AuraMoon.auramoon.billing.repository.GuestFolioRepository;
+import com.AuraMoon.auramoon.billing.repository.FolioItemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,6 +55,9 @@ public class MealSelectionServiceTest {
     @Mock
     private GuestFolioRepository guestFolioRepository;
 
+    @Mock
+    private FolioItemRepository folioItemRepository;
+
     @InjectMocks
     private MealSelectionService mealSelectionService;
 
@@ -89,19 +93,19 @@ public class MealSelectionServiceTest {
     }
 
     @Test
-    void testGetFilteredMenuForGuest_NoProfile() {
+    void testGetPersonalizedMenu_NoProfile() {
         when(menuItemRepository.findAll()).thenReturn(Arrays.asList(itemNormal, itemAllergy, itemMeat));
         when(dietaryProfileRepository.findByUserId(1)).thenReturn(Optional.empty());
 
-        List<MenuItemResponse> result = mealSelectionService.getFilteredMenuForGuest(1);
+        List<MenuItemViewModel> result = mealSelectionService.getPersonalizedMenu(1);
 
         assertEquals(3, result.size());
-        assertTrue(result.stream().allMatch(MenuItemResponse::getIsAvailableForGuest));
+        assertTrue(result.stream().allMatch(MenuItemViewModel::getIsAvailableForGuest));
         assertTrue(result.stream().allMatch(item -> item.getWarningMessage() == null));
     }
 
     @Test
-    void testGetFilteredMenuForGuest_WithAllergy() {
+    void testGetPersonalizedMenu_WithAllergy() {
         DietaryProfile profile = DietaryProfile.builder()
                 .userId(1)
                 .foodAllergies("peanut")
@@ -111,24 +115,24 @@ public class MealSelectionServiceTest {
         when(menuItemRepository.findAll()).thenReturn(Arrays.asList(itemNormal, itemAllergy, itemMeat));
         when(dietaryProfileRepository.findByUserId(1)).thenReturn(Optional.of(profile));
 
-        List<MenuItemResponse> result = mealSelectionService.getFilteredMenuForGuest(1);
+        List<MenuItemViewModel> result = mealSelectionService.getPersonalizedMenu(1);
 
         assertEquals(3, result.size());
         
         // Find normal item (rice)
-        MenuItemResponse normalRes = result.stream().filter(item -> item.getId() == 1).findFirst().orElseThrow();
+        MenuItemViewModel normalRes = result.stream().filter(item -> item.getId() == 1).findFirst().orElseThrow();
         assertTrue(normalRes.getIsAvailableForGuest());
         assertNull(normalRes.getWarningMessage());
 
         // Find allergy item (peanut toast)
-        MenuItemResponse allergyRes = result.stream().filter(item -> item.getId() == 2).findFirst().orElseThrow();
+        MenuItemViewModel allergyRes = result.stream().filter(item -> item.getId() == 2).findFirst().orElseThrow();
         assertFalse(allergyRes.getIsAvailableForGuest()); // Should be blocked
         assertNotNull(allergyRes.getWarningMessage());
         assertTrue(allergyRes.getWarningMessage().contains("dị ứng"));
     }
 
     @Test
-    void testGetFilteredMenuForGuest_WithVeganPreference() {
+    void testGetPersonalizedMenu_WithVeganPreference() {
         DietaryProfile profile = DietaryProfile.builder()
                 .userId(1)
                 .foodAllergies("")
@@ -138,28 +142,28 @@ public class MealSelectionServiceTest {
         when(menuItemRepository.findAll()).thenReturn(Arrays.asList(itemNormal, itemAllergy, itemMeat));
         when(dietaryProfileRepository.findByUserId(1)).thenReturn(Optional.of(profile));
 
-        List<MenuItemResponse> result = mealSelectionService.getFilteredMenuForGuest(1);
+        List<MenuItemViewModel> result = mealSelectionService.getPersonalizedMenu(1);
 
         assertEquals(3, result.size());
 
         // Normal rice should be recommended (vegan)
-        MenuItemResponse normalRes = result.stream().filter(item -> item.getId() == 1).findFirst().orElseThrow();
+        MenuItemViewModel normalRes = result.stream().filter(item -> item.getId() == 1).findFirst().orElseThrow();
         assertTrue(normalRes.getIsRecommended());
 
         // Beef noodles should NOT be recommended
-        MenuItemResponse meatRes = result.stream().filter(item -> item.getId() == 3).findFirst().orElseThrow();
+        MenuItemViewModel meatRes = result.stream().filter(item -> item.getId() == 3).findFirst().orElseThrow();
         assertFalse(meatRes.getIsRecommended());
     }
 
     @Test
-    void testSelectDailyMeals_Success() {
-        MealSelectionRequest request = new MealSelectionRequest();
-        request.setGuestId(1);
-        request.setBookingId(10);
-        request.setMealDate(LocalDate.of(2026, 6, 10));
-        request.setMealType("Lunch");
-        request.setMenuItemIds(Collections.singletonList(1));
-        request.setNote("No ice");
+    void testSubmitMealSelection_Success() {
+        MealSelectionForm form = new MealSelectionForm();
+        form.setGuestId(1);
+        form.setBookingId(10);
+        form.setMealDate(LocalDate.of(2026, 6, 10));
+        form.setMealType("Lunch");
+        form.setMenuItemIds(Collections.singletonList(1));
+        form.setNote("No ice");
 
         Booking booking = Booking.builder().guestId(1).build();
         booking.setId(10);
@@ -179,7 +183,7 @@ public class MealSelectionServiceTest {
         MealOrder savedOrder = MealOrder.builder().id(100).build();
         when(mealOrderRepository.save(any(MealOrder.class))).thenReturn(savedOrder);
 
-        MealSelectionResponse response = mealSelectionService.selectDailyMeals(request);
+        MealSelectionResponse response = mealSelectionService.submitMealSelection(form);
 
         assertEquals("SUCCESS", response.getStatus());
         verify(mealOrderRepository, times(1)).save(any(MealOrder.class));
@@ -191,14 +195,14 @@ public class MealSelectionServiceTest {
     }
 
     @Test
-    void testSelectDailyMeals_ALaCarte_Success() {
-        MealSelectionRequest request = new MealSelectionRequest();
-        request.setGuestId(1);
-        request.setBookingId(10);
-        request.setMealDate(LocalDate.of(2026, 6, 10));
-        request.setMealType("A-La-Carte"); // UC19 context
-        request.setMenuItemIds(Collections.singletonList(1)); // price = 10.00
-        request.setNote("Extra spicy");
+    void testSubmitMealSelection_ALaCarte_Success() {
+        MealSelectionForm form = new MealSelectionForm();
+        form.setGuestId(1);
+        form.setBookingId(10);
+        form.setMealDate(LocalDate.of(2026, 6, 10));
+        form.setMealType("A-La-Carte"); // UC19 context
+        form.setMenuItemIds(Collections.singletonList(1)); // price = 10.00
+        form.setNote("Extra spicy");
 
         Booking booking = Booking.builder().guestId(1).build();
         booking.setId(10);
@@ -218,12 +222,13 @@ public class MealSelectionServiceTest {
         MealOrder savedOrder = MealOrder.builder().id(100).build();
         when(mealOrderRepository.save(any(MealOrder.class))).thenReturn(savedOrder);
 
-        MealSelectionResponse response = mealSelectionService.selectDailyMeals(request);
+        MealSelectionResponse response = mealSelectionService.submitMealSelection(form);
 
         assertEquals("SUCCESS", response.getStatus());
         verify(mealOrderRepository, times(1)).save(any(MealOrder.class));
         verify(mealOrderItemRepository, times(1)).save(any(MealOrderItem.class));
         verify(guestFolioRepository, times(1)).save(any(GuestFolio.class));
+        verify(folioItemRepository, times(1)).save(any());
         
         // 10.00 + 5% service charge (0.50) = 10.50
         assertEquals(new BigDecimal("10.50"), folio.getTotalExtraFb());
@@ -231,13 +236,13 @@ public class MealSelectionServiceTest {
     }
 
     @Test
-    void testSelectDailyMeals_AllergyViolation() {
-        MealSelectionRequest request = new MealSelectionRequest();
-        request.setGuestId(1);
-        request.setBookingId(10);
-        request.setMealDate(LocalDate.of(2026, 6, 10));
-        request.setMealType("Lunch");
-        request.setMenuItemIds(Collections.singletonList(2)); // Item 2 has peanut
+    void testSubmitMealSelection_AllergyViolation() {
+        MealSelectionForm form = new MealSelectionForm();
+        form.setGuestId(1);
+        form.setBookingId(10);
+        form.setMealDate(LocalDate.of(2026, 6, 10));
+        form.setMealType("Lunch");
+        form.setMenuItemIds(Collections.singletonList(2)); // Item 2 has peanut
 
         Booking booking = Booking.builder().guestId(1).build();
         booking.setId(10);
@@ -254,7 +259,7 @@ public class MealSelectionServiceTest {
         when(dietaryProfileRepository.findByUserId(1)).thenReturn(Optional.of(profile));
         when(menuItemRepository.findById(2)).thenReturn(Optional.of(itemAllergy));
 
-        MealSelectionResponse response = mealSelectionService.selectDailyMeals(request);
+        MealSelectionResponse response = mealSelectionService.submitMealSelection(form);
 
         assertEquals("ALLERGY_VIOLATION", response.getStatus());
         assertNotNull(response.getDetails());

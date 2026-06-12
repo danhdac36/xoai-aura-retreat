@@ -1,8 +1,6 @@
 package com.AuraMoon.auramoon.fnb.service;
 
-import com.AuraMoon.auramoon.fnb.dto.MealSelectionRequest;
-import com.AuraMoon.auramoon.fnb.dto.MealSelectionResponse;
-import com.AuraMoon.auramoon.fnb.dto.MenuItemResponse;
+import com.AuraMoon.auramoon.fnb.dto.*;
 import com.AuraMoon.auramoon.fnb.entity.DietaryProfile;
 import com.AuraMoon.auramoon.fnb.entity.MealOrder;
 import com.AuraMoon.auramoon.fnb.entity.MealOrderItem;
@@ -14,12 +12,15 @@ import com.AuraMoon.auramoon.fnb.repository.MenuItemRepository;
 import com.AuraMoon.auramoon.booking.entity.Booking;
 import com.AuraMoon.auramoon.booking.repository.BookingRepository;
 import com.AuraMoon.auramoon.billing.entity.GuestFolio;
+import com.AuraMoon.auramoon.billing.entity.FolioItem;
 import com.AuraMoon.auramoon.billing.repository.GuestFolioRepository;
+import com.AuraMoon.auramoon.billing.repository.FolioItemRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,28 +30,49 @@ import java.util.stream.Collectors;
 @Service
 public class MealSelectionService {
 
+    private static final List<String> FALLBACK_IMAGES = Arrays.asList(
+        "/img/pexels-alesiakozik-6544376.jpg",
+        "/img/pexels-arina-krasnikova-6654115.jpg",
+        "/img/pexels-elizabeth-zernetska-86424040-9001223.jpg",
+        "/img/pexels-kamrujjamanjewel-24866519.jpg",
+        "/img/pexels-leongsan-35132140.jpg",
+        "/img/pexels-rachel-claire-6127215.jpg",
+        "/img/pexels-saveurssecretes-6289992.jpg",
+        "/img/pexels-spike-yuu-926249888-19999942.jpg",
+        "/img/pexels-thu-huynh-639083784-19141541.jpg",
+        "/img/anna-pelzer-IGfIGP5ONV0-unsplash.jpg",
+        "/img/chad-montano-eeqbbemH9-c-unsplash.jpg",
+        "/img/lily-banse--YHSwy6uqvk-unsplash.jpg",
+        "/img/joseph-gonzalez-zcUgjyqEwe8-unsplash.jpg",
+        "/img/pexels-lucasandrade-19781592.jpg",
+        "/img/image3_202409300146524974.jpg"
+    );
+
     private final DietaryProfileRepository dietaryProfileRepository;
     private final MenuItemRepository menuItemRepository;
     private final MealOrderRepository mealOrderRepository;
     private final MealOrderItemRepository mealOrderItemRepository;
     private final BookingRepository bookingRepository;
     private final GuestFolioRepository guestFolioRepository;
+    private final FolioItemRepository folioItemRepository;
 
     public MealSelectionService(DietaryProfileRepository dietaryProfileRepository,
                                 MenuItemRepository menuItemRepository,
                                 MealOrderRepository mealOrderRepository,
                                 MealOrderItemRepository mealOrderItemRepository,
                                 BookingRepository bookingRepository,
-                                GuestFolioRepository guestFolioRepository) {
+                                GuestFolioRepository guestFolioRepository,
+                                FolioItemRepository folioItemRepository) {
         this.dietaryProfileRepository = dietaryProfileRepository;
         this.menuItemRepository = menuItemRepository;
         this.mealOrderRepository = mealOrderRepository;
         this.mealOrderItemRepository = mealOrderItemRepository;
         this.bookingRepository = bookingRepository;
         this.guestFolioRepository = guestFolioRepository;
+        this.folioItemRepository = folioItemRepository;
     }
 
-    public List<MenuItemResponse> getFilteredMenuForGuest(Integer guestId) {
+    public List<MenuItemViewModel> getPersonalizedMenu(Integer guestId) {
         List<MenuItem> allItems = menuItemRepository.findAll().stream()
                 .filter(MenuItem::getIsAvailable)
                 .collect(Collectors.toList());
@@ -81,25 +103,23 @@ public class MealSelectionService {
             }
         }
 
-        List<MenuItemResponse> responseList = new ArrayList<>();
+        List<MenuItemViewModel> responseList = new ArrayList<>();
         for (MenuItem item : allItems) {
-            MenuItemResponse response = new MenuItemResponse();
+            MenuItemViewModel response = new MenuItemViewModel();
             response.setId(item.getId());
             response.setItemName(item.getItemName());
             response.setPrice(item.getPrice());
             response.setIngredient(item.getIngredient());
             response.setIsAvailable(item.getIsAvailable());
 
-            // Enrich nutrition facts and images dynamically based on the item name
-            enrichNutritionFacts(response);
+            enrichNutritionFactsViewModel(response);
 
-            // 1. Check Allergy Violations
+            // 1. Check Allergy Violations (BR-06)
             List<String> violatedAllergies = new ArrayList<>();
             String itemNameLower = item.getItemName().toLowerCase();
             String ingredientLower = item.getIngredient() != null ? item.getIngredient().toLowerCase() : "";
 
             for (String allergy : allergies) {
-                // Support both English and Vietnamese mapping
                 String checkAllergy = allergy;
                 if ("peanut".equals(allergy)) checkAllergy = "đậu phộng";
                 if ("đậu phộng".equals(allergy)) checkAllergy = "peanut";
@@ -111,7 +131,6 @@ public class MealSelectionService {
                 if (itemNameLower.contains(allergy) || ingredientLower.contains(allergy) ||
                     itemNameLower.contains(checkAllergy) || ingredientLower.contains(checkAllergy)) {
                     
-                    // Translate to friendly names for UI warning
                     String friendlyName = allergy;
                     if ("peanut".equals(allergy)) friendlyName = "đậu phộng";
                     if ("shrimp".equals(allergy)) friendlyName = "hải sản";
@@ -131,7 +150,7 @@ public class MealSelectionService {
                 response.setWarningMessage(null);
             }
 
-            // 2. Check Recommendations based on Dietary Preferences (e.g. vegan/chay)
+            // 2. Check Recommendations based on Dietary Preferences (Vegan / Chay)
             boolean isVegFriendly = true;
             List<String> animalProducts = Arrays.asList(
                 "beef", "pork", "chicken", "meat", "seafood", "fish", "shrimp", "squid", "crab", "lobster", "snail",
@@ -159,80 +178,192 @@ public class MealSelectionService {
         return responseList;
     }
 
-    private void enrichNutritionFacts(MenuItemResponse response) {
-        String name = response.getItemName().toLowerCase();
-        if (name.contains("hồi") || name.contains("salmon")) {
-            response.setImageUrl("https://lh3.googleusercontent.com/aida/ADBb0uhcj3_Ba-K6jKYvOIV8HbVPdW-XVgmUoglPtSZ7hBhwhteY74jw7D7zrT5GQ4IRHQGDCYpYRum1-ET2R5LhiA82cnSizWjQlfHkXTO-vlmBVNymbUEhlQ6b275jCnkSNIolq-xRPnLe9vu0vaGwV--laSH0jwalr4xCPlZmlYRorrca_LkNb9HP3imYXU4IhnCizTxIx0RXzzYXjwDDYk0Mt2y6uywbMTp338LC8fbJwrqdXhARUunUvjY");
-            response.setCalories(345);
-            response.setProtein("32g");
-            response.setCarbs("12g");
-            response.setFats("18g");
-            response.setFiber("2g");
-        } else if (name.contains("salad")) {
-            response.setImageUrl("https://lh3.googleusercontent.com/aida-public/AB6AXuDvCaliK_ZWDU9xw0wEt-Cb-v-FE0m9qYLyg9aIJaoAHWs_IhRNBvb2VMWfdwopQ3A7VMS23w5AgITj5H1A23dsi2p780AWGLAAiU-EQLSIu9lJFWGvbninxoq6GsNK6YzyDRhCsoAiGMjKiP0dU2fKLZUq6qyNRHXDHtSFd1dcciJxt7ByBaPPnrHoAOnQLS1YR-LaMij9YusMh0e9WYQFk0BFh18jz2Q6RS7cajwFNKWoXuDvcB3OI2SVl3Ziq61HrlbIbF3becQ");
-            response.setCalories(210);
-            response.setProtein("8g");
-            response.setCarbs("24g");
-            response.setFats("14g");
-            response.setFiber("6g");
-        } else if (name.contains("cơm") || name.contains("rice bowl")) {
-            response.setImageUrl("https://lh3.googleusercontent.com/aida-public/AB6AXuCRAmP6rs8IPSfFwt6W7xbrPqUEGjAp2tBe1aPn9hYypoXFMQhntfq7elR5amMD2Bf9_us_dnC8V6gEoWW36D7u3XP2n_RzVM2CiYpZoAdllefRoX_7AnxPyyzBKB1WsBiQcO7gmPihQJXukRSgEfkLa_xr74R8ad2II3C4QY7czuFhNCERXOA3JeveliO6Y3VitdkMF_qZ82iYKsaUWnNZloDVC9vs1IwMo0CRH15VZi_2A0qMb28VqdjVzsgSsdhy5RIIsq5jxyQ");
-            response.setCalories(290);
-            response.setProtein("15g");
-            response.setCarbs("48g");
-            response.setFats("5g");
-            response.setFiber("9g");
-        } else if (name.contains("tôm") || name.contains("shrimp")) {
-            response.setImageUrl("https://lh3.googleusercontent.com/aida-public/AB6AXuAzZUuNZzYCO1zjBkT5-2CqC5apkrAnX-ryycO2n0itZ6abpJ-YECMO0GTu2LWHLLOKkmq4F8gczkuKH2bjLOKtecmnPSfx5gE4mnD90Fuj0WUZPtidEiqwDf3aPEo8q0Oxf8nXGoeEE-1Tvspi3sp6YdHSeNkwcNRGp8DHjMOef0GMC8cFHgr_6maW9bCdlcS_QoYM6TZzOnEToQ_y9p6nJKKC15YqSuS98e4dOjsCL02yTWUA9vu2Xht3Fze1cReJPEbNehvd4zU");
-            response.setCalories(280);
-            response.setProtein("22g");
-            response.setCarbs("15g");
-            response.setFats("12g");
-            response.setFiber("3g");
+    // ─── Image resolution: keyword → local /img/ file ─────────────────────────
+    private String resolveLocalImageUrl(String itemName, Integer itemId) {
+        if (itemName == null) return FALLBACK_IMAGES.get(0);
+        String lower = itemName.toLowerCase();
+
+        if (lower.contains("hồi") || lower.contains("salmon"))
+            return "/img/anna-tukhfatullina-food-photographer-stylist-Mzy-OjtCI70-unsplash.jpg";
+        if (lower.contains("salad") || lower.contains("rau trộn"))
+            return "/img/anna-pelzer-IGfIGP5ONV0-unsplash.jpg";
+        if (lower.contains("phở"))
+            return "/img/Pho-ga-ha-noi.jpg";
+        if (lower.contains("bún bò"))
+            return "/img/Bún_bò_Huế.jpg";
+        if (lower.contains("bún chả"))
+            return "/img/Bún_chả_Vietnamese_food.jpg";
+        if (lower.contains("bánh xèo"))
+            return "/img/banhxeo.jpg";
+        if (lower.contains("bánh cuốn"))
+            return "/img/banhcuon.jpg";
+        if (lower.contains("bánh bèo"))
+            return "/img/BanhBeo2.jpg";
+        if (lower.contains("gỏi cuốn") || lower.contains("goi cuon"))
+            return "/img/goi-cuon-nha-hang-qua-ngon.jpg";
+        if (lower.contains("bánh canh"))
+            return "/img/1d3dbc6e-banh-canh-cua-sai-gon-2-min.jpg";
+        if (lower.contains("hủ tiếu"))
+            return "/img/Hu-tieu-nam-vang(2).jpg";
+        if (lower.contains("bún thịt nướng"))
+            return "/img/bun-thit-nuong-kieu-mien-nam.jpg";
+        if (lower.contains("nem rán") || lower.contains("chả giò"))
+            return "/img/cach-lam-mon-nem-ran-thom-ngon-chuan-vi-don-gian-tai-nha-avt-1200x676.jpg";
+        if (lower.contains("cơm") && (lower.contains("gà") || lower.contains("hội an")))
+            return "/img/dd2876f6-com-ga-hoi-an.jpg";
+        if (lower.contains("tôm") || lower.contains("shrimp"))
+            return "/img/istockphoto-1299419373-612x612.jpg";
+        if (lower.contains("cơm") || lower.contains("rice"))
+            return "/img/image3_202409300146524974.jpg";
+        if (lower.contains("nước ép") || lower.contains("juice") || lower.contains("sinh tố") || lower.contains("trà"))
+            return "/img/istockphoto-2214231242-612x612.jpg";
+        if (lower.contains("gà") || lower.contains("chicken"))
+            return "/img/Pho-ga-ha-noi.jpg";
+        if (lower.contains("bò") || lower.contains("beef"))
+            return "/img/Bún_bò_Huế.jpg";
+        if (lower.contains("heo") || lower.contains("lợn") || lower.contains("pork"))
+            return "/img/Bún_chả_Vietnamese_food.jpg";
+        if (lower.contains("cá ") || lower.contains("fish"))
+            return "/img/joseph-gonzalez-zcUgjyqEwe8-unsplash.jpg";
+        if (lower.contains("bún") || lower.contains("mì ") || lower.contains("miến"))
+            return "/img/bun-thit-nuong-kieu-mien-nam.jpg";
+        // Rotate fallback images by item ID for visual variety
+        int idx = (itemId != null ? Math.abs(itemId) : 0) % FALLBACK_IMAGES.size();
+        return FALLBACK_IMAGES.get(idx);
+    }
+
+    private void enrichNutritionFactsViewModel(MenuItemViewModel vm) {
+        String name = vm.getItemName() != null ? vm.getItemName().toLowerCase() : "";
+        // Local image mapping (BR: no DB change)
+        String imageUrl = resolveLocalImageUrl(vm.getItemName(), vm.getId());
+        vm.setImageUrl(imageUrl);
+        if (imageUrl != null && imageUrl.startsWith("/img/")) {
+            vm.setImageFileName(imageUrl.substring(5));
         } else {
-            response.setImageUrl("https://lh3.googleusercontent.com/aida/ADBb0uhcj3_Ba-K6jKYvOIV8HbVPdW-XVgmUoglPtSZ7hBhwhteY74jw7D7zrT5GQ4IRHQGDCYpYRum1-ET2R5LhiA82cnSizWjQlfHkXTO-vlmBVNymbUEhlQ6b275jCnkSNIolq-xRPnLe9vu0vaGwV--laSH0jwalr4xCPlZmlYRorrca_LkNb9HP3imYXU4IhnCizTxIx0RXzzYXjwDDYk0Mt2y6uywbMTp338LC8fbJwrqdXhARUunUvjY");
-            response.setCalories(150);
-            response.setProtein("4g");
-            response.setCarbs("18g");
-            response.setFats("3g");
-            response.setFiber("2g");
+            vm.setImageFileName(imageUrl);
+        }
+        // Nutrition facts by dish type
+        if (name.contains("hồi") || name.contains("salmon")) {
+            vm.setCalories(345); vm.setProtein("32g"); vm.setCarbs("12g"); vm.setFats("18g"); vm.setFiber("2g");
+        } else if (name.contains("salad")) {
+            vm.setCalories(210); vm.setProtein("8g"); vm.setCarbs("24g"); vm.setFats("14g"); vm.setFiber("6g");
+        } else if (name.contains("cơm") || name.contains("rice bowl")) {
+            vm.setCalories(290); vm.setProtein("15g"); vm.setCarbs("48g"); vm.setFats("5g"); vm.setFiber("9g");
+        } else if (name.contains("tôm") || name.contains("shrimp")) {
+            vm.setCalories(280); vm.setProtein("22g"); vm.setCarbs("15g"); vm.setFats("12g"); vm.setFiber("3g");
+        } else if (name.contains("phở") || name.contains("bún") || name.contains("mì ") || name.contains("hủ tiếu")) {
+            vm.setCalories(380); vm.setProtein("20g"); vm.setCarbs("55g"); vm.setFats("8g"); vm.setFiber("3g");
+        } else if (name.contains("gà") || name.contains("chicken")) {
+            vm.setCalories(320); vm.setProtein("28g"); vm.setCarbs("20g"); vm.setFats("10g"); vm.setFiber("2g");
+        } else if (name.contains("bò") || name.contains("beef")) {
+            vm.setCalories(350); vm.setProtein("30g"); vm.setCarbs("18g"); vm.setFats("15g"); vm.setFiber("1g");
+        } else if (name.contains("nước ép") || name.contains("sinh tố") || name.contains("trà")) {
+            vm.setCalories(80); vm.setProtein("1g"); vm.setCarbs("20g"); vm.setFats("0g"); vm.setFiber("1g");
+        } else {
+            vm.setCalories(150); vm.setProtein("4g"); vm.setCarbs("18g"); vm.setFats("3g"); vm.setFiber("2g");
         }
     }
 
+    // ─── UC19: All menu items for À-La-Carte tab ───────────────────────────────
+    public List<MenuItemViewModel> getAllMenuItemsForAlacarte(Integer guestId) {
+        List<MenuItem> allItems = menuItemRepository.findAll().stream()
+                .filter(MenuItem::getIsAvailable)
+                .collect(Collectors.toList());
+
+        Optional<DietaryProfile> profileOpt = dietaryProfileRepository.findByUserId(guestId);
+        List<String> allergies = new ArrayList<>();
+        if (profileOpt.isPresent() && profileOpt.get().getFoodAllergies() != null) {
+            String raw = profileOpt.get().getFoodAllergies();
+            if (!raw.isBlank()) {
+                allergies = Arrays.stream(raw.split("[,;]"))
+                        .map(String::trim).map(String::toLowerCase)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList());
+            }
+        }
+
+        List<MenuItemViewModel> result = new ArrayList<>();
+        for (MenuItem item : allItems) {
+            MenuItemViewModel vm = new MenuItemViewModel();
+            vm.setId(item.getId());
+            vm.setItemName(item.getItemName());
+            vm.setPrice(item.getPrice());
+            vm.setIngredient(item.getIngredient());
+            vm.setIsAvailable(item.getIsAvailable());
+            enrichNutritionFactsViewModel(vm);
+
+            String itemNameLower = item.getItemName().toLowerCase();
+            String ingredientLower = item.getIngredient() != null ? item.getIngredient().toLowerCase() : "";
+            List<String> violated = new ArrayList<>();
+
+            for (String allergy : allergies) {
+                String check = allergy;
+                if ("peanut".equals(allergy))    check = "đậu phộng";
+                else if ("đậu phộng".equals(allergy)) check = "peanut";
+                else if ("shrimp".equals(allergy))    check = "tôm";
+                else if ("tôm".equals(allergy))       check = "shrimp";
+                else if ("cashew".equals(allergy))    check = "hạt điều";
+                else if ("hạt điều".equals(allergy))  check = "cashew";
+                else if ("hải sản".equals(allergy))   check = "seafood";
+                else if ("seafood".equals(allergy))   check = "hải sản";
+
+                if (itemNameLower.contains(allergy) || ingredientLower.contains(allergy)
+                        || itemNameLower.contains(check) || ingredientLower.contains(check)) {
+                    String friendly = allergy;
+                    if ("peanut".equals(allergy))  friendly = "đậu phộng";
+                    if ("shrimp".equals(allergy) || "tôm".equals(allergy)) friendly = "hải sản";
+                    if ("cashew".equals(allergy))  friendly = "hạt điều";
+                    if (!violated.contains(friendly)) violated.add(friendly);
+                }
+            }
+
+            if (!violated.isEmpty()) {
+                vm.setIsAvailableForGuest(false);
+                vm.setWarningMessage("Món ăn này có chứa " + String.join(" và ", violated) + ", nằm trong danh sách dị ứng của bạn.");
+            } else {
+                vm.setIsAvailableForGuest(true);
+                vm.setWarningMessage(null);
+            }
+            vm.setIsRecommended(false); // No recommendation badge for à la carte
+            result.add(vm);
+        }
+        return result;
+    }
+
     @Transactional
-    public MealSelectionResponse selectDailyMeals(MealSelectionRequest request) {
-        if (request.getGuestId() == null) {
+    public MealSelectionResponse submitMealSelection(MealSelectionForm form) {
+        if (form.getGuestId() == null) {
             return new MealSelectionResponse("Guest ID is required", "FAILED");
         }
-        if (request.getBookingId() == null) {
+        if (form.getBookingId() == null) {
             return new MealSelectionResponse("Booking ID is required", "FAILED");
         }
-        if (request.getMealDate() == null) {
+        if (form.getMealDate() == null) {
             return new MealSelectionResponse("Meal date is required", "FAILED");
         }
-        if (request.getMealType() == null || request.getMealType().isBlank()) {
+        if (form.getMealType() == null || form.getMealType().isBlank()) {
             return new MealSelectionResponse("Meal type is required", "FAILED");
         }
-        if (request.getMenuItemIds() == null || request.getMenuItemIds().isEmpty()) {
+        if (form.getMenuItemIds() == null || form.getMenuItemIds().isEmpty()) {
             return new MealSelectionResponse("At least one menu item must be selected", "FAILED");
         }
 
-        Optional<Booking> bookingOpt = bookingRepository.findById(request.getBookingId());
+        Optional<Booking> bookingOpt = bookingRepository.findById(form.getBookingId());
         if (bookingOpt.isEmpty()) {
             return new MealSelectionResponse("Booking not found", "FAILED");
         }
         Booking booking = bookingOpt.get();
-        if (!booking.getGuestId().equals(request.getGuestId())) {
+        if (!booking.getGuestId().equals(form.getGuestId())) {
             return new MealSelectionResponse("Booking does not belong to the specified guest", "FAILED");
         }
 
-        Optional<GuestFolio> folioOpt = guestFolioRepository.findByBookingId(request.getBookingId());
+        Optional<GuestFolio> folioOpt = guestFolioRepository.findByBookingId(form.getBookingId());
         if (folioOpt.isEmpty()) {
             return new MealSelectionResponse("Folio not found for this booking", "FAILED");
         }
         GuestFolio folio = folioOpt.get();
 
-        Optional<DietaryProfile> profileOpt = dietaryProfileRepository.findByUserId(request.getGuestId());
+        Optional<DietaryProfile> profileOpt = dietaryProfileRepository.findByUserId(form.getGuestId());
         List<String> allergies = new ArrayList<>();
         if (profileOpt.isPresent()) {
             String allergiesStr = profileOpt.get().getFoodAllergies();
@@ -248,7 +379,7 @@ public class MealSelectionService {
         List<MenuItem> selectedItems = new ArrayList<>();
         List<String> allergyViolations = new ArrayList<>();
 
-        for (Integer itemId : request.getMenuItemIds()) {
+        for (Integer itemId : form.getMenuItemIds()) {
             Optional<MenuItem> itemOpt = menuItemRepository.findById(itemId);
             if (itemOpt.isEmpty()) {
                 return new MealSelectionResponse("Menu item with ID " + itemId + " not found", "FAILED");
@@ -286,23 +417,26 @@ public class MealSelectionService {
             return new MealSelectionResponse("Allergy validation failed. Selected items violate guest's allergy profile.", "ALLERGY_VIOLATION", allergyViolations);
         }
 
+        // BR-16: trạng thái đơn hàng bắt đầu là Pending
         MealOrder order = MealOrder.builder()
-                .bookingId(request.getBookingId())
+                .bookingId(form.getBookingId())
                 .folioId(folio.getId())
-                .guestId(request.getGuestId())
-                .orderedAt(request.getMealDate().atStartOfDay())
-                .orderedBy(request.getGuestId())
-                .placeOrder(request.getMealType())
-                .note(request.getNote())
+                .guestId(form.getGuestId())
+                .orderedAt(form.getMealDate().atStartOfDay())
+                .orderedBy(form.getGuestId())
+                .placeOrder(form.getMealType())
+                .note(form.getNote())
                 .orderStatus("PENDING")
                 .build();
 
         MealOrder savedOrder = mealOrderRepository.save(order);
 
         BigDecimal totalCost = BigDecimal.ZERO;
+        List<String> itemNames = new ArrayList<>();
         for (MenuItem item : selectedItems) {
             BigDecimal itemPrice = item.getPrice() != null ? item.getPrice() : BigDecimal.ZERO;
             totalCost = totalCost.add(itemPrice);
+            itemNames.add(item.getItemName());
 
             MealOrderItem orderItem = MealOrderItem.builder()
                     .mealOrder(savedOrder)
@@ -314,9 +448,8 @@ public class MealSelectionService {
             mealOrderItemRepository.save(orderItem);
         }
 
-        // Bill to folio if it is A-La-Carte (UC19)
-        // Calculated with 5% service charge as shown in mockup
-        if ("A-La-Carte".equalsIgnoreCase(request.getMealType()) && totalCost.compareTo(BigDecimal.ZERO) > 0) {
+        // BR-11: A-la-carte phải ghi phí vào Guest Folio
+        if ("A-La-Carte".equalsIgnoreCase(form.getMealType()) && totalCost.compareTo(BigDecimal.ZERO) > 0) {
             BigDecimal serviceCharge = totalCost.multiply(new BigDecimal("0.05")).setScale(2, RoundingMode.HALF_UP);
             BigDecimal totalWithServiceFee = totalCost.add(serviceCharge);
 
@@ -327,6 +460,20 @@ public class MealSelectionService {
             folio.setFinalAmount(totalPackage.add(folio.getTotalExtraFb()));
 
             guestFolioRepository.save(folio);
+
+            // Tạo FolioItem tương ứng cho hóa đơn A_LA_CARTE
+            FolioItem folioItem = FolioItem.builder()
+                    .guestFolio(folio)
+                    .serviceCategory("FNB")
+                    .referenceId(savedOrder.getId())
+                    .description("Gọi món ngoài (A-La-Carte): " + String.join(", ", itemNames))
+                    .amount(totalWithServiceFee)
+                    .createAt(LocalDateTime.now())
+                    .createBy(form.getGuestId())
+                    .status("PENDING")
+                    .build();
+
+            folioItemRepository.save(folioItem);
         }
 
         return new MealSelectionResponse("Daily meals selected successfully.", "SUCCESS");

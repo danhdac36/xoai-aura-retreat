@@ -3,14 +3,15 @@ package com.AuraMoon.auramoon.fnb.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-public class MealSelectionRequest {
-
+public class MealSelectionForm {
     private Integer guestId;
     private Integer bookingId;
     private LocalDate mealDate;
     private String mealType;
     private List<Integer> menuItemIds;
     private String note;
+
+    public MealSelectionForm() {}
 
     public Integer getGuestId() {
         return guestId;

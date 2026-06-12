@@ -2,28 +2,24 @@ package com.AuraMoon.auramoon.fnb.dto;
 
 import java.math.BigDecimal;
 
-public class MenuItemResponse {
+public class MenuItemViewModel {
     private Integer id;
     private String itemName;
     private BigDecimal price;
     private String ingredient;
     private Boolean isAvailable;
     private String imageUrl;
-
-    // Nutrition facts
+    private String imageFileName;
     private Integer calories;
     private String protein;
     private String carbs;
     private String fats;
     private String fiber;
-
-    // Guest-specific fields
     private Boolean isAvailableForGuest;
     private String warningMessage;
     private Boolean isRecommended;
 
-    public MenuItemResponse() {
-    }
+    public MenuItemViewModel() {}
 
     public Integer getId() {
         return id;
@@ -71,6 +67,14 @@ public class MenuItemResponse {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getImageFileName() {
+        return imageFileName;
+    }
+
+    public void setImageFileName(String imageFileName) {
+        this.imageFileName = imageFileName;
     }
 
     public Integer getCalories() {

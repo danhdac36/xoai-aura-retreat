@@ -29,6 +29,22 @@ Tài liệu này lưu trữ thông tin tổng hợp về các yêu cầu, các c
 11. **[menu.html](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/templates/selection/menu.html)**: Giao diện trang thực đơn và biểu mẫu đặt món tương tác Thymeleaf.
 12. **[MealSelectionServiceTest.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/test/java/com/AuraMoon/auramoon/fnb/service/MealSelectionServiceTest.java)**: Bộ Unit Test Mockito kiểm thử tự động toàn bộ logic UC16 & UC19.
 13. **Cấu trúc thư mục Resources mới**: Tạo các thư mục phục vụ lưu trữ file CSS, hình ảnh, JavaScript và giao diện Thymeleaf cho các phân hệ của resort bao gồm `auth`, `billing`, `booking`, `fnb`, `home`, `layout` và `spa` dưới thư mục `resources/static` và `resources/templates`.
+14. **[selection.css](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/static/css/fnb/selection.css)**: Tệp stylesheet tĩnh chứa CSS cho giao diện chọn khách hàng của module F&B, tách từ `index.html`.
+15. **[menu.css](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/static/css/fnb/menu.css)**: Tệp stylesheet tĩnh chứa CSS cho giao diện thực đơn, tách từ `menu.html`.
+16. **[menu.js](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/static/js/fnb/menu.js)**: Tệp JavaScript tĩnh chứa logic tính toán hóa đơn real-time và tương tác của giao diện thực đơn, tách từ `menu.html`.
+17. **[SRS_Module4_FnB_Functional_Requirements.md](file:///d:/SWP301/su26-swp391-se2023-g6/SRS/SRS_Module4_FnB_Functional_Requirements.md)**: Tài liệu trích xuất và hệ thống hóa toàn bộ yêu cầu chức năng (Giao diện & Logic) từ phần 3 của SRS dành riêng cho Module 4 (F&B), bao gồm UC16–UC20, Business Rules BR-06/07/11/16, đặc tả màn hình và phân quyền.
+18. **[SWP391-FNB-IMP-UC17.md](file:///d:/SWP301/su26-swp391-se2023-g6/Implement/SWP391-FNB-IMP-UC17.md)**: Đặc tả kỹ thuật cho KDS Dashboard, trạng thái đơn và giảm thiểu dữ liệu (UC17, UC18, UC20) theo chuẩn EDS v2.0.
+19. **[SWP391-FNB-TDD-UC17.md](file:///d:/SWP301/su26-swp391-se2023-g6/Implement/SWP391-FNB-TDD-UC17.md)**: Đặc tả kiểm thử tự động (TDD spec) theo chuẩn TDD v1.0.
+20. **[MealPrepResponse.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/dto/MealPrepResponse.java)**: DTO cho phiếu KDS Dashboard chứa thông tin phòng, tên khách, và thông tin dị ứng ẩm thực đã được rút gọn.
+21. **[OrderItemDto.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/dto/OrderItemDto.java)**: DTO lưu thông tin món và số lượng gọi trong KDS ticket.
+22. **[MealOrderServiceTest.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/test/java/com/AuraMoon/auramoon/fnb/service/MealOrderServiceTest.java)**: Lớp kiểm thử tự động Mockito kiểm tra KDS dashboard, tính năng giảm thiểu dữ liệu và quy trình chuyển đổi trạng thái một chiều.
+23. **[TestRule.md](file:///d:/SWP301/su26-swp391-se2023-g6/Rule/TestRule.md)**: Bộ quy tắc và nguyên tắc kiểm thử tự động (Unit Test / Integration Test) của dự án.
+24. **[SWP391-FNB-TDD-UC16.md](file:///d:/SWP301/su26-swp391-se2023-g6/Implement/SWP391-FNB-TDD-UC16.md)**: Đặc tả kiểm thử tự động (TDD spec) cho UC16 và UC19 theo chuẩn TDD v1.0.
+25. **[SWP391-FNB-CODE-UC16.md](file:///d:/SWP301/su26-swp391-se2023-g6/Implement/SWP391-FNB-CODE-UC16.md)**: Tài liệu bọc mã nguồn Backend của UC16 và UC19 để tuân thủ Rule 2 của dự án.
+26. **[FolioItemRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/billing/repository/FolioItemRepository.java)**: Repository truy xuất dữ liệu FolioItem cho hóa đơn tổng hợp.
+27. **[MealSelectionForm.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/dto/MealSelectionForm.java)**: DTO đóng gói dữ liệu submit form đặt món của khách hàng qua MVC.
+28. **[MenuItemViewModel.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/dto/MenuItemViewModel.java)**: DTO hiển thị thông tin chi tiết món ăn kèm các cờ dị ứng/khuyên dùng tại giao diện Thymeleaf.
+29. **[selection.html](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/templates/fnb/selection.html)**: Trang giao diện Thymeleaf thực đơn cá nhân hóa và gọi món ngoài chuyển hướng sang POST /fnb/selection.
 
 ### 🛠️ Tệp tin Chỉnh sửa (Modified Files)
 Dưới đây là các tệp tin hiện hữu trong dự án đã được điều chỉnh bổ sung:
@@ -37,8 +53,11 @@ Dưới đây là các tệp tin hiện hữu trong dự án đã được đi�
 - **[MealSelectionController.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/controller/MealSelectionController.java)**: Cập nhật kiểu trả về thành danh sách chứa thông số dinh dưỡng `MenuItemResponse`.
 - **[MealSelectionMvcController.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/controller/MealSelectionMvcController.java)**: Viết lại cơ chế Seeder tự động dữ liệu mẫu qua native query SQL Server với `SET IDENTITY_INSERT` để giữ nguyên các ràng buộc CSDL gốc.
 - **[MealSelectionService.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/service/MealSelectionService.java)**: Bổ sung logic làm giàu dinh dưỡng, xác thực dị ứng đa ngữ (Anh-Việt) và tự động tính 5% phí phục vụ cho đơn hàng gọi thêm ngoài (UC19).
-- **[menu.html](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/templates/selection/menu.html)**: Thiết kế lại toàn bộ giao diện dựa trên khung HTML Tailwind CSS sang trọng được cung cấp từ bản thiết kế mockup, xử lý tính toán số tiền real-time bằng JS.
+- **[menu.html](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/templates/selection/menu.html)**: Thiết kế lại toàn bộ giao diện dựa trên khung HTML Tailwind CSS sang trọng được cung cấp từ bản thiết kế mockup, xử lý tính toán số tiền real-time bằng JS. Đồng thời refactor loại bỏ toàn bộ style và script nội tuyến theo Nguyên tắc 4 để chuyển sang liên kết ngoài.
+- **[index.html](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/resources/templates/selection/index.html)**: Loại bỏ các khối CSS nội tuyến và liên kết đến stylesheet tĩnh tương ứng theo Nguyên tắc 4.
 - **[MealSelectionServiceTest.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/test/java/com/AuraMoon/auramoon/fnb/service/MealSelectionServiceTest.java)**: Viết thêm các bộ Unit Test bổ sung để xác nhận độ chính xác của logic dị ứng và hóa đơn.
+- **[MealOrderRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/repository/MealOrderRepository.java)** / **[MealOrderItemRepository.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/repository/MealOrderItemRepository.java)**: Bổ sung các phương thức truy vấn lọc theo ngày và theo ID đơn hàng.
+- **[MealOrderService.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/service/MealOrderService.java)** / **[MealOrderController.java](file:///d:/SWP301/su26-swp391-se2023-g6/auramoon/src/main/java/com/AuraMoon/auramoon/fnb/controller/MealOrderController.java)**: Hiện thực hóa nghiệp vụ KDS, ẩn thông tin bệnh lý vật lý ở Backend, và kiểm soát bất biến trạng thái BR-16.
 - **Các tệp tin Repository & DTO liên quan**: Đồng bộ hóa kiểu dữ liệu khóa chính về `Integer` để khớp tuyệt đối với SQL Server.
 
 ---
@@ -92,7 +111,7 @@ Chạy lệnh kiểm thử tự động độc lập qua Maven để xác nhận
 ```bash
 mvn clean compile test
 ```
-*Hệ thống sẽ thực hiện biên dịch sạch và chạy 7 ca kiểm thử. Kết quả kỳ vọng: `BUILD SUCCESS` (0 thất bại, 0 lỗi).*
+*Hệ thống sẽ thực hiện biên dịch sạch và chạy 14 ca kiểm thử (gồm 6 ca của MealSelectionServiceTest, 1 ca của AuramoonApplicationTests và 7 ca mới của MealOrderServiceTest). Kết quả kỳ vọng: `BUILD SUCCESS` (0 thất bại, 0 lỗi).*
 
 ---
 
@@ -102,6 +121,7 @@ mvn clean compile test
 * **Sửa lỗi Truncation của SQL Server**: Khắc phục lỗi độ dài `item_name` trong bảng `MENU_ITEM` (độ dài gốc chỉ là 20 ký tự) bằng cách nâng cột lên `NVARCHAR(100)` và chạy lệnh biên dịch lại `sp_recompile` trong SQL Server.
 * **Sửa lỗi thiếu cột audit `created_at`**: Bổ sung cột `created_at` cho các bảng thừa kế từ `BaseEntity` (`BOOKING`, `RETREAT_PACKAGE`, `GUEST_FOLIO`, `DIETARY_PROFILE`, v.v.) bị thiếu trong CSDL gốc.
 * **Tích hợp giao diện Tailwind CSS cao cấp**: Tích hợp mã giao diện Tailwind CSS cao cấp theo đúng chuẩn mockup, chạy mượt mà trên nền Thymeleaf của Spring Boot.
+* **Tuân thủ Nguyên tắc 4 (Tách CSS/JS nội tuyến)**: Refactor toàn bộ mã CSS/JS nội tuyến từ các tệp `index.html` và `menu.html` sang các tệp tin tĩnh tương ứng (`selection.css`, `menu.css`, `menu.js`) đặt trong đúng thư mục module chuyên biệt dưới `/static/css/fnb/` và `/static/js/fnb/`, liên kết bằng Thymeleaf.
 
 ---
 
