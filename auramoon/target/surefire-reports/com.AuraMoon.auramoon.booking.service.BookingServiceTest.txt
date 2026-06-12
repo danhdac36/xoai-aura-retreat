@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.AuraMoon.auramoon.booking.service.BookingServiceTest
--------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.015 s -- in com.AuraMoon.auramoon.booking.service.BookingServiceTest
