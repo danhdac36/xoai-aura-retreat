@@ -8,6 +8,7 @@ import com.AuraMoon.auramoon.billing.repository.FolioItemRepository;
 import com.AuraMoon.auramoon.billing.repository.GuestFolioRepository;
 import com.AuraMoon.auramoon.billing.repository.PaymentRepository;
 import com.AuraMoon.auramoon.billing.service.BillingService;
+import com.AuraMoon.auramoon.billing.exception.PendingOrdersExistException;
 import com.AuraMoon.auramoon.booking.entity.Booking;
 import com.AuraMoon.auramoon.booking.entity.Villa;
 import com.AuraMoon.auramoon.booking.repository.BookingRepository;
@@ -69,6 +70,12 @@ public class BillingServiceImpl implements BillingService {
     public Payment initiatePayment(Integer bookingId, String method, String gateway) {
         GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException("Folio not found"));
+
+        List<FolioItem> items = folioItemRepository.findByGuestFolioId(folio.getId());
+        boolean hasPendingOrders = items.stream().anyMatch(item -> "PENDING".equalsIgnoreCase(item.getStatus()));
+        if (hasPendingOrders) {
+            throw new PendingOrdersExistException("Khách không thể check-out vì còn đơn Spa/F&B đang chờ xử lý.");
+        }
 
         CheckoutViewDTO data = getCheckoutData(bookingId);
         BigDecimal amountToPay = data.getBalanceDue();

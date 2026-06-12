@@ -9,6 +9,7 @@ import com.AuraMoon.auramoon.booking.repository.ReviewRepository;
 import com.AuraMoon.auramoon.booking.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -43,10 +44,11 @@ public class ReviewServiceImpl implements ReviewService {
         canSubmitReview(bookingId);
 
         Booking booking = bookingRepository.findById(bookingId).get();
+        String safeComment = (comment != null) ? HtmlUtils.htmlEscape(comment) : null;
         Review review = Review.builder()
                 .booking(booking)
                 .rating(rating)
-                .comment(comment)
+                .comment(safeComment)
                 .build();
                 
         return reviewRepository.save(review);
