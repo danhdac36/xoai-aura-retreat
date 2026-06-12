@@ -33,16 +33,15 @@ public interface RetreatPackageRepository extends JpaRepository<RetreatPackage, 
                                                 WHERE r.isActive = true
                                                 AND r.isDelete = false
                                                 AND (:typePackage IS NULL OR :typePackage = '' OR r.typePackage = :typePackage)
-                                                AND (:durationDays IS NULL OR r.durationDays = :durationDays)
-                                                AND (
-                                                     :priceRange IS NULL OR :priceRange = ''
-                                                     OR (:priceRange = 'UNDER_5' AND r.price < 5000000)
-                        OR (:priceRange = 'FROM_5_TO_10' AND r.price >= 5000000 AND r.price <= 10000000)
-                        OR (:priceRange = 'OVER_10' AND r.price > 10000000)
-                                                )
+                                                AND (:minDays IS NULL OR r.durationDays >= :minDays)
+                                                AND (:maxDays IS NULL OR r.durationDays <= :maxDays)
+                                                AND (:minPrice IS NULL OR r.price >= :minPrice)
+                                                AND (:maxPrice IS NULL OR r.price <= :maxPrice)
                                                 """)
         List<RetreatPackage> searchPackages(
                         @Param("typePackage") String typePackage,
-                        @Param("durationDays") Integer durationDays,
-                        @Param("priceRange") String priceRange);
+                        @Param("minDays") Integer minDays,
+                        @Param("maxDays") Integer maxDays,
+                        @Param("minPrice") Double minPrice,
+                        @Param("maxPrice") Double maxPrice);
 }

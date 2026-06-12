@@ -11,7 +11,7 @@ public interface RetreatPackageService {
 
     List<String> getAllActivePackageTypes();
 
-    List<RetreatPackageDTO> searchPackages(String typePackage, Integer durationDays, String priceRange);
+    List<RetreatPackageDTO> searchPackages(String typePackage, Integer minDays, Integer maxDays, Double minPrice, Double maxPrice);
 
     RetreatPackageDTO getPackageById(Integer id);
 

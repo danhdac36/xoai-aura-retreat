@@ -50,8 +50,8 @@ public class RetreatPackageServiceImpl implements RetreatPackageService {
     }
 
     @Override
-    public List<RetreatPackageDTO> searchPackages(String typePackage, Integer durationDays, String priceRange) {
-        return retreatPackageRepository.searchPackages(typePackage, durationDays, priceRange)
+    public List<RetreatPackageDTO> searchPackages(String typePackage, Integer minDays, Integer maxDays, Double minPrice, Double maxPrice) {
+        return retreatPackageRepository.searchPackages(typePackage, minDays, maxDays, minPrice, maxPrice)
                 .stream()
                 .map(this::convertToDTO)
                 .toList();

@@ -8,37 +8,74 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/booking/booking-form.css}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif !important;
+        }
+        h1, h2, h3, h4, h5, h6, .font-serif {
+            font-family: 'Playfair Display', serif !important;
+        }
+    </style>
 </head>
-<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans flex items-center justify-center min-h-screen">
-    <main class="w-full max-w-md p-6">
-        <div class="glass-card bg-white/70 backdrop-blur-md border border-white/20 p-8 rounded-2xl shadow-xl text-center">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full text-green-600 mb-6">
+<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans flex items-center justify-center min-h-screen p-4">
+    <main class="w-full max-w-lg">
+        <div class="glass-card bg-white/80 backdrop-blur-md border border-white/30 p-8 md:p-10 rounded-3xl shadow-2xl text-center relative overflow-hidden animate-fade-in">
+            <!-- Decorative soft background glowing circle -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-[#566342]/10 rounded-full blur-2xl"></div>
+            
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-[#dae8be] text-[#3f4b2c] rounded-full mb-6 shadow-inner animate-bounce">
                 <span class="material-symbols-outlined text-4xl">check_circle</span>
             </div>
             
-            <h1 class="text-3xl font-serif text-gray-900 mb-2">Thanh toán thành công!</h1>
-            <p class="text-gray-500 mb-6">Đơn đặt gói trị liệu của bạn đã được xác nhận đặt cọc thành công.</p>
+            <h1 class="text-3xl font-serif font-bold text-gray-900 mb-2">Đặt Kỳ Nghỉ Thành Công!</h1>
+            <p class="text-sm text-gray-500 mb-8 max-w-sm mx-auto">Đơn cọc của bạn đã được xác nhận thanh toán thành công. Chuỗi ngày phục hồi sức khỏe đang chờ đón bạn.</p>
 
-            <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-8 text-left space-y-2 text-sm">
-                <div class="flex justify-between">
-                    <span class="text-gray-400">Mã đặt phòng:</span>
-                    <span class="font-semibold text-gray-900" th:text="'#' + ${bookingId}">#100</span>
+            <!-- Dynamic Transaction info box -->
+            <div class="bg-[#fbf9f8] border border-gray-100 rounded-2xl p-5 mb-8 text-left space-y-3.5 text-sm shadow-sm">
+                <div class="flex justify-between items-center border-b border-gray-50 pb-2.5">
+                    <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Mã đặt phòng</span>
+                    <span class="font-serif font-bold text-base text-[#566342]" th:text="'#' + ${bookingId}">#100</span>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-400">Mã giao dịch:</span>
-                    <span class="font-mono text-gray-600" th:text="${transactionCode}">TX_AURA_123</span>
+                <div class="flex justify-between items-center border-b border-gray-50 pb-2.5">
+                    <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Mã giao dịch</span>
+                    <span class="font-mono text-xs text-gray-600 bg-white px-2.5 py-1 rounded border border-gray-100" th:text="${transactionCode}">TX_AURA_123</span>
                 </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-400">Trạng thái đặt phòng:</span>
-                    <span class="text-green-600 font-semibold">Đã xác nhận (CONFIRMED)</span>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Trạng thái</span>
+                    <span class="inline-flex items-center gap-1 bg-[#dae8be] text-[#3f4b2c] text-xs font-bold px-2.5 py-1 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#3f4b2c]"></span>
+                        Đã xác nhận cọc
+                    </span>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-3">
-                <a th:href="@{/itinerary}" class="w-full py-3 bg-[#566342] text-white rounded-lg font-semibold hover:bg-[#566342]/90 transition-colors shadow-md flex items-center justify-center gap-2">
-                    Xem lịch trình Wellness <span class="material-symbols-outlined">calendar_today</span>
+            <!-- Steps next -->
+            <div class="text-left mb-8 border-t border-gray-100 pt-6">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-base">info</span> Các bước tiếp theo
+                </h3>
+                <ul class="space-y-2.5 text-xs text-gray-600">
+                    <li class="flex items-start gap-2">
+                        <span class="text-[#566342] font-bold">1.</span>
+                        <span>Nhận email xác nhận chi tiết phòng & lịch đặt trong vòng 5 phút.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-[#566342] font-bold">2.</span>
+                        <span>Đọc kỹ hướng dẫn chuẩn bị trang phục & thể chất trước ngày Check-in.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-[#566342] font-bold">3.</span>
+                        <span>Chuyên gia sức khỏe sẽ liên hệ trực tiếp để chuẩn bị chu đáo nhất.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Double buttons -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a th:href="@{/packages}" class="flex-1 py-3 bg-[#566342] text-white font-medium rounded-xl hover:bg-[#3f4b2c] transition-all duration-300 shadow-md shadow-[#566342]/10 hover:shadow-lg flex items-center justify-center gap-1.5 text-sm">
+                    Khám phá gói khác <span class="material-symbols-outlined text-sm">spa</span>
                 </a>
-                <a th:href="@{/packages}" class="w-full py-3 border border-[#566342] text-[#566342] rounded-lg font-semibold hover:bg-[#566342]/5 transition-colors">
+                <a th:href="@{/packages}" class="flex-1 py-3 border border-gray-200 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition-all duration-300 text-sm">
                     Quay lại Trang chủ
                 </a>
             </div>

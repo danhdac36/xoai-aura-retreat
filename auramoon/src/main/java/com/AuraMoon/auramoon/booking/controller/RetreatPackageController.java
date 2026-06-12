@@ -21,21 +21,27 @@ public class RetreatPackageController {
     @GetMapping
     public String listPackages(
             @RequestParam(value = "type", required = false) String type,
-            @RequestParam(value = "durationDays", required = false) Integer durationDays,
-            @RequestParam(value = "priceRange", required = false) String priceRange,
+            @RequestParam(value = "minDays", required = false) Integer minDays,
+            @RequestParam(value = "maxDays", required = false) Integer maxDays,
+            @RequestParam(value = "minPrice", required = false) Double minPrice,
+            @RequestParam(value = "maxPrice", required = false) Double maxPrice,
             Model model) {
 
         List<RetreatPackageDTO> packages = retreatPackageService.searchPackages(
                 type,
-                durationDays,
-                priceRange);
+                minDays,
+                maxDays,
+                minPrice,
+                maxPrice);
 
         model.addAttribute("packages", packages);
         model.addAttribute("types", retreatPackageService.getAllActivePackageTypes());
 
         model.addAttribute("selectedType", type == null || type.trim().isEmpty() ? "All" : type);
-        model.addAttribute("selectedDurationDays", durationDays);
-        model.addAttribute("selectedPriceRange", priceRange);
+        model.addAttribute("minDays", minDays != null ? minDays : 2);
+        model.addAttribute("maxDays", maxDays != null ? maxDays : 7);
+        model.addAttribute("minPrice", minPrice != null ? minPrice : 10000000.0);
+        model.addAttribute("maxPrice", maxPrice != null ? maxPrice : 50000000.0);
 
         if (packages.isEmpty()) {
             model.addAttribute("popularPackages", retreatPackageService.getPopularPackages());
