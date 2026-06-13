@@ -257,87 +257,15 @@ CREATE TABLE PAYMENT (
     status VARCHAR(10),
     CONSTRAINT FK_PAYMENT_FOLIO FOREIGN KEY (folio_id) REFERENCES GUEST_FOLIO(folio_id)
 );
-GO
 
--- =========================================================
--- DUMMY DATA: Lịch làm việc Chuyên viên Spa (SCHEDULE)
--- =========================================================
-
--- 1. Insert ROLE
-INSERT INTO [ROLE] (role_name) VALUES ('Guest'), ('Therapist');
-
--- 2. Insert USER (1 Guest, 1 Therapist)
-INSERT INTO [USER] (role_id, email, password_hash, full_name, status)
-VALUES 
-(1, 'guest@example.com', 'hash123', N'Nguyễn Văn Khách', 'Active'),
-(2, 'spa@example.com', 'hash123', N'Trần Thị Spa', 'Active');
-
--- 3. Insert THERAPIST
-INSERT INTO THERAPIST (therapist_id, therapist_code, status)
-VALUES (2, 'SPA001', 'Active');
-
--- 4. Insert TREATMENT_ROOM
-INSERT INTO TREATMENT_ROOM (room_code, room_name, status)
-VALUES ('R01', N'Phòng Hoa Sen', 'Available');
-
--- 5. Insert TREATMENT_SERVICE
-INSERT INTO TREATMENT_SERVICE (treatment_code, service_name, duration_minutes, price)
-VALUES ('SV01', N'Massage Toàn Thân', 60, 500000);
-
--- 6. Insert RETREAT_PACKAGE (Required cho Booking)
-INSERT INTO RETREAT_PACKAGE (type_package, package_name, duration_days, price)
-VALUES ('Relax', N'Gói Thư Giãn Cuối Tuần', 2, 2000000);
-
--- 7. Insert BOOKING
-INSERT INTO BOOKING (guest_id, package_id, total_guests, booking_status)
-VALUES (1, 1, 1, 'Confirmed');
-
--- 8. Insert TREATMENT_BOOKING
-INSERT INTO TREATMENT_BOOKING (booking_id, service_id, status)
-VALUES (1, 1, 'Pending');
-
--- 9. Insert SCHEDULE (Lịch làm việc Chuyên viên Spa)
-INSERT INTO SCHEDULE (treatment_id, therapist_code, room_id, start_time, end_time)
-VALUES 
-(1, 'SPA001', 1, '2026-06-14 09:00:00', '2026-06-14 10:00:00'),
-(1, 'SPA001', 1, '2026-06-14 14:00:00', '2026-06-14 15:00:00');
-GO
-
--- =========================================================
--- DUMMY DATA: Lịch làm việc Chuyên viên Spa thứ 3 (SPA003)
--- =========================================================
-
--- 10. Insert USER (Spa Employee 3)
-INSERT INTO [USER] (role_id, email, password_hash, full_name, status)
-VALUES (2, 'spa3@example.com', 'hash123', N'Lê Thị Spa Ba', 'Active');
-
-DECLARE @Spa3Id INT = SCOPE_IDENTITY();
-
--- 11. Insert THERAPIST (Spa Employee 3)
-INSERT INTO THERAPIST (therapist_id, therapist_code, status)
-VALUES (@Spa3Id, 'SPA003', 'Active');
-
--- 12. Insert SCHEDULE cho SPA003 (3 ngày, mỗi ngày 5 khung giờ)
-INSERT INTO SCHEDULE (treatment_id, therapist_code, room_id, start_time, end_time)
-VALUES 
--- Ngày 1: 2026-06-15
-(1, 'SPA003', 1, '2026-06-15 08:00:00', '2026-06-15 09:00:00'),
-(1, 'SPA003', 1, '2026-06-15 10:00:00', '2026-06-15 11:00:00'),
-(1, 'SPA003', 1, '2026-06-15 13:00:00', '2026-06-15 14:00:00'),
-(1, 'SPA003', 1, '2026-06-15 15:00:00', '2026-06-15 16:00:00'),
-(1, 'SPA003', 1, '2026-06-15 17:00:00', '2026-06-15 18:00:00'),
-
--- Ngày 2: 2026-06-16
-(1, 'SPA003', 1, '2026-06-16 08:00:00', '2026-06-16 09:00:00'),
-(1, 'SPA003', 1, '2026-06-16 10:00:00', '2026-06-16 11:00:00'),
-(1, 'SPA003', 1, '2026-06-16 13:00:00', '2026-06-16 14:00:00'),
-(1, 'SPA003', 1, '2026-06-16 15:00:00', '2026-06-16 16:00:00'),
-(1, 'SPA003', 1, '2026-06-16 17:00:00', '2026-06-16 18:00:00'),
-
--- Ngày 3: 2026-06-17
-(1, 'SPA003', 1, '2026-06-17 08:00:00', '2026-06-17 09:00:00'),
-(1, 'SPA003', 1, '2026-06-17 10:00:00', '2026-06-17 11:00:00'),
-(1, 'SPA003', 1, '2026-06-17 13:00:00', '2026-06-17 14:00:00'),
-(1, 'SPA003', 1, '2026-06-17 15:00:00', '2026-06-17 16:00:00'),
-(1, 'SPA003', 1, '2026-06-17 17:00:00', '2026-06-17 18:00:00');
+-- 22. Table AUDIT_LOG
+CREATE TABLE AUDIT_LOG (
+    log_id INT IDENTITY(1,1) PRIMARY KEY,
+    action_type VARCHAR(50) NOT NULL,
+    actor_id INT NOT NULL,
+    target_id INT,
+    details NVARCHAR(MAX),
+    timestamp DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_AUDIT_ACTOR FOREIGN KEY (actor_id) REFERENCES [USER](user_id)
+);
 GO

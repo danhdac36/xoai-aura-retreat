@@ -2,19 +2,19 @@
 
 # Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
-| Field                    | Value                                     |
-| ------------------------ | ----------------------------------------- |
-| **Document ID**    | `AURA-BILLING-IMP-021`                  |
-| **Version**        | 1.0                                       |
-| **Date**           | `2026-06-12`                            |
-| **Status**         | Approved                                  |
-| **Document Owner** | Phùng Giang Hải                         |
-| **Author**         | `Phùng Giang Hải - Backend Developer` |
-| **Reviewed by**    | Phùng Giang Hải                         |
-| **DPO Sign-off**   | `[ ] N/A — Module không xử lý PII`  |
-| **Approved by**    | `Principal Architect`                   |
-| **Last Review**    | `2026-06-12`                            |
-| **Based on EDS**   | v2.0                                      |
+| Field                    | Value                                          |
+| ------------------------ | ---------------------------------------------- |
+| **Document ID**    | `AURA-BILLING-IMP-021`                       |
+| **Version**        | 1.0                                            |
+| **Date**           | `2026-06-12`                                 |
+| **Status**         | In Review                                      |
+| **Document Owner** | Phùng Giang Hải - Tech Lead & Module 5 Owner |
+| **Author**         | Phùng Giang Hải - Tech Lead & Module 5 Owner |
+| **Reviewed by**    | Phùng Giang Hải - Tech Lead & Module 5 Owner |
+| **DPO Sign-off**   | `[ ] N/A — Module không xử lý PII`       |
+| **Approved by**    | `Principal Architect`                        |
+| **Last Review**    | `2026-06-14`                                 |
+| **Based on EDS**   | v2.0                                           |
 
 # CHANGELOG
 
@@ -22,7 +22,9 @@
 
 | Ngày      | Người thực hiện | Nội dung thay đổi                                           |
 | ---------- | ------------------- | -------------------------------------------------------------- |
-| 2026-06-12 | Sinh viên 5        | Tạo tài liệu EDS lần đầu cho UC21 - Consolidated Invoice |
+| 2026-06-12 | AI Assistant        | Tạo tài liệu EDS lần đầu cho UC21 - Consolidated Invoice |
+| 2026-06-14 | AI Assistant        | Update Header and Add BR-15 Audit Trail                        |
+| 2026-06-14 | AI Assistant        | Tách AuditLogService và AuditLogRepository chuẩn MVC        |
 
 # MỤC LỤC
 
@@ -62,6 +64,7 @@
 | -------------- | ----------------- | -------------------------------------------------------------------- | --------------------------------------------------------- | ----------------- | -------------- |
 | BR-11          | Business Rule     | Guest Folio — Mọi Spa/F&B charge đẩy vào tài khoản trung tâm | `BillingServiceImpl.getCheckoutData()`                  | AHLEI Night Audit | ADR-001        |
 | BR-12          | Business Rule     | Check-out Constraint — Không check-out nếu còn pending orders    | `FolioItemRepository.existsByGuestFolioIdAndStatusIn()` | —                | —             |
+| BR-15          | Business Rule     | Audit Trail Management — Lưu log hoạt động xem hóa đơn       | `AuditLogService.logActivity()`                         | —                | —             |
 | UC21           | User Story        | Lễ tân tạo Hóa đơn Gộp tổng hợp Package + Spa + F&B         | `CheckoutController.showCheckoutPage()`                 | —                | ADR-001        |
 
 # 3. Architecture Decision Records (ADR)
@@ -183,7 +186,16 @@ class BillingServiceImpl {
   -guestFolioRepository: GuestFolioRepository
   -folioItemRepository: FolioItemRepository
   -paymentRepository: PaymentRepository
+  -auditLogService: AuditLogService
   +getCheckoutData(bookingId: Integer): CheckoutViewDTO
+}
+
+interface AuditLogService <<interface>> {
+  +logActivity(action: String, actorId: Integer, targetId: Integer)
+}
+
+interface AuditLogRepository <<interface>> {
+  +save(log: AuditLog): AuditLog
 }
 
 BillingService <|.. BillingServiceImpl
@@ -194,6 +206,8 @@ class CheckoutController {
 }
 
 CheckoutController --> BillingService : uses
+BillingServiceImpl --> AuditLogService : uses
+AuditLogService --> AuditLogRepository : uses
 @enduml
 ```
 
@@ -252,6 +266,30 @@ public class FolioItem {
     private String status;
 }
 
+// === AUDIT ENTITY: AuditLog ===
+@Entity
+@Table(name = "AUDIT_LOG")
+public class AuditLog {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "log_id")
+    private Integer id;
+
+    @Column(name = "action_type", nullable = false, length = 50)
+    private String actionType;
+
+    @Column(name = "actor_id", nullable = false)
+    private Integer actorId;
+
+    @Column(name = "target_id")
+    private Integer targetId;
+
+    @Column(name = "details", columnDefinition = "NVARCHAR(MAX)")
+    private String details;
+
+    @Column(name = "timestamp")
+    private Date timestamp;
+}
+
 // === BILLING DTO: CheckoutViewDTO ===
 @Data @Builder
 public class CheckoutViewDTO {
@@ -276,6 +314,8 @@ participant "BillingServiceImpl" as Service
 participant "GuestFolioRepository" as FolioRepo
 participant "FolioItemRepository" as ItemRepo
 participant "PaymentRepository" as PayRepo
+participant "AuditLogService" as AuditService
+participant "AuditLogRepository" as AuditRepo
 database "SQL Server" as DB
 
 User -> Controller: GET /billing/checkout?bookingId=1
@@ -299,6 +339,16 @@ PayRepo -> DB: SELECT * FROM PAYMENT WHERE folio_id = ? AND status = 'SUCCESS'
 PayRepo --> Service: List<Payment>
 
 Service -> Service: totalCost = packageAmount + totalExtra\nbalanceDue = totalCost - totalPaid
+
+Service -> AuditService: logActivity("VIEW_INVOICE", req.userId, bookingId)
+activate AuditService
+AuditService -> AuditRepo: save(auditLog)
+activate AuditRepo
+AuditRepo -> DB: INSERT INTO AUDIT_LOG
+AuditRepo --> AuditService: AuditLog
+deactivate AuditRepo
+AuditService --> Service: success
+deactivate AuditService
 
 Service --> Controller: CheckoutViewDTO
 deactivate Service
@@ -353,6 +403,14 @@ public interface BillingService {
      */
     CheckoutViewDTO getCheckoutData(Integer bookingId);
 }
+
+// AuditLogService.java — @version 1.0
+public interface AuditLogService {
+    /**
+     * Ghi nhận log kiểm toán bất đồng bộ
+     */
+    void logActivity(String actionType, Integer actorId, Integer targetId);
+}
 ```
 
 ## 8.2. Repository Interface
@@ -375,6 +433,11 @@ public interface FolioItemRepository extends JpaRepository<FolioItem, Integer> {
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Integer> {
     List<Payment> findByGuestFolioIdAndStatus(Integer folioId, String status);
+}
+
+// AuditLogRepository.java — @version 1.0
+@Repository
+public interface AuditLogRepository extends JpaRepository<AuditLog, Integer> {
 }
 ```
 
