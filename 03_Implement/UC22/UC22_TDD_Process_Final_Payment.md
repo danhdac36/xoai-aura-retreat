@@ -83,6 +83,7 @@ UC22 Checkout bao gồm các layer:
 | TC-COND-004 | VNPAY Callback: Thành công (`00`) | `vnpayReturn` | `BIL-TC-004` |
 | TC-COND-005 | VNPAY Callback: Thất bại / Hủy (`24`) | `vnpayReturn` | `BIL-TC-005` |
 | TC-COND-006 | VNPAY Callback: Sai chữ ký | `vnpayReturn` | `BIL-TC-006` |
+| TC-COND-007 | Nợ 0 đồng -> Bypass thanh toán | `processPayment` | `BIL-TC-007` |
 
 ## TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
 | Technique | Applied To | Rationale |
@@ -161,6 +162,17 @@ UC22 Checkout bao gồm các layer:
 **Expected Result (PASS):** Redirect báo "Lỗi bảo mật", Payment VẪN PENDING.
 **Expected Result (FAIL):** Bị bypass chữ ký, cho phép check-out chùa.
 
+## BIL-TC-007 — Bypass Thanh toán khi Nợ 0 Đồng
+**Severity:** `CRITICAL`
+**Feature Under Test:** `CheckoutController.processPayment()`
+**TDD Phase:** 🔴 RED
+**Condition Ref:** `TC-COND-007`
+
+**Preconditions:** Khởi tạo DB không có Pending orders, balanceDue = 0.
+**Test Steps:** Gọi `mockMvc.perform(post("/checkout/1/pay"))` (không truyền tham số paymentMethod).
+**Expected Result (PASS):** HTTP 302 tới `/checkout/success`, không sinh thêm Payment record, DB Booking là COMPLETED, Folio là PAID.
+**Expected Result (FAIL):** Quăng lỗi 400 Bad Request hoặc 500 Internal Server Error.
+
 # 5. Red-Green-Refactor Tracker
 
 | TC ID | Test File | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note |
@@ -171,6 +183,7 @@ UC22 Checkout bao gồm các layer:
 | `BIL-TC-004` | `CheckoutControllerTest.java` | `[ ]` | `[ ]` | |
 | `BIL-TC-005` | `CheckoutControllerTest.java` | `[ ]` | `[ ]` | |
 | `BIL-TC-006` | `CheckoutControllerTest.java` | `[ ]` | `[ ]` | |
+| `BIL-TC-007` | `CheckoutControllerTest.java` | `[ ]` | `[ ]` | |
 
 # 6. Entry / Exit Criteria
 

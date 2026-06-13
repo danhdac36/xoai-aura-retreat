@@ -37,16 +37,28 @@ public class CheckoutController {
 
     @PostMapping("/checkout/{bookingId}/pay")
     public String processPayment(@PathVariable Integer bookingId,
-            @RequestParam String paymentMethod,
+            @RequestParam(required = false) String paymentMethod,
             HttpServletRequest request,
             RedirectAttributes redirectAttributes) {
         try {
+            CheckoutViewDTO data = billingService.getCheckoutData(bookingId);
+            if (data.getBalanceDue().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+                billingService.completeCheckoutWithoutPayment(bookingId);
+                redirectAttributes.addFlashAttribute("successMessage", "Check-out thành công! Bạn không có khoản nợ nào cần thanh toán.");
+                return "redirect:/billing/checkout/success?bookingId=" + bookingId; // Or redirect to a general success page
+            }
+
+            if (paymentMethod == null || paymentMethod.trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng chọn phương thức thanh toán.");
+                return "redirect:/billing/checkout?bookingId=" + bookingId;
+            }
+
             String gateway = "CASH".equals(paymentMethod) ? "CASH" : "VNPAY";
             Payment payment = billingService.initiatePayment(bookingId, paymentMethod, gateway);
 
             if ("CASH".equals(paymentMethod)) {
                 billingService.completePaymentAndCheckout(payment.getId(), null);
-                redirectAttributes.addFlashAttribute("successMessage", "Thanh toán Tiền mặt thành công!");
+                redirectAttributes.addFlashAttribute("successMessage", "Thanh toán Tiền mặt và Check-out thành công!");
                 return "redirect:/billing/checkout/success?paymentId=" + payment.getId();
             } else {
                 // Sửa lỗi sinh sai URL khi chạy qua Ngrok
@@ -98,9 +110,19 @@ public class CheckoutController {
     }
 
     @GetMapping("/checkout/success")
-    public String checkoutSuccess(@RequestParam Integer paymentId, Model model) {
-        Payment payment = billingService.getPaymentById(paymentId);
-        Integer bookingId = payment.getGuestFolio().getBookingId();
+    public String checkoutSuccess(
+            @RequestParam(required = false) Integer paymentId, 
+            @RequestParam(required = false) Integer bookingId, 
+            Model model) {
+        
+        if (paymentId != null) {
+            Payment payment = billingService.getPaymentById(paymentId);
+            bookingId = payment.getGuestFolio().getBookingId();
+        }
+
+        if (bookingId == null) {
+            return "redirect:/billing/checkout";
+        }
 
         model.addAttribute("successMessage", "Thanh toán thành công. Check-out hoàn tất!");
         model.addAttribute("bookingId", bookingId);

@@ -9,6 +9,7 @@ public interface BillingService {
     
     Payment initiatePayment(Integer bookingId, String paymentMethod, String paymentGateway);
     void completePaymentAndCheckout(Integer paymentId, String transactionCode);
+    void completeCheckoutWithoutPayment(Integer bookingId);
     void markPaymentAsFailed(Integer paymentId);
     Payment getPaymentById(Integer paymentId);
 }

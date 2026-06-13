@@ -126,6 +126,28 @@ public class BillingServiceImpl implements BillingService {
 
     @Override
     @Transactional
+    public void completeCheckoutWithoutPayment(Integer bookingId) {
+        GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new RuntimeException("Folio not found"));
+
+        folio.setStatus("PAID");
+        guestFolioRepository.save(folio);
+
+        Booking booking = bookingRepository.findById(folio.getBookingId())
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        booking.setBookingStatus("COMPLETED");
+        booking.setPaymentStatus("PAID");
+        bookingRepository.save(booking);
+
+        if (booking.getAssignedVilla() != null) {
+            Villa villa = booking.getAssignedVilla();
+            villa.setVillaStatus("VACANT_NEEDS_CLEANING");
+            villaRepository.save(villa);
+        }
+    }
+
+    @Override
+    @Transactional
     public void markPaymentAsFailed(Integer paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
