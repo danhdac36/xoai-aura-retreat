@@ -25,11 +25,11 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-    private final BookingRepository bookingRepository;
-    private final RetreatPackageRepository retreatPackageRepository;
-    private final VillaTypeRepository villaTypeRepository;
-    private final GuestFolioRepository guestFolioRepository;
-    private final VillaService villaService;
+        private final BookingRepository bookingRepository;
+        private final RetreatPackageRepository retreatPackageRepository;
+        private final VillaTypeRepository villaTypeRepository;
+        private final GuestFolioRepository guestFolioRepository;
+        private final VillaService villaService;
 
     @Override
     @Transactional
@@ -100,4 +100,5 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
     }
 }
+
 

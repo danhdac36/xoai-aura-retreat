@@ -44,7 +44,7 @@ public class BookingController {
 
     @GetMapping("/success")
     public String bookingSuccess(@RequestParam("bookingId") Integer bookingId,
-                                 Model model) {
+            Model model) {
         model.addAttribute("bookingId", bookingId);
         return "booking/success";
     }
