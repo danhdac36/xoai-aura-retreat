@@ -25,15 +25,22 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-    private final BookingRepository bookingRepository;
-    private final RetreatPackageRepository retreatPackageRepository;
-    private final VillaTypeRepository villaTypeRepository;
-    private final GuestFolioRepository guestFolioRepository;
-    private final VillaService villaService;
+        private final BookingRepository bookingRepository;
+        private final RetreatPackageRepository retreatPackageRepository;
+        private final VillaTypeRepository villaTypeRepository;
+        private final GuestFolioRepository guestFolioRepository;
+        private final VillaService villaService;
 
     @Override
     @Transactional
     public BookingResponseDTO createBooking(Integer guestId, BookingRequestDTO request) {
+        if (request.getRetreatPackageId() == null) {
+            throw new IllegalArgumentException("Vui lòng chọn gói trị liệu.");
+        }
+        if (request.getVillaTypeId() == null) {
+            throw new IllegalArgumentException("Vui lòng chọn loại biệt thự lưu trú.");
+        }
+
         RetreatPackage retreatPackage = retreatPackageRepository.findByIdAndIsActiveTrueAndIsDeleteFalse(request.getRetreatPackageId())
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy gói trị liệu với ID: " + request.getRetreatPackageId()));
 
@@ -60,6 +67,15 @@ public class BookingServiceImpl implements BookingService {
 
         Booking savedBooking = bookingRepository.save(booking);
 
+        GuestFolio guestFolio = GuestFolio.builder()
+                .bookingId(savedBooking.getId())
+                .totalPackageAmount(savedBooking.getRetreatPackage().getPrice())
+                .totalExtraFb(BigDecimal.ZERO)
+                .finalAmount(savedBooking.getRetreatPackage().getPrice())
+                .status("PENDING")
+                .build();
+        guestFolioRepository.save(guestFolio);
+
         return BookingResponseDTO.builder()
                 .bookingId(savedBooking.getId())
                 .guestId(savedBooking.getGuestId())
@@ -82,15 +98,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setBookingStatus("CONFIRMED");
         booking.setPaymentStatus("DEPOSITED");
         bookingRepository.save(booking);
-
-        GuestFolio guestFolio = GuestFolio.builder()
-                .bookingId(bookingId)
-                .totalPackageAmount(booking.getRetreatPackage().getPrice())
-                .totalExtraFb(BigDecimal.ZERO)
-                .finalAmount(booking.getRetreatPackage().getPrice())
-                .status("PENDING")
-                .build();
-        guestFolioRepository.save(guestFolio);
     }
 }
+
 
