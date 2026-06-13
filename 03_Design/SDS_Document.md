@@ -6,7 +6,7 @@
 
 **Project Name (Code)**
 
-> – Hanoi, Sep 2025 –
+> � Hanoi, Sep 2025 �
 
 **Table of Contents**
 
@@ -16,19 +16,19 @@
 
 > [1. High Level Design 4](#high-level-design)
 >
-> [1.1 Software Architecture 4](#software-architecture---ngọc)
+> [1.1 Software Architecture 4](#software-architecture---ng?c)
 >
-> [1.2 Package Diagram 4](#package-diagram---hải)
+> [1.2 Package Diagram 4](#package-diagram---h?i)
 >
-> [1.3 Database Design 5](#database-design---ngọc)
+> [1.3 Database Design 5](#database-design---ng?c)
 >
-> [2. State Transition Diagrams 7](#state-transition-diagrams---hải)
+> [2. State Transition Diagrams 7](#state-transition-diagrams---h?i)
 >
 > [2.1 PIN Validation 7](#pin-validation)
 >
-> [2.2 … 7](#section-1)
+> [2.2 � 7](#section-1)
 >
-> [3. Detailed Design 8](#detailed-design---dương)
+> [3. Detailed Design 8](#detailed-design---duong)
 >
 > [3.1 \<Feature/Function Name1\> 8](#_heading=h.sgmf6yhq7gop)
 >
@@ -138,7 +138,7 @@ M, D</strong></td>
 
 ## 1. High Level Design
 
-### 1.1 Software Architecture - Ngọc
+### 1.1 Software Architecture - Ng?c
 
 *\[The content of this section includes the overall architectural
 diagram which includes the sub-systems and/or components, the external
@@ -155,7 +155,7 @@ Architecture</u>](https://app.diagrams.net/#G1nYppNahTHsDyff4ABh4xfEVTmDvZ9q0X#%
 
 *[Provide the package diagram for each sub-system. The content of this section including the overall package diagram, the explanation, package and class naming conventions in each package. Please see the sample & description table format below]*
 
-`plantuml
+```plantuml
 @startuml
 skinparam packageStyle folder
 skinparam linetype ortho
@@ -201,7 +201,7 @@ fnb ..> common : <<import>>
 billing ..> common : <<import>>
 
 @enduml
-`
+```
 
 ***Package descriptions***
 
@@ -218,7 +218,7 @@ billing ..> common : <<import>>
 
 * **High Cohesion & Low Coupling:** Core business domains (Spa, F&B, Booking) are completely separated into distinct packages without cross-dependencies. This allows developers to modify or maintain each module independently.
 * **No Circular Dependency:** A clear uni-directional dependency flow prevents circular dependency errors during Spring Boot Bean initialization.
-### 1.3 Database Design - Ngọc
+### 1.3 Database Design - Ng?c
 
 *\[Provide the files description, database table relationship & table
 descriptions like example below\]*
@@ -391,7 +391,7 @@ Diagram</u>](https://drive.google.com/file/d/1ZJ7tXirFLBp5_qo8BCYYA1ZVyBzUI62m/v
 | 1 | folio_id | X |  |  | X | Unique identifier of the room debt record (Auto-incrementing). |
 | 2 | booking_id |  | X |  | X | Main foreign key linked to BOOKING (booking_id) to consolidate all incurred costs into the room account |
 | 3 | total_package_amout |  |  |  |  | Total cost of room and initial fixed package treatment. |
-| 4 | total_extra_fb |  |  |  |  | Total of additional costs outside the package from à la carte dining services |
+| 4 | total_extra_fb |  |  |  |  | Total of additional costs outside the package from � la carte dining services |
 | 5 | final_amount |  |  |  |  | Total final cost to be paid before departure |
 | 6 | status |  |  |  |  | Room debt record status (Pending / Settled). Constraint to prevent Check-out if there is outstanding debt |
 | 7 | is_delete |  |  |  |  | Flag to mark the logical deletion of the debt record. |
@@ -506,7 +506,7 @@ Diagram</u>](https://drive.google.com/file/d/1ZJ7tXirFLBp5_qo8BCYYA1ZVyBzUI62m/v
 | 7 | payment_date |  |  |  |  | Time the payment transaction was successfully recorded |
 | 8 | status |  |  |  |  | Status of the financial payment transaction processing (Success / Failed / Processing). |
 
-## 2. State Transition Diagrams - Hải
+## 2. State Transition Diagrams - H?i
 
 *\[Specify and draw state charts (state transition diagrams) for the
 data and system like below sample. In the diagrams, beside the states,
@@ -519,11 +519,11 @@ transitions, entry actions, or exit actions\]*
 
 ![](images/media/image2.png)
 
-### 2.2 …
+### 2.2 �
 
 ### 
 
-## 3. Detailed Design - Dương
+## 3. Detailed Design - Duong
 
 ### **3.1 Auto-Matching Spa Scheduling & Specific Therapist Selection (UC12)** This feature allows guests to book a Spa session with two options: assigning a specific Therapist, or letting the system automatically assign any available therapist. The system ensures data locking (FOR UPDATE) and automatic Rollback via @Transactional to prevent room and personnel resource collisions (double-booking). 
 
@@ -566,3 +566,6 @@ transitions, entry actions, or exit actions\]*
 ![](images/media/image10.png)
 
 [<u>Link</u>](https://drive.google.com/file/d/1wSW6l8DWsNzzyyQzyKsONrnA4CSqcB1M/view?usp=sharing)
+
+
+
