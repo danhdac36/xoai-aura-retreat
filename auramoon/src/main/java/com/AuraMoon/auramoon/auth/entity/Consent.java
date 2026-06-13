@@ -1,16 +1,20 @@
 package com.AuraMoon.auramoon.auth.entity;
 
+import com.AuraMoon.auramoon.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "CONSENT")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Consent {
+@AttributeOverrides({
+    @AttributeOverride(name = "updatedAt", column = @Column(name = "update_at"))
+})
+public class Consent extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,11 +31,4 @@ public class Consent {
 
     @Column(name = "consent_version", length = 8)
     private String consentVersion;
-
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "is_delete")
-    @Builder.Default
-    private Boolean isDelete = false;
 }

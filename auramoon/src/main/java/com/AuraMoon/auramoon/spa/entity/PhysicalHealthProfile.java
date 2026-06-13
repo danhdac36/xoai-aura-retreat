@@ -1,16 +1,20 @@
 package com.AuraMoon.auramoon.spa.entity;
 
+import com.AuraMoon.auramoon.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PHYSICAL_HEALTH_PROFILE")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PhysicalHealthProfile {
+@AttributeOverrides({
+    @AttributeOverride(name = "updatedAt", column = @Column(name = "update_at"))
+})
+public class PhysicalHealthProfile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +31,4 @@ public class PhysicalHealthProfile {
     @Lob
     @Column(name = "injuries")
     private String injuries;
-
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
 }

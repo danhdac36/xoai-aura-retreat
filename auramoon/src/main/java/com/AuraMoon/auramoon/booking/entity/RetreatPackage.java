@@ -1,17 +1,18 @@
 package com.AuraMoon.auramoon.booking.entity;
 
+import com.AuraMoon.auramoon.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "RETREAT_PACKAGE")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RetreatPackage {
+public class RetreatPackage extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,14 +42,4 @@ public class RetreatPackage {
 
     @Column(name = "price")
     private BigDecimal price;
-
-    @Column(name = "create_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "update_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "is_delete")
-    @Builder.Default
-    private Boolean isDelete = false;
 }
