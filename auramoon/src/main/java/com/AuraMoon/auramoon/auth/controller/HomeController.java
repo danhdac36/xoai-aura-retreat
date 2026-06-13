@@ -1,13 +1,15 @@
-package com.AuraMoon.auramoon.publicweb.controller;
+package com.AuraMoon.auramoon.auth.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class HomeController {
 
-    @GetMapping({"/", "/home"})
+    @GetMapping({ "/", "/home" })
     public String showHomePage(Model model) {
         model.addAttribute("pageTitle", "Trang Chủ - Xoai Aura Retreat");
         return "public/home";
@@ -35,5 +37,11 @@ public class HomeController {
     public String showCulinaryPage(Model model) {
         model.addAttribute("pageTitle", "Aura Culinary & Dining - Xoai Aura Retreat");
         return "public/culinary";
+    }
+
+    @PostMapping
+    public String loginPost() {
+
+        return "redirect:/home";
     }
 }
