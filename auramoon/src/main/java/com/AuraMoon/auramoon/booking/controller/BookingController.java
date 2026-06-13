@@ -35,25 +35,17 @@ public class BookingController {
         Integer guestId = 1;
         try {
             BookingResponseDTO response = bookingService.createBooking(guestId, request);
-            // Redirect sang trang giả lập cổng thanh toán
-            return "redirect:/booking/payment/callback?bookingId=" + response.getBookingId() + "&transactionCode=TX_AURA_" + System.currentTimeMillis();
+            // Redirect sang controller thanh toán đặt cọc của module billing
+            return "redirect:/billing/deposit/pay?bookingId=" + response.getBookingId();
         } catch (Exception e) {
             return "redirect:/packages/" + request.getRetreatPackageId() + "?error=" + e.getMessage();
         }
     }
 
-    @GetMapping("/payment/callback")
-    public String paymentCallback(@RequestParam("bookingId") Integer bookingId,
-                                  @RequestParam("transactionCode") String transactionCode,
-                                  Model model) {
-        try {
-            bookingService.confirmPayment(bookingId, transactionCode);
-            model.addAttribute("bookingId", bookingId);
-            model.addAttribute("transactionCode", transactionCode);
-            return "booking/success";
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "error";
-        }
+    @GetMapping("/success")
+    public String bookingSuccess(@RequestParam("bookingId") Integer bookingId,
+                                 Model model) {
+        model.addAttribute("bookingId", bookingId);
+        return "booking/success";
     }
 }
