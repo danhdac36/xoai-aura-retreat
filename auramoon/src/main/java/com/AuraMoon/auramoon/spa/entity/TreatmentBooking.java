@@ -12,8 +12,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @AttributeOverrides({
-    @AttributeOverride(name = "createdAt", column = @Column(name = "create_at", updatable = false)),
-    @AttributeOverride(name = "updatedAt", column = @Column(name = "update_at"))
+        @AttributeOverride(name = "createdAt", column = @Column(name = "create_at", updatable = false)),
+        @AttributeOverride(name = "updatedAt", column = @Column(name = "update_at"))
 })
 public class TreatmentBooking extends BaseEntity {
 

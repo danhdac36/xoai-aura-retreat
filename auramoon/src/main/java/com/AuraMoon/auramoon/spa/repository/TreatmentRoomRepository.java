@@ -1,6 +1,6 @@
 package com.AuraMoon.auramoon.spa.repository;
 
-import com.AuraMoon.auramoon.spa.entity.Therapist;
+import com.AuraMoon.auramoon.spa.entity.TreatmentRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,17 +10,17 @@ import jakarta.persistence.LockModeType;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface TherapistRepository extends JpaRepository<Therapist, Integer> {
-
-    long countByStatus(String status);
-
+public interface TreatmentRoomRepository extends JpaRepository<TreatmentRoom, Integer> {
+    
+    long countByStatusAndIsDeleteFalse(String status);
+    
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT t FROM Therapist t " +
-           "WHERE t.status = 'Active' " +
+    @Query("SELECT r FROM TreatmentRoom r " +
+           "WHERE r.status = 'Active' AND r.isDelete = false " +
            "AND NOT EXISTS (" +
            "  SELECT 1 FROM Schedule s " +
-           "  WHERE s.therapist.therapistCode = t.therapistCode AND s.isDelete = false " +
+           "  WHERE s.room.id = r.id AND s.isDelete = false " +
            "  AND s.startTime < :reqEnd AND s.endTime > :reqStart" +
-           ") ORDER BY t.therapistCode ASC")
-    List<Therapist> findAvailableTherapistsWithLock(@Param("reqStart") LocalDateTime reqStart, @Param("reqEnd") LocalDateTime reqEnd);
+           ") ORDER BY r.id ASC")
+    List<TreatmentRoom> findAvailableRoomsWithLock(@Param("reqStart") LocalDateTime reqStart, @Param("reqEnd") LocalDateTime reqEnd);
 }
