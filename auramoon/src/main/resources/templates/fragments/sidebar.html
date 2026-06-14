@@ -10,21 +10,35 @@
         </div>
         <nav class="flex-1 px-4 space-y-1">
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                href="#">
-                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-                <span class="font-label-md text-label-md">Dashboard</span>
+                th:href="@{/home}">
+                <span class="material-symbols-outlined" data-icon="home">home</span>
+                <span class="font-label-md text-label-md">Home</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl scale-[0.98] transition-transform"
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
                 th:href="@{/packages}">
-                <span class="material-symbols-outlined" data-icon="logout">logout</span>
+                <span class="material-symbols-outlined" data-icon="package">package_2</span>
                 <span class="font-label-md text-label-md">Retreat Package</span>
             </a>
-            <a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl scale-[0.98] transition-transform"
-                th:href="@{/spa/therapists/{code}/schedules}">
-                <span class="material-symbols-outlined" data-icon="logout">logout</span>
-                <span class="font-label-md text-label-md">Therapist</span>
+            <!-- Spa Schedule (SpaScheduleController) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/booking-spa}">
+                <span class="material-symbols-outlined" data-icon="calendar">calendar_month</span>
+                <span class="font-label-md text-label-md">Spa Booking</span>
+            </a>
+            <!-- Spa Receptionist Booking (SpaReceptionistController) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/booking-spa/manual}">
+                <span class="material-symbols-outlined" data-icon="receipt">receipt_long</span>
+                <span class="font-label-md text-label-md">Spa Receptionist</span>
+            </a>
+            <!-- Therapist Daily (TherapistScheduleController) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/therapist/schedules/daily}">
+                <span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+                <span class="font-label-md text-label-md">Therapist Daily</span>
             </a>
         </nav>
+
     </aside>
 </body>
 
