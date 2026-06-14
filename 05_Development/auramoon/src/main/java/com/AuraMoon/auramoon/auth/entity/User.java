@@ -1,5 +1,10 @@
 package com.AuraMoon.auramoon.auth.entity;
 
+<<<<<<< HEAD:05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/entity/User.java
+=======
+import com.AuraMoon.auramoon.auth.config.AesDataEncryptor;
+import com.AuraMoon.auramoon.common.entity.BaseEntity;
+>>>>>>> NMNGocc:auramoon/src/main/java/com/AuraMoon/auramoon/auth/entity/User.java
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -45,7 +50,8 @@ public class User {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(name = "Identify_code", length = 20)
+    @Convert(converter = AesDataEncryptor.class)
+    @Column(name = "Identify_code", length = 255)
     private String identifyCode;
 
     @Lob
@@ -65,4 +71,7 @@ public class User {
 
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
+
+    @Column(name = "verify_token")
+    private String verifyToken;
 }

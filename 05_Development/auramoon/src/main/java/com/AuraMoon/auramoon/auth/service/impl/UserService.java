@@ -1,22 +1,24 @@
 package com.AuraMoon.auramoon.auth.service.impl;
 
-import com.AuraMoon.auramoon.auth.dto.request.RegisterDto;
-import com.AuraMoon.auramoon.auth.entity.Role;
 import com.AuraMoon.auramoon.auth.entity.User;
-import com.AuraMoon.auramoon.auth.repository.IRoleRepository;
 import com.AuraMoon.auramoon.auth.repository.IUserRepository;
-import com.AuraMoon.auramoon.auth.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Collections;
 
 @Service
-public class UserService implements IUserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private IUserRepository userRepository;
 
+<<<<<<< HEAD:05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/service/impl/UserService.java
     @Autowired
     private IRoleRepository roleRepository;
 
@@ -64,11 +66,21 @@ public class UserService implements IUserService {
         }
         if (!register.getPassword().equals(register.getConfirmPassword())) {
             throw new RuntimeException("Mật khẩu xác nhận không khớp!");
+=======
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("Không tìm thấy tài khoản ứng với email: " + email);
+>>>>>>> NMNGocc:auramoon/src/main/java/com/AuraMoon/auramoon/auth/service/impl/UserService.java
         }
 
-        Role guestRole = roleRepository.findByRoleName("GUEST")
-                .orElseThrow(() -> new RuntimeException("Role GUEST không tồn tại trong hệ thống!"));
+        if ("PENDING".equals(user.getStatus())) {
+            throw new UsernameNotFoundException("Tài khoản chưa kích hoạt. Vui lòng kiểm tra email.");
+        }
 
+<<<<<<< HEAD:05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/service/impl/UserService.java
         User user = new User();
         user.setFullName(register.getFullName());
         user.setEmail(register.getEmail());
@@ -87,5 +99,17 @@ public class UserService implements IUserService {
 
     @Override
     public void deleteUser(Long id) {
+=======
+        String roleName = user.getRole().getRoleName();
+        if (!roleName.startsWith("ROLE_")) {
+            roleName = "ROLE_" + roleName;
+        }
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPasswordHash(),
+                Collections.singletonList(new SimpleGrantedAuthority(roleName))
+        );
+>>>>>>> NMNGocc:auramoon/src/main/java/com/AuraMoon/auramoon/auth/service/impl/UserService.java
     }
 }
