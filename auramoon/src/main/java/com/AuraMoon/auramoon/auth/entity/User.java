@@ -1,5 +1,6 @@
 package com.AuraMoon.auramoon.auth.entity;
 
+import com.AuraMoon.auramoon.auth.config.AesDataEncryptor;
 import com.AuraMoon.auramoon.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,7 +25,6 @@ public class User extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
-    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Column(name = "email", nullable = false, unique = true, length = 50)
@@ -45,7 +45,8 @@ public class User extends BaseEntity {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(name = "Identify_code", length = 20)
+    @Convert(converter = AesDataEncryptor.class)
+    @Column(name = "Identify_code", length = 255)
     private String identifyCode;
 
     @Lob
@@ -57,4 +58,7 @@ public class User extends BaseEntity {
 
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
+
+    @Column(name = "verify_token")
+    private String verifyToken;
 }

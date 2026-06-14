@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface IUserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+public interface IUserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
     User findByEmail(String email);
     Boolean existsByEmail(String email);
+    User findByVerifyToken(String verifyToken);
 }
