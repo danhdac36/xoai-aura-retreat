@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface TherapistScheduleService {
     List<TherapistScheduleDto> getDailySchedule(String therapistCode, LocalDate date);
+    void updateSessionStatus(Integer scheduleId, String therapistCode, String newStatus);
 }

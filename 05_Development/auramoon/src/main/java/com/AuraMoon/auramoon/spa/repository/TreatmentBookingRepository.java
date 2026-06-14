@@ -2,7 +2,6 @@ package com.AuraMoon.auramoon.spa.repository;
 
 // 1. Thư viện chuẩn của Java
 import java.util.List;
-import java.util.Optional;
 
 // 2. Thư viện Spring Data JPA
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,9 +13,7 @@ import com.AuraMoon.auramoon.spa.entity.TreatmentBooking;
 
 public interface TreatmentBookingRepository extends JpaRepository<TreatmentBooking, Integer> {
 
-    // Tớ đã đổi List thành Optional để không bị lỗi hàm .orElseThrow() bên Service
-    // nhé
-    Optional<TreatmentBooking> findByBookingIdAndTreatmentService_Id(Integer bookingId, Integer serviceId);
+    List<TreatmentBooking> findByBookingIdAndTreatmentService_Id(Integer bookingId, Integer serviceId);
 
     @Query(value = "SELECT tb.* FROM TREATMENT_BOOKING tb " +
             "JOIN BOOKING b ON tb.booking_id = b.booking_id " +

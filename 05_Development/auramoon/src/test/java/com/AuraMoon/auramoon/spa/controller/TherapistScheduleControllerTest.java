@@ -21,6 +21,8 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -110,5 +112,50 @@ public class TherapistScheduleControllerTest {
                                 .session(session))
                                 .andExpect(status().is3xxRedirection())
                                 .andExpect(redirectedUrl("/login"));
+        }
+
+        @Test
+        public void updateStatus_ValidRequest_RedirectsWithSuccess() throws Exception {
+                // Arrange
+                Integer scheduleId = 1;
+                String status = "Completed";
+                String dateStr = "2026-06-15";
+                String therapistCode = "TH01";
+                session.setAttribute("therapistCode", therapistCode);
+
+                doNothing().when(therapistScheduleService).updateSessionStatus(scheduleId, therapistCode, status);
+
+                // Act & Assert
+                mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/therapist/schedules/update-status")
+                                .param("scheduleId", scheduleId.toString())
+                                .param("status", status)
+                                .param("date", dateStr)
+                                .session(session))
+                                .andExpect(status().is3xxRedirection())
+                                .andExpect(redirectedUrl("/therapist/schedules/daily?date=" + dateStr))
+                                .andExpect(flash().attribute("successMessage", "Cập nhật trạng thái thành công"));
+        }
+
+        @Test
+        public void updateStatus_ServiceThrowsException_RedirectsWithError() throws Exception {
+                // Arrange
+                Integer scheduleId = 1;
+                String status = "Completed";
+                String dateStr = "2026-06-15";
+                String therapistCode = "TH01";
+                session.setAttribute("therapistCode", therapistCode);
+
+                doThrow(new com.AuraMoon.auramoon.spa.exception.SpaBusinessException("SPA-012", "Trạng thái không hợp lệ"))
+                                .when(therapistScheduleService).updateSessionStatus(scheduleId, therapistCode, status);
+
+                // Act & Assert
+                mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/therapist/schedules/update-status")
+                                .param("scheduleId", scheduleId.toString())
+                                .param("status", status)
+                                .param("date", dateStr)
+                                .session(session))
+                                .andExpect(status().is3xxRedirection())
+                                .andExpect(redirectedUrl("/therapist/schedules/daily?date=" + dateStr))
+                                .andExpect(flash().attribute("errorMessage", "Trạng thái không hợp lệ"));
         }
 }

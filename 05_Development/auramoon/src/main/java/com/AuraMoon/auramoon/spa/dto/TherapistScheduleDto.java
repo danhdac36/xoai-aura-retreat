@@ -18,4 +18,5 @@ public class TherapistScheduleDto {
     private String serviceName;
     private String roomName;
     private String note;
+    private String status;
 }
