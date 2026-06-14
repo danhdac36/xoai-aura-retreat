@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xoai Aura Retreat – Thực đơn Gọi Món Ngoài (UC19)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/fnb/fnb.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header-container">
+        <h1>Thực đơn gọi món ngoài (A-La-Carte)</h1>
+        <p>Thưởng thức các món ngon ẩm thực cao cấp, chi phí sẽ được tự động ghi nhận vào hóa đơn phòng của bạn.</p>
+    </header>
+
+    <!-- Filter Form -->
+    <section class="header-container" style="border-bottom: none; margin-bottom: 1.5rem;">
+        <div class="filter-form">
+            <div class="form-group">
+                <label for="input-guest-id">Mã khách hàng (Guest ID)</label>
+                <input type="number" id="input-guest-id" value="1" min="1">
+            </div>
+            <div class="form-group">
+                <label for="input-booking-id">Mã đặt phòng (Booking ID)</label>
+                <input type="number" id="input-booking-id" value="1" min="1">
+            </div>
+            <div>
+                <button type="button" class="btn-search" onclick="loadAlacarteMenu()">Tải thực đơn</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <main class="main-content">
+        <!-- Left Column: Menu Items -->
+        <section aria-label="Danh sách món gọi ngoài">
+            <div class="menu-grid" id="menu-grid">
+                <!-- 50 European items dynamically rendered here -->
+            </div>
+        </section>
+
+        <!-- Right Column: Sidebar / Cart Panel -->
+        <aside class="sidebar-panel" aria-label="Giỏ hàng">
+            <h2 class="sidebar-title">
+                <span>Giỏ hàng</span>
+                <span class="qty-btn" id="cart-badge" style="background-color: var(--olive-green); color: white; width: 24px; height: 24px; font-size: 0.8rem;">0</span>
+            </h2>
+
+            <div class="cart-items" id="cart-items-list">
+                <p class="cart-empty" id="empty-cart-msg">Chưa chọn món nào</p>
+            </div>
+
+            <!-- Cost Summary -->
+            <div class="pricing-summary">
+                <div class="price-row">
+                    <span>Tạm tính:</span>
+                    <span id="price-subtotal">0đ</span>
+                </div>
+                <div class="price-row">
+                    <span>Phí phục vụ (5%):</span>
+                    <span id="price-service-charge">0đ</span>
+                </div>
+                <div class="price-row total">
+                    <span>Tổng cộng:</span>
+                    <span id="price-total">0đ</span>
+                </div>
+            </div>
+
+            <!-- Order Fields -->
+            <div class="checkout-note-group">
+                <label for="order-place">Địa điểm giao món</label>
+                <input type="text" id="order-place" value="Villa V101">
+            </div>
+            <div class="checkout-note-group">
+                <label for="order-note">Ghi chú cho nhà bếp</label>
+                <textarea id="order-note" placeholder="Ví dụ: Ít dầu mỡ, không cay..."></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="btn-checkout" id="btn-submit-order" onclick="submitAlacarteOrder()">XÁC NHẬN ĐẶT MÓN</button>
+        </aside>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="/js/fnb/menu-data.js"></script>
+    <script src="/js/fnb/menu-image-map.js"></script>
+    <script src="/js/fnb/uc19.js"></script>
+</body>
+</html>
+
