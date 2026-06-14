@@ -9,4 +9,7 @@ import java.util.List;
 @Repository
 public interface VillaRepository extends JpaRepository<Villa, Integer> {
     List<Villa> findByVillaType_IdAndVillaStatusAndIsDeleteFalse(Integer typeId, String status);
+    
+    long countByIsDeleteFalse();
+    long countByVillaStatusAndIsDeleteFalse(String status);
 }

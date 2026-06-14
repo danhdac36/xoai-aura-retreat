@@ -7,7 +7,7 @@
 | **Document ID**    | `AURA-BILLING-IMP-022`  |
 | **Version**        | 1.3                       |
 | **Date**           | `2026-06-09`            |
-| **Status**         | In review               |
+| **Status**         | ✅ Approved               |
 | **Document Owner** | Phùng Giang Hải         |
 | **Author**         | Phùng Giang Hải         |
 | **Reviewed by**    | Phùng Giang Hải         |

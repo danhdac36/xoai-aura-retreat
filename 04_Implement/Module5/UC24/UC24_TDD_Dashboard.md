@@ -5,7 +5,7 @@
 **Document ID:** AURA-DASH-TDD-024
 **Version:** 2.0
 **Date:** 2026-06-13
-**Status:** In Review
+**Status:** Approved
 **Standard:** ISO/IEC/IEEE 29119-3:2021 — Software Testing Part 3: Test Documentation
 **Author:** Phùng Giang Hải– Backend Developer
 **Reviewed by:** [x] Phùng Giang Hải
@@ -383,14 +383,16 @@
 
 | TC ID               | Test File                         | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note |
 | ------------------- | --------------------------------- | ---------------- | ----------------- | ---------------- |
-| `DASH-TC-001`     | `DashboardServiceImplTest.java` | `[ ]`          | `[pending]`     | —               |
-| `DASH-TC-002`     | `DashboardServiceImplTest.java` | `[ ]`          | `[pending]`     | —               |
-| `DASH-TC-003`     | `DashboardServiceImplTest.java` | `[ ]`          | `[pending]`     | —               |
-| `DASH-TC-004`     | `DashboardServiceImplTest.java` | `[ ]`          | `[pending]`     | —               |
-| `DASH-TC-005`     | `DashboardServiceImplTest.java` | `[ ]`          | `[pending]`     | —               |
-| `DASH-TC-006`     | `DashboardControllerTest.java`  | `[ ]`          | `[pending]`     | —               |
-| `DASH-TC-007`     | `DashboardServiceImplTest.java` | `[ ]`          | `[pending]`     | —               |
-| `DASH-TC-INT-001` | `DashboardIntegrationTest.java` | `[ ]`          | `[pending]`     | —               |
+| `DASH-TC-001`     | `DashboardServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `DASH-TC-002`     | `DashboardServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `DASH-TC-003`     | `DashboardServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `DASH-TC-004`     | `DashboardServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `DASH-TC-005`     | `DashboardServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `DASH-TC-006`     | `DashboardControllerTest.java`  | `[x]`          | `[x]`     | -               |
+| `DASH-TC-007`     | `DashboardServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `DASH-TC-008`     | `DashboardServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `DASH-TC-ERR-001` | `DashboardControllerTest.java`  | `[x]`          | `[x]`     | -               |
+| `DASH-TC-INT-001` | `DashboardIntegrationTest.java` | `[x]`          | `[x]`     | -               |
 
 # 6. Entry / Exit Criteria
 

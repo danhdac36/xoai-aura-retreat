@@ -5,5 +5,5 @@ import java.time.LocalDate;
 
 public interface ReportService {
     ReportDataDTO generateReportData(LocalDate startDate, LocalDate endDate, String reportType);
-    byte[] exportToExcel(ReportDataDTO reportData);
+    byte[] exportToExcel(LocalDate startDate, LocalDate endDate, String reportType);
 }

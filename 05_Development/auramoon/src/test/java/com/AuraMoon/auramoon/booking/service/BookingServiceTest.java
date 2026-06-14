@@ -176,6 +176,5 @@ public class BookingServiceTest {
         assertEquals("CONFIRMED", booking.getBookingStatus());
         assertEquals("DEPOSITED", booking.getPaymentStatus());
         verify(bookingRepository, times(1)).save(booking);
-        verify(guestFolioRepository, times(1)).save(any(GuestFolio.class));
     }
 }

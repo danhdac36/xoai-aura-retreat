@@ -7,7 +7,7 @@
 | **Document ID**    | `AURA-REV-IMP-023`                     |
 | **Version**        | 1.0                                      |
 | **Date**           | `2026-06-09`                           |
-| **Status**         | In review                                |
+| **Status**         | ✅ Approved                                |
 | **Document Owner** | `SWP391_G6_Team`                       |
 | **Author**         | `Phùng Giang Hải- Backend Developer` |
 | **Reviewed by**    | Phùng Giang Hải                        |

@@ -7,7 +7,7 @@
 | **Document ID**    | `AURA-BILLING-IMP-021`                       |
 | **Version**        | 1.0                                            |
 | **Date**           | `2026-06-12`                                 |
-| **Status**         | In review                                      |
+| **Status**         | ✅ Approved                                      |
 | **Document Owner** | Phùng Giang Hải - Tech Lead & Module 5 Owner |
 | **Author**         | Phùng Giang Hải - Tech Lead & Module 5 Owner |
 | **Reviewed by**    | Phùng Giang Hải - Tech Lead & Module 5 Owner |

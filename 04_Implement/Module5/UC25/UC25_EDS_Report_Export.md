@@ -6,14 +6,14 @@
 | ------------------------ | ----------------------------------------- |
 | **Document ID**    | `AURA-REPORT-IMP-025`                   |
 | **Version**        | 1.0                                       |
-| **Date**           | `2026-06-13`                            |
-| **Status**         | In Review                                 |
+| **Date**           | `2026-06-14`                            |
+| **Status**         | ✅ Approved                                     |
 | **Document Owner** | Phùng Giang Hải                         |
 | **Author**         | `Phùng Giang Hải - Backend Developer` |
 | **Reviewed by**    | Phùng Giang Hải                         |
 | **DPO Sign-off**   | `[ ] N/A — Module không xử lý PII`  |
 | **Approved by**    | `Principal Architect`                   |
-| **Last Review**    | `2026-06-13`                            |
+| **Last Review**    | `2026-06-14`                            |
 | **Based on EDS**   | v2.0                                      |
 
 # CHANGELOG
@@ -23,6 +23,7 @@
 | Ngày      | Người thực hiện | Nội dung thay đổi                                 |
 | ---------- | ------------------- | ---------------------------------------------------- |
 | 2026-06-13 | Sinh viên 5        | Tạo tài liệu EDS lần đầu — UC25 Export Report |
+| 2026-06-14 | AI Assistant        | Chuẩn hóa Bảng mã lỗi (Mục 10) về chuẩn 5 cột, bảo toàn dữ liệu MVC |
 
 # MỤC LỤC
 
@@ -454,11 +455,11 @@ public class ReportController {
 
 # 10. Bảng mã lỗi (Error Codes)
 
-| Tên Exception               | Flash/Model Key | Thông báo hiển thị (UI Message)                                                  | Trigger Condition                                 |
-| ---------------------------- | --------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| `Exception` (generic)      | `error`       | Đã xảy ra lỗi khi tạo báo cáo. Vui lòng thử lại.                           | Lỗi tổng hợp dữ liệu hoặc lỗi kết nối DB |
-| `RuntimeException`         | `error`       | Lỗi khi tạo file Excel. Vui lòng thử lại.                                       | Apache POI gặp lỗi khi tạo workbook            |
-| `IllegalArgumentException` | `error`       | Khoảng thời gian không hợp lệ. Ngày bắt đầu phải trước ngày kết thúc. | startDate > endDate                               |
+| Code | HTTP Status | Message (EN) | Message (VI) | Trigger Condition |
+| --- | --- | --- | --- | --- |
+| `RPT-001` | 500 | Report generation failed | Đã xảy ra lỗi khi tạo báo cáo. Vui lòng thử lại. | Lỗi tổng hợp dữ liệu hoặc lỗi kết nối DB.<br/>• **Exception:** `Exception` (generic)<br/>• **Model Key:** `error` |
+| `RPT-002` | 500 | Excel generation failed | Lỗi khi tạo file Excel. Vui lòng thử lại. | Apache POI gặp lỗi khi tạo workbook.<br/>• **Exception:** `RuntimeException`<br/>• **Model Key:** `error` |
+| `RPT-003` | 400 | Invalid date range | Khoảng thời gian không hợp lệ. Ngày bắt đầu phải trước ngày kết thúc. | startDate > endDate.<br/>• **Exception:** `IllegalArgumentException`<br/>• **Model Key:** `error` |
 
 # 11. Quy trình Triển khai (Step-by-Step)
 
@@ -569,7 +570,7 @@ mvn clean install
 | RPT-TC-003 | Export file Excel thành công                   | HIGH      | byte[] trả về > 0, file mở được trong Excel                         |
 | RPT-TC-004 | Empty data → Report trả về list rỗng         | MEDIUM    | Không throw exception, file Excel có header nhưng không có data rows |
 | RPT-TC-005 | Invalid date range (start > end)                 | MEDIUM    | Throw IllegalArgumentException                                            |
-| RPT-TC-006 | Unauthorized access (Guest/Receptionist)         | HIGH      | Redirect login hoặc 403                                                  |
+| RPT-TC-006 | Unauthorized access (Delegated to Module 1)      | LOW       | Module 1 Global Filter/Interceptor handles redirect to login hoặc 403. Module 5 tests disabled. |
 
 # 14. Phương pháp Xác minh
 
@@ -670,6 +671,7 @@ Bước 2: Kết quả mong đợi
 
 * ✅ = Được phép
 * ❌ = Bị từ chối (Redirect sang trang login hoặc 403)
+* **Lưu ý:** Việc kiểm tra phân quyền (Authorization) được ủy quyền (delegated) và xử lý tập trung bởi **Global Filter/Interceptor của Module 1**. UC25 không thực hiện kiểm tra quyền trực tiếp tại Controller.
 
 # PHỤ LỤC
 

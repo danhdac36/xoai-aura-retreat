@@ -3,6 +3,7 @@ package com.AuraMoon.auramoon.billing.controller;
 import com.AuraMoon.auramoon.billing.dto.CheckoutViewDTO;
 import com.AuraMoon.auramoon.billing.entity.Payment;
 import com.AuraMoon.auramoon.billing.exception.PendingOrdersExistException;
+import com.AuraMoon.auramoon.billing.service.AuditLogService;
 import com.AuraMoon.auramoon.billing.service.BillingService;
 import com.AuraMoon.auramoon.billing.service.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,11 +22,13 @@ public class CheckoutController {
 
     private final BillingService billingService;
     private final VNPayService vnPayService;
+    private final AuditLogService auditLogService;
 
     @GetMapping("/checkout")
     public String showCheckoutPage(@RequestParam Integer bookingId, Model model) {
         try {
             CheckoutViewDTO data = billingService.getCheckoutData(bookingId);
+            auditLogService.logActivity("VIEW_INVOICE", 1, bookingId);
             model.addAttribute("data", data);
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
@@ -44,6 +47,7 @@ public class CheckoutController {
             CheckoutViewDTO data = billingService.getCheckoutData(bookingId);
             if (data.getBalanceDue().compareTo(java.math.BigDecimal.ZERO) <= 0) {
                 billingService.completeCheckoutWithoutPayment(bookingId);
+                auditLogService.logActivity("CHECKOUT_COMPLETE", 1, bookingId);
                 redirectAttributes.addFlashAttribute("successMessage", "Check-out thành công! Bạn không có khoản nợ nào cần thanh toán.");
                 return "redirect:/billing/checkout/success?bookingId=" + bookingId; // Or redirect to a general success page
             }
@@ -55,6 +59,7 @@ public class CheckoutController {
 
             String gateway = "CASH".equals(paymentMethod) ? "CASH" : "VNPAY";
             Payment payment = billingService.initiatePayment(bookingId, paymentMethod, gateway);
+            auditLogService.logActivity("INITIATE_PAYMENT", 1, bookingId);
 
             if ("CASH".equals(paymentMethod)) {
                 billingService.completePaymentAndCheckout(payment.getId(), null);
@@ -93,10 +98,12 @@ public class CheckoutController {
             Integer paymentId = Integer.parseInt(params.get("vnp_TxnRef"));
             if ("00".equals(params.get("vnp_ResponseCode"))) {
                 billingService.completePaymentAndCheckout(paymentId, params.get("vnp_TransactionNo"));
+                if (bookingId != null) auditLogService.logActivity("COMPLETE_PAYMENT", 1, bookingId);
                 redirectAttributes.addFlashAttribute("successMessage", "Thanh toán VNPay thành công!");
                 return "redirect:/billing/checkout/success?paymentId=" + paymentId;
             } else {
                 billingService.markPaymentAsFailed(paymentId);
+                if (bookingId != null) auditLogService.logActivity("PAYMENT_FAILED", 1, bookingId);
                 redirectAttributes.addFlashAttribute("errorMessage", "Khách hàng hủy giao dịch hoặc thẻ lỗi.");
             }
         } else {
@@ -124,6 +131,7 @@ public class CheckoutController {
             return "redirect:/billing/checkout";
         }
 
+        auditLogService.logActivity("CHECKOUT_COMPLETE", 1, bookingId);
         model.addAttribute("successMessage", "Thanh toán thành công. Check-out hoàn tất!");
         model.addAttribute("bookingId", bookingId);
         return "billing/checkout/checkout_success";

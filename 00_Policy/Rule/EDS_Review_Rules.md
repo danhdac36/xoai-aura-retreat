@@ -18,6 +18,9 @@
 - **Không có sự sai lệch:** 4 bộ tài liệu cốt lõi là SRS (Yêu cầu), SDS (Thiết kế hệ thống), EDS (Đặc tả kỹ thuật), và TDD (Đặc tả kiểm thử) là một thể thống nhất. Bất kỳ một chỉnh sửa, thêm bớt nào ở một tài liệu BẮT BUỘC phải được rà soát và cập nhật đồng bộ 100% lên 3 tài liệu còn lại. Tuyệt đối không được phép có bất kỳ sự sai lệch, dư thừa hay thiếu hụt logic nào giữa các tài liệu.
 - **Trình tự "Đồng bộ Trong trước, Ngoài sau":** Trước khi đồng bộ chéo sang các file khác (vòng ngoài), BẮT BUỘC phải rà soát và triệt tiêu mọi mâu thuẫn nội bộ (internal inconsistency) TRONG CHÍNH FILE ĐANG SỬA (vòng trong). Ví dụ: Trong EDS, nếu thêm một luồng Bypass ở Pseudo-code thì phải tự động xóa Error Code cũ cản trở luồng đó, đồng thời cập nhật luôn Test Summary và Verification Samples trong cùng file trước khi mở file SRS hay TDD lên sửa.
 
+### 4. NGUYÊN TẮC "BÁO CÁO XUNG ĐỘT TRUNG THỰC" (Honest Conflict Reporting)
+- **Cấm sửa giấu diếm:** Nếu gặp xung đột giữa tài liệu (EDS/TDD/SRS) và mã nguồn (Code) hoặc thấy có sự khác biệt (lệch pha), BẮT BUỘC PHẢI BÁO CÁO NGAY CHO TECH LEAD. Tuyệt đối không được "chăm chăm sửa cho có" hoặc "sửa để qua mặt". Đặc biệt nghiêm cấm hành vi tự ý sửa đổi tài liệu thiết kế hoặc test case để hợp thức hóa/lách luật cho một đoạn code sai trái nhằm qua mặt người duyệt.
+
 ---
 
 ## PHẦN 2: VAI TRÒ LẬP TRÌNH VIÊN (DEVELOPER)

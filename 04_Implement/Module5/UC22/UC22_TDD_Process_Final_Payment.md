@@ -285,13 +285,13 @@ UC22 Checkout bao gồm các layer:
 
 | TC ID          | Test File                       | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note |
 | -------------- | ------------------------------- | ---------------- | ----------------- | ---------------- |
-| `BIL-TC-001` | `CheckoutControllerTest.java` | `[ ]`          | `[ ]`           | Update: Thêm AuditLog assert |
-| `BIL-TC-002` | `CheckoutControllerTest.java` | `[X]`          | `[X]`           | Passed           |
-| `BIL-TC-003` | `CheckoutControllerTest.java` | `[ ]`          | `[ ]`           | Update: Thêm AuditLog assert |
-| `BIL-TC-004` | `CheckoutControllerTest.java` | `[ ]`          | `[ ]`           | Update: Thêm AuditLog assert |
-| `BIL-TC-005` | `CheckoutControllerTest.java` | `[ ]`          | `[ ]`           | Update: Thêm AuditLog assert |
-| `BIL-TC-006` | `CheckoutControllerTest.java` | `[ ]`          | `[ ]`           | Update: Thêm AuditLog assert |
-| `BIL-TC-007` | `CheckoutControllerTest.java` | `[ ]`          | `[ ]`           | Update: Thêm AuditLog assert |
+| `BIL-TC-001` | `CheckoutControllerTest.java` | `[x]`          | `[ ]`           | Update: Thêm AuditLog assert |
+| `BIL-TC-002` | `CheckoutControllerTest.java` | `[X]`          | `[ ]`           | -                            |
+| `BIL-TC-003` | `CheckoutControllerTest.java` | `[x]`          | `[ ]`           | Update: Thêm AuditLog assert |
+| `BIL-TC-004` | `CheckoutControllerTest.java` | `[x]`          | `[ ]`           | Update: Thêm AuditLog assert |
+| `BIL-TC-005` | `CheckoutControllerTest.java` | `[x]`          | `[ ]`           | Update: Thêm AuditLog assert |
+| `BIL-TC-006` | `CheckoutControllerTest.java` | `[x]`          | `[ ]`           | Update: Thêm AuditLog assert |
+| `BIL-TC-007` | `CheckoutControllerTest.java` | `[x]`          | `[ ]`           | Update: Thêm AuditLog assert |
 
 # 6. Entry / Exit Criteria
 

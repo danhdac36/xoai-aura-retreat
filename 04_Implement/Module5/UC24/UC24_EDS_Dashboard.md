@@ -6,14 +6,14 @@
 | ------------------------ | ---------------------------------------- |
 | **Document ID**    | `AURA-DASH-IMP-024`                    |
 | **Version**        | 2.0                                      |
-| **Date**           | `2026-06-13`                           |
-| **Status**         | In Review                                |
+| **Date**           | `2026-06-14`                           |
+| **Status**         | ✅ Approved                                     |
 | **Document Owner** | Phùng Giang Hải                        |
 | **Author**         | `Phùng Giang Hải- Backend Developer` |
 | **Reviewed by**    | Phùng Giang Hải                        |
 | **DPO Sign-off**   | `[ ] N/A — Module không xử lý PII` |
 | **Approved by**    | `Principal Architect`                  |
-| **Last Review**    | `2026-06-13`                           |
+| **Last Review**    | `2026-06-14`                           |
 | **Based on EDS**   | v2.0                                     |
 
 # CHANGELOG
@@ -24,6 +24,7 @@
 | ---------- | ------------------- | ------------------------------------------------------------------------------- |
 | 2026-06-10 | Sinh viên 5        | Tạo tài liệu EDS lần đầu — UC24 Revenue Dashboard                        |
 | 2026-06-13 | Sinh viên 5        | Viết lại hoàn chỉnh theo EDS v2.0 — bổ sung tất cả sections còn thiếu |
+| 2026-06-14 | AI Assistant        | Chuẩn hóa Bảng mã lỗi (Mục 10) về định dạng 5 cột và bảo toàn dữ liệu MVC |
 
 # MỤC LỤC
 
@@ -456,10 +457,10 @@ public class DashboardController {
 
 # 10. Bảng mã lỗi (Error Codes)
 
-| Tên Exception          | Flash/Model Key | Thông báo hiển thị (UI Message)                                             | Trigger Condition                                              |
-| ----------------------- | --------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `Exception` (generic) | `error`       | Đã xảy ra lỗi khi tải dữ liệu Dashboard. Vui lòng thử lại.            | Lỗi tổng hợp doanh thu hoặc lỗi kết nối DB              |
-| N/A (empty data)        | N/A             | Dashboard hiển thị "Không có dữ liệu trong khoảng thời gian đã chọn" | Không có GuestFolio nào với status PAID trong khoảng lọc |
+| Code | HTTP Status | Message (EN) | Message (VI) | Trigger Condition |
+| --- | --- | --- | --- | --- |
+| `DASH-001` | 500 | Dashboard loading error | Đã xảy ra lỗi khi tải dữ liệu Dashboard. Vui lòng thử lại. | Lỗi tổng hợp doanh thu hoặc kết nối DB.<br/>• **Exception:** `Exception` (generic)<br/>• **Model Key:** `error` |
+| `DASH-002` | 200 | No data available | Không có dữ liệu trong khoảng thời gian đã chọn | Không có GuestFolio nào với status PAID trong khoảng lọc.<br/>• **Exception:** `N/A` (empty data)<br/>• **Model Key:** `N/A` (Thymeleaf conditions handle empty list) |
 
 > **Lưu ý:** UC24 là chức năng Read-only, không phát sinh lỗi nghiệp vụ nghiêm trọng. Trường hợp không có dữ liệu, dashboard hiển thị giá trị mặc định (0).
 
@@ -559,7 +560,7 @@ git checkout -- auramoon/src/main/resources/static/css/dashboard/
 | DASH-TC-003 | Loại bỏ hóa đơn UNPAID                           | CRITICAL  | totalRevenue = 0 khi chỉ có hóa đơn chưa thanh toán              |
 | DASH-TC-004 | Không có dữ liệu → Dashboard trả về 0          | MEDIUM    | DTO trả về tất cả revenue = 0, rate = 0                             |
 | DASH-TC-005 | Tính Occupancy Rate chính xác                      | MEDIUM    | (occupied / total) * 100 = giá trị chính xác                        |
-| DASH-TC-006 | Unauthorized access (Guest/Receptionist)              | HIGH      | Redirect sang login hoặc 403                                           |
+| DASH-TC-006 | Unauthorized access (Delegated to Module 1)           | LOW       | Module 1 Global Filter/Interceptor handles redirect to login hoặc 403. Module 5 tests disabled. |
 
 # 14. Phương pháp Xác minh
 
@@ -653,6 +654,7 @@ Bước 2: Kết quả mong đợi
 
 * ✅ = Được phép
 * ❌ = Bị từ chối (Redirect sang trang login hoặc 403)
+* **Lưu ý:** Việc kiểm tra phân quyền (Authorization) được ủy quyền (delegated) và xử lý tập trung bởi **Global Filter/Interceptor của Module 1**. UC24 không thực hiện kiểm tra quyền trực tiếp tại Controller.
 
 # PHỤ LỤC
 

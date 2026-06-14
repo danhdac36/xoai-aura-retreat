@@ -10,6 +10,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.AuraMoon.auramoon.auth.entity.User;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class ReportIntegrationTest {
@@ -21,7 +23,13 @@ class ReportIntegrationTest {
     @Test
     @DisplayName("RPT-TC-INT-001: Full Export Flow (E2E)")
     void testFullExportFlow() throws Exception {
+        User mockUser = new User();
+        com.AuraMoon.auramoon.auth.entity.Role mockRole = new com.AuraMoon.auramoon.auth.entity.Role();
+        mockRole.setRoleName("MANAGER");
+        mockUser.setRole(mockRole);
+
         mockMvc.perform(get("/manager/report/export")
+                .sessionAttr("currentUser", mockUser)
                 .param("startDate", "2026-06-01")
                 .param("endDate", "2026-06-30")
                 .param("reportType", "ALL"))

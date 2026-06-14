@@ -5,7 +5,7 @@
 **Document ID:** AURA-REPORT-TDD-025
 **Version:** 1.0
 **Date:** 2026-06-13
-**Status:** In Review
+**Status:** Approved
 **Standard:** ISO/IEC/IEEE 29119-3:2021 — Software Testing Part 3: Test Documentation
 **Author:** Phùng Giang Hải– Backend Developer
 **Reviewed by:** [x] Phùng Giang Hải
@@ -386,14 +386,15 @@
 
 | TC ID              | Test File                      | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note |
 | ------------------ | ------------------------------ | ---------------- | ----------------- | ---------------- |
-| `RPT-TC-001`     | `ReportServiceImplTest.java` | `[ ]`          | `[pending]`     | —               |
-| `RPT-TC-002`     | `ReportServiceImplTest.java` | `[ ]`          | `[pending]`     | —               |
-| `RPT-TC-003`     | `ReportServiceImplTest.java` | `[ ]`          | `[pending]`     | —               |
-| `RPT-TC-004`     | `ReportServiceImplTest.java` | `[ ]`          | `[pending]`     | —               |
-| `RPT-TC-005`     | `ReportServiceImplTest.java` | `[ ]`          | `[pending]`     | —               |
-| `RPT-TC-006`     | `ReportControllerTest.java`  | `[ ]`          | `[pending]`     | —               |
-| `RPT-TC-007`     | `ReportControllerTest.java`  | `[ ]`          | `[pending]`     | —               |
-| `RPT-TC-INT-001` | `ReportIntegrationTest.java` | `[ ]`          | `[pending]`     | —               |
+| `RPT-TC-001`     | `ReportServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `RPT-TC-002`     | `ReportServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `RPT-TC-003`     | `ReportServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `RPT-TC-004`     | `ReportServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `RPT-TC-005`     | `ReportServiceImplTest.java` | `[x]`          | `[x]`     | -               |
+| `RPT-TC-006`     | `ReportControllerTest.java`  | `[x]`          | `[x]`     | -               |
+| `RPT-TC-007`     | `ReportControllerTest.java`  | `[x]`          | `[x]`     | -               |
+| `RPT-TC-ERR-001` | `ReportControllerTest.java`  | `[x]`          | `[x]`     | -               |
+| `RPT-TC-INT-001` | `ReportIntegrationTest.java` | `[x]`          | `[x]`     | -               |
 
 # 6. Entry / Exit Criteria
 
