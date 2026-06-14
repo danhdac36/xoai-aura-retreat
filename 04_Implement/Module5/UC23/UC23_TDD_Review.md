@@ -5,7 +5,7 @@
 **Document ID:** AURA-TDD-023
 **Version:** 1.0
 **Date:** 2026-06-09
-**Status:** Approved
+**Status:** In review
 **Standard:** ISO/IEC/IEEE 29119-3:2021 — Software Testing Part 3: Test Documentation
 **Author:** Phùng Giang Hải
 **Reviewed by:** [x] Phùng Giang Hải
@@ -23,8 +23,8 @@
 # CHANGELOG
 
 | Ngày      | Người thực hiện | Nội dung thay đổi                              |
-| ---------- | ------------------- | ------------------------------------------------- |
 | 2026-06-09 | AI Agent            | Khởi tạo tài liệu — TDD spec cho UC23 Review |
+| 2026-06-14 | AI Assistant        | Bổ sung kịch bản bắt lỗi Boundary Value (REV-TC-004) và ánh xạ mã lỗi đồng bộ với EDS |
 
 # MỤC LỤC
 
@@ -84,6 +84,7 @@ Review & Rating bao gồm các layer:
 | TC-COND-002  | Booking chưa hoàn tất | `ReviewService.canSubmitReview()` | `REV-TC-002` |
 | TC-COND-003  | Đánh giá trùng lặp  | `ReviewService.canSubmitReview()` | `REV-TC-003` |
 | TC-COND-004  | XSS trong comment        | `ReviewService.submitReview()`    | `REV-TC-XSS` |
+| TC-COND-005  | Đánh giá điểm không hợp lệ | `ReviewService.submitReview()` | `REV-TC-004` |
 
 ## TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
 
@@ -144,7 +145,7 @@ Review & Rating bao gồm các layer:
 
 **Expected Result (PASS):**
 
-* Throw `BookingNotCompletedException` (Đơn chưa hoàn tất).
+* Throw `BookingNotCompletedException` (Đơn chưa hoàn tất). (Ánh xạ Mã lỗi: `REV-003`)
 
 **Expected Result (FAIL):**
 
@@ -168,11 +169,35 @@ Review & Rating bao gồm các layer:
 
 **Expected Result (PASS):**
 
-* Throw `ReviewAlreadyExistsException`.
+* Throw `ReviewAlreadyExistsException`. (Ánh xạ Mã lỗi: `REV-002`)
 
 **Expected Result (FAIL):**
 
 * Cho phép đánh giá đè lên hoặc tạo bản ghi mới (Race Condition / Spam).
+
+## REV-TC-004 — Đánh giá có điểm số không hợp lệ
+
+**Severity:** `HIGH`
+**Feature Under Test:** `ReviewService.submitReview()`
+**TDD Phase:** 🔴 RED
+**Condition Ref:** `TC-COND-005`
+
+**Preconditions:**
+
+* Booking ID = 4 (COMPLETED).
+
+**Test Steps:**
+
+1. Gọi `submitReview(4, 6, "Excellent")` (Boundary > 5).
+2. Gọi `submitReview(4, 0, "Bad")` (Boundary < 1).
+
+**Expected Result (PASS):**
+
+* Cả 2 trường hợp đều throw `InvalidRatingException`. (Ánh xạ Mã lỗi: `REV-001`)
+
+**Expected Result (FAIL):**
+
+* Lưu điểm 0 hoặc 6 xuống DB mà không bị chặn.
 
 ## REV-TC-XSS — XSS trong comment (Security Test)
 
@@ -206,6 +231,7 @@ Review & Rating bao gồm các layer:
 | `REV-TC-001` | `ReviewServiceTest.java` | `[X]`          | `[X]`           | Passed           |
 | `REV-TC-002` | `ReviewServiceTest.java` | `[X]`          | `[X]`           | Passed           |
 | `REV-TC-003` | `ReviewServiceTest.java` | `[X]`          | `[X]`           | Passed           |
+| `REV-TC-004` | `ReviewServiceTest.java` | `[X]`          | `[ ]`           | Pending implementation |
 | `REV-TC-XSS` | `ReviewServiceTest.java` | `[X]`          | `[X]`           | Passed           |
 
 # 6. Entry / Exit Criteria

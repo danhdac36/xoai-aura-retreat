@@ -5,15 +5,15 @@
 | Field                    | Value                     |
 | ------------------------ | ------------------------- |
 | **Document ID**    | `AURA-BILLING-IMP-022`  |
-| **Version**        | 1.2                       |
+| **Version**        | 1.3                       |
 | **Date**           | `2026-06-09`            |
-| **Status**         | Approved                  |
+| **Status**         | In review               |
 | **Document Owner** | Phùng Giang Hải         |
 | **Author**         | Phùng Giang Hải         |
 | **Reviewed by**    | Phùng Giang Hải         |
 | **DPO Sign-off**   | `[ ] Pending`           |
 | **Approved by**    | `[Principal Architect]` |
-| **Last Review**    | `2026-06-09`            |
+| **Last Review**    | `2026-06-14`            |
 | **Based on EDS**   | v2.0                      |
 
 # CHANGELOG
@@ -26,6 +26,18 @@
 | 2026-06-09 | AI Assistant        | Refactor sang kiến trúc Spring Boot MVC (Controller trả về View)                      |
 | 2026-06-09 | AI Assistant        | Cập nhật cấu trúc Entity Payment ở phần 5.2 để khớp với mã nguồn thực tế    |
 | 2026-06-09 | AI Assistant        | Thiết kế lại luồng thanh toán VNPay thành quy trình 2 bước (Redirect & Callback) |
+| 2026-06-14 | AI Assistant        | Bổ sung AuditLog vào Class Diagram, Data Structure và Sequence Diagram (BR-15) |
+| 2026-06-14 | AI Assistant        | Bổ sung AuditLogRepository và AuditLogServiceImpl vào Class Diagram chuẩn kiến trúc |
+| 2026-06-14 | AI Assistant        | Đơn giản hóa AuditLogService thành Concrete Class để đồng bộ thiết kế với UC21 |
+| 2026-06-14 | AI Assistant        | Chuyển trách nhiệm gọi AuditLogService lên Controller để tránh lặp log (Phương án 1) |
+| 2026-06-14 | AI Assistant        | Cập nhật Pseudo-code Section 9.2 để minh bạch vị trí hàm ghi Log trong Controller |
+| 2026-06-14 | AI Assistant        | Bổ sung ghi log INITIATE_PAYMENT ở cả chiều đi VNPay theo yêu cầu Tech Lead |
+| 2026-06-14 | AI Assistant        | Bổ sung Sequence Diagram (Error Path) và State Machine Diagram vào Mục 6 theo chuẩn EDS |
+| 2026-06-14 | AI Assistant        | Bổ sung BR-19 Zero Balance Bypass (Nợ 0 đồng) vào Matrix, State Machine và Pseudo-code |
+| 2026-06-14 | AI Assistant        | Xóa Error Code mâu thuẫn, cập nhật Test Summary và Verification Sample cho BR-19 để đồng bộ nội bộ file |
+| 2026-06-14 | AI Assistant        | Bổ sung Sequence Diagram cho luồng Zero Balance Bypass (BR-19) vào Mục 6.2 |
+| 2026-06-14 | AI Assistant        | Cập nhật Deployment Checklist và Implementation Steps (Mục 11) cho BR-19 để hoàn tất rà soát toàn bộ file |
+| 2026-06-14 | AI Assistant        | Sửa đổi Bảng mã lỗi (Mục 10) về đúng chuẩn 5 cột của EDS_TEMPLATE_V2.0 |
 
 # MỤC LỤC
 
@@ -65,6 +77,7 @@
 | -------------- | ----------------- | ------------------------------------------------------------------------------ | ------------------------------------------- | ----------------- | -------------- |
 | BR-12          | Business Rule     | Checkout Constraint (Không thể check-out nếu còn order Spa/F&B đang chờ) | `CheckoutService.validatePendingOrders()` | —                | —             |
 | BR-15          | Business Rule     | Audit Trail (Ghi log các hoạt động giao dịch)                             | `AuditLogRepository`                      | —                | —             |
+| BR-19          | Business Rule     | Zero Balance Bypass (Nợ 0 đồng thì tự động hoàn tất checkout)             | `CheckoutController.processPayment()`     | —                | —             |
 | UC22           | User Story        | Xử lý thanh toán cuối cùng và check-out                                  | `CheckoutController.processPayment()`     | —                | ADR-001        |
 
 # 3. Architecture Decision Records (ADR)
@@ -152,6 +165,16 @@ class BillingServiceImpl {
   -villaRepository: VillaRepository
 }
 
+class AuditLogService {
+  -auditLogRepository: AuditLogRepository
+  +logActivity(actionType, actorId, targetId): void
+}
+
+interface AuditLogRepository <<interface>> {
+}
+
+AuditLogService --> AuditLogRepository : uses
+
 BillingService <|.. BillingServiceImpl
 
 class VNPayService {
@@ -171,6 +194,7 @@ VNPayService --> VNPayConfig : uses
 class CheckoutController {
   -billingService: BillingService
   -vnPayService: VNPayService
+  -auditLogService: AuditLogService
   +processPayment(bookingId, method, request): String
   +vnpayReturn(params, bookingId): String
   +checkoutSuccess(paymentId, model): String
@@ -178,6 +202,7 @@ class CheckoutController {
 
 CheckoutController --> BillingService : uses
 CheckoutController --> VNPayService : uses
+CheckoutController --> AuditLogService : uses
 @enduml
 ```
 
@@ -220,6 +245,36 @@ public class Payment {
 
     @Column(name = "status", length = 10)
     private String status; // 'PENDING', 'SUCCESS', 'FAILED'
+}
+
+// === AUDIT LOG ENTITY (BR-15) ===
+
+@Entity
+@Table(name = "AUDIT_LOG")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class AuditLog {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "log_id")
+    private Integer id;
+
+    @Column(name = "action_type", length = 50, nullable = false)
+    private String actionType; // e.g. 'PROCESS_PAYMENT_SUCCESS'
+
+    @Column(name = "actor_id", nullable = false)
+    private Integer actorId; // Receptionist User ID
+
+    @Column(name = "target_id")
+    private Integer targetId; // Payment ID
+
+    @Column(name = "details", columnDefinition = "NVARCHAR(MAX)")
+    private String details;
+
+    @Column(name = "timestamp")
+    private LocalDateTime timestamp;
 }
 ```
 
@@ -269,9 +324,97 @@ CheckoutService -> DB: Update Folio(PAID), Booking(COMPLETED), Villa(VACANT_NEED
 CheckoutService --> Controller: void
 deactivate CheckoutService
 
+Controller -> AuditLogService: logActivity("PROCESS_PAYMENT_SUCCESS", actorId, paymentId)
+
 Controller -> Controller: Thêm FlashAttribute("Thanh toán thành công")
 Controller --> View: HTTP 302 Redirect tới trang /checkout/{bookingId}/success
 deactivate Controller
+@enduml
+```
+
+## 6.2. Sequence Diagram — Zero Balance Bypass (BR-19 Happy Path)
+
+```plantuml
+@startuml
+actor Receptionist
+participant View
+participant Controller
+participant CheckoutService
+participant AuditLogService
+database "SQL Server" as DB
+
+Receptionist -> View: Click "Hoàn tất Thanh toán" (Nợ = 0)
+View -> Controller: POST /checkout/{bookingId}/pay
+activate Controller
+
+Controller -> CheckoutService: getFolioByBooking(bookingId)
+CheckoutService --> Controller: folio (balanceDue = 0)
+
+Controller -> CheckoutService: completePaymentAndCheckout(null, "BYPASS_ZERO_BALANCE")
+activate CheckoutService
+CheckoutService -> DB: Update Folio(PAID), Booking(COMPLETED), Villa(VACANT_NEEDS_CLEANING)
+note right: Không sinh ra bản ghi Payment mới
+CheckoutService --> Controller: void
+deactivate CheckoutService
+
+Controller -> AuditLogService: logActivity("PROCESS_PAYMENT_SUCCESS", actorId, null)
+
+Controller -> Controller: Thêm FlashAttribute("Thanh toán thành công")
+Controller --> View: HTTP 302 Redirect tới trang /checkout/{bookingId}/success
+deactivate Controller
+@enduml
+```
+
+## 6.3. Sequence Diagram — Error Path (VNPay Failed / Invalid Signature)
+
+```plantuml
+@startuml
+actor Receptionist
+participant VNPayGateway
+participant Controller
+participant VNPayService
+participant CheckoutService
+participant AuditLogService
+database "SQL Server" as DB
+
+== TRƯỜNG HỢP 1: VNPay trả về thất bại (vnp_ResponseCode != 00) ==
+Receptionist -> VNPayGateway: Khách hủy giao dịch
+VNPayGateway -> Controller: GET /checkout/vnpay-return?vnp_ResponseCode=24
+activate Controller
+Controller -> VNPayService: verifySignature()
+VNPayService --> Controller: true
+Controller -> CheckoutService: markPaymentAsFailed(paymentId)
+activate CheckoutService
+CheckoutService -> DB: Update Payment(status=FAILED)
+CheckoutService --> Controller: void
+deactivate CheckoutService
+Controller -> AuditLogService: logActivity("PROCESS_PAYMENT_FAILED", actorId, paymentId)
+Controller -> Controller: Thêm FlashAttribute("Thanh toán thất bại")
+Controller --> Receptionist: Redirect /checkout/error
+deactivate Controller
+
+== TRƯỜNG HỢP 2: Chữ ký bảo mật không hợp lệ (Fake Callback) ==
+VNPayGateway -> Controller: GET /checkout/vnpay-return?vnp_ResponseCode=00 (giả mạo)
+activate Controller
+Controller -> VNPayService: verifySignature()
+VNPayService --> Controller: false
+Controller -> AuditLogService: logActivity("SECURITY_ALERT_INVALID_SIGNATURE", actorId, paymentId)
+Controller -> Controller: Thêm FlashAttribute("Sai chữ ký bảo mật")
+Controller --> Receptionist: Redirect /checkout/error
+deactivate Controller
+@enduml
+```
+
+## 6.4. State Machine Diagram (Payment Status)
+
+```plantuml
+@startuml
+[*] --> SUCCESS : Khởi tạo thanh toán nhưng Nợ = 0đ (BR-19 Bypass)
+[*] --> PENDING : Khởi tạo thanh toán (CASH/VNPAY)
+PENDING --> SUCCESS : VNPay Callback (00) / CASH hoàn tất
+PENDING --> FAILED : VNPay Callback (!=00)
+SUCCESS --> [*]
+FAILED --> [*]
 @enduml
 ```
 
@@ -337,11 +480,21 @@ public class VNPayConfig {
 
 ```java
 @PostMapping("/{bookingId}/pay")
-public String processPayment(@PathVariable Integer bookingId, @RequestParam String paymentMethod, HttpServletRequest request) {
+public String processPayment(@PathVariable Integer bookingId, @RequestParam(required=false) String paymentMethod, HttpServletRequest request) {
+    // 1. Kiểm tra Bypass (BR-19)
+    GuestFolio folio = checkoutService.getFolioByBooking(bookingId);
+    if (folio.getBalanceDue().compareTo(BigDecimal.ZERO) == 0) {
+        checkoutService.completePaymentAndCheckout(null, "BYPASS_ZERO_BALANCE");
+        auditLogService.logActivity("PROCESS_PAYMENT_SUCCESS", 1, null);
+        return "redirect:/checkout/" + bookingId + "/success";
+    }
+
+    // 2. Khởi tạo thanh toán bình thường
     Integer paymentId = checkoutService.initiatePayment(bookingId, paymentMethod, paymentMethod); // e.g. "VNPAY"
   
     if ("CASH".equals(paymentMethod)) {
         checkoutService.completePaymentAndCheckout(paymentId, null);
+        auditLogService.logActivity("PROCESS_PAYMENT_SUCCESS", 1, paymentId); // Lễ tân (ID=1)
         return "redirect:/checkout/" + bookingId + "/success";
     } else if ("VNPAY".equals(paymentMethod)) {
         // Hỗ trợ Reverse Proxy (Ngrok / Nginx)
@@ -354,6 +507,7 @@ public String processPayment(@PathVariable Integer bookingId, @RequestParam Stri
         String baseUrl = scheme + "://" + host + port;
         String returnUrl = baseUrl + "/checkout/vnpay-return";
         String vnpayUrl = vnpayService.createPaymentUrl(amount, paymentId, returnUrl);
+        auditLogService.logActivity("INITIATE_PAYMENT", 1, paymentId); // Log lúc khởi tạo đẩy sang VNPay
         return "redirect:" + vnpayUrl;
     }
     return "redirect:/checkout/" + bookingId;
@@ -369,13 +523,18 @@ public String vnpayReturn(@RequestParam Map<String, String> params, RedirectAttr
         Integer paymentId = Integer.parseInt(params.get("vnp_TxnRef"));
         if ("00".equals(params.get("vnp_ResponseCode"))) {
             checkoutService.completePaymentAndCheckout(paymentId, params.get("vnp_TransactionNo"));
+            auditLogService.logActivity("PROCESS_PAYMENT_SUCCESS", 1, paymentId); // Ghi log sự kiện thanh toán
             redirectAttributes.addFlashAttribute("successMessage", "Thanh toán VNPay thành công!");
             return "redirect:/checkout/success"; // Route về trang thành công
         } else {
             checkoutService.markPaymentAsFailed(paymentId);
+            auditLogService.logActivity("PROCESS_PAYMENT_FAILED", 1, paymentId); // Log thất bại
             redirectAttributes.addFlashAttribute("errorMessage", "Thanh toán VNPay thất bại hoặc bị hủy.");
         }
     } else {
+        // Fix: Cần lấy paymentId từ params nếu có, giả định vnp_TxnRef luôn có
+        Integer pId = params.containsKey("vnp_TxnRef") ? Integer.parseInt(params.get("vnp_TxnRef")) : null;
+        auditLogService.logActivity("SECURITY_ALERT_INVALID_SIGNATURE", 1, pId); // Log cảnh báo bảo mật
         redirectAttributes.addFlashAttribute("errorMessage", "Sai chữ ký bảo mật VNPay.");
     }
     return "redirect:/checkout/error";
@@ -384,12 +543,15 @@ public String vnpayReturn(@RequestParam Map<String, String> params, RedirectAttr
 
 # 10. Bảng mã lỗi (Error Codes)
 
-| Tên Exception                  | Flash Attribute Key | Thông báo hiển thị (UI Message)                                     | Trigger Condition                          |
-| ------------------------------- | ------------------- | ----------------------------------------------------------------------- | ------------------------------------------ |
-| `PendingOrdersExistException` | `errorMessage`    | Khách không thể check-out vì còn đơn Spa/F&B đang chờ xử lý. | Bị chặn ở Giai đoạn 1 (BR-12)         |
-| (VNPay Failed)                  | `errorMessage`    | Thanh toán VNPay thất bại hoặc khách hàng hủy giao dịch.        | Giai đoạn 2:`vnp_ResponseCode != 00`   |
-| (VNPay Signature Invalid)       | `errorMessage`    | Chữ ký bảo mật VNPay không hợp lệ. Giao dịch bị từ chối.     | Giai đoạn 2:`verifySignature == false` |
-| `RuntimeException`            | `errorMessage`    | No balance due                                                          | Balance Due ≤ 0 (đã thanh toán đủ)   |
+> Tiền tố mã lỗi hệ thống Billing (Payment) sử dụng: `BIL-`. Dù UI trả về dạng HTML, các HTTP Status code và logic xử lý vẫn tuân thủ bảng sau để phục vụ logging và trace.
+
+| Code | HTTP Status | Message (EN) | Message (VI) | Trigger Condition |
+| --- | --- | --- | --- | --- |
+| `BIL-003` | 409 | Pending orders exist | Khách không thể check-out vì còn đơn Spa/F&B đang chờ xử lý | Bị chặn ở Giai đoạn 1 (BR-12).<br/>• **Exception:** `PendingOrdersExistException`<br/>• **Flash Key:** `errorMessage` |
+| `BIL-004` | 400 | Payment failed | Thanh toán VNPay thất bại hoặc khách hàng hủy giao dịch | Giai đoạn 2: `vnp_ResponseCode != 00`<br/>• **Flash Key:** `errorMessage` |
+| `BIL-005` | 403 | Invalid signature | Chữ ký bảo mật VNPay không hợp lệ. Giao dịch bị từ chối | Giai đoạn 2: `verifySignature == false`<br/>• **Flash Key:** `errorMessage` |
+
+> **Ghi chú xử lý MVC:** Khi các mã lỗi trên xảy ra, `CheckoutController` sẽ redirect người dùng kèm `FlashAttribute("errorMessage")` để hiển thị trên UI. Log hệ thống bắt buộc phải ghi nhận đầy đủ mã `Code` tương ứng.
 
 # 11. Quy trình Triển khai (Step-by-Step)
 
@@ -428,7 +590,7 @@ vnp_PayUrl=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
 
 ### Chặng 3 — Controller Layer
 
-1. `POST /billing/checkout/{bookingId}/pay` — Phân luồng CASH vs VNPAY
+1. `POST /billing/checkout/{bookingId}/pay` — Phân luồng BYPASS 0 ĐỒNG (BR-19) vs CASH vs VNPAY
 2. `GET /billing/checkout/vnpay-return` — Xử lý callback từ VNPay
 
 ### Chặng 4 — UI Integration
@@ -440,6 +602,7 @@ vnp_PayUrl=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
 
 - [X] CASH: Click thanh toán → redirect thành công
 - [X] VNPAY: Click → redirect sang VNPay → quét QR → callback thành công
+- [X] BYPASS (BR-19): Nợ 0 đồng → tự động redirect thành công
 - [X] BR-12: Nếu có pending orders → flash error message
 - [X] VNPay signature verification hoạt động
 
@@ -479,6 +642,7 @@ FROM PAYMENT WHERE status = 'PENDING' AND payment_date < DATEADD(HOUR, -1, GETDA
 | BIL-TC-004 | VNPay Callback thành công (00)           | CRITICAL  | Payment = SUCCESS, Booking = COMPLETED    |
 | BIL-TC-005 | VNPay Callback thất bại (24)             | HIGH      | Payment = FAILED, Booking không đổi    |
 | BIL-TC-006 | VNPay sai chữ ký                         | CRITICAL  | Flash error, Payment không đổi         |
+| BIL-TC-007 | Bypass Thanh toán Nợ 0 đồng (BR-19)      | CRITICAL  | Bypass payment, Booking = COMPLETED    |
 
 # 14. Phương pháp Xác minh
 
@@ -540,6 +704,15 @@ Bước 1: Tạo FolioItem với status = 'PENDING' cho bookingId=1
 Bước 2: Thử thanh toán → POST /billing/checkout/1/pay
 Bước 3: Redirect quay lại checkout page
 Bước 4: Flash message: "Không thể Check-out: Khách còn đơn hàng Spa/F&B đang thực hiện."
+```
+
+## 15.4. Bypass Payment — Zero Balance (BR-19)
+
+```
+Bước 1: Khởi tạo dữ liệu khách hàng có Balance Due = 0
+Bước 2: Form submit POST /billing/checkout/1/pay (Không truyền paymentMethod)
+Bước 3: Hệ thống bypass cổng thanh toán, Redirect → /billing/checkout/1/success
+Bước 4: Trang hiển thị "Thanh toán thành công. Check-out hoàn tất!"
 ```
 
 # 16. Bảng tổng hợp phân quyền (Authorization Matrix)

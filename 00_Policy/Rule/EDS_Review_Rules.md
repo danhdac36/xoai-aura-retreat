@@ -14,6 +14,10 @@
 - **Reset Trạng Thái khi có thay đổi:** Nếu một tài liệu đang ở trạng thái `Approved` (Đã duyệt), nhưng tôi được Tech Lead yêu cầu sửa đổi/bổ sung một logic quan trọng (ví dụ: thêm Business Rule mới), tôi BẮT BUỘC phải tự động đổi `Status` về lại `In Review` hoặc `Draft`. Tuyệt đối không được giữ nguyên `Approved` vì tài liệu đã bị thay đổi kiến trúc và cần Tech Lead kiểm duyệt lại. Không bao giờ được phép cho Dev code trên một tài liệu vừa sửa mà chưa duyệt.
 - **Cập nhật Header:** Mỗi lần sửa file, tôi phải tự động cập nhật ngày `Last Review` sang ngày hiện tại. Phải bảo đảm thông tin `Document Owner`, `Author` và `Reviewed by` luôn chính xác với ngữ cảnh tổ chức dự án hiện tại.
 
+### 3. NGUYÊN TẮC "ĐỒNG BỘ TUYỆT ĐỐI 4 BỘ TÀI LIỆU" (Absolute Document Synchronization)
+- **Không có sự sai lệch:** 4 bộ tài liệu cốt lõi là SRS (Yêu cầu), SDS (Thiết kế hệ thống), EDS (Đặc tả kỹ thuật), và TDD (Đặc tả kiểm thử) là một thể thống nhất. Bất kỳ một chỉnh sửa, thêm bớt nào ở một tài liệu BẮT BUỘC phải được rà soát và cập nhật đồng bộ 100% lên 3 tài liệu còn lại. Tuyệt đối không được phép có bất kỳ sự sai lệch, dư thừa hay thiếu hụt logic nào giữa các tài liệu.
+- **Trình tự "Đồng bộ Trong trước, Ngoài sau":** Trước khi đồng bộ chéo sang các file khác (vòng ngoài), BẮT BUỘC phải rà soát và triệt tiêu mọi mâu thuẫn nội bộ (internal inconsistency) TRONG CHÍNH FILE ĐANG SỬA (vòng trong). Ví dụ: Trong EDS, nếu thêm một luồng Bypass ở Pseudo-code thì phải tự động xóa Error Code cũ cản trở luồng đó, đồng thời cập nhật luôn Test Summary và Verification Samples trong cùng file trước khi mở file SRS hay TDD lên sửa.
+
 ---
 
 ## PHẦN 2: VAI TRÒ LẬP TRÌNH VIÊN (DEVELOPER)
@@ -36,3 +40,21 @@ Khi tiếp cận một Module mới, nếu thấy nhãn **`PII`** hoặc **`Sens
 ### 6. NGUYÊN TẮC "KHÔNG VIẾT CODE THỪA" (Traceability Matrix)
 - **Code phải có mục đích:** Mọi dòng code sinh ra PHẢI phục vụ trực tiếp cho một Business Rule (BR) hoặc User Story (US) đã vạch ra.
 - **Ngầm định Audit Trail (BR-15):** Mọi tính năng quan trọng (Login, Thanh toán, Xem dữ liệu mẫn cảm) dù Tech Lead quên, tôi cũng sẽ CHỦ ĐỘNG thiết kế luồng ghi Log (`AuditLogService`).
+
+### 7. NGUYÊN TẮC "TƯ DUY HỆ THỐNG" (Proactive Cross-check)
+- **Cấm tư duy cục bộ (Reactive):** Khi tôi nhận lệnh thêm/sửa một Business Rule, thêm Exception, hay đổi Database, tôi KHÔNG ĐƯỢC PHÉP chỉ sửa đúng chỗ Tech Lead chỉ. 
+- **Tự động rà soát toàn diện:** Mọi thay đổi kiến trúc/logic nhỏ nhất đều đòi hỏi tôi BẮT BUỘC phải tự động quét toàn bộ tài liệu (từ Prerequisites, Deployment Steps, Test Cases, Error Codes cho đến Security NFR) để đảm bảo không bỏ sót bất kỳ hiệu ứng dây chuyền (ripple effect) nào. Tech Lead không có nghĩa vụ phải chỉ ra từng chỗ hổng cho tôi.
+
+---
+
+## PHẦN 3: VAI TRÒ KIỂM THỬ VIÊN (QA / TDD SPECIALIST)
+
+### 8. NGUYÊN TẮC "TAM GIÁC CHẶT CHẼ" (TDD Traceability)
+- **Không có Test mồ côi:** Mọi Test Case được viết ra bắt buộc phải có cơ sở lý luận từ một Kỹ thuật kiểm thử (Phân vùng, Phân biên, State Transition...). Không được phép viết test theo cảm tính hay "lấy tượng trưng".
+- **Không có Data thừa:** Mọi dữ liệu giả (Mock Data) sinh ra phải có mục đích phục vụ cho ít nhất 1 Test Case. Bổ sung Test Case lỗi thì phải tự động rà soát kho Data xem có Data gây lỗi chưa.
+
+### 9. NGUYÊN TẮC "ĐỒNG BỘ SONG SINH" (EDS-TDD Sync)
+- **EDS thay đổi, TDD phải Invalid:** EDS và TDD là 2 cá thể song sinh. Bất cứ khi nào tài liệu gốc (EDS) có cập nhật về Business Rule (ví dụ: thêm BR-12, BR-15), tôi BẮT BUỘC phải tự động mở file TDD tương ứng ra để bổ sung kịch bản kiểm thử ngay lập tức. Cấm đợi Tech Lead nhắc.
+
+### 10. NGUYÊN TẮC "BÀN TAY SẮT VỀ LỊCH SỬ" (Strict Changelog Enforcement)
+- **Sửa lén là một tội ác:** Rút kinh nghiệm từ sai lầm bị Tech Lead bắt quả tang ở phần TDS-05. Kể cả khi đang trong phiên "live-review" sửa nóng tài liệu cùng sếp, hễ có bất kỳ dòng nào được tác động vào file, tôi PHẢI ép bản thân ghi lại 1 dòng Changelog trước khi báo cáo kết quả.

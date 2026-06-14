@@ -40,7 +40,8 @@ public class BillingServiceImpl implements BillingService {
 
         List<FolioItem> items = folioItemRepository.findByGuestFolioId(folio.getId());
         Map<String, List<FolioItem>> groupedServices = items.stream()
-                .collect(Collectors.groupingBy(item -> item.getServiceCategory() != null ? item.getServiceCategory() : "Khác"));
+                .collect(Collectors
+                        .groupingBy(item -> item.getServiceCategory() != null ? item.getServiceCategory() : "Khác"));
 
         BigDecimal totalExtra = items.stream()
                 .map(item -> item.getAmount() != null ? item.getAmount() : BigDecimal.ZERO)
@@ -51,7 +52,8 @@ public class BillingServiceImpl implements BillingService {
                 .map(payment -> payment.getAmount() != null ? payment.getAmount() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal packageAmount = folio.getTotalPackageAmount() != null ? folio.getTotalPackageAmount() : BigDecimal.ZERO;
+        BigDecimal packageAmount = folio.getTotalPackageAmount() != null ? folio.getTotalPackageAmount()
+                : BigDecimal.ZERO;
         BigDecimal totalCost = packageAmount.add(totalExtra);
         BigDecimal balanceDue = totalCost.subtract(totalPaid);
 

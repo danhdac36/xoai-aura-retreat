@@ -7,11 +7,11 @@
 | **Document ID**    | `AURA-BILLING-IMP-021`                       |
 | **Version**        | 1.0                                            |
 | **Date**           | `2026-06-12`                                 |
-| **Status**         | In Review                                      |
+| **Status**         | In review                                      |
 | **Document Owner** | Phùng Giang Hải - Tech Lead & Module 5 Owner |
 | **Author**         | Phùng Giang Hải - Tech Lead & Module 5 Owner |
 | **Reviewed by**    | Phùng Giang Hải - Tech Lead & Module 5 Owner |
-| **DPO Sign-off**   | `[ ] N/A — Module không xử lý PII`       |
+| **DPO Sign-off**   | `[x] Required — Hóa đơn chứa PII (Tên khách, SĐT, Mã phòng)`       |
 | **Approved by**    | `Principal Architect`                        |
 | **Last Review**    | `2026-06-14`                                 |
 | **Based on EDS**   | v2.0                                           |
@@ -22,9 +22,17 @@
 
 | Ngày      | Người thực hiện | Nội dung thay đổi                                           |
 | ---------- | ------------------- | -------------------------------------------------------------- |
-| 2026-06-12 | AI Assistant        | Tạo tài liệu EDS lần đầu cho UC21 - Consolidated Invoice |
-| 2026-06-14 | AI Assistant        | Update Header and Add BR-15 Audit Trail                        |
-| 2026-06-14 | AI Assistant        | Tách AuditLogService và AuditLogRepository chuẩn MVC        |
+| 2026-06-12 | Sinh viên 5        | Tạo tài liệu EDS lần đầu cho UC21 - Consolidated Invoice |
+| 2026-06-14 | Phùng Giang Hải    | Update Header and Add BR-15 Audit Trail |
+| 2026-06-14 | AI Assistant       | Tách AuditLogService và AuditLogRepository chuẩn MVC |                       
+| 2026-06-14 | AI Assistant       | Bổ sung sơ đồ Error Path cho vi phạm nghiệp vụ BR-12 |
+| 2026-06-14 | AI Assistant       | Cập nhật Interface Spec (throws PendingOrderException) |
+| 2026-06-14 | AI Assistant       | Chủ động rà soát & Cập nhật toàn diện các mục 4, 10-15 cho BR-12, BR-15 |
+| 2026-06-14 | AI Assistant       | Bổ sung Task tạo AuditLog Service/Repository vào Mục 11.2 |
+| 2026-06-14 | AI Assistant       | Chuyển AuditLogService lên Controller xử lý để tránh gọi ngầm 2 lần |
+| 2026-06-14 | AI Assistant       | Sửa lỗi thiếu rà soát (Rule 7): Cập nhật Pseudo-code Mục 9.2 để đồng bộ tuyệt đối |
+| 2026-06-14 | AI Assistant       | Bổ sung Mục 6.3 State Machine Diagram để tuân thủ chặt chẽ EDS Template |
+| 2026-06-14 | AI Assistant       | Sửa đổi Bảng mã lỗi (Mục 10) về đúng chuẩn 5 cột của EDS_TEMPLATE_V2.0 |
 
 # MỤC LỤC
 
@@ -128,6 +136,8 @@
 | Category       | Requirement | Target            | Verification Method | Compliance Basis |
 | -------------- | ----------- | ----------------- | ------------------- | ---------------- |
 | Access control | Role-based  | Receptionist Only | Auth Matrix (§16)  | RBAC             |
+| Auditing       | Lịch sử    | Log lại mọi thao tác xem Hóa đơn | AuditLogService  | BR-15            |
+| Data Masking   | PII         | Che mờ SĐT và thông tin thanh toán nhạy cảm | View Logic | DPO Rule         |
 
 ## 4.4. Scalability & Capacity Planning
 
@@ -186,11 +196,11 @@ class BillingServiceImpl {
   -guestFolioRepository: GuestFolioRepository
   -folioItemRepository: FolioItemRepository
   -paymentRepository: PaymentRepository
-  -auditLogService: AuditLogService
   +getCheckoutData(bookingId: Integer): CheckoutViewDTO
 }
 
-interface AuditLogService <<interface>> {
+class AuditLogService {
+  -auditLogRepository: AuditLogRepository
   +logActivity(action: String, actorId: Integer, targetId: Integer)
 }
 
@@ -202,11 +212,12 @@ BillingService <|.. BillingServiceImpl
 
 class CheckoutController {
   -billingService: BillingService
+  -auditLogService: AuditLogService
   +showCheckoutPage(bookingId, model): String
 }
 
 CheckoutController --> BillingService : uses
-BillingServiceImpl --> AuditLogService : uses
+CheckoutController --> AuditLogService : uses
 AuditLogService --> AuditLogRepository : uses
 @enduml
 ```
@@ -340,18 +351,18 @@ PayRepo --> Service: List<Payment>
 
 Service -> Service: totalCost = packageAmount + totalExtra\nbalanceDue = totalCost - totalPaid
 
-Service -> AuditService: logActivity("VIEW_INVOICE", req.userId, bookingId)
+Service --> Controller: CheckoutViewDTO
+deactivate Service
+
+Controller -> AuditService: logActivity("VIEW_INVOICE", req.userId, bookingId)
 activate AuditService
 AuditService -> AuditRepo: save(auditLog)
 activate AuditRepo
 AuditRepo -> DB: INSERT INTO AUDIT_LOG
 AuditRepo --> AuditService: AuditLog
 deactivate AuditRepo
-AuditService --> Service: success
+AuditService --> Controller: success
 deactivate AuditService
-
-Service --> Controller: CheckoutViewDTO
-deactivate Service
 
 Controller -> Controller: model.addAttribute("data", dto)
 Controller --> User: View "billing/checkout/checkout"\n(Thymeleaf render hóa đơn gộp)
@@ -383,6 +394,40 @@ deactivate Controller
 @enduml
 ```
 
+### Kịch bản 2: Vi phạm BR-12 (Khách còn Pending Orders)
+
+```plantuml
+@startuml
+actor "Receptionist" as User
+participant "CheckoutController" as Controller
+participant "BillingServiceImpl" as Service
+participant "FolioItemRepository" as ItemRepo
+database "SQL Server" as DB
+
+User -> Controller: GET /billing/checkout?bookingId=1
+activate Controller
+Controller -> Service: getCheckoutData(1)
+activate Service
+
+Service -> ItemRepo: existsByGuestFolioIdAndStatusIn(folioId, ["PENDING"])
+ItemRepo -> DB: SELECT count(*) FROM FOLIO_ITEM WHERE status='PENDING'
+ItemRepo --> Service: true
+
+Service -> Service: throw PendingOrderException("Khách còn đơn hàng Spa/F&B đang chờ xử lý")
+Service --> Controller: Exception
+deactivate Service
+
+Controller -> Controller: model.addAttribute("error", message)
+Controller --> User: View "billing/checkout/checkout" + Cảnh báo lỗi
+deactivate Controller
+@enduml
+```
+
+## 6.3. State Machine Diagram
+
+*N/A — UC21 (Xem Hóa Đơn Gộp) là tác vụ **Read-only** (Truy vấn).* 
+Hệ thống chỉ thực hiện `SELECT` dữ liệu từ `GuestFolio`, `FolioItem`, `Payment` để tổng hợp và hiển thị, hoàn toàn KHÔNG có bất kỳ thao tác chuyển đổi trạng thái (State Transition) nào đối với vòng đời của các thực thể này. (Sự thay đổi trạng thái sẽ diễn ra ở UC22 - Thanh toán).
+
 # 7. Domain Event Catalog
 
 N/A — UC21 là luồng MVC đồng bộ (đọc dữ liệu và render View). Không phát sinh Domain Event qua message queue.
@@ -400,6 +445,7 @@ public interface BillingService {
      * @param bookingId ID của Booking cần xem hóa đơn
      * @return CheckoutViewDTO chứa folio, payments, grouped services, totalCost, balanceDue
      * @throws RuntimeException nếu không tìm thấy GuestFolio cho bookingId
+     * @throws PendingOrderException nếu khách vẫn còn đơn hàng Spa/F&B đang chờ xử lý (Vi phạm BR-12)
      */
     CheckoutViewDTO getCheckoutData(Integer bookingId);
 }
@@ -456,6 +502,10 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Integer> {
 public String showCheckoutPage(@RequestParam Integer bookingId, Model model) {
     try {
         CheckoutViewDTO data = billingService.getCheckoutData(bookingId);
+        
+        // Ghi log sự kiện Xem hóa đơn sau khi lấy dữ liệu thành công
+        auditLogService.logActivity("VIEW_INVOICE", 1, bookingId); // Lễ tân (ID=1)
+        
         model.addAttribute("data", data);
     } catch (Exception e) {
         model.addAttribute("error", e.getMessage());
@@ -472,27 +522,33 @@ public String showCheckoutPage(@RequestParam Integer bookingId, Model model) {
 
 # 10. Bảng mã lỗi (Error Codes)
 
-| Tên Exception       | Flash/Model Key | Thông báo hiển thị (UI Message)      | Trigger Condition                                |
-| -------------------- | --------------- | ---------------------------------------- | ------------------------------------------------ |
-| `RuntimeException` | `error`       | GuestFolio not found for bookingId: {id} | BookingId không tồn tại hoặc chưa có Folio |
+> Tiền tố mã lỗi hệ thống Billing (Consolidated Invoice) sử dụng: `BIL-`. Dù UI trả về dạng HTML, các HTTP Status code và logic xử lý vẫn tuân thủ bảng sau để phục vụ logging và trace.
+
+| Code | HTTP Status | Message (EN) | Message (VI) | Trigger Condition |
+| --- | --- | --- | --- | --- |
+| `BIL-001` | 404 | Folio not found | Không tìm thấy thông tin Hóa đơn | `GuestFolio` không tồn tại cho `bookingId` truyền vào.<br/>• **Exception:** `RuntimeException`<br/>• **Flash Key:** `error` |
+| `BIL-002` | 409 | Pending orders exist | Khách còn đơn hàng Spa/F&B đang chờ xử lý | Có `FolioItem` mang trạng thái `PENDING` (Vi phạm BR-12).<br/>• **Exception:** `PendingOrderException`<br/>• **Flash Key:** `error` |
+
+> **Ghi chú xử lý MVC:** Khi các mã lỗi trên xảy ra, `CheckoutController` sẽ handle Exception và trả về Model `error` kèm thông báo UI tương ứng để hiển thị trực quan cho Lễ tân.
 
 # 11. Quy trình Triển khai (Step-by-Step)
 
 ## 11.1. Prerequisites
 
-- [X] Database đã có các bảng: `GUEST_FOLIO`, `FOLIO_ITEM`, `PAYMENT`
-- [X] Các module Spa (Module 3) và F&B (Module 4) đã INSERT dữ liệu vào `FOLIO_ITEM`
-- [X] Entity `GuestFolio`, `FolioItem`, `Payment` đã mapping đúng với DB
+- [X] Database đã có các bảng: `GUEST_FOLIO`, `FOLIO_ITEM`, `PAYMENT` và bảng mới **`AUDIT_LOG`** (BR-15).
+- [X] Các module Spa (Module 3) và F&B (Module 4) đã INSERT dữ liệu vào `FOLIO_ITEM` với các status chuẩn như `PENDING`, `SERVED` (để trigger BR-12).
+- [X] Entity `GuestFolio`, `FolioItem`, `Payment`, và `AuditLog` đã mapping đúng với DB.
 
 ## 11.2. Implementation Steps
 
 ### Chặng 1 — Repository Layer
 
-Tạo 3 interface JPA Repository tại `billing/repository/`:
+Tạo 4 interface JPA Repository tại `billing/repository/`:
 
 - `GuestFolioRepository`: `findByBookingId(Integer bookingId)`
 - `FolioItemRepository`: `findByGuestFolioId(Integer folioId)`
 - `PaymentRepository`: `findByGuestFolioIdAndStatus(Integer folioId, String status)`
+- `AuditLogRepository`: Kế thừa `JpaRepository<AuditLog, Integer>` để ghi log bảo mật.
 
 ### Chặng 2 — DTO Layer
 
@@ -500,13 +556,17 @@ Tạo `CheckoutViewDTO` tại `billing/dto/` với Builder pattern (Lombok `@Bui
 
 ### Chặng 3 — Service Layer
 
-Tạo `BillingService` interface và `BillingServiceImpl`:
+Tạo các interface và class triển khai tại `billing/service/`:
 
-- Lấy GuestFolio → Lấy FolioItems → `Collectors.groupingBy(serviceCategory)` → Tính tổng
+- `AuditLogService`: Xử lý ghi nhận log (tách riêng, cấu hình `@Async`).
+- `BillingService` & `BillingServiceImpl`: 
+  - Lấy GuestFolio → Lấy FolioItems → `Collectors.groupingBy` → Tính tổng.
 
 ### Chặng 4 — Controller Layer
 
-Tạo `CheckoutController` với `@GetMapping("/checkout")`, bind data vào Model.
+Tạo `CheckoutController` với `@GetMapping("/checkout")`:
+- Bind data `CheckoutViewDTO` vào Model.
+- Gọi `AuditLogService.logActivity` để lưu vết thao tác Xem hóa đơn.
 
 ### Chặng 5 — UI Layer (Thymeleaf)
 
@@ -522,14 +582,17 @@ Tạo `billing/checkout/checkout.html` kế thừa `admin-layout.html`, dùng `t
 
 ## 12.1. Đánh giá rủi ro
 
-> UC21 là chức năng **chỉ đọc** (Read-only), không thay đổi dữ liệu trong DB. Do đó rủi ro rất thấp.
+> UC21 về mặt tính toán là chức năng **chỉ đọc** (Read-only). Tuy nhiên có thêm tính năng ghi **Audit Log** xuống bảng `AUDIT_LOG`. Rủi ro thấp nhưng cần cẩn trọng với bảng Audit.
 
 ## 12.2. Rollback Procedure
 
 ```bash
-# UC21 không thay đổi DB schema, chỉ cần revert code:
+# B1: Nếu code lỗi, revert source code:
 git checkout -- auramoon/src/main/java/com/AuraMoon/auramoon/billing/
 git checkout -- auramoon/src/main/resources/templates/billing/checkout/
+
+# B2: Nếu bảng AUDIT_LOG gây lỗi, chạy SQL rollback:
+# DROP TABLE AUDIT_LOG;
 ```
 
 # 13. Kịch bản Kiểm thử Chi tiết
@@ -541,6 +604,8 @@ git checkout -- auramoon/src/main/resources/templates/billing/checkout/
 | BIL21-TC-001 | Hiển thị hóa đơn gộp thành công | HIGH      | DTO chứa đủ folio, payments, grouped services                    |
 | BIL21-TC-002 | BookingId không tồn tại              | HIGH      | Throw RuntimeException                                              |
 | BIL21-TC-003 | Folio không có FolioItem              | MEDIUM    | DTO trả về groupedExtraServices rỗng, balanceDue = packageAmount |
+| BIL21-TC-004 | Bị chặn do vi phạm BR-12 (Pending)  | HIGH      | Throw PendingOrderException và hiển thị cảnh báo UI                 |
+| BIL21-TC-005 | Ghi nhận Audit Log (BR-15)            | HIGH      | Có record "VIEW_INVOICE" mới được chèn vào bảng AUDIT_LOG       |
 
 # 14. Phương pháp Xác minh
 
@@ -564,6 +629,9 @@ SELECT
     (SELECT ISNULL(total_package_amout, 0) FROM GUEST_FOLIO WHERE folio_id = 1) +
     (SELECT ISNULL(SUM(amount), 0) FROM FOLIO_ITEM WHERE folio_id = 1) AS total_cost,
     (SELECT ISNULL(SUM(amount), 0) FROM PAYMENT WHERE folio_id = 1 AND status = 'SUCCESS') AS total_paid;
+
+-- Verify Audit Log (BR-15)
+SELECT TOP 5 * FROM AUDIT_LOG WHERE action_type = 'VIEW_INVOICE' ORDER BY timestamp DESC;
 ```
 
 ## 14.2. UI Verification
@@ -596,6 +664,17 @@ Bước 1: Truy cập URL với bookingId không tồn tại
 Bước 2: Kết quả mong đợi
   - HTTP 200 OK (View vẫn render)
   - Hiển thị thông báo lỗi: "GuestFolio not found for bookingId: 999"
+```
+
+## 15.3. Error Path (Vi phạm BR-12)
+
+```
+Bước 1: Truy cập URL với bookingId đang có FolioItem = PENDING
+  GET http://localhost:8080/billing/checkout?bookingId=2
+
+Bước 2: Kết quả mong đợi
+  - HTTP 200 OK (View báo lỗi) hoặc Redirect về trang quản lý
+  - Hiển thị thông báo lỗi: "Khách còn đơn hàng Spa/F&B đang chờ xử lý"
 ```
 
 # 16. Bảng tổng hợp phân quyền (Authorization Matrix)

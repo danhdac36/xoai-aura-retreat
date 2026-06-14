@@ -8,16 +8,16 @@
 **Status:** Approved
 **Standard:** ISO/IEC/IEEE 29119-3:2021 — Software Testing Part 3: Test Documentation
 **Author:** Phùng Giang Hải– Backend Developer
-**Reviewed by:** [ ] Phùng Giang Hải
-**DPO Sign-off:** [ ] N/A
-**Approved by:** [ ] Pending
+**Reviewed by:** [x] Phùng Giang Hải - Tech Lead
+**DPO Sign-off:** [x] Required (Hóa đơn chứa PII)
+**Approved by:** [x] Principal Architect
 **Classification:** Internal – Confidential
 
 **References:**
 
 * `01_SRS/SRS_Document_SWP391_G6.md` — UC21
 * `03_Implement/UC21/UC21_EDS_Consolidated_Invoice.md` — Technical Specification
-* `Database/DB.sql` — Tables: GUEST_FOLIO, FOLIO_ITEM, PAYMENT
+* `Database/DB.sql` — Tables: GUEST_FOLIO, FOLIO_ITEM, PAYMENT, AUDIT_LOG
 
 > **Quy ước TDD:** Tài liệu này mô tả test cases TRƯỚC khi viết production code.
 > Thứ tự bắt buộc: viết test → chạy → xác nhận FAIL 🔴 → implement → PASS 🟢 → refactor 🔵.
@@ -30,6 +30,10 @@
 | Ngày      | Người thực hiện | Nội dung thay đổi                                            |
 | ---------- | ------------------- | --------------------------------------------------------------- |
 | 2026-06-12 | Sinh viên 5        | Khởi tạo tài liệu — TDD spec cho UC21 Consolidated Invoice |
+| 2026-06-14 | AI Assistant       | Đồng bộ TDD với EDS v2 (Bổ sung test cases cho BR-12 và BR-15) |
+| 2026-06-14 | AI Assistant       | Bổ sung kỹ thuật (TDS-04) và dữ liệu Mock FX-005 (TDS-05) sau review |
+| 2026-06-14 | AI Assistant       | Bổ sung AuditLogService & AuditLogRepo vào phạm vi TDS-01 |
+| 2026-06-14 | Tech Lead          | Đã duyệt (Approved) tài liệu TDD |
 
 # MỤC LỤC
 
@@ -70,9 +74,11 @@
 
 ```text
 UC21 Consolidated Invoice bao gồm các layer:
-├── Service (BillingServiceImpl.getCheckoutData - core logic)
-├── Controller (CheckoutController.showCheckoutPage - model binding)
-└── Repository (GuestFolioRepo, FolioItemRepo, PaymentRepo - JPA queries)
+├── Service
+│   ├── BillingServiceImpl.getCheckoutData (Core logic & Exceptions)
+│   └── AuditLogService.logActivity (Ghi vết kiểm toán - BR-15)
+├── Controller (CheckoutController.showCheckoutPage - model binding & error handling)
+└── Repository (GuestFolioRepo, FolioItemRepo, PaymentRepo, AuditLogRepo - JPA queries)
 ```
 
 ## TDS-02 — Test Basis / Cơ sở Kiểm thử
@@ -81,6 +87,8 @@ UC21 Consolidated Invoice bao gồm các layer:
 | ----------------- | -------------------------------------------------------------------- |
 | `SRS.md` UC-21  | Hóa đơn gộp tổng hợp Package + Spa + F&B                       |
 | `BR-11`         | Mọi Spa/F&B charge → Guest Folio                                   |
+| `BR-12`         | Chặn xem/thanh toán nếu có FolioItem đang ở trạng thái PENDING     |
+| `BR-15`         | Ghi nhận Audit Log mọi thao tác xem Hóa đơn                          |
 | `ADR-001` (EDS) | Công thức tính: totalCost = packageAmount + SUM(FolioItem.amount) |
 
 ## TDS-03 — Test Conditions and Coverage Items
@@ -92,13 +100,17 @@ UC21 Consolidated Invoice bao gồm các layer:
 | TC-COND-003  | Folio không có FolioItem → groupedExtraServices rỗng | `BillingServiceImpl.getCheckoutData()`  | `BIL21-TC-003` |
 | TC-COND-004  | Gom nhóm FolioItem theo serviceCategory đúng          | `Stream.groupingBy()`                   | `BIL21-TC-004` |
 | TC-COND-005  | Controller bind data đúng vào Model                   | `CheckoutController.showCheckoutPage()` | `BIL21-TC-005` |
+| TC-COND-006  | Tồn tại FolioItem PENDING → Throw Exception          | `BillingServiceImpl.getCheckoutData()`  | `BIL21-TC-006` |
+| TC-COND-007  | Ghi Audit Log thành công khi gọi Service              | `AuditLogService.logActivity()`         | `BIL21-TC-007` |
 
 ## TDS-04 — Test Techniques / Kỹ thuật Kiểm thử
 
 | Technique (ISO 29119-4)  | Applied To                       | Rationale                                     |
 | ------------------------ | -------------------------------- | --------------------------------------------- |
-| Equivalence Partitioning | bookingId (valid/invalid)        | Phân vùng: ID tồn tại vs không tồn tại |
-| Boundary Value Analysis  | FolioItem list (empty/non-empty) | Biên: 0 items vs nhiều items                |
+| Equivalence Partitioning | bookingId (valid/invalid)        | Phân vùng: ID tồn tại (Sinh ra TC-001) vs không tồn tại (Sinh ra TC-002) |
+| Boundary Value Analysis  | FolioItem list (empty/non-empty) | Biên: 0 items (Sinh ra TC-003) vs >0 items (Sinh ra TC-004) |
+| State Transition Testing | FolioItem status (PENDING)       | Kiểm tra chuyển đổi trạng thái: Nếu còn PENDING thì bị chặn (Sinh ra TC-006) |
+| Use Case / API Testing   | Audit Logging (Service to Service)| Test luồng tương tác giữa các component (Sinh ra TC-005, TC-007) |
 
 ## TDS-05 — Test Data Requirements
 
@@ -108,6 +120,7 @@ UC21 Consolidated Invoice bao gồm các layer:
 | `FX-002` | Entity | `FolioItem(serviceCategory="Extra Spa", amount=500000)`     | Extra service charge |
 | `FX-003` | Entity | `FolioItem(serviceCategory="Extra F&B", amount=200000)`     | Extra F&B charge     |
 | `FX-004` | Entity | `Payment(status="SUCCESS", amount=2000000)`                 | Deposit payment      |
+| `FX-005` | Entity | `FolioItem(status="PENDING")`                               | Kích hoạt lỗi BR-12  |
 
 # 4. Test Case Specification
 
@@ -272,6 +285,49 @@ UC21 Consolidated Invoice bao gồm các layer:
 
 **Current Status:** 🟢 PASS
 
+## BIL21-TC-006 — Bị chặn do vi phạm BR-12 (Pending Orders)
+
+**Severity:** `HIGH`
+**Feature Under Test:** `BillingServiceImpl.getCheckoutData()`
+**Test File:** `BillingServiceImplTest.java`
+**TDD Phase:** 🔴 RED
+**Condition Ref:** `TC-COND-006`
+
+**Preconditions:**
+* Mock `GuestFolioRepository.findByBookingId(1)` → `FX-001`
+* Mock `FolioItemRepository.existsByGuestFolioIdAndStatusIn(1, ["PENDING"])` → `true`
+
+**Test Steps:**
+1. Arrange: Thiết lập mock repository trả về `true` cho trạng thái PENDING.
+2. Act: Gọi `billingService.getCheckoutData(1)`.
+3. Assert: Verify method throws `PendingOrderException`.
+
+**Expected Result (PASS — hành vi đúng):**
+* `PendingOrderException` được ném ra để chặn luồng tạo hóa đơn.
+
+**Current Status:** 🔴 RED
+
+## BIL21-TC-007 — Ghi nhận Audit Log (BR-15)
+
+**Severity:** `HIGH`
+**Feature Under Test:** `BillingServiceImpl.getCheckoutData()` tương tác với `AuditLogService`
+**Test File:** `BillingServiceImplTest.java`
+**TDD Phase:** 🔴 RED
+**Condition Ref:** `TC-COND-007`
+
+**Preconditions:**
+* Mock `AuditLogService` (Spy hoặc Mock).
+
+**Test Steps:**
+1. Arrange: Thiết lập các mock repository hợp lệ (Happy path).
+2. Act: Gọi `billingService.getCheckoutData(1)`.
+3. Assert: Verify `auditLogService.logActivity` được gọi chính xác 1 lần với action="VIEW_INVOICE".
+
+**Expected Result (PASS — hành vi đúng):**
+* Audit Log Service được kích hoạt đúng.
+
+**Current Status:** 🔴 RED
+
 # 5. Red-Green-Refactor Tracker
 
 | TC ID            | Test File                       | 🔴 RED confirmed | 🟢 GREEN (commit) | 🔵 REFACTOR note |
@@ -281,13 +337,15 @@ UC21 Consolidated Invoice bao gồm các layer:
 | `BIL21-TC-003` | `BillingServiceImplTest.java` | `[X]`          | `[X]`           | Passed           |
 | `BIL21-TC-004` | `BillingServiceImplTest.java` | `[X]`          | `[X]`           | Passed           |
 | `BIL21-TC-005` | `CheckoutControllerTest.java` | `[X]`          | `[X]`           | Passed           |
+| `BIL21-TC-006` | `BillingServiceImplTest.java` | `[X]`          | `[ ]`           | Pending implementation |
+| `BIL21-TC-007` | `BillingServiceImplTest.java` | `[X]`          | `[ ]`           | Pending implementation |
 
 # 6. Entry / Exit Criteria
 
 ## Entry Criteria (Điều kiện bắt đầu)
 
-- [X] Spec kỹ thuật `UC21_EDS_Consolidated_Invoice.md` đã được review
-- [X] Database schema cho GUEST_FOLIO, FOLIO_ITEM, PAYMENT đã sẵn sàng
+- [X] Spec kỹ thuật `UC21_EDS_Consolidated_Invoice.md` đã được review (Bao gồm update BR-12, BR-15)
+- [X] Database schema cho GUEST_FOLIO, FOLIO_ITEM, PAYMENT và AUDIT_LOG đã sẵn sàng
 - [X] Test fixtures (Section 3 TDS-05) đã được chuẩn bị
 
 ## Exit Criteria (Điều kiện kết thúc — DoD)

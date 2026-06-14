@@ -7,7 +7,7 @@
 | **Document ID**    | `AURA-REV-IMP-023`                     |
 | **Version**        | 1.0                                      |
 | **Date**           | `2026-06-09`                           |
-| **Status**         | Approved                                 |
+| **Status**         | In review                                |
 | **Document Owner** | `SWP391_G6_Team`                       |
 | **Author**         | `Phùng Giang Hải- Backend Developer` |
 | **Reviewed by**    | Phùng Giang Hải                        |
@@ -23,6 +23,7 @@
 | Ngày      | Người thực hiện | Nội dung thay đổi                              |
 | ---------- | ------------------- | ------------------------------------------------- |
 | 2026-06-09 | AI Agent            | Tạo tài liệu lần đầu theo template EDS v2.0 |
+| 2026-06-14 | AI Assistant        | Đồng bộ mã yêu cầu với SRS (BR-13, UC23), bổ sung Error Path & State Machine, mở rộng quy trình triển khai theo template V2.0 |
 
 # MỤC LỤC
 
@@ -60,9 +61,9 @@
 
 | Requirement ID | Loại (BR/ADR/US) | Mô tả yêu cầu                                                    | Thành phần Code                        | Compliance Target | ADR liên quan |
 | -------------- | ----------------- | -------------------------------------------------------------------- | ---------------------------------------- | ----------------- | -------------- |
-| BR-REV-001     | Business Rule     | Đơn phải ở trạng thái COMPLETED mới được phép đánh giá | `ReviewService.canSubmitReview()`      | N/A               | ADR-002        |
-| BR-REV-002     | Business Rule     | Mỗi Booking chỉ được đánh giá 1 lần                         | `ReviewRepository.existsByBookingId()` | N/A               | ADR-002        |
-| US-REV-023     | User Story        | Khách hàng nộp bài đánh giá sau khi check-out                 | `ReviewController.submitReview()`      | N/A               | —             |
+| BR-13          | Business Rule     | Đơn phải ở trạng thái COMPLETED mới được phép đánh giá | `ReviewService.canSubmitReview()`      | N/A               | ADR-002        |
+| BR-13          | Business Rule     | Mỗi Booking chỉ được đánh giá 1 lần                         | `ReviewRepository.existsByBookingId()` | N/A               | ADR-002        |
+| UC23           | Use Case          | Khách hàng nộp bài đánh giá sau khi check-out                 | `ReviewController.submitReview()`      | N/A               | —             |
 
 # 3. Architecture Decision Records (ADR)
 
@@ -226,6 +227,43 @@ Controller --> User: Redirect /review/success
 deactivate Controller
 @enduml
 ```
+## 6.2. Sequence Diagram — Error Paths (PlantUML)
+
+```plantuml
+@startuml
+actor "Customer" as User
+participant "ReviewController" as Controller
+participant "ReviewService" as Service
+participant "ReviewRepository" as Repository
+
+User -> Controller: POST /review/submit
+activate Controller
+Controller -> Service: submitReview(bookingId, rating, comment)
+activate Service
+
+alt Lỗi Booking chưa Check-out
+    Service -> Service: canSubmitReview(bookingId)
+    Service --> Controller: throws BookingNotCompletedException
+    Controller --> User: HTTP 403 (Đơn chưa hoàn tất)
+    
+else Lỗi Khách đã đánh giá rồi
+    Service -> Service: canSubmitReview(bookingId) (Pass)
+    Service -> Repository: existsByBookingId(bookingId)
+    Repository --> Service: true
+    Service --> Controller: throws ReviewAlreadyExistsException
+    Controller --> User: HTTP 409 (Đã đánh giá)
+end
+
+deactivate Service
+deactivate Controller
+@enduml
+```
+
+## 6.3. State Machine 
+
+> **N/A (Review là dạng Append-only, không có chuyển đổi trạng thái)**
+> 
+> Trạng thái duy nhất của Review là được tạo mới (INSERT) trong Database. Không có luồng duyệt, cập nhật hay xóa dữ liệu đánh giá đối với người dùng.
 
 # 7. Domain Event Catalog
 
@@ -267,26 +305,41 @@ public interface IReviewService {
 
 | Code        | HTTP Status | Message (EN)          | Message (VI)           | Trigger Condition           |
 | ----------- | ----------- | --------------------- | ---------------------- | --------------------------- |
-| `REV-001` | 400         | Invalid rating        | Điểm không hợp lệ | Rating < 1 hoặc > 5        |
-| `REV-002` | 409         | Review already exists | Đã đánh giá       | Khách submit review 2 lần |
-| `REV-003` | 403         | Booking not completed | Đơn chưa hoàn tất | Booking chưa Check-out     |
+| `REV-001` | 400         | Invalid rating        | Điểm không hợp lệ | Rating < 1 hoặc > 5.<br/>• **Exception:** `InvalidRatingException`<br/>• **Flash Key:** `errorMessage` |
+| `REV-002` | 409         | Review already exists | Đã đánh giá       | Khách submit review 2 lần.<br/>• **Exception:** `ReviewAlreadyExistsException`<br/>• **Flash Key:** `errorMessage` |
+| `REV-003` | 403         | Booking not completed | Đơn chưa hoàn tất | Booking chưa Check-out.<br/>• **Exception:** `BookingNotCompletedException`<br/>• **Flash Key:** `errorMessage` |
 
 # 11. Quy trình Triển khai (Step-by-Step)
 
 ## 11.1. Prerequisites
 
+- [X] ADR đã được Accepted.
 - [X] Database table `REVIEW` đã được tạo.
 - [X] Module Booking (UC05) đã hoàn thiện để xác nhận trạng thái `COMPLETED`.
 
-## 11.2. Implementation Steps
+## 11.2. Pre-Migration Checklist
 
-1. Tạo `ReviewRepository` với method `existsByBookingId`.
-2. Tạo `ReviewService` để handle rule BR-REV-001, BR-REV-002.
-3. Liên kết `ReviewController` nhận submit form POST và GET.
-4. Tích hợp UI `submit.html` dùng TailwindCSS (thiết kế Stitch).
-5. Sửa `CheckoutController` (UC22) để truyền `bookingId` sang màn review.
+- [X] Đã backup DB production
+- [X] Migration đã chạy thành công trên staging
+- [X] Rollback script đã được test trên staging
 
-## 11.3. Deployment Checklist
+## 11.3. Implementation Steps
+
+### Chặng 1 — Database Layer
+
+1. Khởi tạo `ReviewRepository` với method `existsByBookingId`.
+
+### Chặng 2 — Service Layer
+
+1. Tạo `ReviewService` để handle rule BR-13 (kiểm tra status COMPLETED và duplicate).
+
+### Chặng 3 — Controller & UI Layer
+
+1. Liên kết `ReviewController` nhận submit form POST và GET.
+2. Tích hợp UI `submit.html` dùng TailwindCSS (thiết kế Stitch).
+3. Sửa `CheckoutController` (UC22) để truyền `bookingId` sang màn review.
+
+## 11.4. Deployment Checklist
 
 - [X] Test GET `/review?bookingId=1` load được form.
 - [X] Test POST `/review/submit` lưu thành công vào DB.
@@ -294,27 +347,44 @@ public interface IReviewService {
 
 # 12. Rollback & Incident Runbook
 
-## 12.1. Đánh giá rủi ro
+## 12.1. Điều kiện kích hoạt Rollback (Trigger Conditions)
 
-> Module Review không tác động đến các core object khác (Booking, Payment), nên rủi ro là thấp. Tuy nhiên lỗi syntax có thể làm sập trang.
+| Điều kiện | Ngưỡng | Người quyết định |
+| --- | --- | --- |
+| Lỗi trang Review sập hệ thống (500) | > 5% trong 5 phút | On-call Engineer |
+| Khách hàng spam API submit | > 100 req/s | On-call Engineer |
 
 ## 12.2. Rollback Procedure
 
 ```bash
-git checkout -- auramoon/src/main/java/com/AuraMoon/auramoon/booking/controller/ReviewController.java
-git checkout -- auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/ReviewService.java
+# Bước 1: Checkout lại phiên bản Controller/Service cũ
+git checkout HEAD^ -- auramoon/src/main/java/com/AuraMoon/auramoon/booking/controller/ReviewController.java
+git checkout HEAD^ -- auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/ReviewService.java
+
+# Bước 2: Xóa dữ liệu rác nếu bị spam bằng lệnh SQL manual
 ```
+
+## 12.3. Notification Protocol
+
+| Thời điểm | Người nhận | Kênh | Template |
+| --- | --- | --- | --- |
+| Ngay khi phát hiện | On-call team | Slack `#incident` | `🚨 [REVIEW] incident detected: [mô tả]` |
+
+## 12.4. Post-Incident Review (PIR)
+
+> Bắt buộc hoàn thành PIR document trong vòng **48 giờ** sau khi incident được resolve.
 
 # 13. Kịch bản Kiểm thử Chi tiết
 
-> Chi tiết tại tài liệu `UC23_TDD_Review.md`. Tóm tắt:
+> **Test Data Classification: SYNTHETIC**
+> Tuyệt đối không dùng Production PII trong test cases.
 
 | TC ID      | Tên                      | Mức độ | Kết quả mong đợi                             |
 | ---------- | ------------------------- | --------- | ------------------------------------------------ |
-| REV-TC-001 | Đánh giá hợp lệ      | HIGH      | Review được lưu xuống DB.                   |
-| REV-TC-002 | Booking chưa hoàn tất  | HIGH      | Ném exception `BookingNotCompletedException`. |
-| REV-TC-003 | Đánh giá 2 lần (spam) | HIGH      | Ném exception `ReviewAlreadyExistsException`. |
-| REV-TC-XSS | XSS trong comment         | CRITICAL  | Script tag bị escape.                           |
+| REV-TC-001 | Đánh giá hợp lệ (BR-13) | HIGH      | Review được lưu xuống DB.                   |
+| REV-TC-002 | Booking chưa hoàn tất (BR-13)| HIGH      | Ném exception `BookingNotCompletedException`. |
+| REV-TC-003 | Đánh giá 2 lần (BR-13)  | HIGH      | Ném exception `ReviewAlreadyExistsException`. |
+| REV-TC-XSS | XSS trong comment         | CRITICAL  | Script tag bị escape an toàn.                   |
 
 # 14. Phương pháp Xác minh
 
