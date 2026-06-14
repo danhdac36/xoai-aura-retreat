@@ -314,7 +314,7 @@
         // Fetch Package Data from Backend on Load
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                const res = await fetch('/api/v1/spa/schedules/active-package');
+                const res = await fetch('/booking-spa/active-package');
                 const data = await res.json();
                 
                 if (res.ok) {
@@ -330,6 +330,11 @@
                     
                     // Now fetch available slots for the default date
                     fetchAvailableSlots(selectedDate);
+                } else {
+                    document.getElementById('ui-service-name').innerText = "Chưa có dữ liệu";
+                    document.getElementById('ui-service-price').innerText = data.error || "Không tìm thấy gói nào.";
+                    document.getElementById('summary-time').innerHTML = "Chưa xác định";
+                    document.getElementById('time-slots-loading').innerHTML = `<span class="text-error">${data.error || "Không tải được khung giờ"}</span>`;
                 }
             } catch (error) {
                 console.error("Failed to load active package", error);
@@ -435,8 +440,9 @@
             document.getElementById('time-slots-evening').innerHTML = '';
             
             try {
-                const res = await fetch(`/api/v1/spa/schedules/available-slots?date=${dateStr}&duration=${serviceDuration}`);
-                const availableTimes = await res.json();
+                const response = await fetch(`/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const availableTimes = await response.json();
                 
                 const allTimesMorning = ["09:00", "10:00", "11:00", "12:00"];
                 const allTimesAfternoon = ["14:00", "15:00", "16:00", "17:00", "18:00"];
@@ -562,7 +568,7 @@
             loadingSpinner.classList.remove('hidden');
 
             try {
-                const response = await fetch('/api/v1/spa/schedules', {
+                const response = await fetch('/booking-spa', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)

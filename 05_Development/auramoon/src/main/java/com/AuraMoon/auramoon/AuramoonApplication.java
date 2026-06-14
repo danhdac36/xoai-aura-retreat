@@ -9,5 +9,4 @@ public class AuramoonApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AuramoonApplication.class, args);
 	}
-
 }

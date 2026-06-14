@@ -22,8 +22,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class SpaScheduleServiceImpl implements SpaScheduleService {
@@ -35,10 +33,10 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
     private final TreatmentServiceRepository treatmentServiceRepository;
 
     public SpaScheduleServiceImpl(ScheduleRepository scheduleRepository,
-                                  TreatmentRoomRepository roomRepository,
-                                  TherapistRepository therapistRepository,
-                                  TreatmentBookingRepository treatmentBookingRepository,
-                                  TreatmentServiceRepository treatmentServiceRepository) {
+            TreatmentRoomRepository roomRepository,
+            TherapistRepository therapistRepository,
+            TreatmentBookingRepository treatmentBookingRepository,
+            TreatmentServiceRepository treatmentServiceRepository) {
         this.scheduleRepository = scheduleRepository;
         this.roomRepository = roomRepository;
         this.therapistRepository = therapistRepository;
@@ -50,19 +48,22 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
     @Transactional
     public SpaScheduleResponse scheduleSession(SpaScheduleRequest request) {
         // 1. Kiểm tra dịch vụ có nằm trong gói không (BR-05)
-        List<TreatmentBooking> bookings = treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(request.getBookingId(), request.getServiceId());
-        
+        List<TreatmentBooking> bookings = treatmentBookingRepository
+                .findByBookingIdAndTreatmentService_Id(request.getBookingId(), request.getServiceId());
+
         TreatmentBooking booking = bookings.stream()
                 .filter(b -> !"Scheduled".equals(b.getStatus()))
                 .findFirst()
-                .orElseThrow(() -> new SpaBusinessException("SPA-001", "Service not found, not in package, or all sessions already scheduled"));
+                .orElseThrow(() -> new SpaBusinessException("SPA-001",
+                        "Service not found, not in package, or all sessions already scheduled"));
 
         TreatmentService service = treatmentServiceRepository.findById(request.getServiceId())
                 .orElseThrow(() -> new SpaBusinessException("SPA-001", "Treatment Service not found"));
 
         // 2. Tính thời gian kết thúc
         LocalDateTime startTime = request.getStartTime();
-        LocalDateTime endTime = startTime.plusMinutes(service.getDurationMinutes() != null ? service.getDurationMinutes() : 60);
+        LocalDateTime endTime = startTime
+                .plusMinutes(service.getDurationMinutes() != null ? service.getDurationMinutes() : 60);
 
         // 3. Tìm Phòng và Chuyên viên rảnh bằng Pessimistic Lock (BR-04)
         List<TreatmentRoom> availableRooms = roomRepository.findAvailableRoomsWithLock(startTime, endTime);
@@ -124,7 +125,8 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
         LocalTime currentTime = LocalTime.of(9, 0); // Open at 09:00
         LocalTime closeTime = LocalTime.of(22, 0); // Spa closes at 22:00 (last booking finishes at 22:00)
 
-        while (currentTime.plusMinutes(durationMinutes).isBefore(closeTime) || currentTime.plusMinutes(durationMinutes).equals(closeTime)) {
+        while (currentTime.plusMinutes(durationMinutes).isBefore(closeTime)
+                || currentTime.plusMinutes(durationMinutes).equals(closeTime)) {
             LocalDateTime slotStart = date.atTime(currentTime);
             LocalDateTime slotEnd = slotStart.plusMinutes(durationMinutes);
 
