@@ -30,22 +30,9 @@ public class TherapistScheduleController {
         // 1. Get therapist code from session
         String therapistCode = (String) session.getAttribute("therapistCode");
 
-        // ---- TẠM THỜI FAKE DỮ LIỆU ĐỂ TEST KHI CHƯA GHÉP CODE LOGIN ----
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
-            boolean isTest = false;
-            for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-                if (ste.getClassName().contains("TherapistScheduleControllerTest")
-                        || ste.getClassName().contains("JUnit")) {
-                    isTest = true;
-                    break;
-                }
-            }
-            if (isTest) {
-                return "redirect:/login";
-            }
-            therapistCode = "NV002"; // Mã chuyên viên giả lập
+            return "redirect:/login";
         }
-        // ----------------------------------------------------------------
 
         // 2. Parse date, default to today if not provided
         LocalDate targetDate = LocalDate.now();
@@ -77,7 +64,7 @@ public class TherapistScheduleController {
 
         String therapistCode = (String) session.getAttribute("therapistCode");
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
-            therapistCode = "NV002"; // Mã chuyên viên giả lập
+            return "redirect:/login";
         }
 
         try {
