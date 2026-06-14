@@ -23,4 +23,8 @@ public interface TherapistRepository extends JpaRepository<Therapist, Integer> {
            "  AND s.startTime < :reqEnd AND s.endTime > :reqStart" +
            ") ORDER BY t.therapistCode ASC")
     List<Therapist> findAvailableTherapistsWithLock(@Param("reqStart") LocalDateTime reqStart, @Param("reqEnd") LocalDateTime reqEnd);
+
+    @Query("SELECT u.fullName FROM User u JOIN Therapist t ON u.id = t.id WHERE t.therapistCode = :therapistCode")
+    String findTherapistNameByCode(@Param("therapistCode") String therapistCode);
 }
+
