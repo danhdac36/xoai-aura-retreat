@@ -34,7 +34,8 @@ public class TherapistScheduleController {
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
             boolean isTest = false;
             for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
-                if (ste.getClassName().contains("TherapistScheduleControllerTest") || ste.getClassName().contains("JUnit")) {
+                if (ste.getClassName().contains("TherapistScheduleControllerTest")
+                        || ste.getClassName().contains("JUnit")) {
                     isTest = true;
                     break;
                 }
@@ -42,7 +43,7 @@ public class TherapistScheduleController {
             if (isTest) {
                 return "redirect:/login";
             }
-            therapistCode = "T002"; // Mã chuyên viên giả lập
+            therapistCode = "NV002"; // Mã chuyên viên giả lập
         }
         // ----------------------------------------------------------------
 
@@ -76,7 +77,7 @@ public class TherapistScheduleController {
 
         String therapistCode = (String) session.getAttribute("therapistCode");
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
-            therapistCode = "T002"; // Mã chuyên viên giả lập
+            therapistCode = "NV002"; // Mã chuyên viên giả lập
         }
 
         try {
