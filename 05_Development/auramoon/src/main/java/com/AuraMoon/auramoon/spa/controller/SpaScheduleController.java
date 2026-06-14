@@ -54,15 +54,10 @@ public class SpaScheduleController {
         // 1. Kiểm tra session xem ai đang đăng nhập (chống IDOR)
         Integer userId = (Integer) session.getAttribute("userId");
 
-        // ---- TẠM THỜI FAKE DỮ LIỆU ĐỂ TEST KHI CHƯA GHÉP CODE LOGIN ----
         if (userId == null) {
-            userId = 2; // Giả lập Khách hàng có ID = 1 đang đăng nhập
-            // Sau khi ghép code login, cậu xóa dòng trên và mở comment 2 dòng dưới ra:
-            // return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            // .body(Map.of("error", "Vui lòng đăng nhập để xem thông tin gói Spa của
-            // bạn."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Vui lòng đăng nhập để xem thông tin gói Spa của bạn."));
         }
-        // ----------------------------------------------------------------
 
         // 2. Lấy gói Spa chưa đặt lịch của ĐÚNG khách hàng này (dựa vào Native Query
         // JOIN bảng BOOKING)
@@ -102,26 +97,14 @@ public class SpaScheduleController {
             // 1. Bắt buộc đăng nhập
             Integer userId = (Integer) session.getAttribute("userId");
 
-            // ---- TẠM THỜI FAKE DỮ LIỆU ĐỂ TEST KHI CHƯA GHÉP CODE LOGIN ----
             if (userId == null) {
-                userId = 2; // Giả lập Khách hàng có ID = 1 đang đăng nhập
-                // Sau khi ghép code login, cậu xóa dòng trên và mở comment 2 dòng dưới ra:
-                // return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                // .body(Map.of("error", Map.of("code", "AUTH-401", "message", "Vui lòng đăng
-                // nhập để tiếp tục.")));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", Map.of("code", "AUTH-401", "message", "Vui lòng đăng nhập để tiếp tục.")));
             }
-            // ----------------------------------------------------------------
 
-            // 2. Chống IDOR: Xác minh bookingId trong request có đúng là của khách hàng
-            // đang đăng nhập không
+            // 2. Chống IDOR: Xác minh bookingId trong request có đúng là của khách hàng đang đăng nhập không
             boolean isOwner = treatmentBookingRepository.findUnscheduledBookingsByGuestId(userId).stream()
                     .anyMatch(b -> b.getBookingId().equals(request.getBookingId()));
-
-            // ---- TẠM THỜI FALLBACK CHO TEST ----
-            if (!isOwner && userId == 2) {
-                isOwner = true; // Bỏ qua kiểm tra IDOR cho user giả lập để cậu test đặt lịch thành công
-            }
-            // ------------------------------------
 
             if (!isOwner) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
