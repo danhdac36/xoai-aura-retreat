@@ -36,6 +36,9 @@ class CheckoutControllerTest {
     @Mock
     private VNPayService vnPayService;
 
+    @Mock
+    private com.AuraMoon.auramoon.billing.service.AuditLogService auditLogService;
+
     @InjectMocks
     private CheckoutController checkoutController;
 
@@ -69,6 +72,7 @@ class CheckoutControllerTest {
         Integer bookingId = 1;
         Payment payment = new Payment();
         payment.setId(100);
+        when(billingService.getCheckoutData(anyInt())).thenReturn(CheckoutViewDTO.builder().balanceDue(BigDecimal.TEN).build());
         when(billingService.initiatePayment(bookingId, "CASH", "CASH")).thenReturn(payment);
 
         // Act & Assert
@@ -86,6 +90,7 @@ class CheckoutControllerTest {
     void processPayment_PendingOrdersExist_RedirectsBackWithError() throws Exception {
         // Arrange
         Integer bookingId = 1;
+        when(billingService.getCheckoutData(anyInt())).thenReturn(CheckoutViewDTO.builder().balanceDue(BigDecimal.TEN).build());
         when(billingService.initiatePayment(anyInt(), anyString(), anyString()))
                 .thenThrow(new PendingOrdersExistException("Còn đơn hàng đang chờ"));
 
@@ -108,6 +113,7 @@ class CheckoutControllerTest {
         payment.setId(101);
         payment.setAmount(new BigDecimal("1000000"));
 
+        when(billingService.getCheckoutData(anyInt())).thenReturn(CheckoutViewDTO.builder().balanceDue(BigDecimal.TEN).build());
         when(billingService.initiatePayment(bookingId, "VNPAY", "VNPAY")).thenReturn(payment);
         when(vnPayService.createPaymentUrl(any(BigDecimal.class), eq(101), anyString()))
                 .thenReturn("http://sandbox.vnpayment.vn/testurl");

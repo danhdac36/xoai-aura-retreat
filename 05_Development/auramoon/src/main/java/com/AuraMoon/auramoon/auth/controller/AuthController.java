@@ -50,8 +50,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth")
-    public String doLogin(@RequestParam("email") String email, @RequestParam("password") String password, Model model,
-            HttpSession session) {
+    public String doLogin(@RequestParam("email") String email, @RequestParam("password") String password, Model model, HttpSession session) {
         // Xử lý đăng nhập
         User user = userService.authenticate(email, password);
         if (user == null) {

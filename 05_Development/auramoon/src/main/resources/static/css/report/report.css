@@ -1,0 +1,18 @@
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+/* Style Guidance - Input Bottom Border */
+.aura-input {
+    background-color: #f6f3f2;
+    border: none;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+.aura-input:focus {
+    outline: none;
+    border-bottom-color: #406840; /* sage-green/tertiary fallback */
+}

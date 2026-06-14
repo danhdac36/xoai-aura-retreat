@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
+import com.AuraMoon.auramoon.auth.entity.User;
 
 @Controller
 @RequestMapping("/booking")
@@ -30,9 +32,13 @@ public class BookingController {
     }
 
     @PostMapping("/create")
-    public String createBooking(@ModelAttribute("bookingRequest") BookingRequestDTO request) {
-        // Giả lập guestId = 1 (hoặc lấy từ session nếu có hệ thống Auth)
-        Integer guestId = 1;
+    public String createBooking(@ModelAttribute("bookingRequest") BookingRequestDTO request, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+        Integer guestId = currentUser.getId();
+        
         try {
             BookingResponseDTO response = bookingService.createBooking(guestId, request);
             // Redirect sang controller thanh toán đặt cọc của module billing

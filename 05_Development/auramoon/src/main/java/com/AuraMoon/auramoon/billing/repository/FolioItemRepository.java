@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface FolioItemRepository extends JpaRepository<FolioItem, Integer> {
     List<FolioItem> findByGuestFolioId(Integer folioId);
+    List<FolioItem> findByGuestFolioIdIn(List<Integer> folioIds);
     boolean existsByGuestFolioIdAndStatusIn(Integer folioId, List<String> statuses);
 }

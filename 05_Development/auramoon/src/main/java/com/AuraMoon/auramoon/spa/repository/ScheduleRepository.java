@@ -46,5 +46,11 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+    @Query("SELECT COUNT(s) FROM Schedule s WHERE s.isDelete = false AND s.startTime BETWEEN :start AND :end")
+    long countSchedules(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT COUNT(s) FROM Schedule s WHERE s.isDelete = false AND s.treatmentBooking.status = :status AND s.startTime BETWEEN :start AND :end")
+    long countSchedulesByStatus(@Param("status") String status, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }
 

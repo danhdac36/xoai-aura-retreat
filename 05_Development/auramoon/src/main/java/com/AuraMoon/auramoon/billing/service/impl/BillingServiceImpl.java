@@ -40,7 +40,8 @@ public class BillingServiceImpl implements BillingService {
 
         List<FolioItem> items = folioItemRepository.findByGuestFolioId(folio.getId());
         Map<String, List<FolioItem>> groupedServices = items.stream()
-                .collect(Collectors.groupingBy(item -> item.getServiceCategory() != null ? item.getServiceCategory() : "Khác"));
+                .collect(Collectors
+                        .groupingBy(item -> item.getServiceCategory() != null ? item.getServiceCategory() : "Khác"));
 
         BigDecimal totalExtra = items.stream()
                 .map(item -> item.getAmount() != null ? item.getAmount() : BigDecimal.ZERO)
@@ -51,7 +52,8 @@ public class BillingServiceImpl implements BillingService {
                 .map(payment -> payment.getAmount() != null ? payment.getAmount() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal packageAmount = folio.getTotalPackageAmount() != null ? folio.getTotalPackageAmount() : BigDecimal.ZERO;
+        BigDecimal packageAmount = folio.getTotalPackageAmount() != null ? folio.getTotalPackageAmount()
+                : BigDecimal.ZERO;
         BigDecimal totalCost = packageAmount.add(totalExtra);
         BigDecimal balanceDue = totalCost.subtract(totalPaid);
 
@@ -108,6 +110,28 @@ public class BillingServiceImpl implements BillingService {
         paymentRepository.save(payment);
 
         GuestFolio folio = payment.getGuestFolio();
+        folio.setStatus("PAID");
+        guestFolioRepository.save(folio);
+
+        Booking booking = bookingRepository.findById(folio.getBookingId())
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        booking.setBookingStatus("COMPLETED");
+        booking.setPaymentStatus("PAID");
+        bookingRepository.save(booking);
+
+        if (booking.getAssignedVilla() != null) {
+            Villa villa = booking.getAssignedVilla();
+            villa.setVillaStatus("VACANT_NEEDS_CLEANING");
+            villaRepository.save(villa);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void completeCheckoutWithoutPayment(Integer bookingId) {
+        GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new RuntimeException("Folio not found"));
+
         folio.setStatus("PAID");
         guestFolioRepository.save(folio);
 

@@ -4,12 +4,14 @@ import com.AuraMoon.auramoon.spa.entity.Therapist;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Lock;
 import jakarta.persistence.LockModeType;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Repository
 public interface TherapistRepository extends JpaRepository<Therapist, Integer> {
 
     long countByStatus(String status);
@@ -27,4 +29,3 @@ public interface TherapistRepository extends JpaRepository<Therapist, Integer> {
     @Query("SELECT u.fullName FROM User u JOIN Therapist t ON u.id = t.id WHERE t.therapistCode = :therapistCode")
     String findTherapistNameByCode(@Param("therapistCode") String therapistCode);
 }
-

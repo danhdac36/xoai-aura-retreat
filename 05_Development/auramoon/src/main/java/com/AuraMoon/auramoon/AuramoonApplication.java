@@ -12,3 +12,4 @@ public class AuramoonApplication {
 		SpringApplication.run(AuramoonApplication.class, args);
 	}
 }
+

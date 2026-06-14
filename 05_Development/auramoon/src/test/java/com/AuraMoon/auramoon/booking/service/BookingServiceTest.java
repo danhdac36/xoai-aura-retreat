@@ -33,149 +33,151 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceTest {
 
-    @Mock
-    private BookingRepository bookingRepository;
+        @Mock
+        private BookingRepository bookingRepository;
 
-    @Mock
-    private VillaRepository villaRepository;
+        @Mock
+        private VillaRepository villaRepository;
 
-    @Mock
-    private VillaTypeRepository villaTypeRepository;
+        @Mock
+        private VillaTypeRepository villaTypeRepository;
 
-    @Mock
-    private RetreatPackageRepository retreatPackageRepository;
+        @Mock
+        private RetreatPackageRepository retreatPackageRepository;
 
-    @Mock
-    private GuestFolioRepository guestFolioRepository;
+        @Mock
+        private GuestFolioRepository guestFolioRepository;
 
-    @Mock
-    private VillaService villaService;
+        @Mock
+        private VillaService villaService;
 
-    @InjectMocks
-    private BookingServiceImpl bookingService;
+        @InjectMocks
+        private BookingServiceImpl bookingService;
 
-    @Test
-    @DisplayName("UC07-TC-001: Đặt gói và biệt thự thành công khi còn phòng trống")
-    public void createBooking_villasAvailable_savesSuccessfully() {
-        // Arrange
-        Integer guestId = 1;
-        LocalDate checkinDate = LocalDate.now().plusDays(2);
-        BookingRequestDTO request = BookingRequestDTO.builder()
-                .retreatPackageId(1)
-                .villaTypeId(2)
-                .checkinDate(checkinDate)
-                .totalGuests(2)
-                .build();
+        @Test
+        @DisplayName("UC07-TC-001: Đặt gói và biệt thự thành công khi còn phòng trống")
+        public void createBooking_villasAvailable_savesSuccessfully() {
+                // Arrange
+                Integer guestId = 1;
+                LocalDate checkinDate = LocalDate.now().plusDays(2);
+                BookingRequestDTO request = BookingRequestDTO.builder()
+                                .retreatPackageId(1)
+                                .villaTypeId(2)
+                                .checkinDate(checkinDate)
+                                .totalGuests(2)
+                                .build();
 
-        RetreatPackage retreatPackage = RetreatPackage.builder()
-                .id(1)
-                .packageName("Mindfulness Retreat")
-                .durationDays(3)
-                .price(BigDecimal.valueOf(15000000))
-                .isActive(true)
-                .build();
+                RetreatPackage retreatPackage = RetreatPackage.builder()
+                                .id(1)
+                                .packageName("Mindfulness Retreat")
+                                .durationDays(3)
+                                .price(BigDecimal.valueOf(15000000))
+                                .isActive(true)
+                                .build();
 
-        VillaType villaType = VillaType.builder()
-                .id(2)
-                .typeName("Ocean View Villa")
-                .pricePerDay(BigDecimal.valueOf(5000000))
-                .build();
+                VillaType villaType = VillaType.builder()
+                                .id(2)
+                                .typeName("Ocean View Villa")
+                                .pricePerDay(BigDecimal.valueOf(5000000))
+                                .build();
 
-        when(retreatPackageRepository.findByIdAndIsActiveTrueAndIsDeleteFalse(1)).thenReturn(Optional.of(retreatPackage));
-        when(villaTypeRepository.findById(2)).thenReturn(Optional.of(villaType));
-        when(villaService.checkVillaAvailability(eq(2), eq(checkinDate), eq(checkinDate.plusDays(3))))
-                .thenReturn(true);
+                when(retreatPackageRepository.findByIdAndIsActiveTrueAndIsDeleteFalse(1))
+                                .thenReturn(Optional.of(retreatPackage));
+                when(villaTypeRepository.findById(2)).thenReturn(Optional.of(villaType));
+                when(villaService.checkVillaAvailability(eq(2), eq(checkinDate), eq(checkinDate.plusDays(3))))
+                                .thenReturn(true);
 
-        Booking savedBooking = Booking.builder()
-                .id(100)
-                .guestId(guestId)
-                .retreatPackage(retreatPackage)
-                .checkinDate(checkinDate)
-                .checkoutDate(checkinDate.plusDays(3))
-                .totalGuests(2)
-                .bookingStatus("PENDING")
-                .paymentStatus("UNPAID")
-                .build();
+                Booking savedBooking = Booking.builder()
+                                .id(100)
+                                .guestId(guestId)
+                                .retreatPackage(retreatPackage)
+                                .checkinDate(checkinDate)
+                                .checkoutDate(checkinDate.plusDays(3))
+                                .totalGuests(2)
+                                .bookingStatus("PENDING")
+                                .paymentStatus("UNPAID")
+                                .build();
 
-        when(bookingRepository.save(any(Booking.class))).thenReturn(savedBooking);
+                when(bookingRepository.save(any(Booking.class))).thenReturn(savedBooking);
 
-        // Act
-        BookingResponseDTO response = bookingService.createBooking(guestId, request);
+                // Act
+                BookingResponseDTO response = bookingService.createBooking(guestId, request);
 
-        // Assert
-        assertNotNull(response);
-        assertEquals(100, response.getBookingId());
-        assertEquals("PENDING", response.getBookingStatus());
-        assertEquals("UNPAID", response.getPaymentStatus());
-        assertEquals("Mindfulness Retreat", response.getRetreatPackageName());
-        assertEquals(checkinDate.plusDays(3), response.getCheckoutDate());
-        verify(bookingRepository, times(1)).save(any(Booking.class));
-    }
+                // Assert
+                assertNotNull(response);
+                assertEquals(100, response.getBookingId());
+                assertEquals("PENDING", response.getBookingStatus());
+                assertEquals("UNPAID", response.getPaymentStatus());
+                assertEquals("Mindfulness Retreat", response.getRetreatPackageName());
+                assertEquals(checkinDate.plusDays(3), response.getCheckoutDate());
+                verify(bookingRepository, times(1)).save(any(Booking.class));
+        }
 
-    @Test
-    @DisplayName("UC07-TC-002: Đặt gói thất bại và ném lỗi BOOK-002 khi hết phòng trống")
-    public void createBooking_noVillasAvailable_throwsBook002() {
-        // Arrange
-        Integer guestId = 1;
-        LocalDate checkinDate = LocalDate.now().plusDays(2);
-        BookingRequestDTO request = BookingRequestDTO.builder()
-                .retreatPackageId(1)
-                .villaTypeId(2)
-                .checkinDate(checkinDate)
-                .totalGuests(2)
-                .build();
+        @Test
+        @DisplayName("UC07-TC-002: Đặt gói thất bại và ném lỗi BOOK-002 khi hết phòng trống")
+        public void createBooking_noVillasAvailable_throwsBook002() {
+                // Arrange
+                Integer guestId = 1;
+                LocalDate checkinDate = LocalDate.now().plusDays(2);
+                BookingRequestDTO request = BookingRequestDTO.builder()
+                                .retreatPackageId(1)
+                                .villaTypeId(2)
+                                .checkinDate(checkinDate)
+                                .totalGuests(2)
+                                .build();
 
-        RetreatPackage retreatPackage = RetreatPackage.builder()
-                .id(1)
-                .durationDays(3)
-                .isActive(true)
-                .build();
+                RetreatPackage retreatPackage = RetreatPackage.builder()
+                                .id(1)
+                                .durationDays(3)
+                                .isActive(true)
+                                .build();
 
-        VillaType villaType = VillaType.builder()
-                .id(2)
-                .build();
+                VillaType villaType = VillaType.builder()
+                                .id(2)
+                                .build();
 
-        when(retreatPackageRepository.findByIdAndIsActiveTrueAndIsDeleteFalse(1)).thenReturn(Optional.of(retreatPackage));
-        when(villaTypeRepository.findById(2)).thenReturn(Optional.of(villaType));
-        when(villaService.checkVillaAvailability(eq(2), eq(checkinDate), eq(checkinDate.plusDays(3))))
-                .thenReturn(false);
+                when(retreatPackageRepository.findByIdAndIsActiveTrueAndIsDeleteFalse(1))
+                                .thenReturn(Optional.of(retreatPackage));
+                when(villaTypeRepository.findById(2)).thenReturn(Optional.of(villaType));
+                when(villaService.checkVillaAvailability(eq(2), eq(checkinDate), eq(checkinDate.plusDays(3))))
+                                .thenReturn(false);
 
-        // Act & Assert
-        assertThrows(VillaNotAvailableException.class, () -> {
-            bookingService.createBooking(guestId, request);
-        });
-        verify(bookingRepository, never()).save(any(Booking.class));
-    }
+                // Act & Assert
+                assertThrows(VillaNotAvailableException.class, () -> {
+                        bookingService.createBooking(guestId, request);
+                });
+                verify(bookingRepository, never()).save(any(Booking.class));
+        }
 
-    @Test
-    @DisplayName("UC07-TC-003: Xác nhận thanh toán thành công, cập nhật trạng thái đặt phòng và mở Folio nợ")
-    public void confirmPayment_validBooking_updatesStatusAndCreatesFolio() {
-        // Arrange
-        Integer bookingId = 100;
-        String transactionCode = "TX_99999";
+        @Test
+        @DisplayName("UC07-TC-003: Xác nhận thanh toán thành công, cập nhật trạng thái đặt phòng và mở Folio nợ")
+        public void confirmPayment_validBooking_updatesStatusAndCreatesFolio() {
+                // Arrange
+                Integer bookingId = 100;
+                String transactionCode = "TX_99999";
 
-        RetreatPackage retreatPackage = RetreatPackage.builder()
-                .id(1)
-                .price(BigDecimal.valueOf(15000000))
-                .build();
+                RetreatPackage retreatPackage = RetreatPackage.builder()
+                                .id(1)
+                                .price(BigDecimal.valueOf(15000000))
+                                .build();
 
-        Booking booking = Booking.builder()
-                .id(bookingId)
-                .guestId(1)
-                .retreatPackage(retreatPackage)
-                .bookingStatus("PENDING")
-                .paymentStatus("UNPAID")
-                .build();
+                Booking booking = Booking.builder()
+                                .id(bookingId)
+                                .guestId(1)
+                                .retreatPackage(retreatPackage)
+                                .bookingStatus("PENDING")
+                                .paymentStatus("UNPAID")
+                                .build();
 
-        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+                when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 
-        // Act
-        bookingService.confirmPayment(bookingId, transactionCode);
+                // Act
+                bookingService.confirmPayment(bookingId, transactionCode);
 
-        // Assert
-        assertEquals("CONFIRMED", booking.getBookingStatus());
-        assertEquals("DEPOSITED", booking.getPaymentStatus());
-        verify(bookingRepository, times(1)).save(booking);
-        verify(guestFolioRepository, times(1)).save(any(GuestFolio.class));
-    }
+                // Assert
+                assertEquals("CONFIRMED", booking.getBookingStatus());
+                assertEquals("DEPOSITED", booking.getPaymentStatus());
+                verify(bookingRepository, times(1)).save(booking);
+                verify(guestFolioRepository, times(1)).save(any(GuestFolio.class));
+        }
 }
