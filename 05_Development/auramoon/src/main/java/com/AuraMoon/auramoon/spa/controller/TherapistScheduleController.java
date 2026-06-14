@@ -30,6 +30,12 @@ public class TherapistScheduleController {
         // 1. Get therapist code from session
         String therapistCode = (String) session.getAttribute("therapistCode");
 
+        // Fake dữ liệu nếu session trống để chạy thử nghiệm
+        if (therapistCode == null || therapistCode.trim().isEmpty()) {
+            therapistCode = "NV002";
+            session.setAttribute("therapistCode", therapistCode);
+        }
+
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
             return "redirect:/login";
         }
@@ -50,6 +56,7 @@ public class TherapistScheduleController {
         // 4. Add to model
         model.addAttribute("schedules", schedules);
         model.addAttribute("selectedDate", targetDate);
+        model.addAttribute("therapistCode", therapistCode);
 
         return "spa/therapist-schedule";
     }
@@ -63,6 +70,13 @@ public class TherapistScheduleController {
             RedirectAttributes redirectAttributes) {
 
         String therapistCode = (String) session.getAttribute("therapistCode");
+
+        // Fake dữ liệu nếu session trống để chạy thử nghiệm
+        if (therapistCode == null || therapistCode.trim().isEmpty()) {
+            therapistCode = "NV002";
+            session.setAttribute("therapistCode", therapistCode);
+        }
+
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
             return "redirect:/login";
         }
@@ -78,4 +92,5 @@ public class TherapistScheduleController {
 
         return "redirect:/therapist/schedules/daily?date=" + dateStr;
     }
+
 }
