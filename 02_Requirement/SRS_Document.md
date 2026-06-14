@@ -3328,7 +3328,10 @@ forth.\]*
 |    BR-16    |               Meal Order Status Workflow               |                                                       Meal Order status shall only progress in the following sequence: Pending ? Preparing ? Ready for Delivery. Status reversal shall not be permitted. Only Chefs or F&B Staff may update Meal Order status.                                                       |              UC18              |
 |    BR-17    |    Spa Appointment Notification and Synchronization    |                                                            After a Spa appointment is successfully booked, the system shall send confirmation and reminder notifications to the guest. Notification failures shall not invalidate a confirmed appointment.                                                            |              UC11              |
 |    BR-18    |        Authentication and Single Sign-On (SSO)        |                                         The system shall support authentication through Google and Facebook. Accounts registered via SSO must complete email verification before being allowed to book a Retreat Package. The system shall prevent duplicate account creation.                                         |              UC01              |
+<<<<<<< HEAD
 |    BR-19    |                 Zero Balance Bypass                   |                                         If a guest's total balance due is exactly 0 VND (e.g., fully pre-paid), the checkout process shall automatically bypass the payment gateway selection and complete the checkout immediately without generating a pending payment transaction.                                         |              UC22              |
+=======
+>>>>>>> origin/SourceCode
 
 ### 5.2 System Messages
 

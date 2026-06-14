@@ -19,12 +19,15 @@ CREATE TABLE [USER] (
     gender VARCHAR(6),
     date_of_birth DATE,
     phone VARCHAR(20),
-    Identify_code VARCHAR(20),
+    Identify_code VARCHAR(255),
     avatar VARCHAR(MAX),
     last_update DATETIME DEFAULT GETDATE(),
     status VARCHAR(10),
     created_at DATETIME DEFAULT GETDATE(),
     last_login DATETIME,
+    verify_token VARCHAR(255),
+    booking_id INT,
+    is_delete BIT DEFAULT 0, 
     CONSTRAINT FK_USER_ROLE FOREIGN KEY (role_id) REFERENCES [ROLE](role_id)
 );
 
