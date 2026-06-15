@@ -44,7 +44,13 @@ public class BookingController {
             // Redirect sang controller thanh toán đặt cọc của module billing
             return "redirect:/billing/deposit/pay?bookingId=" + response.getBookingId();
         } catch (Exception e) {
-            return "redirect:/packages/" + request.getRetreatPackageId() + "?error=" + e.getMessage();
+            String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown error";
+            try {
+                errorMsg = java.net.URLEncoder.encode(errorMsg, "UTF-8");
+            } catch (java.io.UnsupportedEncodingException ex) {
+                // ignore
+            }
+            return "redirect:/packages/" + request.getRetreatPackageId() + "?error=" + errorMsg;
         }
     }
 

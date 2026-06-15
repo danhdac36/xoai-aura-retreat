@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html lang="vi" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Xoai Aura Retreat - Hành trình cá nhân hóa để Chữa lành &amp; Làm mới</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-container": "#5a6745",
+                        "tertiary-container": "#d1ffcb",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dcd9d9",
+                        "surface-container-low": "#f6f3f2",
+                        "on-secondary-fixed-variant": "#3f4b2c",
+                        "on-secondary-fixed": "#141f05",
+                        "secondary-fixed": "#dae8be",
+                        "secondary-container": "#d7e5bb",
+                        "error": "#ba1a1a",
+                        "tertiary": "#406840",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#1b1c1c",
+                        "inverse-surface": "#303030",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#002106",
+                        "secondary-fixed-dim": "#becca3",
+                        "primary": "#5f5e5b",
+                        "primary-fixed-dim": "#c9c6c2",
+                        "surface-tint": "#5f5e5b",
+                        "surface-bright": "#fbf9f8",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#c1eebc",
+                        "surface-variant": "#e4e2e1",
+                        "surface-container-highest": "#e4e2e1",
+                        "primary-container": "#f5f2ed",
+                        "outline-variant": "#c8c7be",
+                        "secondary": "#566342",
+                        "on-primary-container": "#6f6e6a",
+                        "surface": "#fbf9f8",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#1b1c1c",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "background": "#fbf9f8",
+                        "surface-container": "#f0eded",
+                        "inverse-on-surface": "#f3f0f0",
+                        "on-tertiary-container": "#4f784f",
+                        "inverse-primary": "#c9c6c2",
+                        "on-surface-variant": "#474741",
+                        "primary-fixed": "#e5e2dd",
+                        "tertiary-fixed-dim": "#a5d2a2",
+                        "on-tertiary-fixed-variant": "#284f2a",
+                        "on-primary-fixed": "#1c1c19",
+                        "on-primary-fixed-variant": "#474743",
+                        "outline": "#787770",
+                        "sage-green": "#566342",
+                        "earth-beige": "#f4f1ea",
+                        "sand-light": "#fbf9f8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-lg": "32px",
+                        "margin-desktop": "80px",
+                        "gutter": "24px",
+                        "stack-sm": "8px",
+                        "margin-mobile": "20px",
+                        "section-gap": "120px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Playfair Display"],
+                        "headline-sm": ["Playfair Display"],
+                        "headline-lg": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "headline-sm": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "headline-lg": ["40px", { "lineHeight": "48px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "48px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #fbf9f8;
+            color: #1b1c1c;
+        }
+        .hero-overlay {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%);
+        }
+        .navbar-scrolled {
+            background-color: rgba(251, 249, 248, 0.9) !important;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .navbar-scrolled a, .navbar-scrolled .nav-link {
+            color: #1b1c1c !important;
+        }
+        .navbar-scrolled .logo {
+            color: #5f5e5b !important;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-desktop py-6 bg-transparent transition-all duration-300">
+<a class="font-display-lg text-2xl text-white hover:opacity-80 transition-opacity tracking-tight uppercase" href="#">Xoai Aura</a>
+<nav class="hidden md:flex items-center gap-stack-lg">
+<a class="nav-link font-label-md text-label-md text-white border-b-2 border-white/40 pb-1 hover:border-white transition-all duration-300 uppercase tracking-widest" href="#">Retreats</a>
+<a class="nav-link font-label-md text-label-md text-white/80 hover:text-white transition-all duration-300 uppercase tracking-widest" href="#">Villas</a>
+<a class="nav-link font-label-md text-label-md text-white/80 hover:text-white transition-all duration-300 uppercase tracking-widest" href="#">Spa</a>
+<a class="nav-link font-label-md text-label-md text-white/80 hover:text-white transition-all duration-300 uppercase tracking-widest" href="#">Wellness</a>
+<a class="nav-link font-label-md text-label-md text-white/80 hover:text-white transition-all duration-300 uppercase tracking-widest" href="#">Culinary</a>
+</nav>
+<button class="hidden md:block bg-secondary text-on-secondary font-label-md text-label-md py-3 px-8 rounded hover:opacity-90 transition-opacity uppercase tracking-widest">
+        Book Now
+    </button>
+<button class="md:hidden text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<main>
+<section class="relative h-screen w-full flex items-center justify-center">
+<div class="absolute inset-0 z-0">
+<img alt="Hero background" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBChE7XIMMydv5XGqWxr5iBJ5JsOtEUJEEULyjVTIc8_hAuf2SCyjIjZtTyesYTzdHj3OF2M8NQi35FXghXhIjg-k-TKQfprd97WyZyFJ2EneO74ooUH-dyDdEFq2AADoUN-ne2TtDfVymzBZH761RyecunBjzB-93Brdl2b_dOb-mEUWMe85OTOwjohA1QQBh_UA0IS7Vo9a6jxc1UK6p1Mm5ON8Weq57VUvVlSpjiDhw4ZUKOAk2jIRPxS3DXEr78vHSyW9CAx1w"/>
+<div class="absolute inset-0 hero-overlay"></div>
+</div>
+<div class="relative z-10 text-center px-margin-mobile md:px-margin-desktop max-w-4xl mx-auto flex flex-col items-center gap-stack-lg">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-white drop-shadow-md uppercase">XOAI AURA</h1>
+<p class="font-body-lg text-body-lg text-white/90 max-w-2xl">
+                Hành trình cá nhân hóa để Chữa lành &amp; Tái tạo năng lượng
+            </p>
+<button class="mt-stack-sm bg-secondary text-on-secondary font-label-md text-label-md py-4 px-10 rounded hover:bg-on-secondary-container transition-colors duration-300 uppercase tracking-widest">
+                Khám phá các Gói Nghỉ dưỡng
+            </button>
+</div>
+</section>
+<!-- Section 1: Introducing Aura -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16 md:gap-24">
+<div class="w-full md:w-1/2">
+<img alt="Introducing Aura" class="w-full h-[600px] object-cover rounded shadow-sm" src="https://lh3.googleusercontent.com/aida/AP1WRLsCCImr_39WareIKRyx3qgv2kK1gqF1D12JJ9YsD-zcmUwoKxtkZQXLQZeBqMXl1knDnMPOu1er-PwJkzY_TGlgx0s6bRyzON9lBiZrOd-0azFS5XhApPvWu_ZWslLXZTVb8yGiAyArUOcjHDNGQYUZXs6R7MvQ5RZbO6mvxWLfVp9PeSMwqo4xP6eey8yrahKiLfYJ9cwQFziAczO9P89icJW0yvCmRn_2Ni5_lnmZ9zWG_Jn99xeTQwY"/>
+</div>
+<div class="w-full md:w-1/2 flex flex-col items-start gap-stack-md">
+<h2 class="font-display-lg text-headline-lg md:text-5xl text-primary uppercase tracking-tight">INTRODUCING AURA</h2>
+<h3 class="font-headline-sm text-headline-sm text-secondary italic">Nơi khởi nguồn của sự cân bằng và chữa lành</h3>
+<div class="space-y-4 mt-2">
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Xoai Aura Retreat mang đến một khái niệm nghỉ dưỡng hoàn toàn mới, nơi mỗi bước chân của bạn đều được dẫn dắt bởi sự tĩnh lặng và nghệ thuật chữa lành tinh tế. Chúng tôi tin rằng sức khỏe đích thực đến từ sự hòa hợp giữa tâm hồn và thiên nhiên.
+                </p>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Tại đây, các chương trình được thiết kế cá nhân hóa tuyệt đối, kết hợp giữa tinh hoa y học cổ truyền và các liệu pháp phục hồi hiện đại. Không gian tối giản nhưng sang trọng giúp bạn rũ bỏ mọi lo toan, chỉ còn lại sự hiện diện thuần khiết của chính mình.
+                </p>
+</div>
+<div class="flex items-center gap-8 mt-8 opacity-60">
+<span class="material-symbols-outlined text-4xl">workspace_premium</span>
+<span class="material-symbols-outlined text-4xl">verified</span>
+<span class="material-symbols-outlined text-4xl">star</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Aura Story -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-earth-beige">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row-reverse items-center gap-16 md:gap-24">
+<div class="w-full md:w-1/2">
+<img alt="Aura Story" class="w-full h-[600px] object-cover rounded shadow-sm" src="https://lh3.googleusercontent.com/aida/AP1WRLuLl-Qn1EHHlo7-2BY3vSth8FnmYzZkCkAO-MPvepmIbKX-2QLN6XvN9izX1mL5SfI9jzYoH6GrtJ4hrBqzTZ5kglYzsQjc9GNigDUBkg8q1b67GeuDdv4JmVle199LqN2Nyu5l2I86gOlswJPCPQ3U64gXHBRFRMINJLeruenFHundS2sAeKX0VPtOYaLrz3Z3je-bxMZ6GsHsF-HkvexgR_Gh_SWS4Na39Dk03Dtwgnky6nZOYCJ5n-M"/>
+</div>
+<div class="w-full md:w-1/2 flex flex-col items-start gap-stack-md">
+<h2 class="font-display-lg text-headline-lg md:text-5xl text-primary uppercase tracking-tight">AURA STORY</h2>
+<div class="space-y-4 mt-2">
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Câu chuyện của Aura bắt đầu từ mong muốn kiến tạo một thánh đường tĩnh lặng giữa nhịp sống hối hả. Tên gọi "Xoai Aura" tượng trưng cho sự thuần khiết của vùng đất và hào quang rạng rỡ của sức khỏe mà chúng tôi khao khát khơi gợi trong mỗi vị khách.
+                </p>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Tầm nhìn của chúng tôi không chỉ dừng lại ở một khu nghỉ dưỡng, mà là một hành trình biến đổi. Mỗi chi tiết kiến trúc, mỗi thực đơn dinh dưỡng đều mang trong mình tâm huyết bảo tồn giá trị bản địa và nâng niu trải nghiệm riêng tư nhất của con người.
+                </p>
+</div>
+<button class="mt-4 border border-secondary text-secondary font-label-md text-label-md py-3 px-10 rounded hover:bg-secondary hover:text-on-secondary transition-all duration-300 uppercase tracking-widest">
+                Read More
+            </button>
+</div>
+</div>
+</section>
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16 md:gap-24">
+<div class="w-full md:w-1/2 relative">
+<div class="absolute inset-0 bg-earth-beige/20 z-10 rounded-xl pointer-events-none"></div>
+<img alt="Liệu trình Aura Spa" class="w-full h-[500px] object-cover rounded-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5UX8cH_d1A6dk-z5-7xLMUcQYPjmUMnqyq6G0-ZSBEc0VLYGVoD6uBdBVj3T2qW1Jx_p-3J03N-2B-YF2tyfHabV_OLC8zaqjRf_pzCVYmO6G5xapAacjmN5gQ-EEk9Y9r1xgliPbsz2O-M9Kyvvpv_nohOJCv620v3klgBLp74A8qcee59GpSU86V6rSbLqWa6kYDNqEmxcqE9WJ4XjCPT9HZWMOrjNLockgLQpfqzJ1duPZvUPJi9MWA23d1_wiYXI789y3vn4"/>
+</div>
+<div class="w-full md:w-1/2 flex flex-col items-start gap-stack-md">
+<h2 class="font-display-lg text-headline-lg text-primary uppercase">Aura Spa &amp; Trị liệu</h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">
+                    Khám phá thánh đường của sự tĩnh lặng, nơi truyền thống chữa lành cổ xưa hòa quyện cùng các phương pháp chăm sóc sức khỏe hiện đại. Các chuyên gia trị liệu của chúng tôi sử dụng các sản phẩm tự nhiên từ địa phương để trẻ hóa cơ thể và tâm trí, mang đến những liệu trình được thiết kế riêng cho nhu cầu của bạn.
+                </p>
+<button class="text-secondary font-label-md text-label-md flex items-center gap-2 hover:opacity-80 transition-opacity underline underline-offset-8 decoration-outline-variant uppercase tracking-widest">
+                    Xem Tất cả Liệu trình <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-earth-beige">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row-reverse items-center gap-16 md:gap-24">
+<div class="w-full md:w-1/2 relative">
+<div class="absolute inset-0 bg-earth-beige/20 z-10 rounded-xl pointer-events-none"></div>
+<img alt="Ẩm thực Dinh dưỡng" class="w-full h-[500px] object-cover rounded-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlE2-wAOLKa3_tUsp1a_xpeNJ7PDSWvH---lo74n4hwtDCavzgkqi3x59kUSvfqycql_WAFqRFseGv6DaiQ972ExMrj4__Lr2Z71kD7IZoovpvx3lfLPeYGXvr9qfpIuJ0kTwgKHX7NZKax85mCIoML4U8UNZz0VElwYQqZomKyUd56ktf_LgT9ZAo8emL3PeQO_4N17ufyWP-rBJOIRSRir8oDp90WLq-xz2J1XadYd8Xi2OV9mZrp2f5ACW4p25d3v42-Rlz3lU"/>
+</div>
+<div class="w-full md:w-1/2 flex flex-col items-start gap-stack-md">
+<h2 class="font-display-lg text-headline-lg text-primary uppercase">Ẩm thực Dinh dưỡng</h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">
+                    Dinh dưỡng là cốt lõi của hành trình chữa lành. Chúng tôi cung cấp các kế hoạch bữa ăn được chọn lọc kỹ lưỡng dựa trên hồ sơ dị ứng và chế độ ăn uống của bạn, đảm bảo mọi món ăn đều hỗ trợ mục tiêu nghỉ dưỡng trong khi vẫn bảo mật tuyệt đối lịch sử y tế khỏi đội ngũ bếp.
+                </p>
+<button class="text-secondary font-label-md text-label-md flex items-center gap-2 hover:opacity-80 transition-opacity underline underline-offset-8 decoration-outline-variant uppercase tracking-widest">
+                    Xem Thực đơn Tham khảo <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-secondary text-on-secondary relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
+<div class="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center gap-stack-lg">
+<h2 class="font-display-lg text-headline-lg uppercase">Truy cập Hành trình của Bạn</h2>
+<p class="font-body-lg text-body-lg text-secondary-fixed opacity-90">
+                Đăng nhập để xem lịch trình cá nhân, hoàn thiện Hồ sơ Sức khỏe và quản lý các buổi trị liệu đã đặt trước.
+            </p>
+<div class="bg-on-secondary-container/20 p-6 rounded-xl text-left w-full max-w-lg mt-4 border border-on-secondary/10">
+<p class="font-body-md text-body-md text-secondary-container mb-2 text-sm italic">
+                    Chúng tôi tôn trọng quyền riêng tư của bạn. Bạn có "Quyền được Xóa dữ liệu" và toàn quyền kiểm soát việc quản lý sự đồng ý ngay trong cổng thông tin.
+                </p>
+</div>
+<button class="mt-4 bg-surface text-secondary font-label-md text-label-md py-4 px-10 rounded hover:bg-surface-container transition-colors duration-300 uppercase tracking-widest">
+                Đi tới Cổng thông tin Khách hàng
+            </button>
+</div>
+</section>
+</main>
+<footer class="w-full px-margin-desktop py-section-gap flex flex-col md:flex-row justify-between items-start gap-gutter bg-sand-light border-t border-outline-variant/30">
+<div class="flex flex-col gap-stack-sm">
+<span class="font-display-lg text-2xl text-primary italic">
+            Xoai Aura Retreat
+        </span>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-sm text-sm">
+            © 2024 Xoai Aura Retreat. Tuân thủ Quy định Bảo vệ Dữ liệu Việt Nam.
+        </p>
+</div>
+<div class="flex flex-col md:flex-row gap-8 md:gap-16">
+<div class="flex flex-col gap-4">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-8 duration-300 uppercase tracking-widest" href="#">Liên hệ</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-8 duration-300 uppercase tracking-widest" href="#">Cổng thông tin Nhân viên</a>
+</div>
+<div class="flex flex-col gap-4">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-8 duration-300 uppercase tracking-widest" href="#">Chính sách Bảo mật</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-8 duration-300 uppercase tracking-widest" href="#">Phát triển Bền vững</a>
+</div>
+</div>
+</footer>
+<script>
+    window.addEventListener('scroll', function() {
+        const header = document.querySelector('header');
+        if (window.scrollY > 80) {
+            header.classList.add('navbar-scrolled');
+            header.classList.remove('py-6');
+            header.classList.add('py-4');
+        } else {
+            header.classList.remove('navbar-scrolled');
+            header.classList.add('py-6');
+            header.classList.remove('py-4');
+        }
+    });
+</script>
+</body></html>
