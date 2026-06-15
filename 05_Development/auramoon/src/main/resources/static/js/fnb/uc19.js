@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Load menu items from static data and filter for European dishes
-function loadAlacarteMenu() {
+async function loadAlacarteMenu() {
     const guestId = document.getElementById("input-guest-id").value;
     const bookingId = document.getElementById("input-booking-id").value;
 
@@ -16,22 +16,33 @@ function loadAlacarteMenu() {
         return;
     }
 
-    // Filter exactly the 50 European dishes from static menuData
-    const europeanDishes = (menuData || []).filter(item => 
-        item.ingredient && item.ingredient.toLowerCase().includes("europe")
-    );
+    try {
+        const response = await fetch("/api/v1/fnb/menu/all");
 
-    alacarteItems = europeanDishes.map(item => {
-        return {
-            ...item,
-            isAllergic: false
-        };
-    });
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.message || err.error || "Lỗi tải thực đơn gọi món ngoài");
+        }
 
-    cartItems = [];
-    renderMenu();
-    renderCartPanel();
-    showToast(`Tải ${alacarteItems.length} món A-La-Carte thành công`, "success");
+        const data = await response.json();
+
+        alacarteItems = data
+            .filter(item => item.ingredient && item.ingredient.toLowerCase().includes("europe"))
+            .slice(0, 50)
+            .map(item => ({
+                ...item,
+                isAllergic: false
+            }));
+
+        cartItems = [];
+        renderMenu();
+        renderCartPanel();
+
+        showToast(`Tải ${alacarteItems.length} món A-La-Carte thành công`, "success");
+    } catch (error) {
+        console.error("Load A-La-Carte menu error:", error);
+        showToast(error.message || "Lỗi tải thực đơn gọi món ngoài", "error");
+    }
 }
 
 
@@ -50,10 +61,10 @@ function renderMenu() {
         const cartItem = cartItems.find(i => i.id === item.id);
         const isSelected = !!cartItem;
         const isAllergic = item.isAllergic;
-        
+
         const card = document.createElement("article");
         card.className = `menu-card ${isAllergic ? 'allergic-card' : ''}`;
-        
+
         let buttonHtml = "";
         if (isAllergic) {
             buttonHtml = `
@@ -132,42 +143,62 @@ function removeFromCart(itemId) {
 
 // Render cart list
 function renderCartPanel() {
-    const listContainer = document.getElementById("cart-items-list");
-    const emptyMsg = document.getElementById("empty-cart-msg");
+    const cartList = document.getElementById("cart-items-list");
     const badge = document.getElementById("cart-badge");
 
-    listContainer.innerHTML = "";
-    badge.textContent = cartItems.reduce((acc, i) => acc + i.quantity, 0);
+    if (!cartList) {
+        console.error("Không tìm thấy element #cart-items-list");
+        return;
+    }
+
+    cartList.innerHTML = "";
+
+    if (badge) {
+        badge.textContent = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+    }
 
     if (cartItems.length === 0) {
-        listContainer.appendChild(emptyMsg);
+        cartList.innerHTML = `<p class="empty-cart-msg">Chưa chọn món nào</p>`;
         updateCostSummary(0);
         return;
     }
 
     cartItems.forEach(item => {
-        const fullItem = alacarteItems.find(i => i.id === item.id) || item;
+        const fullItem = allMenuItems.find(i => i.id === item.id) || item;
         const imageUrl = getMenuImageUrl(fullItem);
 
         const row = document.createElement("div");
         row.className = "cart-item";
+
         row.innerHTML = `
-            <img src="${imageUrl}" alt="${item.itemName}" class="cart-item-img" onerror="this.src='/images/fnb/menu/default-food.jpg'">
+            <img src="${imageUrl}"
+                 alt="${fullItem.itemName}"
+                 class="cart-item-img"
+                 onerror="this.src='/images/fnb/menu/default-food.jpg'">
+
             <div class="cart-item-details">
-                <div class="cart-item-name">${item.itemName}</div>
-                <div class="cart-item-price">${formatVND(item.price)}</div>
+                <div class="cart-item-name">${fullItem.itemName}</div>
+                <div class="cart-item-price">${formatVND(fullItem.price)}</div>
+
                 <div class="cart-item-qty-row">
-                    <button class="qty-btn" onclick="updateCartQuantity(${item.id}, -1)">-</button>
+                    <button type="button" class="qty-btn" onclick="updateCartItemQuantity(${item.id}, -1)">-</button>
                     <span>${item.quantity}</span>
-                    <button class="qty-btn" onclick="updateCartQuantity(${item.id}, 1)">+</button>
+                    <button type="button" class="qty-btn" onclick="updateCartItemQuantity(${item.id}, 1)">+</button>
                 </div>
             </div>
-            <button class="cart-item-remove" onclick="removeFromCart(${item.id})">Xóa</button>
+
+            <button type="button" class="cart-item-remove" onclick="removeCartItem(${item.id})">
+                Xóa
+            </button>
         `;
-        listContainer.appendChild(row);
+
+        cartList.appendChild(row);
     });
 
-    const subtotal = cartItems.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+    const subtotal = cartItems.reduce((acc, item) => {
+        return acc + Number(item.price || 0) * Number(item.quantity || 1);
+    }, 0);
+
     updateCostSummary(subtotal);
 }
 
@@ -211,25 +242,25 @@ function submitAlacarteOrder() {
         },
         body: JSON.stringify(requestBody)
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => {
-                throw new Error(err.error?.message || "Lỗi khi đặt món");
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        showToast("Đặt món A-La-Carte thành công!", "success");
-        cartItems = [];
-        renderMenu();
-        renderCartPanel();
-        document.getElementById("order-note").value = "";
-    })
-    .catch(err => {
-        console.error(err);
-        showToast(err.message, "error");
-    });
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.error?.message || "Lỗi khi đặt món");
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            showToast("Đặt món A-La-Carte thành công!", "success");
+            cartItems = [];
+            renderMenu();
+            renderCartPanel();
+            document.getElementById("order-note").value = "";
+        })
+        .catch(err => {
+            console.error(err);
+            showToast(err.message, "error");
+        });
 }
 
 // Helper: format number to VND currency
@@ -243,7 +274,7 @@ function showToast(message, type) {
     const toast = document.getElementById("toast-notification");
     toast.textContent = message;
     toast.className = `toast show ${type}`;
-    
+
     setTimeout(() => {
         toast.className = "toast";
     }, 3000);

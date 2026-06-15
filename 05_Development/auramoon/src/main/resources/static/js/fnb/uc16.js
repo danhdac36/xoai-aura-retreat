@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Load menu items from static data
-function loadPersonalizedMenu() {
+async function loadPersonalizedMenu() {
     const userEl = document.getElementById("input-user-id") || document.getElementById("input-guest-id");
     const guestId = userEl ? userEl.value : "";
     const bookingId = document.getElementById("input-booking-id").value;
@@ -18,13 +18,28 @@ function loadPersonalizedMenu() {
         return;
     }
 
-    // Read directly from static menuData
-    allMenuItems = menuData || [];
-    currentPage = 1;
-    renderMenu();
-    renderPagination();
-    renderSelectedPanel();
-    showToast("Tải thực đơn cá nhân thành công", "success");
+    try {
+        const response = await fetch(`/api/v1/fnb/menu?bookingId=${bookingId}&guestId=${guestId}`);
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.message || err.error || "Lỗi tải thực đơn");
+        }
+
+        allMenuItems = await response.json();
+
+        currentPage = 1;
+        selectedItems = [];
+
+        renderMenu();
+        renderPagination();
+        renderSelectedPanel();
+
+        showToast("Tải thực đơn cá nhân thành công", "success");
+    } catch (error) {
+        console.error("Load menu error:", error);
+        showToast(error.message || "Lỗi tải thực đơn", "error");
+    }
 }
 
 
@@ -130,15 +145,21 @@ function updateItemQuantity(itemId, delta) {
 // Render selected items sidebar list
 function renderSelectedPanel() {
     const listContainer = document.getElementById("selected-items-list");
-    const emptyMsg = document.getElementById("empty-cart-msg");
     const badge = document.getElementById("selected-badge");
+
+    if (!listContainer) {
+        console.error("Không tìm thấy #selected-items-list");
+        return;
+    }
 
     listContainer.innerHTML = "";
 
-    badge.textContent = selectedItems.reduce((acc, i) => acc + i.quantity, 0);
+    if (badge) {
+        badge.textContent = selectedItems.reduce((acc, i) => acc + i.quantity, 0);
+    }
 
     if (selectedItems.length === 0) {
-        listContainer.appendChild(emptyMsg);
+        listContainer.innerHTML = `<p class="empty-cart-msg">Chưa chọn món nào</p>`;
         updateCostSummary(0);
         return;
     }
