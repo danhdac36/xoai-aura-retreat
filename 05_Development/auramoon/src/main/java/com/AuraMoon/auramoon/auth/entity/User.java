@@ -61,4 +61,10 @@ public class User extends BaseEntity {
 
     @Column(name = "verify_token")
     private String verifyToken;
+
+    @Column(name = "booking_id")
+    private String bookingId;
+
+    @Column(name = "is_delete")
+    private Boolean isDelete;
 }
