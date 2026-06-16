@@ -1,4 +1,4 @@
-# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
+﻿# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
 
 # Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
@@ -22,22 +22,22 @@
 
 | Ngày      | Người thực hiện | Nội dung thay đổi                                                                      |
 | ---------- | ------------------- | ----------------------------------------------------------------------------------------- |
-| 2026-06-08 | AI Assistant        | Tạo tài liệu lần đầu cho UC22 - Process Final Payment                               |
-| 2026-06-09 | AI Assistant        | Refactor sang kiến trúc Spring Boot MVC (Controller trả về View)                      |
-| 2026-06-09 | AI Assistant        | Cập nhật cấu trúc Entity Payment ở phần 5.2 để khớp với mã nguồn thực tế    |
-| 2026-06-09 | AI Assistant        | Thiết kế lại luồng thanh toán VNPay thành quy trình 2 bước (Redirect & Callback) |
-| 2026-06-14 | AI Assistant        | Bổ sung AuditLog vào Class Diagram, Data Structure và Sequence Diagram (BR-15) |
-| 2026-06-14 | AI Assistant        | Bổ sung AuditLogRepository và AuditLogServiceImpl vào Class Diagram chuẩn kiến trúc |
-| 2026-06-14 | AI Assistant        | Đơn giản hóa AuditLogService thành Concrete Class để đồng bộ thiết kế với UC21 |
-| 2026-06-14 | AI Assistant        | Chuyển trách nhiệm gọi AuditLogService lên Controller để tránh lặp log (Phương án 1) |
-| 2026-06-14 | AI Assistant        | Cập nhật Pseudo-code Section 9.2 để minh bạch vị trí hàm ghi Log trong Controller |
-| 2026-06-14 | AI Assistant        | Bổ sung ghi log INITIATE_PAYMENT ở cả chiều đi VNPay theo yêu cầu Tech Lead |
-| 2026-06-14 | AI Assistant        | Bổ sung Sequence Diagram (Error Path) và State Machine Diagram vào Mục 6 theo chuẩn EDS |
-| 2026-06-14 | AI Assistant        | Bổ sung BR-19 Zero Balance Bypass (Nợ 0 đồng) vào Matrix, State Machine và Pseudo-code |
-| 2026-06-14 | AI Assistant        | Xóa Error Code mâu thuẫn, cập nhật Test Summary và Verification Sample cho BR-19 để đồng bộ nội bộ file |
-| 2026-06-14 | AI Assistant        | Bổ sung Sequence Diagram cho luồng Zero Balance Bypass (BR-19) vào Mục 6.2 |
-| 2026-06-14 | AI Assistant        | Cập nhật Deployment Checklist và Implementation Steps (Mục 11) cho BR-19 để hoàn tất rà soát toàn bộ file |
-| 2026-06-14 | AI Assistant        | Sửa đổi Bảng mã lỗi (Mục 10) về đúng chuẩn 5 cột của EDS_TEMPLATE_V2.0 |
+| 2026-06-08 | Phùng Giang Hải        | Tạo tài liệu lần đầu cho UC22 - Process Final Payment                               |
+| 2026-06-09 | Phùng Giang Hải        | Refactor sang kiến trúc Spring Boot MVC (Controller trả về View)                      |
+| 2026-06-09 | Phùng Giang Hải        | Cập nhật cấu trúc Entity Payment ở phần 5.2 để khớp với mã nguồn thực tế    |
+| 2026-06-09 | Phùng Giang Hải        | Thiết kế lại luồng thanh toán VNPay thành quy trình 2 bước (Redirect & Callback) |
+| 2026-06-14 | Phùng Giang Hải        | Bổ sung AuditLog vào Class Diagram, Data Structure và Sequence Diagram (BR-15) |
+| 2026-06-14 | Phùng Giang Hải        | Bổ sung AuditLogRepository và AuditLogServiceImpl vào Class Diagram chuẩn kiến trúc |
+| 2026-06-14 | Phùng Giang Hải        | Đơn giản hóa AuditLogService thành Concrete Class để đồng bộ thiết kế với UC21 |
+| 2026-06-14 | Phùng Giang Hải        | Chuyển trách nhiệm gọi AuditLogService lên Controller để tránh lặp log (Phương án 1) |
+| 2026-06-14 | Phùng Giang Hải        | Cập nhật Pseudo-code Section 9.2 để minh bạch vị trí hàm ghi Log trong Controller |
+| 2026-06-14 | Phùng Giang Hải        | Bổ sung ghi log INITIATE_PAYMENT ở cả chiều đi VNPay theo yêu cầu Tech Lead |
+| 2026-06-14 | Phùng Giang Hải        | Bổ sung Sequence Diagram (Error Path) và State Machine Diagram vào Mục 6 theo chuẩn EDS |
+| 2026-06-14 | Phùng Giang Hải        | Bổ sung BR-19 Zero Balance Bypass (Nợ 0 đồng) vào Matrix, State Machine và Pseudo-code |
+| 2026-06-14 | Phùng Giang Hải        | Xóa Error Code mâu thuẫn, cập nhật Test Summary và Verification Sample cho BR-19 để đồng bộ nội bộ file |
+| 2026-06-14 | Phùng Giang Hải        | Bổ sung Sequence Diagram cho luồng Zero Balance Bypass (BR-19) vào Mục 6.2 |
+| 2026-06-14 | Phùng Giang Hải        | Cập nhật Deployment Checklist và Implementation Steps (Mục 11) cho BR-19 để hoàn tất rà soát toàn bộ file |
+| 2026-06-14 | Phùng Giang Hải        | Sửa đổi Bảng mã lỗi (Mục 10) về đúng chuẩn 5 cột của EDS_TEMPLATE_V2.0 |
 
 # MỤC LỤC
 
@@ -87,7 +87,7 @@
 | Field              | Value                   |
 | ------------------ | ----------------------- |
 | **Status**   | Accepted                |
-| **Deciders** | AI Assistant, Team Lead |
+| **Deciders** | Phùng Giang Hải, Team Lead |
 | **Date**     | 2026-06-09              |
 
 **Bối cảnh (Context)**

@@ -37,4 +37,8 @@ public class GuestFolio extends BaseEntity {
 
     @Column(name = "status", length = 10)
     private String status;
+
+    public void setFolioId(Integer folioId) {
+        this.id = folioId;
+    }
 }

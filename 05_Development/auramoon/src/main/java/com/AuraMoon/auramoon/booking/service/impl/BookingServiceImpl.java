@@ -67,15 +67,6 @@ public class BookingServiceImpl implements BookingService {
 
         Booking savedBooking = bookingRepository.save(booking);
 
-        GuestFolio guestFolio = GuestFolio.builder()
-                .bookingId(savedBooking.getId())
-                .totalPackageAmount(savedBooking.getRetreatPackage().getPrice())
-                .totalExtraFb(BigDecimal.ZERO)
-                .finalAmount(savedBooking.getRetreatPackage().getPrice())
-                .status("PENDING")
-                .build();
-        guestFolioRepository.save(guestFolio);
-
         return BookingResponseDTO.builder()
                 .bookingId(savedBooking.getId())
                 .guestId(savedBooking.getGuestId())
@@ -98,6 +89,15 @@ public class BookingServiceImpl implements BookingService {
         booking.setBookingStatus("CONFIRMED");
         booking.setPaymentStatus("DEPOSITED");
         bookingRepository.save(booking);
+
+        GuestFolio guestFolio = GuestFolio.builder()
+                .bookingId(booking.getId())
+                .totalPackageAmount(booking.getRetreatPackage().getPrice())
+                .totalExtraFb(BigDecimal.ZERO)
+                .finalAmount(booking.getRetreatPackage().getPrice())
+                .status("OPEN")
+                .build();
+        guestFolioRepository.save(guestFolio);
     }
 }
 

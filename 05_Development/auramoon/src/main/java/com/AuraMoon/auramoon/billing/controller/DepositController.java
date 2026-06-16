@@ -2,6 +2,9 @@ package com.AuraMoon.auramoon.billing.controller;
 
 import com.AuraMoon.auramoon.billing.entity.GuestFolio;
 import com.AuraMoon.auramoon.billing.entity.Payment;
+import com.AuraMoon.auramoon.common.enums.PaymentTransactionStatus;
+import com.AuraMoon.auramoon.common.enums.PaymentMethod;
+import com.AuraMoon.auramoon.common.enums.PaymentGateway;
 import com.AuraMoon.auramoon.billing.repository.GuestFolioRepository;
 import com.AuraMoon.auramoon.billing.repository.PaymentRepository;
 import com.AuraMoon.auramoon.billing.service.VNPayService;
@@ -36,10 +39,10 @@ public class DepositController {
         Payment payment = Payment.builder()
                 .guestFolio(folio)
                 .amount(folio.getTotalPackageAmount())
-                .paymentMethod("VNPAY")
-                .paymentGateway("VNPAY")
+                .paymentMethod(PaymentMethod.BANK_TRANSFER.name())
+                .paymentGateway(PaymentGateway.VNPAY.name())
                 .paymentDate(LocalDateTime.now())
-                .status("PENDING")
+                .status(PaymentTransactionStatus.PENDING.name())
                 .build();
         payment = paymentRepository.save(payment);
 
@@ -67,7 +70,7 @@ public class DepositController {
                     .orElseThrow(() -> new RuntimeException("Payment not found"));
 
             if ("00".equals(params.get("vnp_ResponseCode"))) {
-                payment.setStatus("SUCCESS");
+                payment.setStatus(PaymentTransactionStatus.SUCCESS.name());
                 payment.setTransactionCode(params.get("vnp_TransactionNo"));
                 payment.setPaymentDate(LocalDateTime.now());
                 paymentRepository.save(payment);
@@ -77,7 +80,7 @@ public class DepositController {
                 
                 return "redirect:/booking/success?bookingId=" + bookingId;
             } else {
-                payment.setStatus("FAILED");
+                payment.setStatus(PaymentTransactionStatus.FAILED.name());
                 payment.setPaymentDate(LocalDateTime.now());
                 paymentRepository.save(payment);
                 

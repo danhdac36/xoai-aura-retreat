@@ -16,13 +16,13 @@ CREATE TABLE [USER] (
     email VARCHAR(50) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     full_name NVARCHAR(50),
-    gender VARCHAR(6) CHECK (gender IN ('MALE', 'FEMALE', 'OTHER')),
+    gender VARCHAR(6),
     date_of_birth DATE,
     phone VARCHAR(20),
     Identify_code VARCHAR(255),
     avatar VARCHAR(MAX),
     last_update DATETIME DEFAULT GETDATE(),
-    status VARCHAR(10) CHECK (status IN ('ACTIVE', 'INACTIVE', 'BANNED')),
+    status VARCHAR(10),
     created_at DATETIME DEFAULT GETDATE(),
     last_login DATETIME,
     verify_token VARCHAR(255),
@@ -35,7 +35,7 @@ CREATE TABLE [USER] (
 CREATE TABLE THERAPIST (
     therapist_id INT PRIMARY KEY,
     therapist_code VARCHAR(6) NOT NULL UNIQUE,
-    status VARCHAR(10) CHECK (status IN ('AVAILABLE', 'BUSY', 'OFF_DUTY')),
+    status VARCHAR(10),
     CONSTRAINT FK_THERAPIST_USER FOREIGN KEY (therapist_id) REFERENCES [USER](user_id)
 );
 
@@ -87,7 +87,7 @@ CREATE TABLE TREATMENT_ROOM (
     room_code VARCHAR(10) NOT NULL UNIQUE,
     image VARCHAR(MAX),
     room_name NVARCHAR(50),
-    status VARCHAR(20) CHECK (status IN ('AVAILABLE', 'OCCUPIED', 'MAINTENANCE')),
+    status VARCHAR(20),
     is_delete BIT DEFAULT 0
 );
 
@@ -106,8 +106,8 @@ CREATE TABLE VILLA (
     villa_type INT NOT NULL,
     villa_code VARCHAR(10) NOT NULL UNIQUE,
     limit_person INT,
-    villa_status VARCHAR(20) CHECK (villa_status IN ('AVAILABLE', 'OCCUPIED', 'MAINTENANCE')),
-    cleaning_status VARCHAR(10) CHECK (cleaning_status IN ('CLEAN', 'DIRTY', 'CLEANING')),
+    villa_status VARCHAR(20),
+    cleaning_status VARCHAR(10),
     is_delete BIT DEFAULT 0,
     CONSTRAINT FK_VILLA_TYPE FOREIGN KEY (villa_type) REFERENCES VILLA_TYPE(type_id)
 );
@@ -138,8 +138,8 @@ CREATE TABLE BOOKING (
     total_guests INT,
     create_at DATETIME DEFAULT GETDATE(),
     update_at DATETIME DEFAULT GETDATE(),
-    booking_status VARCHAR(20) CHECK (booking_status IN ('PENDING', 'CONFIRMED', 'CHECKED_IN', 'CHECKED_OUT', 'CANCELLED')),
-    payment_status VARCHAR(20) CHECK (payment_status IN ('UNPAID', 'PARTIAL', 'PAID', 'REFUNDED')),
+    booking_status VARCHAR(20),
+    payment_status VARCHAR(20),
     is_delete BIT DEFAULT 0,
     CONSTRAINT FK_BOOKING_GUEST FOREIGN KEY (guest_id) REFERENCES [USER](user_id),
     CONSTRAINT FK_BOOKING_PACKAGE FOREIGN KEY (package_id) REFERENCES RETREAT_PACKAGE(package_id),
@@ -153,7 +153,7 @@ CREATE TABLE GUEST_FOLIO (
     total_package_amout DECIMAL(18, 2),
     total_extra_fb DECIMAL(18, 2),
     final_amount DECIMAL(18, 2),
-    status VARCHAR(10) CHECK (status IN ('OPEN', 'CLOSED')),
+    status VARCHAR(10),
     is_delete BIT DEFAULT 0,
     create_at DATETIME DEFAULT GETDATE(),
     update_at DATETIME DEFAULT GETDATE(),
@@ -167,7 +167,7 @@ CREATE TABLE TREATMENT_BOOKING (
     folio_id INT,
     service_id INT NOT NULL,
     note NVARCHAR(MAX),
-    status VARCHAR(20) CHECK (status IN ('PENDING', 'SCHEDULED', 'COMPLETED', 'CANCELLED')),
+    status VARCHAR(20),
     is_delete BIT DEFAULT 0,
     create_at DATETIME DEFAULT GETDATE(),
     update_at DATETIME DEFAULT GETDATE(),
@@ -210,7 +210,7 @@ CREATE TABLE MEAL_ORDER (
     ordered_by INT,
     place_order VARCHAR(100),
     note NVARCHAR(MAX),
-    order_status VARCHAR(20) CHECK (order_status IN ('PENDING', 'PREPARING', 'DELIVERED', 'CANCELLED')),
+    order_status VARCHAR(20),
     CONSTRAINT FK_MEAL_BOOKING FOREIGN KEY (booking_id) REFERENCES BOOKING(booking_id),
 );
 
@@ -235,7 +235,7 @@ CREATE TABLE FOLIO_ITEM (
     amount DECIMAL(18, 2),
     create_at DATETIME DEFAULT GETDATE(),
     create_by INT,
-    status VARCHAR(10) CHECK (status IN ('UNPAID', 'PAID', 'VOIDED')),
+    status VARCHAR(10),
     CONSTRAINT FK_FOLIO_ITEM_REF FOREIGN KEY (folio_id) REFERENCES GUEST_FOLIO(folio_id)
 );
 
@@ -253,11 +253,11 @@ CREATE TABLE PAYMENT (
     payment_id INT IDENTITY(1,1) PRIMARY KEY,
     folio_id INT,
     amount DECIMAL(18, 2),
-    payment_method VARCHAR(20) CHECK (payment_method IN ('CASH', 'CREDIT_CARD', 'BANK_TRANSFER')),
-    payment_gateway VARCHAR(20) CHECK (payment_gateway IN ('VNPAY', 'MOMO', 'DIRECT')),
+    payment_method VARCHAR(20),
+    payment_gateway VARCHAR(20),
     transaction_code VARCHAR(100),
     payment_date DATETIME DEFAULT GETDATE(),
-    status VARCHAR(10) CHECK (status IN ('PENDING', 'SUCCESS', 'FAILED')),
+    status VARCHAR(10),
     CONSTRAINT FK_PAYMENT_FOLIO FOREIGN KEY (folio_id) REFERENCES GUEST_FOLIO(folio_id)
 );
 

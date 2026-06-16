@@ -100,3 +100,23 @@ Dưới đây là **Báo cáo phân tích** và **Kế hoạch đồng bộ tr�
   - `PENDING` (Đang chờ xử lý)
   - `SUCCESS` (Thanh toán thành công)
   - `FAILED` (Thanh toán thất bại)
+
+## 4. Danh sách Chuẩn hóa các Loại/Hành động (Type/Action/Category)
+
+Để nhất quán, các trường phân loại này cũng sẽ tuân thủ định dạng **UPPER_SNAKE_CASE** (Tất cả viết HOA). Tuy nhiên không đưa vào file `DB.sql` dưới dạng CHECK constraints để linh hoạt mở rộng trong tương lai.
+
+### Bảng `AUDIT_LOG`
+- **action_type** (`VARCHAR(50)`): Hành động được gọi từ hệ thống (ví dụ: `AuditLogService`).
+  - `VIEW_INVOICE` (Mở xem hóa đơn tổng / trang checkout)
+  - `INITIATE_PAYMENT` (Bắt đầu gọi API thanh toán)
+  - `COMPLETE_PAYMENT` (Thanh toán thành công)
+  - `PAYMENT_FAILED` (Thanh toán thất bại)
+  - `CHECKOUT_COMPLETE` (Hoàn tất thủ tục check-out)
+  - `NIGHT_AUDIT_MANUAL` (Quản lý chạy chốt sổ thủ công qua giao diện)
+  - `NIGHT_AUDIT_AUTO` (Hệ thống tự động chạy chốt sổ lúc nửa đêm)
+
+### Bảng `FOLIO_ITEM` (Chi tiết các hạng mục phát sinh)
+- **service_category** (`NVARCHAR(50)`): Dịch vụ phát sinh thuộc loại nào (Spa, Ăn uống, Khác).
+  - `SPA` (Dịch vụ Spa/Trị liệu phát sinh)
+  - `F_AND_B` (Food & Beverage - Dịch vụ ăn uống phát sinh)
+  - `OTHER` (Dịch vụ khác)

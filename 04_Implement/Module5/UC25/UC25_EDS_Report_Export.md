@@ -1,4 +1,4 @@
-# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
+﻿# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
 
 # Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
@@ -22,8 +22,8 @@
 
 | Ngày      | Người thực hiện | Nội dung thay đổi                                 |
 | ---------- | ------------------- | ---------------------------------------------------- |
-| 2026-06-13 | Sinh viên 5        | Tạo tài liệu EDS lần đầu — UC25 Export Report |
-| 2026-06-14 | AI Assistant        | Chuẩn hóa Bảng mã lỗi (Mục 10) về chuẩn 5 cột, bảo toàn dữ liệu MVC |
+| 2026-06-13 | Phùng Giang Hải        | Tạo tài liệu EDS lần đầu — UC25 Export Report |
+| 2026-06-14 | Phùng Giang Hải        | Chuẩn hóa Bảng mã lỗi (Mục 10) về chuẩn 5 cột, bảo toàn dữ liệu MVC |
 
 # MỤC LỤC
 
@@ -72,7 +72,7 @@
 | Field              | Value                   |
 | ------------------ | ----------------------- |
 | **Status**   | Accepted                |
-| **Deciders** | Sinh viên 5, Tech Lead |
+| **Deciders** | Phùng Giang Hải, Tech Lead |
 | **Date**     | 2026-06-13              |
 
 **Bối cảnh (Context)**

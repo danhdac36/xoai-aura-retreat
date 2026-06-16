@@ -1,4 +1,4 @@
-package com.AuraMoon.auramoon.config;
+package com.AuraMoon.auramoon.common.config;
 
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.springframework.context.annotation.Bean;
