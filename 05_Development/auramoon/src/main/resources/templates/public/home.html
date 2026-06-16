@@ -1,24 +1,32 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/public-layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/public-layout}">
+
 <head>
     <th:block layout:fragment="styles">
         <link rel="stylesheet" th:href="@{/css/public/home.css}">
     </th:block>
 </head>
+
 <body>
     <div layout:fragment="content">
         <main>
             <section class="relative h-screen w-full flex items-center justify-center">
                 <div class="absolute inset-0 z-0">
-                    <img alt="Hero background" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBChE7XIMMydv5XGqWxr5iBJ5JsOtEUJEEULyjVTIc8_hAuf2SCyjIjZtTyesYTzdHj3OF2M8NQi35FXghXhIjg-k-TKQfprd97WyZyFJ2EneO74ooUH-dyDdEFq2AADoUN-ne2TtDfVymzBZH761RyecunBjzB-93Brdl2b_dOb-mEUWMe85OTOwjohA1QQBh_UA0IS7Vo9a6jxc1UK6p1Mm5ON8Weq57VUvVlSpjiDhw4ZUKOAk2jIRPxS3DXEr78vHSyW9CAx1w">
+                    <img alt="Hero background" class="w-full h-full object-cover"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBChE7XIMMydv5XGqWxr5iBJ5JsOtEUJEEULyjVTIc8_hAuf2SCyjIjZtTyesYTzdHj3OF2M8NQi35FXghXhIjg-k-TKQfprd97WyZyFJ2EneO74ooUH-dyDdEFq2AADoUN-ne2TtDfVymzBZH761RyecunBjzB-93Brdl2b_dOb-mEUWMe85OTOwjohA1QQBh_UA0IS7Vo9a6jxc1UK6p1Mm5ON8Weq57VUvVlSpjiDhw4ZUKOAk2jIRPxS3DXEr78vHSyW9CAx1w">
                     <div class="absolute inset-0 hero-overlay"></div>
                 </div>
-                <div class="relative z-10 text-center px-margin-mobile md:px-margin-desktop max-w-4xl mx-auto flex flex-col items-center gap-stack-lg">
-                    <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-white drop-shadow-md">XOAI AURA</h1>
+                <div
+                    class="relative z-10 text-center px-margin-mobile md:px-margin-desktop max-w-4xl mx-auto flex flex-col items-center gap-stack-lg">
+                    <h1
+                        class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-white drop-shadow-md">
+                        XOAI AURA</h1>
                     <p class="font-body-lg text-body-lg text-white/90 max-w-2xl">
                         Hành trình cá nhân hóa để Chữa lành &amp; Tái tạo năng lượng
                     </p>
-                    <a th:href="@{/wellness}" class="mt-stack-sm bg-secondary text-on-secondary font-label-md text-label-md py-4 px-10 rounded hover:bg-on-secondary-container transition-colors duration-300 uppercase tracking-widest inline-block">
+                    <a th:href="@{/wellness}"
+                        class="mt-stack-sm bg-secondary text-on-secondary font-label-md text-label-md py-4 px-10 rounded hover:bg-on-secondary-container transition-colors duration-300 uppercase tracking-widest inline-block">
                         Khám phá các Gói Nghỉ dưỡng
                     </a>
                 </div>
@@ -28,62 +36,82 @@
                     <h2 class="font-headline-lg text-headline-lg text-primary">Triết lý Sống khỏe của Chúng tôi</h2>
                     <div class="w-12 h-0.5 bg-outline-variant mx-auto mb-stack-sm"></div>
                     <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                        Sự quản lý khách sạn truyền thống đang được thay thế bằng các nền tảng tích hợp nhằm cá nhân hóa các Gói Nghỉ dưỡng và lịch trình Spa phức tạp, đảm bảo sự tinh gọn về dữ liệu. Chúng tôi ưu tiên một môi trường tĩnh lặng, nơi hành trình của bạn được nâng niu với sự tôn trọng tối đa dành cho quyền riêng tư và sự an lạc của chính bạn.
+                        Sự quản lý khách sạn truyền thống đang được thay thế bằng các nền tảng tích hợp nhằm cá nhân hóa
+                        các Gói Nghỉ dưỡng và lịch trình Spa phức tạp, đảm bảo sự tinh gọn về dữ liệu. Chúng tôi ưu tiên
+                        một môi trường tĩnh lặng, nơi hành trình của bạn được nâng niu với sự tôn trọng tối đa dành cho
+                        quyền riêng tư và sự an lạc của chính bạn.
                     </p>
                 </div>
             </section>
             <section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-earth-beige">
                 <div class="max-w-7xl mx-auto">
                     <div class="text-center mb-16">
-                        <h2 class="font-headline-lg text-headline-lg text-primary mb-stack-md">Các Gói Nghỉ dưỡng Tiêu biểu</h2>
-                        <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">Những trải nghiệm được thiết kế riêng biệt để lập lại sự cân bằng cho tâm trí, cơ thể và tâm hồn.</p>
+                        <h2 class="font-headline-lg text-headline-lg text-primary mb-stack-md">Các Gói Nghỉ dưỡng Tiêu
+                            biểu</h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">Những trải nghiệm
+                            được thiết kế riêng biệt để lập lại sự cân bằng cho tâm trí, cơ thể và tâm hồn.</p>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-                        <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div
+                            class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                             <div class="h-64 overflow-hidden relative">
                                 <div class="absolute inset-0 bg-[#e3d5ca]/10 z-10"></div>
-                                <img alt="Thanh lọc cơ thể" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyWUpE_Uv9AV95WL4p6cQ0z6Eol8kl9tBxnlFWZr-vghd-4jixZHz_-XAmPEA7QVW57pI4nUSMjQNCmY-rdaeH2cHQnePf3UwKSbPw9SgF_hrLQ6pkrGVE6yX8fudMXaglq_VyhGbh6HIiPRItzRNHL7BZe2xBNKVuVTkf0I_I_INnNbJ_-o8rPKrQeCBSI_uvcTS5GAaGdCjgFLRr7hR2FvsP50nfeQz2YJvXeGlZKazuzgBh7NhNe343zNw0iJS4ZoL1FppqIqo">
+                                <img alt="Thanh lọc cơ thể" class="w-full h-full object-cover"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyWUpE_Uv9AV95WL4p6cQ0z6Eol8kl9tBxnlFWZr-vghd-4jixZHz_-XAmPEA7QVW57pI4nUSMjQNCmY-rdaeH2cHQnePf3UwKSbPw9SgF_hrLQ6pkrGVE6yX8fudMXaglq_VyhGbh6HIiPRItzRNHL7BZe2xBNKVuVTkf0I_I_INnNbJ_-o8rPKrQeCBSI_uvcTS5GAaGdCjgFLRr7hR2FvsP50nfeQz2YJvXeGlZKazuzgBh7NhNe343zNw0iJS4ZoL1FppqIqo">
                             </div>
                             <div class="p-8 flex flex-col flex-grow">
-                                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4">Hành trình Detox 3 Ngày</h3>
+                                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4">Hành trình Detox 3
+                                    Ngày</h3>
                                 <p class="font-body-md text-body-md text-on-surface-variant flex-grow mb-8">
-                                    Kết hợp các loại nước ép thanh lọc, yoga và thiền định. Khởi động lại hệ thống cơ thể trong không gian yên bình.
+                                    Kết hợp các loại nước ép thanh lọc, yoga và thiền định. Khởi động lại hệ thống cơ
+                                    thể trong không gian yên bình.
                                 </p>
-                                <button class="bg-transparent border border-secondary text-secondary font-label-md text-label-md py-2.5 px-6 rounded hover:bg-secondary hover:text-on-secondary transition-colors self-start uppercase tracking-widest">
+                                <button
+                                    class="bg-transparent border border-secondary text-secondary font-label-md text-label-md py-2.5 px-6 rounded hover:bg-secondary hover:text-on-secondary transition-colors self-start uppercase tracking-widest">
                                     Xem Chi tiết
                                 </button>
                             </div>
                         </div>
-                        <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div
+                            class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                             <div class="h-64 overflow-hidden relative">
                                 <div class="absolute inset-0 bg-[#e3d5ca]/10 z-10"></div>
-                                <div class="w-full h-full bg-surface-container-high flex items-center justify-center text-outline-variant">
+                                <div
+                                    class="w-full h-full bg-surface-container-high flex items-center justify-center text-outline-variant">
                                     <span class="material-symbols-outlined text-5xl">self_improvement</span>
                                 </div>
                             </div>
                             <div class="p-8 flex flex-col flex-grow">
-                                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4">Kỳ nghỉ Yoga 5 Ngày</h3>
+                                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4">Kỳ nghỉ Yoga 5 Ngày
+                                </h3>
                                 <p class="font-body-md text-body-md text-on-surface-variant flex-grow mb-8">
-                                    Trải nghiệm yoga giữa rừng sâu, thực đơn dinh dưỡng chuyên biệt và liệu trình spa hàng ngày. Kết nối sâu sắc với thiên nhiên.
+                                    Trải nghiệm yoga giữa rừng sâu, thực đơn dinh dưỡng chuyên biệt và liệu trình spa
+                                    hàng ngày. Kết nối sâu sắc với thiên nhiên.
                                 </p>
-                                <button class="bg-transparent border border-secondary text-secondary font-label-md text-label-md py-2.5 px-6 rounded hover:bg-secondary hover:text-on-secondary transition-colors self-start uppercase tracking-widest">
+                                <button
+                                    class="bg-transparent border border-secondary text-secondary font-label-md text-label-md py-2.5 px-6 rounded hover:bg-secondary hover:text-on-secondary transition-colors self-start uppercase tracking-widest">
                                     Xem Chi tiết
                                 </button>
                             </div>
                         </div>
-                        <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <div
+                            class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300">
                             <div class="h-64 overflow-hidden relative">
                                 <div class="absolute inset-0 bg-[#e3d5ca]/10 z-10"></div>
-                                <div class="w-full h-full bg-surface-container-high flex items-center justify-center text-outline-variant">
+                                <div
+                                    class="w-full h-full bg-surface-container-high flex items-center justify-center text-outline-variant">
                                     <span class="material-symbols-outlined text-5xl">spa</span>
                                 </div>
                             </div>
                             <div class="p-8 flex flex-col flex-grow">
-                                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4">Chữa lành Hào quang</h3>
+                                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-4">Chữa lành Hào quang
+                                </h3>
                                 <p class="font-body-md text-body-md text-on-surface-variant flex-grow mb-8">
-                                    Các buổi trị liệu chuyên sâu, dinh dưỡng cá nhân hóa và phòng nghỉ sang trọng cho hành trình chữa lành toàn diện.
+                                    Các buổi trị liệu chuyên sâu, dinh dưỡng cá nhân hóa và phòng nghỉ sang trọng cho
+                                    hành trình chữa lành toàn diện.
                                 </p>
-                                <button class="bg-transparent border border-secondary text-secondary font-label-md text-label-md py-2.5 px-6 rounded hover:bg-secondary hover:text-on-secondary transition-colors self-start uppercase tracking-widest">
+                                <button
+                                    class="bg-transparent border border-secondary text-secondary font-label-md text-label-md py-2.5 px-6 rounded hover:bg-secondary hover:text-on-secondary transition-colors self-start uppercase tracking-widest">
                                     Xem Chi tiết
                                 </button>
                             </div>
@@ -95,14 +123,19 @@
                 <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16 md:gap-24">
                     <div class="w-full md:w-1/2 relative">
                         <div class="absolute inset-0 bg-earth-beige/20 z-10 rounded-xl pointer-events-none"></div>
-                        <img alt="Liệu trình Aura Spa" class="w-full h-[500px] object-cover rounded-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5UX8cH_d1A6dk-z5-7xLMUcQYPjmUMnqyq6G0-ZSBEc0VLYGVoD6uBdBVj3T2qW1Jx_p-3J03N-2B-YF2tyfHabV_OLC8zaqjRf_pzCVYmO6G5xapAacjmN5gQ-EEk9Y9r1xgliPbsz2O-M9Kyvvpv_nohOJCv620v3klgBLp74A8qcee59GpSU86V6rSbLqWa6kYDNqEmxcqE9WJ4XjCPT9HZWMOrjNLockgLQpfqzJ1duPZvUPJi9MWA23d1_wiYXI789y3vn4">
+                        <img alt="Liệu trình Aura Spa" class="w-full h-[500px] object-cover rounded-xl"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5UX8cH_d1A6dk-z5-7xLMUcQYPjmUMnqyq6G0-ZSBEc0VLYGVoD6uBdBVj3T2qW1Jx_p-3J03N-2B-YF2tyfHabV_OLC8zaqjRf_pzCVYmO6G5xapAacjmN5gQ-EEk9Y9r1xgliPbsz2O-M9Kyvvpv_nohOJCv620v3klgBLp74A8qcee59GpSU86V6rSbLqWa6kYDNqEmxcqE9WJ4XjCPT9HZWMOrjNLockgLQpfqzJ1duPZvUPJi9MWA23d1_wiYXI789y3vn4">
                     </div>
                     <div class="w-full md:w-1/2 flex flex-col items-start gap-stack-md">
                         <h2 class="font-headline-lg text-headline-lg text-primary">Aura Spa &amp; Trị liệu</h2>
                         <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">
-                            Khám phá thánh đường của sự tĩnh lặng, nơi truyền thống chữa lành cổ xưa hòa quyện cùng các phương pháp chăm sóc sức khỏe hiện đại. Các chuyên gia trị liệu của chúng tôi sử dụng các sản phẩm tự nhiên từ địa phương để trẻ hóa cơ thể và tâm trí, mang đến những liệu trình được thiết kế riêng cho nhu cầu của bạn.
+                            Khám phá thánh đường của sự tĩnh lặng, nơi truyền thống chữa lành cổ xưa hòa quyện cùng các
+                            phương pháp chăm sóc sức khỏe hiện đại. Các chuyên gia trị liệu của chúng tôi sử dụng các
+                            sản phẩm tự nhiên từ địa phương để trẻ hóa cơ thể và tâm trí, mang đến những liệu trình được
+                            thiết kế riêng cho nhu cầu của bạn.
                         </p>
-                        <a th:href="@{/spa}" class="text-secondary font-label-md text-label-md flex items-center gap-2 hover:opacity-80 transition-opacity underline underline-offset-8 decoration-outline-variant uppercase tracking-widest">
+                        <a th:href="@{/spa}"
+                            class="text-secondary font-label-md text-label-md flex items-center gap-2 hover:opacity-80 transition-opacity underline underline-offset-8 decoration-outline-variant uppercase tracking-widest">
                             Xem Tất cả Liệu trình <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         </a>
                     </div>
@@ -112,32 +145,43 @@
                 <div class="max-w-7xl mx-auto flex flex-col md:flex-row-reverse items-center gap-16 md:gap-24">
                     <div class="w-full md:w-1/2 relative">
                         <div class="absolute inset-0 bg-earth-beige/20 z-10 rounded-xl pointer-events-none"></div>
-                        <img alt="Ẩm thực Dinh dưỡng" class="w-full h-[500px] object-cover rounded-xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlE2-wAOLKa3_tUsp1a_xpeNJ7PDSWvH---lo74n4hwtDCavzgkqi3x59kUSvfqycql_WAFqRFseGv6DaiQ972ExMrj4__Lr2Z71kD7IZoovpvx3lfLPeYGXvr9qfpIuJ0kTwgKHX7NZKax85mCIoML4U8UNZz0VElwYQqZomKyUd56ktf_LgT9ZAo8emL3PeQO_4N17ufyWP-rBJOIRSRir8oDp90WLq-xz2J1XadYd8Xi2OV9mZrp2f5ACW4p25d3v42-Rlz3lU">
+                        <img alt="Ẩm thực Dinh dưỡng" class="w-full h-[500px] object-cover rounded-xl"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlE2-wAOLKa3_tUsp1a_xpeNJ7PDSWvH---lo74n4hwtDCavzgkqi3x59kUSvfqycql_WAFqRFseGv6DaiQ972ExMrj4__Lr2Z71kD7IZoovpvx3lfLPeYGXvr9qfpIuJ0kTwgKHX7NZKax85mCIoML4U8UNZz0VElwYQqZomKyUd56ktf_LgT9ZAo8emL3PeQO_4N17ufyWP-rBJOIRSRir8oDp90WLq-xz2J1XadYd8Xi2OV9mZrp2f5ACW4p25d3v42-Rlz3lU">
                     </div>
                     <div class="w-full md:w-1/2 flex flex-col items-start gap-stack-md">
                         <h2 class="font-headline-lg text-headline-lg text-primary">Ẩm thực Dinh dưỡng</h2>
                         <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">
-                            Dinh dưỡng là cốt lõi của hành trình chữa lành. Chúng tôi cung cấp các kế hoạch bữa ăn được chọn lọc kỹ lưuỡng dựa trên hồ sơ dị ứng và chế độ ăn uống của bạn, đảm bảo mọi món ăn đều hỗ trợ mục tiêu nghỉ dưỡng trong khi vẫn bảo mật tuyệt đối lịch sử y tế khỏi đội ngũ bếp.
+                            Dinh dưỡng là cốt lõi của hành trình chữa lành. Chúng tôi cung cấp các kế hoạch bữa ăn được
+                            chọn lọc kỹ lưuỡng dựa trên hồ sơ dị ứng và chế độ ăn uống của bạn, đảm bảo mọi món ăn đều
+                            hỗ trợ mục tiêu nghỉ dưỡng trong khi vẫn bảo mật tuyệt đối lịch sử y tế khỏi đội ngũ bếp.
                         </p>
-                        <a th:href="@{/culinary}" class="text-secondary font-label-md text-label-md flex items-center gap-2 hover:opacity-80 transition-opacity underline underline-offset-8 decoration-outline-variant uppercase tracking-widest">
+                        <a th:href="@{/culinary}"
+                            class="text-secondary font-label-md text-label-md flex items-center gap-2 hover:opacity-80 transition-opacity underline underline-offset-8 decoration-outline-variant uppercase tracking-widest">
                             Xem Thực đơn Tham khảo <span class="material-symbols-outlined text-sm">arrow_forward</span>
                         </a>
                     </div>
                 </div>
             </section>
-            <section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-secondary text-on-secondary relative overflow-hidden">
-                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]"></div>
+            <section
+                class="py-section-gap px-margin-mobile md:px-margin-desktop bg-secondary text-on-secondary relative overflow-hidden">
+                <div
+                    class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]">
+                </div>
                 <div class="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center gap-stack-lg">
                     <h2 class="font-headline-lg text-headline-lg">Truy cập Hành trình của Bạn</h2>
                     <p class="font-body-lg text-body-lg text-secondary-fixed opacity-90">
-                        Đăng nhập để xem lịch trình cá nhân, hoàn thiện Hồ sơ Sức khỏe và quản lý các buổi trị liệu đã đặt trước.
+                        Đăng nhập để xem lịch trình cá nhân, hoàn thiện Hồ sơ Sức khỏe và quản lý các buổi trị liệu đã
+                        đặt trước.
                     </p>
-                    <div class="bg-on-secondary-container/20 p-6 rounded-xl text-left w-full max-w-lg mt-4 border border-on-secondary/10">
+                    <div
+                        class="bg-on-secondary-container/20 p-6 rounded-xl text-left w-full max-w-lg mt-4 border border-on-secondary/10">
                         <p class="font-body-md text-body-md text-secondary-container mb-2 text-sm italic">
-                            Chúng tôi tôn trọng quyền riêng tư của bạn. Bạn có "Quyền được Xóa dữ liệu" và toàn quyền kiểm soát việc quản lý sự đồng ý ngay trong cổng thông tin.
+                            Chúng tôi tôn trọng quyền riêng tư của bạn. Bạn có "Quyền được Xóa dữ liệu" và toàn quyền
+                            kiểm soát việc quản lý sự đồng ý ngay trong cổng thông tin.
                         </p>
                     </div>
-                    <a th:href="@{/login}" class="mt-4 bg-surface text-secondary font-label-md text-label-md py-4 px-10 rounded hover:bg-surface-container transition-colors duration-300 uppercase tracking-widest inline-block">
+                    <a th:href="@{/login}"
+                        class="mt-4 bg-surface text-secondary font-label-md text-label-md py-4 px-10 rounded hover:bg-surface-container transition-colors duration-300 uppercase tracking-widest inline-block">
                         Đi tới Cổng thông tin Khách hàng
                     </a>
                 </div>
@@ -148,4 +192,5 @@
         <script th:src="@{/js/public/home.js}"></script>
     </th:block>
 </body>
+
 </html>

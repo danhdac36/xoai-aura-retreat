@@ -53,11 +53,11 @@ public class SpaScheduleController {
         // 1. Kiểm tra session xem ai đang đăng nhập (chống IDOR)
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
-            userId = 2;
+            userId = 6;
             session.setAttribute("userId", userId);
 
             com.AuraMoon.auramoon.auth.entity.User currentUser = new com.AuraMoon.auramoon.auth.entity.User();
-            currentUser.setId(1);
+            currentUser.setId(6);
             currentUser.setFullName("Fake Guest");
             session.setAttribute("currentUser", currentUser);
         }
@@ -100,11 +100,11 @@ public class SpaScheduleController {
             // 1. Bắt buộc đăng nhập
             Integer userId = (Integer) session.getAttribute("userId");
             if (userId == null) {
-                userId = 2;
+                userId = 6;
                 session.setAttribute("userId", userId);
 
                 com.AuraMoon.auramoon.auth.entity.User currentUser = new com.AuraMoon.auramoon.auth.entity.User();
-                currentUser.setId(2);
+                currentUser.setId(6);
                 currentUser.setFullName("Fake Guest");
                 session.setAttribute("currentUser", currentUser);
             }

@@ -1,4 +1,4 @@
-# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
+﻿# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
 
 # Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
@@ -23,7 +23,7 @@
 | Ngày      | Người thực hiện | Nội dung thay đổi                              |
 | ---------- | ------------------- | ------------------------------------------------- |
 | 2026-06-09 | AI Agent            | Tạo tài liệu lần đầu theo template EDS v2.0 |
-| 2026-06-14 | AI Assistant        | Đồng bộ mã yêu cầu với SRS (BR-13, UC23), bổ sung Error Path & State Machine, mở rộng quy trình triển khai theo template V2.0 |
+| 2026-06-14 | Phùng Giang Hải        | Đồng bộ mã yêu cầu với SRS (BR-13, UC23), bổ sung Error Path & State Machine, mở rộng quy trình triển khai theo template V2.0 |
 
 # MỤC LỤC
 

@@ -30,12 +30,6 @@ public class TherapistScheduleController {
         // 1. Get therapist code from session
         String therapistCode = (String) session.getAttribute("therapistCode");
 
-        // Fake dữ liệu nếu session trống để chạy thử nghiệm
-        if (therapistCode == null || therapistCode.trim().isEmpty()) {
-            therapistCode = "NV002";
-            session.setAttribute("therapistCode", therapistCode);
-        }
-
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
             return "redirect:/login";
         }
@@ -70,12 +64,6 @@ public class TherapistScheduleController {
             RedirectAttributes redirectAttributes) {
 
         String therapistCode = (String) session.getAttribute("therapistCode");
-
-        // Fake dữ liệu nếu session trống để chạy thử nghiệm
-        if (therapistCode == null || therapistCode.trim().isEmpty()) {
-            therapistCode = "NV002";
-            session.setAttribute("therapistCode", therapistCode);
-        }
 
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
             return "redirect:/login";
