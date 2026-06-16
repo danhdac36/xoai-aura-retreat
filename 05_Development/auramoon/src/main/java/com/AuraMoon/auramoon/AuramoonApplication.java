@@ -3,6 +3,7 @@ package com.AuraMoon.auramoon;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.security.core.Authentication;
 
 @SpringBootApplication
 @EnableJpaAuditing

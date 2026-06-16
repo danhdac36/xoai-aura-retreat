@@ -26,24 +26,16 @@ public class SecurityConfig {
             "/auth/forgot-password",
             "/auth/login-admin",
             "/auth/verify-email",
-            "/spa",
-            "/wellness",
-            "/culinary",
-            "/villas",
             "/css/**",
             "/js/**",
-            "/images/**",
-            "/webjars/**",
-            "/error",
-            "/"
+            "/images/**"
     };
 
     private static final String[] GUEST_ENDPOINTS = {
             "/user/**",
             "/orders/**",
             "/cart/**",
-            "/profile/**",
-            "/packages/**"
+            "/profile/**"
     };
 
     private static final String[] ADMIN_ENDPOINTS = {
