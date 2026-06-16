@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::div})}">
+<head>
+    <title>Báo cáo Hiệu suất &amp; Xuất dữ liệu</title>
+</head>
+<body>
+    <div class="w-full">
+        <!-- Load specific report css -->
+        <link rel="stylesheet" th:href="@{/css/billing/report.css}">
+        
+        <div class="max-w-7xl mx-auto">
+            <!-- Page Header -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-stack-lg gap-4">
+                <div>
+                    <h2 class="font-headline-lg text-headline-lg text-on-background mb-2">Báo cáo Hiệu suất &amp; Xuất dữ liệu</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+                        Theo dõi và phân tích các chỉ số vận hành quan trọng của khu nghỉ dưỡng. Tạo báo cáo tùy chỉnh và xuất dữ liệu để phục vụ công tác quản lý chiến lược.
+                    </p>
+                </div>
+                <div class="flex gap-3">
+                    <a th:href="@{/manager/report/export(startDate=${startDate},endDate=${endDate},type=${type})}" class="flex items-center gap-2 px-6 py-2.5 bg-surface-container-lowest border border-outline text-primary rounded font-label-md text-label-md hover:bg-surface-container-low transition-all">
+                        <span class="material-symbols-outlined text-[18px]">file_download</span>
+                        Xuất Excel
+                    </a>
+                </div>
+            </div>
+
+            <!-- Toolbar / Filters -->
+            <div class="bg-surface-container-lowest border border-outline-variant p-stack-lg rounded mb-gutter">
+                <form action="/manager/report" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Data Type -->
+                    <div class="space-y-2">
+                        <label class="font-label-md text-label-md text-on-surface-variant">Loại báo cáo</label>
+                        <select name="type" class="w-full aura-input py-3 px-4 font-body-md text-body-md rounded-t bg-surface-container-low">
+                            <option value="ALL" th:selected="${type == 'ALL'}">Tất cả báo cáo</option>
+                            <option value="OCCUPANCY" th:selected="${type == 'OCCUPANCY'}">Tỷ lệ lấp đầy Villa</option>
+                            <option value="UTILIZATION" th:selected="${type == 'UTILIZATION'}">Hiệu suất Dịch vụ Spa</option>
+                        </select>
+                    </div>
+                    <!-- Start Date -->
+                    <div class="space-y-2">
+                        <label class="font-label-md text-label-md text-on-surface-variant">Từ ngày</label>
+                        <input type="date" name="startDate" th:value="${startDate}" class="w-full aura-input py-3 px-4 font-body-md text-body-md rounded-t bg-surface-container-low">
+                    </div>
+                    <!-- End Date -->
+                    <div class="space-y-2">
+                        <label class="font-label-md text-label-md text-on-surface-variant">Đến ngày</label>
+                        <input type="date" name="endDate" th:value="${endDate}" class="w-full aura-input py-3 px-4 font-body-md text-body-md rounded-t bg-surface-container-low">
+                    </div>
+                    <!-- CTA -->
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full py-3 bg-primary text-on-primary font-label-md text-label-md rounded flex items-center justify-center gap-2 hover:brightness-110 transition-colors">
+                            <span class="material-symbols-outlined">refresh</span>
+                            Cập nhật báo cáo
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Dashboard Bento Grid Logic -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-gutter">
+                <!-- KPI Card 2 -->
+                <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded relative overflow-hidden group">
+                    <div class="relative z-10">
+                        <p class="font-label-md text-label-md text-on-surface-variant mb-1">Trung bình Tỷ lệ lấp đầy Villa</p>
+                        <h3 class="font-headline-sm text-headline-sm text-primary mb-4" th:text="${#numbers.formatDecimal(data.avgOccupancyRate, 0, 1)} + '%'">84.2%</h3>
+                    </div>
+                    <div class="absolute right-[-20px] bottom-[-20px] opacity-5 group-hover:opacity-10 transition-opacity">
+                        <span class="material-symbols-outlined text-[120px]">villa</span>
+                    </div>
+                </div>
+                <!-- KPI Card 3 -->
+                <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded relative overflow-hidden group">
+                    <div class="relative z-10">
+                        <p class="font-label-md text-label-md text-on-surface-variant mb-1">Trung bình Hiệu suất Chuyên viên Spa</p>
+                        <h3 class="font-headline-sm text-headline-sm text-primary mb-4" th:text="${#numbers.formatDecimal(data.avgUtilizationRate, 0, 1)} + '%'">64.2%</h3>
+                    </div>
+                    <div class="absolute right-[-20px] bottom-[-20px] opacity-5 group-hover:opacity-10 transition-opacity">
+                        <span class="material-symbols-outlined text-[120px]">spa</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Table Section -->
+            <div class="bg-surface-container-lowest border border-outline-variant rounded overflow-hidden shadow-sm">
+                <div class="px-8 py-6 border-b border-outline-variant flex justify-between items-center">
+                    <h3 class="font-headline-sm text-headline-sm text-primary">Dữ liệu chi tiết</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-surface-container-low">
+                            <tr>
+                                <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Ngày / Đối tượng</th>
+                                <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Chỉ số</th>
+                                <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Giá trị thực tế</th>
+                                <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Tỷ lệ</th>
+                                <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-outline-variant">
+                            <!-- Occupancy Rows -->
+                            <tr th:each="row : ${data.occupancyRows}" class="hover:bg-surface-bright transition-colors">
+                                <td class="px-8 py-5 font-body-md text-body-md text-on-surface" th:text="${row.date}">15/10/2023</td>
+                                <td class="px-8 py-5 font-body-md text-body-md text-on-surface">Tỷ lệ lấp đầy Villa</td>
+                                <td class="px-10 py-5 font-body-md text-body-md text-on-surface font-semibold" th:text="${row.occupiedVillas} + ' / ' + ${row.totalVillas}"></td>
+                                <td class="px-8 py-5 font-body-md text-body-md text-on-surface-variant" th:text="${#numbers.formatDecimal(row.occupancyRate, 0, 1)} + '%'"></td>
+                                <td class="px-8 py-5">
+                                    <span class="px-3 py-1 bg-tertiary-container text-on-tertiary-container rounded-full text-[12px] font-bold uppercase tracking-tight">Cập nhật</span>
+                                </td>
+                            </tr>
+                            <!-- Utilization Rows -->
+                            <tr th:each="row : ${data.utilizationRows}" class="hover:bg-surface-bright transition-colors">
+                                <td class="px-8 py-5 font-body-md text-body-md text-on-surface" th:text="${row.therapistName}">Chuyên viên A</td>
+                                <td class="px-8 py-5 font-body-md text-body-md text-on-surface">Hiệu suất Spa</td>
+                                <td class="px-10 py-5 font-body-md text-body-md text-on-surface font-semibold" th:text="${row.completedSessions} + ' / ' + ${row.totalSessions}"></td>
+                                <td class="px-8 py-5 font-body-md text-body-md text-on-surface-variant" th:text="${#numbers.formatDecimal(row.utilizationRate, 0, 1)} + '%'"></td>
+                                <td class="px-8 py-5">
+                                    <span class="px-3 py-1 bg-tertiary-container text-on-tertiary-container rounded-full text-[12px] font-bold uppercase tracking-tight">Cập nhật</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(data.occupancyRows) and #lists.isEmpty(data.utilizationRows)}">
+                                <td colspan="5" class="px-8 py-5 text-center text-on-surface-variant">Không có dữ liệu trong khoảng thời gian này</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Space for breathing room -->
+            <div class="h-20"></div>
+        </div>
+
+        <!-- Load JS -->
+        <script th:src="@{/js/billing/report.js}"></script>
+    </div>
+</body>
+</html>

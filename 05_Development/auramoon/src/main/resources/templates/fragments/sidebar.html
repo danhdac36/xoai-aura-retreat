@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <aside th:fragment="sidebar"
+        class="h-screen w-64 fixed left-0 top-0 bg-surface-container-low border-r border-outline-variant flex flex-col py-stack-lg z-50">
+        <div class="px-6 mb-10">
+            <h1 class="font-headline-sm text-headline-sm text-primary">Xoai Aura</h1>
+            <p class="font-label-md text-label-md text-on-surface-variant opacity-70">Luxury Wellness Retreat</p>
+        </div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/home}">
+                <span class="material-symbols-outlined" data-icon="home">home</span>
+                <span class="font-label-md text-label-md">Home</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/manager/dashboard}">
+                <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                <span class="font-label-md text-label-md">Dashboard (Admin)</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/manager/report}">
+                <span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+                <span class="font-label-md text-label-md">Report Export</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/packages}">
+                <span class="material-symbols-outlined" data-icon="package">package_2</span>
+                <span class="font-label-md text-label-md">Retreat Package</span>
+            </a>
+            <!-- Spa Schedule (SpaScheduleController) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/booking-spa}">
+                <span class="material-symbols-outlined" data-icon="calendar">calendar_month</span>
+                <span class="font-label-md text-label-md">Spa Booking</span>
+            </a>
+            <!-- Spa Receptionist Booking (SpaReceptionistController) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/booking-spa/manual}">
+                <span class="material-symbols-outlined" data-icon="receipt">receipt_long</span>
+                <span class="font-label-md text-label-md">Spa Receptionist</span>
+            </a>
+            <!-- Therapist Daily (TherapistScheduleController) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/therapist/schedules/daily}">
+                <span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+                <span class="font-label-md text-label-md">Therapist Daily</span>
+            </a>
+        </nav>
+    </aside>
+</body>
+
+</html>

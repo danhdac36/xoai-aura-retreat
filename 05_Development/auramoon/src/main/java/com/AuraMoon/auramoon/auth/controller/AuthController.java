@@ -44,10 +44,19 @@ public class AuthController {
         }
 
         try {
+<<<<<<< HEAD:05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/controller/AuthController.java
+            userService.registerUser(registerDto);
+            logger.info("User registered successfully: " + registerDto.getEmail());
+            model.addAttribute("success", "Đăng ký thành công!");
+            return "redirect:/login";
+        } catch (Exception e) {
+            logger.warning("Registration error: " + e.getMessage());
+=======
             authService.register(registrationDto);
             model.addAttribute("successMessage", "Link kích hoạt đã được gửi vào hòm thư của bạn. Vui lòng kiểm tra email.");
             return "auth/register-success";
         } catch (IllegalArgumentException e) {
+>>>>>>> NMNGocc:auramoon/src/main/java/com/AuraMoon/auramoon/auth/controller/AuthController.java
             model.addAttribute("error", e.getMessage());
             return "auth/registration";
         } catch (Exception e) {

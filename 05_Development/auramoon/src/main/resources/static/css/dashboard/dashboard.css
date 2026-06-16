@@ -1,0 +1,13 @@
+.chart-bar {
+    transition: height 1s ease-in-out;
+}
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #c8c7be;
+    border-radius: 10px;
+}

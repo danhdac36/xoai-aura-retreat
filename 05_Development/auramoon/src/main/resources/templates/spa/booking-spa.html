@@ -1,0 +1,594 @@
+<!DOCTYPE html><html class="light" lang="vi"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Đặt lịch Trị liệu Spa | Aura Wellness</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#1b1c1c",
+                        "primary-fixed-dim": "#c9c6c2",
+                        "surface-dim": "#dcd9d9",
+                        "outline-variant": "#c8c7be",
+                        "secondary-container": "#d7e5bb",
+                        "secondary-fixed-dim": "#becca3",
+                        "on-surface-variant": "#474741",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#f0eded",
+                        "on-tertiary-fixed-variant": "#284f2a",
+                        "on-primary-fixed": "#1c1c19",
+                        "primary-fixed": "#e5e2dd",
+                        "inverse-primary": "#c9c6c2",
+                        "tertiary": "#406840",
+                        "surface": "#fbf9f8",
+                        "secondary": "#566342",
+                        "on-primary-container": "#6f6e6a",
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-fixed-variant": "#3f4b2c",
+                        "surface-tint": "#5f5e5b",
+                        "surface-container-low": "#f6f3f2",
+                        "on-secondary-container": "#5a6745",
+                        "background": "#fbf9f8",
+                        "surface-bright": "#fbf9f8",
+                        "surface-container-highest": "#e4e2e1",
+                        "outline": "#787770",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#d1ffcb",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#f5f2ed",
+                        "surface-variant": "#e4e2e1",
+                        "secondary-fixed": "#dae8be",
+                        "on-tertiary-fixed": "#002106",
+                        "on-secondary-fixed": "#141f05",
+                        "on-tertiary-container": "#4f784f",
+                        "on-surface": "#1b1c1c",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#474743",
+                        "inverse-on-surface": "#f3f0f0",
+                        "primary": "#5f5e5b",
+                        "tertiary-fixed-dim": "#a5d2a2",
+                        "inverse-surface": "#303030",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#c1eebc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "section-gap": "120px",
+                        "margin-mobile": "20px",
+                        "stack-md": "16px",
+                        "margin-desktop": "80px",
+                        "stack-sm": "8px",
+                        "stack-lg": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Playfair Display"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
+                        "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .calendar-day-active {
+            background-color: #566342;
+            color: white;
+        }
+        .time-slot-active {
+            border-color: #566342;
+            background-color: #f5f2ed;
+        }
+        
+        /* Toast Notification Styles */
+        #toast {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            transform: translateY(100%);
+            opacity: 0;
+            z-index: 1000;
+        }
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* New Animations for UI Lively feel */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes kenBurns {
+            0% { transform: scale(1.0); }
+            100% { transform: scale(1.05); }
+        }
+        .bg-animated-image {
+            position: fixed;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            background-image: url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            z-index: -2;
+            animation: kenBurns 30s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(252, 251, 249, 0.8), rgba(252, 251, 249, 0.95));
+            z-index: -1;
+            pointer-events: none;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-blob {
+            animation: blob 15s infinite alternate;
+        }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="text-on-surface relative overflow-x-hidden min-h-screen">
+<!-- Animated Photo Background -->
+<div class="bg-animated-image"></div>
+<div class="bg-overlay"></div>
+
+<!-- Decorative background blurs for lively UI -->
+<div class="fixed top-0 left-0 w-96 h-96 bg-[#869273]/20 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob pointer-events-none z-[-1]"></div>
+<div class="fixed top-0 right-0 w-96 h-96 bg-[#c5c1b6]/40 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-2000 pointer-events-none z-[-1]"></div>
+<div class="fixed -bottom-32 left-20 w-96 h-96 bg-[#869273]/30 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-4000 pointer-events-none z-[-1]"></div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg font-label-md text-white pointer-events-none">
+    <span class="material-symbols-outlined" id="toastIcon">info</span>
+    <span id="toastMessage">Message</span>
+</div>
+
+<main class="max-w-[1440px] mx-auto px-margin-desktop py-12 relative">
+<!-- Back Button -->
+<div class="absolute left-margin-desktop top-12">
+    <a href="#" onclick="history.back(); return false;" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md group">
+        <span class="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
+        Quay lại
+    </a>
+</div>
+
+<!-- Header Section -->
+<section class="mb-16 text-center max-w-2xl mx-auto animate-fade-in-up opacity-0 relative z-10">
+<h1 class="font-headline-lg text-headline-lg mb-4 text-primary">Đặt lịch Trị liệu Spa</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Trải nghiệm sự tĩnh lặng và tái tạo năng lượng trong không gian thiền định của Aura Wellness.</p>
+</section>
+<!-- Booking Interface -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<!-- Left: Service Summary & Calendar -->
+<div class="lg:col-span-7 glass-panel p-stack-lg rounded-2xl animate-fade-in-up delay-100 opacity-0 relative z-10 transition-transform duration-500 hover:-translate-y-1">
+<!-- Service Summary -->
+<div class="mb-10 flex items-center gap-stack-md p-stack-md bg-primary-container rounded-lg">
+<div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Close up of a relaxing Swedish massage session with warm aromatic oils being applied to a person's back in a soft-lit, luxurious spa environment. The scene is bathed in tranquil sage green and earth beige tones, reflecting the high-end minimalist design system of Aura Wellness. The atmosphere is deeply serene, sophisticated, and focused on physical rejuvenation and mental clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEnP2E6FcAgC7aG1hKKpRuxPGOMzETt-Ss_4Bcw9F5TV6u67NsotMt9oTTEPHtTnBRBvO2uCK_X3TEpWtqtBeHq8_bIJ3cCd6wcwVHf8qPAp2M3ihml7xn4aGmuDFuNiekExyp9hDUxewVlGagt-wAmv5xjJ_QsWPFLvs658JcTWOl2otwHuJ9bsYE6y_6v2jrKunBHDLxGqX6wcjnTv5oCssZ5Tm9MDTXMgXn7cULOnnu0pzKBUJYAReExWCE7SctjHCOYu4-NJ4">
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-primary-fixed-variant">Dịch vụ đã chọn</h3>
+<p id="ui-service-name" class="font-headline-sm text-headline-sm text-primary">Đang tải dữ liệu...</p>
+<p id="ui-service-price" class="font-body-md text-body-md text-on-surface-variant">Vui lòng đợi...</p>
+</div>
+</div>
+<h3 class="font-label-md text-label-md mb-6 uppercase tracking-wider text-outline">1. Chọn ngày</h3>
+<!-- Calendar (Interactive Placeholder) -->
+<div class="bg-white/80 rounded-xl p-6 border border-white/50 shadow-sm backdrop-blur-sm">
+<div class="flex justify-between items-center mb-8 px-2">
+<span id="calendar-month-year" class="font-headline-sm text-headline-sm">Tháng 6, 2024</span>
+<div class="flex gap-4">
+<button id="prev-month-btn" class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2 rounded hover:bg-surface-container-low">chevron_left</button>
+<button id="next-month-btn" class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2 rounded hover:bg-surface-container-low">chevron_right</button>
+</div>
+</div>
+<div class="grid grid-cols-7 text-center mb-4">
+<div class="font-label-md text-label-md text-outline py-2">T2</div>
+<div class="font-label-md text-label-md text-outline py-2">T3</div>
+<div class="font-label-md text-label-md text-outline py-2">T4</div>
+<div class="font-label-md text-label-md text-outline py-2">T5</div>
+<div class="font-label-md text-label-md text-outline py-2">T6</div>
+<div class="font-label-md text-label-md text-outline py-2">T7</div>
+<div class="font-label-md text-label-md text-outline py-2">CN</div>
+</div>
+<div class="grid grid-cols-7 gap-y-2 text-center" id="calendar-grid">
+    <!-- Rendered dynamically by JS -->
+</div>
+</div>
+</div>
+<!-- Right: Time Slots & Confirmation -->
+<div class="lg:col-span-5 flex flex-col gap-gutter">
+<div class="glass-panel p-stack-lg rounded-2xl animate-fade-in-up delay-200 opacity-0 relative z-10 transition-transform duration-500 hover:-translate-y-1">
+<h3 class="font-label-md text-label-md mb-4 uppercase tracking-wider text-outline">2. Chọn giờ</h3>
+<div class="flex gap-2 mb-6 bg-surface-container-low p-1 rounded-lg">
+    <button id="tab-morning" class="flex-1 py-2 text-label-md font-label-md rounded-md transition-colors bg-white shadow-sm text-primary" onclick="switchTimeTab('morning')">Sáng</button>
+    <button id="tab-afternoon" class="flex-1 py-2 text-label-md font-label-md rounded-md transition-colors text-outline-variant hover:text-primary" onclick="switchTimeTab('afternoon')">Chiều</button>
+    <button id="tab-evening" class="flex-1 py-2 text-label-md font-label-md rounded-md transition-colors text-outline-variant hover:text-primary" onclick="switchTimeTab('evening')">Tối</button>
+</div>
+<div id="time-slots-container" class="relative min-h-[200px]">
+    <div class="grid grid-cols-2 gap-4" id="time-slots-morning"></div>
+    <div class="grid grid-cols-2 gap-4 hidden" id="time-slots-afternoon"></div>
+    <div class="grid grid-cols-2 gap-4 hidden" id="time-slots-evening"></div>
+    <p id="time-slots-loading" class="text-center text-outline-variant py-4">Đang tải khung giờ...</p>
+</div>
+</div>
+<div class="glass-panel p-stack-lg rounded-2xl animate-fade-in-up delay-300 opacity-0 relative z-10 transition-transform duration-500 hover:-translate-y-1">
+<h3 class="font-label-md text-label-md mb-6 uppercase tracking-wider text-outline">Tóm tắt đặt lịch</h3>
+<div class="space-y-4 mb-6">
+<div class="flex justify-between items-center">
+<span class="font-body-md text-on-surface-variant">Ngày:</span>
+<span class="font-label-md text-label-md" id="summary-date">20 Tháng 6, 2024</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-on-surface-variant">Thời gian:</span>
+<span class="font-label-md text-label-md"><span id="summary-time">10:00</span> (60 phút)</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-on-surface-variant">Phòng:</span>
+<span class="font-label-md text-label-md">Sẽ được sắp xếp</span>
+</div>
+</div>
+
+<div class="mb-8">
+    <label for="note" class="block font-body-md text-on-surface-variant mb-2">Ghi chú cho Spa (Tuỳ chọn)</label>
+    <textarea id="note" rows="2" class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 font-body-md text-on-surface focus:outline-none focus:border-secondary transition-colors" placeholder="Vd: Tôi muốn massage nhẹ nhàng..."></textarea>
+</div>
+
+<button id="submitBtn" class="w-full bg-secondary text-on-secondary py-4 rounded-lg font-label-md text-label-md hover:scale-[0.99] transition-transform shadow-lg flex items-center justify-center gap-2">
+    Xác nhận đặt lịch
+    <svg id="loadingSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+</button>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Data variables
+        const todayReal = new Date();
+        const yy = todayReal.getFullYear();
+        const mm = String(todayReal.getMonth() + 1).padStart(2, '0');
+        const dd = String(todayReal.getDate()).padStart(2, '0');
+        const todayStr = `${yy}-${mm}-${dd}`;
+
+        let selectedDate = todayStr;
+        let selectedTime = "10:00";
+        let activeTimeTab = 'morning';
+        let currentBookingId = null;
+        let currentServiceId = null;
+        let serviceDuration = 60;
+
+        // Fetch Package Data from Backend on Load
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch('/booking-spa/active-package');
+                const data = await res.json();
+                
+                if (res.ok) {
+                    currentBookingId = data.bookingId;
+                    currentServiceId = data.serviceId;
+                    serviceDuration = data.durationMinutes || 60;
+                    
+                    document.getElementById('ui-service-name').innerText = `${data.serviceName} - ${data.durationMinutes} phút`;
+                    document.getElementById('ui-service-price').innerText = data.priceInfo;
+                    
+                    // Update summary
+                    document.getElementById('summary-time').innerHTML = `<span id="summary-time-val">10:00</span> (${data.durationMinutes} phút)`;
+                    
+                    // Now fetch available slots for the default date
+                    fetchAvailableSlots(selectedDate);
+                } else {
+                    document.getElementById('ui-service-name').innerText = "Chưa có dữ liệu";
+                    document.getElementById('ui-service-price').innerText = data.error || "Không tìm thấy gói nào.";
+                    document.getElementById('summary-time').innerHTML = "Chưa xác định";
+                    document.getElementById('time-slots-loading').innerHTML = `<span class="text-error">${data.error || "Không tải được khung giờ"}</span>`;
+                }
+            } catch (error) {
+                console.error("Failed to load active package", error);
+                document.getElementById('ui-service-name').innerText = "Lỗi kết nối Backend";
+                document.getElementById('ui-service-price').innerText = "Không thể tải dịch vụ";
+            }
+        });
+
+        // Dynamic Calendar Logic
+        let displayDate = new Date();
+
+        function renderCalendar() {
+            const year = displayDate.getFullYear();
+            const month = displayDate.getMonth();
+            
+            document.getElementById('calendar-month-year').innerText = `Tháng ${month + 1}, ${year}`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            // Adjust so Monday is 0, Sunday is 6
+            let startOffset = firstDay - 1;
+            if (startOffset === -1) startOffset = 6;
+            
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            
+            // Previous month padding
+            for (let i = startOffset - 1; i >= 0; i--) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'py-4 text-outline-variant opacity-30';
+                dayDiv.innerText = daysInPrevMonth - i;
+                grid.appendChild(dayDiv);
+            }
+            
+            // Current month days
+            for (let i = 1; i <= daysInMonth; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'py-4 font-body-md rounded-lg hover:bg-surface-container-low transition-colors';
+                btn.innerText = i;
+                
+                // Format the date string YYYY-MM-DD
+                const currentDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                
+                if (currentDateStr === selectedDate) {
+                    btn.classList.add('calendar-day-active');
+                }
+                
+                // Allow selecting only current or future dates
+                if (currentDateStr < todayStr) {
+                    btn.classList.add('opacity-30', 'cursor-not-allowed', 'pointer-events-none');
+                } else {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('#calendar-grid button').forEach(b => b.classList.remove('calendar-day-active'));
+                        btn.classList.add('calendar-day-active');
+                        
+                        selectedDate = currentDateStr;
+                        document.getElementById('summary-date').innerText = `${i} Tháng ${month + 1}, ${year}`;
+                        
+                        fetchAvailableSlots(selectedDate);
+                    });
+                }
+                
+                grid.appendChild(btn);
+            }
+        }
+
+        document.getElementById('prev-month-btn').addEventListener('click', () => {
+            displayDate.setMonth(displayDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        document.getElementById('next-month-btn').addEventListener('click', () => {
+            displayDate.setMonth(displayDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        // Initial render
+        renderCalendar();
+
+        function switchTimeTab(tab) {
+            activeTimeTab = tab;
+            ['morning', 'afternoon', 'evening'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const grid = document.getElementById(`time-slots-${t}`);
+                if(t === tab) {
+                    btn.classList.add('bg-white', 'shadow-sm', 'text-primary');
+                    btn.classList.remove('text-outline-variant', 'hover:text-primary');
+                    grid.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('bg-white', 'shadow-sm', 'text-primary');
+                    btn.classList.add('text-outline-variant', 'hover:text-primary');
+                    grid.classList.add('hidden');
+                }
+            });
+        }
+
+        async function fetchAvailableSlots(dateStr) {
+            document.getElementById('time-slots-loading').classList.remove('hidden');
+            document.getElementById('time-slots-morning').innerHTML = '';
+            document.getElementById('time-slots-afternoon').innerHTML = '';
+            document.getElementById('time-slots-evening').innerHTML = '';
+            
+            try {
+                const response = await fetch(`/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const availableTimes = await response.json();
+                
+                const allTimesMorning = ["09:00", "10:00", "11:00", "12:00"];
+                const allTimesAfternoon = ["14:00", "15:00", "16:00", "17:00", "18:00"];
+                const allTimesEvening = ["19:00", "20:00", "21:00"];
+                
+                document.getElementById('time-slots-loading').classList.add('hidden');
+                
+                const renderGroup = (times, containerId, label) => {
+                    const container = document.getElementById(containerId);
+                    container.innerHTML = '';
+                    times.forEach(time => {
+                        const isAvailable = availableTimes.includes(time);
+                        const btn = document.createElement('button');
+                        if (isAvailable) {
+                            btn.className = 'flex flex-col items-center justify-center py-6 border border-outline-variant rounded-lg transition-all hover:bg-secondary-container/20 group';
+                            btn.innerHTML = `
+                                <span class="font-headline-sm text-headline-sm text-primary group-hover:text-secondary">${time}</span>
+                                <span class="font-label-md text-label-md text-outline">${label}</span>
+                            `;
+                            btn.onclick = () => selectTime(btn, time);
+                        } else {
+                            btn.className = 'flex flex-col items-center justify-center py-6 border border-outline-variant rounded-lg opacity-40 cursor-not-allowed bg-surface-container';
+                            btn.innerHTML = `
+                                <span class="font-headline-sm text-headline-sm text-outline">${time}</span>
+                                <span class="font-label-md text-label-md text-outline">Hết chỗ</span>
+                            `;
+                        }
+                        container.appendChild(btn);
+                    });
+                };
+                
+                renderGroup(allTimesMorning, 'time-slots-morning', 'Sáng');
+                renderGroup(allTimesAfternoon, 'time-slots-afternoon', 'Chiều');
+                renderGroup(allTimesEvening, 'time-slots-evening', 'Tối');
+                
+                // Automatically select the first available if current is invalid
+                if (availableTimes.length > 0 && !availableTimes.includes(selectedTime)) {
+                    selectTime(document.querySelector('#time-slots-container button:not(.cursor-not-allowed)'), availableTimes[0]);
+                } else if (availableTimes.includes(selectedTime)) {
+                    const btn = Array.from(document.querySelectorAll('#time-slots-container button')).find(b => b.querySelector('span').innerText === selectedTime);
+                    if(btn) selectTime(btn, selectedTime);
+                } else {
+                    selectedTime = null;
+                    if(document.getElementById('summary-time-val')) document.getElementById('summary-time-val').innerText = "Hết chỗ";
+                }
+                
+            } catch(e) {
+                document.getElementById('time-slots-loading').innerHTML = '<span class="text-error">Lỗi tải dữ liệu</span>';
+                document.getElementById('time-slots-loading').classList.remove('hidden');
+            }
+        }
+
+        function selectTime(btn, time) {
+            document.querySelectorAll('#time-slots-container button').forEach(b => {
+                b.classList.remove('time-slot-active');
+                if(!b.classList.contains('cursor-not-allowed')) {
+                    b.querySelector('span:first-child').classList.remove('text-secondary');
+                    b.querySelector('span:first-child').classList.add('text-primary');
+                }
+            });
+            btn.classList.add('time-slot-active');
+            btn.querySelector('span:first-child').classList.remove('text-primary');
+            btn.querySelector('span:first-child').classList.add('text-secondary');
+            
+            selectedTime = time;
+            if(document.getElementById('summary-time-val')) {
+                document.getElementById('summary-time-val').innerText = selectedTime;
+            } else {
+                document.getElementById('summary-time').innerText = selectedTime;
+            }
+        }
+
+        // API Fetch Integration
+        const submitBtn = document.getElementById('submitBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        const toastIcon = document.getElementById('toastIcon');
+        let toastTimeout;
+
+        function showToast(message, type) {
+            clearTimeout(toastTimeout);
+            toastMessage.textContent = message;
+            
+            toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg font-label-md text-white pointer-events-none transition-all duration-300';
+            
+            if(type === 'success') {
+                toast.classList.add('bg-secondary');
+                toastIcon.textContent = 'check_circle';
+            } else {
+                toast.classList.add('bg-error');
+                toastIcon.textContent = 'error';
+            }
+            
+            // Force reflow
+            void toast.offsetWidth;
+            toast.classList.add('show');
+
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        submitBtn.addEventListener('click', async () => {
+            if (!currentBookingId || !currentServiceId) {
+                showToast('Chưa tải được thông tin gói từ Backend', 'error');
+                return;
+            }
+            if (!selectedTime) {
+                showToast('Vui lòng chọn một khung giờ hợp lệ', 'error');
+                return;
+            }
+
+            const payload = {
+                bookingId: currentBookingId, // Fetched from Backend
+                serviceId: currentServiceId, // Fetched from Backend
+                startTime: `${selectedDate}T${selectedTime}:00`,
+                note: document.getElementById('note').value
+            };
+
+            // Loading state
+            submitBtn.disabled = true;
+            loadingSpinner.classList.remove('hidden');
+
+            try {
+                const response = await fetch('/booking-spa', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok || response.status === 201) {
+                    showToast('Đã đặt lịch Spa thành công!', 'success');
+                } else {
+                    const errorMsg = data.error?.message || 'Có lỗi xảy ra khi đặt lịch.';
+                    showToast(errorMsg, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Lỗi kết nối máy chủ.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                loadingSpinner.classList.add('hidden');
+            }
+        });
+    </script>
+</body></html>
