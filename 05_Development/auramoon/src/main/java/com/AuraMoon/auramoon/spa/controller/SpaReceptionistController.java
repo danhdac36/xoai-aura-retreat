@@ -39,15 +39,12 @@ public class SpaReceptionistController {
 
     @GetMapping("/manual")
     public String showManualBookingPage(HttpSession session, Model model) {
-        // Kiểm tra phân quyền sơ bộ (chỉ RECEPTIONIST và ADMIN được truy cập)
         String role = (String) session.getAttribute("role");
-
         if (role == null || (!"RECEPTIONIST".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role))) {
-            return "redirect:/login"; // hoặc trang báo lỗi 403
+            return "redirect:/login";
         }
 
-        // Load danh sách các dịch vụ Spa khả dụng
-
+        model.addAttribute("services", treatmentServiceRepository.findByIsAvailableTrueAndIsDeleteFalse());
         return "spa/receptionist-booking";
     }
 
@@ -58,6 +55,7 @@ public class SpaReceptionistController {
         if (role == null || (!"RECEPTIONIST".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role))) {
             return ResponseEntity.status(403).build();
         }
+
         return ResponseEntity.ok(spaBookingRepository.findCheckedInBookingsWithGuestDetails());
     }
 
@@ -73,7 +71,8 @@ public class SpaReceptionistController {
         String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
 
-        if (role == null || userId == null || (!"RECEPTIONIST".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role))) {
+        if (role == null || userId == null
+                || (!"RECEPTIONIST".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role))) {
             redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền thực hiện hành động này.");
             return "redirect:/login";
         }
