@@ -1,16 +1,13 @@
 package com.AuraMoon.auramoon.spa.controller;
 
-// 1. Thư viện chuẩn của Java (Mặc định xếp đầu)
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-// 2. Thư viện Jakarta/Javax
 import jakarta.servlet.http.HttpSession;
 
-// 3. Thư viện Spring Framework
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-// 4. Thư viện nội bộ của dự án (Auramoon)
 import com.AuraMoon.auramoon.spa.dto.SpaScheduleRequest;
 import com.AuraMoon.auramoon.spa.dto.SpaScheduleResponse;
 import com.AuraMoon.auramoon.spa.entity.TreatmentBooking;
@@ -50,20 +46,13 @@ public class SpaScheduleController {
     @GetMapping("/active-package")
     @ResponseBody
     public ResponseEntity<?> getActivePackage(HttpSession session) {
-        // 1. Kiểm tra session xem ai đang đăng nhập (chống IDOR)
         Integer userId = (Integer) session.getAttribute("userId");
-        if (userId == null) {
-            userId = 6;
-            session.setAttribute("userId", userId);
 
-            com.AuraMoon.auramoon.auth.entity.User currentUser = new com.AuraMoon.auramoon.auth.entity.User();
-            currentUser.setId(6);
-            currentUser.setFullName("Fake Guest");
-            session.setAttribute("currentUser", currentUser);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Vui lòng đăng nhập để xem thông tin gói Spa của bạn."));
         }
 
-        // 2. Lấy gói Spa chưa đặt lịch của ĐÚNG khách hàng này (dựa vào Native Query
-        // JOIN bảng BOOKING)
         Optional<TreatmentBooking> firstBooking = treatmentBookingRepository.findUnscheduledBookingsByGuestId(userId)
                 .stream().findFirst();
 
@@ -97,28 +86,16 @@ public class SpaScheduleController {
     @ResponseBody
     public ResponseEntity<?> scheduleSession(@RequestBody SpaScheduleRequest request, HttpSession session) {
         try {
-            // 1. Bắt buộc đăng nhập
             Integer userId = (Integer) session.getAttribute("userId");
-            if (userId == null) {
-                userId = 6;
-                session.setAttribute("userId", userId);
 
-                com.AuraMoon.auramoon.auth.entity.User currentUser = new com.AuraMoon.auramoon.auth.entity.User();
-                currentUser.setId(6);
-                currentUser.setFullName("Fake Guest");
-                session.setAttribute("currentUser", currentUser);
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", Map.of("code", "AUTH-401", "message", "Vui lòng đăng nhập để tiếp tục.")));
             }
 
-            // 2. Chống IDOR: Xác minh bookingId trong request có đúng là của khách hàng
-            // đang đăng nhập không
+            // 2. Chống IDOR: Xác minh bookingId trong request có đúng là của khách hàng đang đăng nhập không
             boolean isOwner = treatmentBookingRepository.findUnscheduledBookingsByGuestId(userId).stream()
                     .anyMatch(b -> b.getBookingId().equals(request.getBookingId()));
-
-            // Nếu không tìm thấy (thường do data dưới DB chưa đồng bộ khi test), fake luôn
-            // là true
-            if (!isOwner) {
-                isOwner = true;
-            }
 
             if (!isOwner) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -126,13 +103,13 @@ public class SpaScheduleController {
                                 Map.of("code", "AUTH-403", "message", "Bạn không có quyền đặt lịch cho gói này.")));
             }
 
-            // 3. Tiến hành đặt lịch
             SpaScheduleResponse response = spaScheduleService.scheduleSession(request);
 
             Map<String, Object> result = new HashMap<>();
             result.put("message", "Spa appointment booked successfully.");
             result.put("data", response);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
+
         } catch (SpaBusinessException e) {
             Map<String, Object> errorWrapper = new HashMap<>();
             Map<String, String> errorDetail = new HashMap<>();
@@ -142,8 +119,9 @@ public class SpaScheduleController {
 
             HttpStatus status = "SPA-010".equals(e.getErrorCode()) ? HttpStatus.CONFLICT : HttpStatus.BAD_REQUEST;
             return ResponseEntity.status(status).body(errorWrapper);
+
         } catch (Exception e) {
-            e.printStackTrace(); // Print to server console
+            e.printStackTrace();
             Map<String, Object> errorWrapper = new HashMap<>();
             Map<String, String> errorDetail = new HashMap<>();
             errorDetail.put("code", "SYS-500");
