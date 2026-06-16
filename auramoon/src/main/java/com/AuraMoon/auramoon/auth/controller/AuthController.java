@@ -50,16 +50,31 @@ public class AuthController {
     }
 
     @PostMapping("/auth")
-    public String doLogin(@RequestParam("email") String email, @RequestParam("password") String password, Model model, HttpSession session) {
+    public String doLogin(@RequestParam("email") String email, @RequestParam("password") String password, Model model,
+            HttpSession session) {
         // Xử lý đăng nhập
         User user = userService.authenticate(email, password);
         if (user == null) {
             model.addAttribute("error", "Email hoặc mật khẩu không đúng");
             return "auth/login";
         }
-        // Lưu user vào session
+
+        // 1. Vẫn giữ lại code của bạn cậu (để không làm hỏng chức năng khác)
         session.setAttribute("currentUser", user);
-        // Optional: set session timeout (seconds)
+
+        // 2. THÊM MỚI: Lưu các biến lẻ để phục vụ cho Spa Controller của cậu
+        session.setAttribute("userId", user.getId()); // Lưu ID
+
+        // Lưu Role (Giả sử User Entity của cậu có hàm getRole() và Role có
+        // getRoleName())
+        if (user.getRole() != null) {
+            session.setAttribute("role", user.getRole().getRoleName());
+        }
+
+        // Nếu có logic lấy TherapistCode thì thêm vào đây, ví dụ:
+        // session.setAttribute("therapistCode",
+        // therapistService.getCodeByUserId(user.getUserId()));
+
         session.setMaxInactiveInterval(30 * 60); // 30 minutes
         return "redirect:/home";
     }
