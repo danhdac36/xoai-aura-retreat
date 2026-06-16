@@ -19,12 +19,15 @@ CREATE TABLE [USER] (
     gender VARCHAR(6),
     date_of_birth DATE,
     phone VARCHAR(20),
-    Identify_code VARCHAR(20),
+    Identify_code VARCHAR(255),
     avatar VARCHAR(MAX),
     last_update DATETIME DEFAULT GETDATE(),
     status VARCHAR(10),
     created_at DATETIME DEFAULT GETDATE(),
     last_login DATETIME,
+    verify_token VARCHAR(255),
+    booking_id INT,
+    is_delete BIT DEFAULT 0, 
     CONSTRAINT FK_USER_ROLE FOREIGN KEY (role_id) REFERENCES [ROLE](role_id)
 );
 
@@ -103,7 +106,7 @@ CREATE TABLE VILLA (
     villa_type INT NOT NULL,
     villa_code VARCHAR(10) NOT NULL UNIQUE,
     limit_person INT,
-    villa_status VARCHAR(10),
+    villa_status VARCHAR(20),
     cleaning_status VARCHAR(10),
     is_delete BIT DEFAULT 0,
     CONSTRAINT FK_VILLA_TYPE FOREIGN KEY (villa_type) REFERENCES VILLA_TYPE(type_id)
@@ -135,8 +138,8 @@ CREATE TABLE BOOKING (
     total_guests INT,
     create_at DATETIME DEFAULT GETDATE(),
     update_at DATETIME DEFAULT GETDATE(),
-    booking_status VARCHAR(10),
-    payment_status VARCHAR(10),
+    booking_status VARCHAR(20),
+    payment_status VARCHAR(20),
     is_delete BIT DEFAULT 0,
     CONSTRAINT FK_BOOKING_GUEST FOREIGN KEY (guest_id) REFERENCES [USER](user_id),
     CONSTRAINT FK_BOOKING_PACKAGE FOREIGN KEY (package_id) REFERENCES RETREAT_PACKAGE(package_id),
@@ -164,7 +167,7 @@ CREATE TABLE TREATMENT_BOOKING (
     folio_id INT,
     service_id INT NOT NULL,
     note NVARCHAR(MAX),
-    status VARCHAR(10),
+    status VARCHAR(20),
     is_delete BIT DEFAULT 0,
     create_at DATETIME DEFAULT GETDATE(),
     update_at DATETIME DEFAULT GETDATE(),
@@ -189,7 +192,7 @@ CREATE TABLE SCHEDULE (
 -- 16. Table MENU_ITEM
 CREATE TABLE MENU_ITEM (
     menu_item_id INT IDENTITY(1,1) PRIMARY KEY,
-    item_name NVARCHAR(20) NOT NULL,
+    item_name NVARCHAR(100) NOT NULL,
     price DECIMAL(18, 2),
     ingredient NVARCHAR(MAX),
     is_available BIT DEFAULT 1,
@@ -207,7 +210,7 @@ CREATE TABLE MEAL_ORDER (
     ordered_by INT,
     place_order VARCHAR(100),
     note NVARCHAR(MAX),
-    order_status VARCHAR(10),
+    order_status VARCHAR(20),
     CONSTRAINT FK_MEAL_BOOKING FOREIGN KEY (booking_id) REFERENCES BOOKING(booking_id),
 );
 
@@ -250,11 +253,22 @@ CREATE TABLE PAYMENT (
     payment_id INT IDENTITY(1,1) PRIMARY KEY,
     folio_id INT,
     amount DECIMAL(18, 2),
-    payment_method VARCHAR(10),
-    payment_gateway VARCHAR(10),
+    payment_method VARCHAR(20),
+    payment_gateway VARCHAR(20),
     transaction_code VARCHAR(100),
     payment_date DATETIME DEFAULT GETDATE(),
     status VARCHAR(10),
     CONSTRAINT FK_PAYMENT_FOLIO FOREIGN KEY (folio_id) REFERENCES GUEST_FOLIO(folio_id)
+);
+
+-- 22. Table AUDIT_LOG
+CREATE TABLE AUDIT_LOG (
+    log_id INT IDENTITY(1,1) PRIMARY KEY,
+    action_type VARCHAR(50) NOT NULL,
+    actor_id INT NOT NULL,
+    target_id INT,
+    details NVARCHAR(MAX),
+    timestamp DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_AUDIT_ACTOR FOREIGN KEY (actor_id) REFERENCES [USER](user_id)
 );
 GO
