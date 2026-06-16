@@ -21,10 +21,11 @@
             </div>
             <div class="flex items-center gap-3 pl-6 border-l border-outline-variant">
                 <div class="text-right">
-                    <p class="text-sm font-semibold">Lễ tân: Linh Nguyễn</p>
-                    <p class="text-xs text-on-surface-variant">Quầy A1</p>
+                    <p class="text-sm font-semibold" th:text="${session.currentUser != null ? session.currentUser.fullName : 'Guest'}">Lễ tân: Linh Nguyễn</p>
+                    <p class="text-xs text-on-surface-variant" th:text="${session.currentUser != null ? session.currentUser.email : ''}">Quầy A1</p>
                 </div>
-                <img alt="Staff Profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjxKxWNM9Mdwd1q-Ntb2XBP2tWZHOJnGCL2k0tVQxMSkLJ5lXLFy4YVhr2xzIstoSmY3eeDxmsvUxgGR1ZidvlK-lkv5B2u_qNh0i4tffRO5hu4TTt-NPTZVPcnEYjcqbIjcIGI-opV3GJWWC6PWB1oftS39SpGphQD7UDCSz0WfQkOA8VoDi3CIwXCLILpVge3ruSs76fgrW729VAHHhA6RpB3syTU-QWYVL4_wHFwND14cNM_H0Nchj6_3Bf1sj91ZcH50GAf6s">
+                <img alt="Staff Profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant" 
+                     th:src="${session.currentUser != null && session.currentUser.avatar != null ? session.currentUser.avatar : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCjxKxWNM9Mdwd1q-Ntb2XBP2tWZHOJnGCL2k0tVQxMSkLJ5lXLFy4YVhr2xzIstoSmY3eeDxmsvUxgGR1ZidvlK-lkv5B2u_qNh0i4tffRO5hu4TTt-NPTZVPcnEYjcqbIjcIGI-opV3GJWWC6PWB1oftS39SpGphQD7UDCSz0WfQkOA8VoDi3CIwXCLILpVge3ruSs76fgrW729VAHHhA6RpB3syTU-QWYVL4_wHFwND14cNM_H0Nchj6_3Bf1sj91ZcH50GAf6s'}">
             </div>
         </div>
     </header>

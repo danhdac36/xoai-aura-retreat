@@ -50,37 +50,17 @@ public class AuthController {
     }
 
     @PostMapping("/auth")
-    public String doLogin(@RequestParam("email") String email, @RequestParam("password") String password, Model model,
-            HttpSession session) {
-
-        // 1. Xác thực tài khoản
+    public String doLogin(@RequestParam("email") String email, @RequestParam("password") String password, Model model, HttpSession session) {
+        // Xử lý đăng nhập
         User user = userService.authenticate(email, password);
         if (user == null) {
             model.addAttribute("error", "Email hoặc mật khẩu không đúng");
             return "auth/login";
         }
-
-        // 2. Lưu thông tin cơ bản
+        // Lưu user vào session
         session.setAttribute("currentUser", user);
-        session.setAttribute("userId", user.getId());
-
-        String roleName = user.getRole().getRoleName();
-        session.setAttribute("role", roleName);
-
-        // 3. LOGIC CẤP "THẺ NHÂN VIÊN" CHO THERAPIST
-        // if ("THERAPIST".equalsIgnoreCase(roleName)) {
-
-        // // Sếp cần gọi service để chọc xuống bảng THERAPIST, tìm therapist_code dựa
-        // vào
-        // // user_id
-        // // Ví dụ: SELECT therapist_code FROM THERAPIST WHERE therapist_id = ?
-        // String tCode = therapistService.getTherapistCodeByUserId(user.getId());
-
-        // // Nhét vào Session
-        // session.setAttribute("therapistCode", tCode);
-        // }
-
-        session.setMaxInactiveInterval(30 * 60);
+        // Optional: set session timeout (seconds)
+        session.setMaxInactiveInterval(30 * 60); // 30 minutes
         return "redirect:/home";
     }
 

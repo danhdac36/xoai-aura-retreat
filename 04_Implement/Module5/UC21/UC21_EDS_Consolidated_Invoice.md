@@ -1,4 +1,4 @@
-# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
+﻿# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
 
 # Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
@@ -22,17 +22,17 @@
 
 | Ngày      | Người thực hiện | Nội dung thay đổi                                           |
 | ---------- | ------------------- | -------------------------------------------------------------- |
-| 2026-06-12 | Sinh viên 5        | Tạo tài liệu EDS lần đầu cho UC21 - Consolidated Invoice |
+| 2026-06-12 | Phùng Giang Hải        | Tạo tài liệu EDS lần đầu cho UC21 - Consolidated Invoice |
 | 2026-06-14 | Phùng Giang Hải    | Update Header and Add BR-15 Audit Trail |
-| 2026-06-14 | AI Assistant       | Tách AuditLogService và AuditLogRepository chuẩn MVC |                       
-| 2026-06-14 | AI Assistant       | Bổ sung sơ đồ Error Path cho vi phạm nghiệp vụ BR-12 |
-| 2026-06-14 | AI Assistant       | Cập nhật Interface Spec (throws PendingOrderException) |
-| 2026-06-14 | AI Assistant       | Chủ động rà soát & Cập nhật toàn diện các mục 4, 10-15 cho BR-12, BR-15 |
-| 2026-06-14 | AI Assistant       | Bổ sung Task tạo AuditLog Service/Repository vào Mục 11.2 |
-| 2026-06-14 | AI Assistant       | Chuyển AuditLogService lên Controller xử lý để tránh gọi ngầm 2 lần |
-| 2026-06-14 | AI Assistant       | Sửa lỗi thiếu rà soát (Rule 7): Cập nhật Pseudo-code Mục 9.2 để đồng bộ tuyệt đối |
-| 2026-06-14 | AI Assistant       | Bổ sung Mục 6.3 State Machine Diagram để tuân thủ chặt chẽ EDS Template |
-| 2026-06-14 | AI Assistant       | Sửa đổi Bảng mã lỗi (Mục 10) về đúng chuẩn 5 cột của EDS_TEMPLATE_V2.0 |
+| 2026-06-14 | Phùng Giang Hải       | Tách AuditLogService và AuditLogRepository chuẩn MVC |                       
+| 2026-06-14 | Phùng Giang Hải       | Bổ sung sơ đồ Error Path cho vi phạm nghiệp vụ BR-12 |
+| 2026-06-14 | Phùng Giang Hải       | Cập nhật Interface Spec (throws PendingOrderException) |
+| 2026-06-14 | Phùng Giang Hải       | Chủ động rà soát & Cập nhật toàn diện các mục 4, 10-15 cho BR-12, BR-15 |
+| 2026-06-14 | Phùng Giang Hải       | Bổ sung Task tạo AuditLog Service/Repository vào Mục 11.2 |
+| 2026-06-14 | Phùng Giang Hải       | Chuyển AuditLogService lên Controller xử lý để tránh gọi ngầm 2 lần |
+| 2026-06-14 | Phùng Giang Hải       | Sửa lỗi thiếu rà soát (Rule 7): Cập nhật Pseudo-code Mục 9.2 để đồng bộ tuyệt đối |
+| 2026-06-14 | Phùng Giang Hải       | Bổ sung Mục 6.3 State Machine Diagram để tuân thủ chặt chẽ EDS Template |
+| 2026-06-14 | Phùng Giang Hải       | Sửa đổi Bảng mã lỗi (Mục 10) về đúng chuẩn 5 cột của EDS_TEMPLATE_V2.0 |
 
 # MỤC LỤC
 
@@ -82,7 +82,7 @@
 | Field              | Value                   |
 | ------------------ | ----------------------- |
 | **Status**   | Accepted                |
-| **Deciders** | Sinh viên 5, Tech Lead |
+| **Deciders** | Phùng Giang Hải, Tech Lead |
 | **Date**     | 2026-06-12              |
 
 **Bối cảnh (Context)**

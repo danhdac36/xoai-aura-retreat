@@ -2,6 +2,7 @@ const menuImageMap = {
     "Cá Hồi Nướng Hương Thảo": "/images/fnb/menu/ca-hoi-nuong-huong-thao.jpg",
     "Salad Aura Thanh Lọc": "/images/fnb/menu/salad-aura-thanh-loc.jpg",
     "Bát Cơm Gạo Lứt Chay": "/images/fnb/menu/bat-com-gao-lut-chay.jpg",
+    "Nước Ép Cần Tây Hữu Cơ": "/images/fnb/menu/nuoc-ep-can-tay-huu-co.jpg",
     "Phở bò": "/images/fnb/menu/pho-bo.jpg",
     "Phở gà": "/images/fnb/menu/pho-ga.jpg",
     "Bún bò Huế": "/images/fnb/menu/bun-bo-hue.jpg",

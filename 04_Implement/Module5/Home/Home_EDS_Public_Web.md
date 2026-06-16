@@ -1,4 +1,4 @@
-# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
+﻿# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
 # Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
 | Field | Value |
@@ -7,8 +7,8 @@
 | **Version** | 1.0 |
 | **Date** | `2026-06-12` |
 | **Status** | Approved |
-| **Document Owner** | `Sinh viên 5` |
-| **Author** | `Sinh viên 5 - Fullstack Developer` |
+| **Document Owner** | `Phùng Giang Hải` |
+| **Author** | `Phùng Giang Hải - Fullstack Developer` |
 | **Reviewed by** | `Tech Lead` |
 | **DPO Sign-off** | `[ ] N/A — Module Public Web không xử lý PII` |
 | **Approved by** | `Principal Architect` |
@@ -20,7 +20,7 @@
 
 | Ngày | Người thực hiện | Nội dung thay đổi |
 | --- | --- | --- |
-| 2026-06-12 | Sinh viên 5 | Tạo tài liệu EDS lần đầu cho Home & Landing Pages |
+| 2026-06-12 | Phùng Giang Hải | Tạo tài liệu EDS lần đầu cho Home & Landing Pages |
 
 # MỤC LỤC
 1. Tổng quan Module
@@ -68,7 +68,7 @@
 | Field | Value |
 | --- | --- |
 | **Status** | Accepted |
-| **Deciders** | Sinh viên 5, Tech Lead |
+| **Deciders** | Phùng Giang Hải, Tech Lead |
 | **Date** | 2026-06-12 |
 
 **Bối cảnh (Context)**
