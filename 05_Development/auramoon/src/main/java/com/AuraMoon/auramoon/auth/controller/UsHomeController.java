@@ -5,11 +5,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class UsHomeController {
-
-    @GetMapping("/home")
-    public String homePage() {
-        System.out.println("Home page");
-        return "auth/home";
-    }
+//
+//    @GetMapping("/home")
+//    public String homePage() {
+//        System.out.println("Home page");
+//        return "auth/home";
+//    }
 
 }

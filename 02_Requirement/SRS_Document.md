@@ -319,20 +319,6 @@ view the guest's physical medical records</td>
 </tr>
 <tr>
 <td style="text-align: center;"><strong>8</strong></td>
-<td style="text-align: center;">Night Audit & Daily Revenue Consolidation</td>
-<td style="text-align: center;"><strong>1. Activity:</strong>
-- System automatically executes at 00:00 daily (or Manager triggers manually).
-- System scans all completed Spa sessions and delivered F&B orders for the business day.
-- System posts each unaudited charge as a new Folio Item into the guest's Guest Folio.
-- System locks audited records to prevent post-audit modification.
-<strong>2. Input:</strong> Completed Spa Bookings (COMPLETED), Delivered F&B Orders (DELIVERED), Active Guest Folios (OPEN).
-<strong>3. Output:</strong> New Folio Items posted, Audit log recorded, Daily revenue summary available for Dashboard.</td>
-<td style="text-align: center;">System, Manager</td>
-<td style="text-align: center;"><strong>Constraint:</strong> Audited records
-cannot be modified after the Night Audit process completes (BR-20). Manager can trigger manually for early checkout scenarios.</td>
-</tr>
-<tr>
-<td style="text-align: center;"><strong>9</strong></td>
 <td style="text-align: center;">Check-out & Consolidated Bill</td>
 <td style="text-align: center;"><strong>1. Activity:</strong>
 - Receptionist clicks Check-out. System scans to check if there are
@@ -348,7 +334,7 @@ Cleaning".</td>
 CANNOT check out if there are pending orders.</td>
 </tr>
 <tr>
-<td style="text-align: center;"><strong>10</strong></td>
+<td style="text-align: center;"><strong>9</strong></td>
 <td style="text-align: center;">Review & Data Deletion</td>
 <td style="text-align: center;"><strong>1. Activity:</strong>
 - Guest submits a Retreat quality review form.
@@ -535,7 +521,6 @@ table form as below\]*
 |      23      | Submit Post-stay Review and Rating                        | Feedback Management           | The Guest submits a review and rating after completing the stay.                                                                     |
 |      24      | View Revenue Analytics Dashboard                          | Analytics and Reporting       | The Resort Manager views revenue charts categorized by package, spa, and F&B income.                                                 |
 |      25      | Export Monthly Occupancy and Therapist Utilization Report | Report Export                 | The Resort Manager exports monthly reports on room occupancy and therapist utilization to Excel.                                     |
-|      26      | Execute Night Audit Process                               | Night Audit                   | The Manager or System executes the Night Audit to consolidate daily POS charges (Spa, F&B) into Guest Folios and lock audited records. |
 
 #### 1.3.2 Use Case Diagrams
 
@@ -681,7 +666,6 @@ specific system user role names\]*
 | Export Center                   |                |                        |                    |                      |        X        |
 | Daily ID Report                 |                |                        |                    |                      |        X        |
 | Excel Reports                   |                |                        |                    |                      |        X        |
-| Night Audit Dashboard           |                |                        |                    |                      |        X        |
 
 #### 1.4.3 Non-UI Functions
 
@@ -695,8 +679,6 @@ batch/cron job, service, API, etc.\]*
 |      2      |      Payment      |  VNPay Payment Gateway API  |         Processes online payments through VNPay.         |
 |      3      |      Payment      | Payment Verification Service | Verifies transaction status and updates booking records. |
 |      4      |  Data Management  |   Database Backup Service   |           Performs scheduled database backups.           |
-|      5      |  Night Audit      | Night Audit Scheduled Job   | Automatically consolidates daily POS charges into Guest Folios at 00:00 every night (UC26). |
-|      6      |  Night Audit      | Night Audit Manual Trigger  | Allows Manager to manually trigger Night Audit for early checkout or reconciliation (UC26).  |
 
 ### 1.5 Entity Relationship Diagram - Ng?c
 
@@ -734,7 +716,6 @@ ERD `</u>`](https://drive.google.com/file/d/1oWAww-BpAlODydsSWfGnFlNlPFawkdOB/vi
 | 19           | Meal_Order              | Manages food orders placed by guests.                                                 |
 | 20           | Meal_Order_Item         | Details the specific food items included in a meal order.                             |
 | 21           | Menu_Item               | Catalog of food items available on the menu.                                          |
-| 22           | Audit_Log               | Records system activity logs for critical operations including login, payment, checkout, and night audit for traceability and compliance. |
 
 ## 2. Use Case Specifications - ??c
 
@@ -1363,108 +1344,6 @@ confirmed.</td>
 <tr>
 <td style="text-align: right;">Assumptions:</td>
 <td colspan="3">- Payment gateway remains available.</td>
-</tr>
-</tbody>
-</table>
-
-#### 2.5.3 UC26 – Execute Night Audit Process
-
-<table>
-<colgroup>
-<col style="width: 19%" />
-<col style="width: 29%" />
-<col style="width: 22%" />
-<col style="width: 27%" />
-</colgroup>
-<tbody>
-<tr>
-<td style="text-align: right;">ID and Name:</td>
-<td colspan="3"><strong>UC26 – Execute Night Audit Process</strong></td>
-</tr>
-<tr>
-<td style="text-align: right;">Primary Actor:</td>
-<td>System (Automated) / Manager (Manual)</td>
-<td style="text-align: right;">Secondary Actors:</td>
-<td>None</td>
-</tr>
-<tr>
-<td style="text-align: right;">Description:</td>
-<td colspan="3">This use case allows the system to automatically (at midnight 00:00) or the Manager to manually trigger the Night Audit process. The process consolidates all completed Spa sessions and delivered F&B orders from the current business day into the Guest Folio as individual Folio Items, then locks the audited source records to prevent post-audit tampering.</td>
-</tr>
-<tr>
-<td style="text-align: right;">Trigger:</td>
-<td colspan="3">- Automatic: System scheduled job (Cron) executes at 00:00 daily.<br />
-- Manual: Manager selects "Run Night Audit" from the Night Audit Dashboard.</td>
-</tr>
-<tr>
-<td style="text-align: right;">Preconditions:</td>
-<td colspan="3">- At least one guest booking exists with status CHECKED_IN.
-- Spa and F&B services have been recorded for the business day.
-- Night Audit has not already been executed for the current business date.</td>
-</tr>
-<tr>
-<td style="text-align: right;">Postconditions:</td>
-<td colspan="3">- All completed Spa charges are posted as Folio Items.
-- All delivered F&B charges are posted as Folio Items.
-- Audited source records are locked (marked as audited).
-- Audit log is recorded with execution details.
-- Daily revenue summary is available for reporting (UC24).</td>
-</tr>
-<tr>
-<td style="text-align: right;">Normal Flow:</td>
-<td colspan="3"><ol type="1">
-- System or Manager initiates Night Audit.
-- System validates that Night Audit has not already been run for the current date.
-- System retrieves all active Guest Folios (status = OPEN).
-- System scans completed Spa Treatment Bookings (status = COMPLETED) that have not been audited for the day.
-- System scans delivered F&B Meal Orders (status = DELIVERED) that have not been audited for the day.
-- System creates a new Folio Item for each unaudited Spa charge, linked to the guest's Folio via Booking_ID (BR-11).
-- System creates a new Folio Item for each unaudited F&B charge, linked to the guest's Folio via Booking_ID (BR-11).
-- System marks each source record (Spa Booking, Meal Order) as audited to prevent duplication (BR-20).
-- System records an Audit Log entry with execution timestamp, number of records processed, and total revenue consolidated (BR-15).
-- System displays MSG-20 upon successful completion.
-</ol></td>
-</tr>
-<tr>
-<td style="text-align: right;">Alternative Flows:</td>
-<td colspan="3">- A1. Manager triggers Night Audit manually before midnight (e.g., for early checkout).<br />
-→ System executes the same consolidation logic for all unaudited records up to the current time.
-- A2. No unaudited charges exist for the day.<br />
-→ System completes with zero records processed and logs a "No new charges" entry.</td>
-</tr>
-<tr>
-<td style="text-align: right;">Exceptions:</td>
-<td colspan="3">- E1. Night Audit already executed for the current date.<br />
-→ System rejects execution and displays a warning: "Night Audit has already been completed for this date."
-- E2. Database transaction failure during consolidation.<br />
-→ System rolls back all changes and displays MSG-21.
-- E3. Guest Folio not found for a booking.<br />
-→ System skips the record, logs the error, and continues processing remaining records.</td>
-</tr>
-<tr>
-<td style="text-align: right;">Priority:</td>
-<td colspan="3">High</td>
-</tr>
-<tr>
-<td style="text-align: right;">Frequency of Use:</td>
-<td colspan="3">Daily (once per night, automated at 00:00 or manual)</td>
-</tr>
-<tr>
-<td style="text-align: right;">Business Rules:</td>
-<td colspan="3">BR-11 – Guest Folio Consolidation.
-BR-15 – Audit Trail Management.
-BR-20 – Night Audit Consolidation.</td>
-</tr>
-<tr>
-<td style="text-align: right;">Other Information:</td>
-<td colspan="3">- Night Audit is a standard hospitality industry accounting procedure (AHLEI standard).
-- The Manager can use the manual trigger to consolidate charges for early checkout scenarios where the guest departs before the scheduled midnight audit.
-- This process does not post Room Charges because the room cost is already included in the pre-paid Retreat Package amount (total_package_amount).</td>
-</tr>
-<tr>
-<td style="text-align: right;">Assumptions:</td>
-<td colspan="3">- Spa and F&B modules correctly update service status (COMPLETED / DELIVERED) upon completion.
-- The system clock is synchronized and accurate for midnight scheduling.</td>
 </tr>
 </tbody>
 </table>
@@ -2756,94 +2635,6 @@ in .csv or .xlsx format.</td>
 </tbody>
 </table>
 
-#### 3.1.14 Night Audit Dashboard Screen
-
-**\[Content \#1\]**
-
-- The interface utilizes a clean operational dashboard layout, accessible
-  only to the Manager/Admin role via the left navigation sidebar.
-- The top section features a date header displaying the current business
-  date, alongside a prominent "Run Night Audit" action button.
-- The mid-section contains summary KPI cards showing the number of
-  active folios processed, total Spa charges consolidated, total F&B
-  charges consolidated, and the grand total revenue posted.
-- The bottom section displays a detailed Data Grid listing each
-  individual Folio Item that was posted during the audit, grouped by
-  guest booking.
-
-**\[Content \#2\]**
-
-- **Description:** This operational screen provides the Management team
-  with control over the Night Audit process – a standard hospitality
-  accounting procedure (AHLEI). The system automatically executes this
-  process at midnight (00:00) via a scheduled job, but the Manager can
-  also trigger it manually from this dashboard for early checkout
-  scenarios or reconciliation purposes. The screen displays the audit
-  execution results and allows the Manager to review all charges that
-  were consolidated into Guest Folios.
-- **Mapped Use Case:** UC26 - As a Manager/System, I want to execute the
-  Night Audit process (manually or automatically at midnight) to
-  consolidate daily POS charges into Guest Folios and lock audited
-  records.
-
-**\[Content \#3\]**
-
-<table style="width:97%;">
-<colgroup>
-<col style="width: 21%" />
-<col style="width: 76%" />
-</colgroup>
-<tbody>
-<tr>
-<td><strong>Field Name</strong></td>
-<td><strong>Description</strong></td>
-</tr>
-<tr>
-<td colspan="2"><strong>Field Group: Audit Control & Status</strong></td>
-</tr>
-<tr>
-<td>(1) Business Date Header</td>
-<td>Data type: LocalDate. Displays the current business date (e.g., Monday, June 16, 2026). Read-only, defaults to the current system date.</td>
-</tr>
-<tr>
-<td>(2) Audit Status Indicator</td>
-<td>Data type: Enum Badge.
-<strong>Logic:</strong> Displays the current Night Audit status for the selected date:
-- "Chưa chạy" (NOT_RUN) – in gray.
-- "Đã hoàn tất" (COMPLETED) – in green, with the execution timestamp.
-- "Đang xử lý" (IN_PROGRESS) – in yellow/animated.</td>
-</tr>
-<tr>
-<td>(3) "Chạy Night Audit" (Run Night Audit) Button</td>
-<td>Action: Triggers manual Night Audit execution.
-<strong>Strict Constraint:</strong> The button must be disabled if the audit has already been completed for the current date (Status = COMPLETED). Upon clicking, the system must display a confirmation dialog before executing. The backend must run the entire consolidation process within a single database transaction to ensure atomicity (BR-20).</td>
-</tr>
-<tr>
-<td colspan="2"><em><strong>Field Group: Audit Summary KPIs</strong></em></td>
-</tr>
-<tr>
-<td>(4) Summary KPI Cards</td>
-<td>Read-only dynamic metrics. The system calculates and displays:
-- Total Active Folios Processed (count of OPEN Guest Folios with new charges).
-- Spa Charges Posted (sum of all Spa Folio Items created during audit).
-- F&B Charges Posted (sum of all F&B Folio Items created during audit).
-- Grand Total Revenue (total monetary amount consolidated).</td>
-</tr>
-<tr>
-<td colspan="2"><em><strong>Field Group: Audit Detail Data Grid</strong></em></td>
-</tr>
-<tr>
-<td>(5) Consolidated Charges Table</td>
-<td>Read-only Data Grid. Displays a paginated list of all Folio Items posted during the Night Audit, with columns: Guest Name, Booking ID, Service Category (SPA / FNB), Description, Amount, and Timestamp.
-<strong>Logic:</strong> Records are grouped by Guest/Booking for easy review. Each row links back to the source record (Treatment Booking or Meal Order) for traceability.</td>
-</tr>
-<tr>
-<td>(6) Audit History Log</td>
-<td>Read-only expandable section. Displays a chronological list of past Night Audit executions, including: Date, Trigger Type (AUTOMATIC / MANUAL), Executor (System or Manager name), Records Processed, and Total Amount. This provides a complete audit trail for compliance and accountability (BR-15).</td>
-</tr>
-</tbody>
-</table>
-
 ### 3.2 User Authentication
 
 #### 3.2.1 Authentication & Login Screen
@@ -3537,8 +3328,6 @@ forth.\]*
 |    BR-16    |               Meal Order Status Workflow               |                                                       Meal Order status shall only progress in the following sequence: Pending ? Preparing ? Ready for Delivery. Status reversal shall not be permitted. Only Chefs or F&B Staff may update Meal Order status.                                                       |              UC18              |
 |    BR-17    |    Spa Appointment Notification and Synchronization    |                                                            After a Spa appointment is successfully booked, the system shall send confirmation and reminder notifications to the guest. Notification failures shall not invalidate a confirmed appointment.                                                            |              UC11              |
 |    BR-18    |        Authentication and Single Sign-On (SSO)        |                                         The system shall support authentication through Google and Facebook. Accounts registered via SSO must complete email verification before being allowed to book a Retreat Package. The system shall prevent duplicate account creation.                                         |              UC01              |
-|    BR-19    |                 Zero Balance Bypass                   |                                         If a guest's total balance due is exactly 0 VND (e.g., fully pre-paid), the checkout process shall automatically bypass the payment gateway selection and complete the checkout immediately without generating a pending payment transaction.                                         |              UC22              |
-|    BR-20    |           Night Audit Consolidation                   |                                         The system shall automatically or manually consolidate all completed Spa (COMPLETED) and delivered F&B (DELIVERED) charges into the Guest Folio as Folio Items at midnight (00:00) daily. Once audited, these records shall be locked and cannot be modified or deleted.                                         |              UC26              |
 
 ### 5.2 System Messages
 
@@ -3564,8 +3353,6 @@ forth.\]*
 |      17      |     MSG-17     |    Success    |  Excel report exported successfully  |                          Report exported successfully.                          |
 |      18      |     MSG-18     |     Error     |          Unauthorized access          |               You do not have permission to access this function.               |
 |      19      |     MSG-19     |     Error     |        Unexpected system error        |        An unexpected system error has occurred. Please try again later.        |
-|      20      |     MSG-20     |    Success    |   Night Audit completed successfully  |    Night Audit process completed. All daily charges have been consolidated.    |
-|      21      |     MSG-21     |     Error     |      Night Audit execution failed     |    Night Audit process failed. Please review the error log and retry manually. |
 
 
 

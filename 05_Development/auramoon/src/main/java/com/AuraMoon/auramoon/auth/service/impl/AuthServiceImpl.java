@@ -45,8 +45,8 @@ public class AuthServiceImpl implements IAuthService {
         user.setPasswordHash(passwordEncoder.encode(registrationDto.getPassword()));
         user.setFullName(registrationDto.getFullName());
         user.setRole(guestRole);
-        user.setStatus("PENDING");
-        
+        user.setStatus("INACTIVE");
+        user.setIsDelete(false);
         String token = UUID.randomUUID().toString();
         user.setVerifyToken(token);
 
@@ -94,6 +94,7 @@ public class AuthServiceImpl implements IAuthService {
         newUser.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString())); // Random password for SSO login
         newUser.setRole(guestRole);
         newUser.setStatus("ACTIVE"); // Google accounts are auto-active
+        newUser.setIsDelete(false);
         newUser.setVerifyToken(null);
 
         User savedUser = userRepository.save(newUser);
