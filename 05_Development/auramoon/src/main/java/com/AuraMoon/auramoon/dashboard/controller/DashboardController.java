@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 
-@Controller
+@Controller("managerDashboardController")
 @RequestMapping("/manager")
 @RequiredArgsConstructor
 public class DashboardController {

@@ -27,20 +27,12 @@ public class TherapistScheduleController {
     public String getDailySchedule(@RequestParam(value = "date", required = false) String dateStr,
             HttpSession session, Model model) {
 
-        // 1. Get therapist code from session
         String therapistCode = (String) session.getAttribute("therapistCode");
-
-        // Fake dữ liệu nếu session trống để chạy thử nghiệm
-        if (therapistCode == null || therapistCode.trim().isEmpty()) {
-            therapistCode = "NV002";
-            session.setAttribute("therapistCode", therapistCode);
-        }
 
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
             return "redirect:/login";
         }
 
-        // 2. Parse date, default to today if not provided
         LocalDate targetDate = LocalDate.now();
         if (dateStr != null && !dateStr.trim().isEmpty()) {
             try {
@@ -50,10 +42,8 @@ public class TherapistScheduleController {
             }
         }
 
-        // 3. Fetch schedules
         List<TherapistScheduleDto> schedules = therapistScheduleService.getDailySchedule(therapistCode, targetDate);
 
-        // 4. Add to model
         model.addAttribute("schedules", schedules);
         model.addAttribute("selectedDate", targetDate);
         model.addAttribute("therapistCode", therapistCode);
@@ -71,12 +61,6 @@ public class TherapistScheduleController {
 
         String therapistCode = (String) session.getAttribute("therapistCode");
 
-        // Fake dữ liệu nếu session trống để chạy thử nghiệm
-        if (therapistCode == null || therapistCode.trim().isEmpty()) {
-            therapistCode = "NV002";
-            session.setAttribute("therapistCode", therapistCode);
-        }
-
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
             return "redirect:/login";
         }
@@ -92,5 +76,4 @@ public class TherapistScheduleController {
 
         return "redirect:/therapist/schedules/daily?date=" + dateStr;
     }
-
 }

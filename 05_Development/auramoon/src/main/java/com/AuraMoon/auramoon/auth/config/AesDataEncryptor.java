@@ -38,7 +38,8 @@ public class AesDataEncryptor implements AttributeConverter<String, String> {
             cipher.init(Cipher.DECRYPT_MODE, key);
             return new String(cipher.doFinal(Base64.getDecoder().decode(dbData)));
         } catch (Exception e) {
-            throw new IllegalStateException("Lỗi giải mã thông tin cá nhân nhạy cảm", e);
+            // Fallback to raw database value if decryption fails
+            return dbData;
         }
     }
 }

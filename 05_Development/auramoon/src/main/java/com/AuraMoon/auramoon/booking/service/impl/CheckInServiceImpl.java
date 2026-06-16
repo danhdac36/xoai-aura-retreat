@@ -25,6 +25,8 @@ public class CheckInServiceImpl implements CheckInService {
     private final EncryptionService encryptionService;
     private final VillaService villaService;
 
+    private static final java.util.logging.Logger auditLogger = java.util.logging.Logger.getLogger(CheckInServiceImpl.class.getName());
+
     @Override
     @Transactional
     public void performCheckIn(CheckInRequestDTO request) {
@@ -59,6 +61,9 @@ public class CheckInServiceImpl implements CheckInService {
 
         // Cập nhật trạng thái dọn dẹp và phòng ở của biệt thự vật lý
         villaService.updateVillaStatuses(villa.getId(), "OCCUPIED", "CLEANED");
+
+        // Ghi Audit Log kiểm toán (BR-15)
+        auditLogger.info("AUDIT LOG: [Check-In Successful] Booking ID: " + booking.getId() + " | Guest ID: " + guest.getId() + " | Physical Villa assigned: " + villa.getVillaCode());
     }
 }
 

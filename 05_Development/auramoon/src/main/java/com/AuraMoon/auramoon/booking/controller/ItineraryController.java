@@ -1,7 +1,9 @@
 package com.AuraMoon.auramoon.booking.controller;
 
+import com.AuraMoon.auramoon.auth.entity.User;
 import com.AuraMoon.auramoon.booking.dto.ItineraryTimelineDTO;
 import com.AuraMoon.auramoon.booking.service.ItineraryService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,10 +20,14 @@ public class ItineraryController {
     }
 
     @GetMapping("/itinerary")
-    public String showItinerary(@RequestParam(value = "guestId", required = false) Integer guestId, Model model) {
-        // Mặc định guestId = 1 nếu không truyền tham số
+    public String showItinerary(@RequestParam(value = "guestId", required = false) Integer guestId, Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");
         if (guestId == null) {
-            guestId = 1;
+            if (currentUser != null) {
+                guestId = currentUser.getId();
+            } else {
+                return "redirect:/login";
+            }
         }
         try {
             ItineraryTimelineDTO timeline = itineraryService.getTimelineForGuest(guestId);

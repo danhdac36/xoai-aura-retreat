@@ -169,7 +169,13 @@ public class BookingServiceTest {
                                 .paymentStatus("UNPAID")
                                 .build();
 
+                GuestFolio guestFolio = GuestFolio.builder()
+                                .bookingId(bookingId)
+                                .status("PENDING")
+                                .build();
+
                 when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+                when(guestFolioRepository.findByBookingId(bookingId)).thenReturn(Optional.of(guestFolio));
 
                 // Act
                 bookingService.confirmPayment(bookingId, transactionCode);
