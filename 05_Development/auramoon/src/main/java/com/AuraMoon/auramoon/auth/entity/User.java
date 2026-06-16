@@ -1,14 +1,9 @@
 package com.AuraMoon.auramoon.auth.entity;
 
-<<<<<<< HEAD:05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/entity/User.java
-=======
 import com.AuraMoon.auramoon.auth.config.AesDataEncryptor;
 import com.AuraMoon.auramoon.common.entity.BaseEntity;
->>>>>>> NMNGocc:auramoon/src/main/java/com/AuraMoon/auramoon/auth/entity/User.java
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
@@ -21,8 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class User {
-
+public class User extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -61,14 +55,6 @@ public class User {
     @Column(name = "status", length = 10)
     private String status;
 
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "last_update")
-    private LocalDateTime updatedAt;
-
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
@@ -78,6 +64,4 @@ public class User {
     @Column(name = "booking_id")
     private String bookingId;
 
-    @Column(name = "is_delete")
-    private Boolean isDelete;
 }

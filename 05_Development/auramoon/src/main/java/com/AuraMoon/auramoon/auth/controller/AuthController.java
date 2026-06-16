@@ -1,14 +1,14 @@
 package com.AuraMoon.auramoon.auth.controller;
 
+import com.AuraMoon.auramoon.auth.dto.UserRegistrationDto;
+import com.AuraMoon.auramoon.auth.service.IAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import com.AuraMoon.auramoon.auth.dto.UserRegistrationDto;
-import com.AuraMoon.auramoon.auth.service.IAuthService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -44,19 +44,10 @@ public class AuthController {
         }
 
         try {
-<<<<<<< HEAD:05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/controller/AuthController.java
-            userService.registerUser(registerDto);
-            logger.info("User registered successfully: " + registerDto.getEmail());
-            model.addAttribute("success", "Đăng ký thành công!");
-            return "redirect:/login";
-        } catch (Exception e) {
-            logger.warning("Registration error: " + e.getMessage());
-=======
             authService.register(registrationDto);
             model.addAttribute("successMessage", "Link kích hoạt đã được gửi vào hòm thư của bạn. Vui lòng kiểm tra email.");
             return "auth/register-success";
         } catch (IllegalArgumentException e) {
->>>>>>> NMNGocc:auramoon/src/main/java/com/AuraMoon/auramoon/auth/controller/AuthController.java
             model.addAttribute("error", e.getMessage());
             return "auth/registration";
         } catch (Exception e) {
@@ -76,6 +67,12 @@ public class AuthController {
             model.addAttribute("message", "Link kích hoạt không hợp lệ hoặc đã hết hạn.");
         }
         return "auth/verify-result";
+    }
+
+    @PostMapping("/login")
+    public String loginPost() {
+
+        return "redirect:/home";
     }
 
     @GetMapping("/logout")

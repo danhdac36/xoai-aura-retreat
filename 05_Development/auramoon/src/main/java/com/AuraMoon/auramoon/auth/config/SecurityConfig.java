@@ -12,7 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@EnableJpaAuditing
 public class SecurityConfig {
 
     @Autowired
@@ -27,18 +26,24 @@ public class SecurityConfig {
             "/auth/forgot-password",
             "/auth/login-admin",
             "/auth/verify-email",
-            "/fnb/uc19-alacarte-order",
-            "/packages",
+            "/spa",
+            "/wellness",
+            "/culinary",
+            "/villas",
             "/css/**",
             "/js/**",
-            "/images/**"
+            "/images/**",
+            "/webjars/**",
+            "/error",
+            "/"
     };
 
     private static final String[] GUEST_ENDPOINTS = {
             "/user/**",
             "/orders/**",
             "/cart/**",
-            "/profile/**"
+            "/profile/**",
+            "/packages/**"
     };
 
     private static final String[] ADMIN_ENDPOINTS = {

@@ -26,6 +26,13 @@
                 </div>
                 <img alt="Staff Profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjxKxWNM9Mdwd1q-Ntb2XBP2tWZHOJnGCL2k0tVQxMSkLJ5lXLFy4YVhr2xzIstoSmY3eeDxmsvUxgGR1ZidvlK-lkv5B2u_qNh0i4tffRO5hu4TTt-NPTZVPcnEYjcqbIjcIGI-opV3GJWWC6PWB1oftS39SpGphQD7UDCSz0WfQkOA8VoDi3CIwXCLILpVge3ruSs76fgrW729VAHHhA6RpB3syTU-QWYVL4_wHFwND14cNM_H0Nchj6_3Bf1sj91ZcH50GAf6s">
             </div>
+            <div>
+                <form th:action="@{/auth/logout}" method="post">
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-all font-medium">
+                        Đăng xuất (Logout)
+                    </button>
+                </form>
+            </div>
         </div>
     </header>
 </body>

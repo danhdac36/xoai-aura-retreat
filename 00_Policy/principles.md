@@ -14,6 +14,8 @@ Cách đặt thên method, class, tất cả phải tuân thủ theo phương ph
 
 Mọi file mà người dùng yêu cầu tạo ra đều phải được tạo dưới dạng **Markdown (.md)** (bao gồm cả việc viết code thì code cũng sẽ được bọc bên trong file Markdown thay vì tạo file mã nguồn trực tiếp).
 
+File phải được lưu trong thư mục 07_Reports
+
 ## Nguyên tắc 3: Báo cáo trước khi thay thế code
 
 Sau khi tôi yêu cầu bạn làm gì thì bạn đều phải báo cáo cái mà bạn phân tích và đọc được cho tôi. Sau khi tôi chấp nhận mới được phép thay thế code trong dự án.

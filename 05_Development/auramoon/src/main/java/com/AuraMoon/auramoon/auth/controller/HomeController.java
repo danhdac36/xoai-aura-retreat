@@ -2,6 +2,7 @@ package com.AuraMoon.auramoon.auth.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class HomeController {
 
-    @GetMapping("/")
+    @GetMapping("/auth")
     public String index(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/auth/login";
@@ -19,6 +20,8 @@ public class HomeController {
         for (GrantedAuthority authority : authentication.getAuthorities()) {
             String role = authority.getAuthority();
             if ("ROLE_ADMIN".equals(role)) {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                System.out.println("this is " + auth.getAuthorities());
                 return "redirect:/admin/home";
             } else if ("ROLE_GUEST".equals(role)) {
                 return "redirect:/profile/home";
@@ -67,9 +70,5 @@ public class HomeController {
         return "public/culinary";
     }
 
-    @PostMapping
-    public String loginPost() {
-        return "redirect:/home";
-    }
 
 }
