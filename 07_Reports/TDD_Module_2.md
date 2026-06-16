@@ -533,6 +533,66 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 
 ---
 
+## 4.5. Unit Tests — RetreatPackageService
+
+### UC06-TC-001 — Lấy tất cả gói nghỉ dưỡng đang hoạt động thành công
+*   **Severity:** `MEDIUM`
+*   **Feature Under Test:** `RetreatPackageServiceImpl.getAllActivePackages()`
+*   **Test File:** `src/test/java/com/AuraMoon/auramoon/booking/service/impl/RetreatPackageServiceImplTest.java`
+*   **TDD Phase:** 🟢 GREEN - Passing
+*   **Preconditions:** Có gói nghỉ dưỡng active trong database.
+*   **Act:** Gọi `getAllActivePackages()`.
+*   **Assert:** Danh sách trả về không rỗng và chứa thông tin chính xác.
+
+### UC06-TC-002 — Lọc gói nghỉ dưỡng theo loại (Type)
+*   **Severity:** `MEDIUM`
+*   **Feature Under Test:** `RetreatPackageServiceImpl.getPackagesByType()`
+*   **Test File:** `src/test/java/com/AuraMoon/auramoon/booking/service/impl/RetreatPackageServiceImplTest.java`
+*   **Act:** Gọi `getPackagesByType("Detox")`.
+*   **Assert:** Các gói trả về đều thuộc loại "Detox".
+
+### UC06-TC-003 — Tìm kiếm nâng cao các gói nghỉ dưỡng
+*   **Severity:** `HIGH`
+*   **Feature Under Test:** `RetreatPackageServiceImpl.searchPackages()`
+*   **Test File:** `src/test/java/com/AuraMoon/auramoon/booking/service/impl/RetreatPackageServiceImplTest.java`
+*   **Act:** Gọi `searchPackages("Stress", 2, 5, 10000000.0, 20000000.0)`.
+*   **Assert:** Lọc chính xác các gói thỏa mãn tất cả tiêu chí tìm kiếm.
+
+### UC06-TC-004 — Lấy chi tiết gói nghỉ dưỡng theo ID thành công
+*   **Severity:** `MEDIUM`
+*   **Feature Under Test:** `RetreatPackageServiceImpl.getPackageById()`
+*   **Test File:** `src/test/java/com/AuraMoon/auramoon/booking/service/impl/RetreatPackageServiceImplTest.java`
+*   **Act:** Gọi `getPackageById(1)`.
+*   **Assert:** DTO trả về đúng ID yêu cầu.
+
+### UC06-TC-005 — Lấy chi tiết gói nghỉ dưỡng không tồn tại
+*   **Severity:** `MEDIUM`
+*   **Feature Under Test:** `RetreatPackageServiceImpl.getPackageById()`
+*   **Test File:** `src/test/java/com/AuraMoon/auramoon/booking/service/impl/RetreatPackageServiceImplTest.java`
+*   **Act:** Gọi `getPackageById(999)`.
+*   **Assert:** Ném ra `RuntimeException`.
+
+---
+
+## 4.6. Unit Tests — ItineraryService
+
+### ITI10-TC-001 — Sinh lịch trình thành công cho gói Stress Relief
+*   **Severity:** `HIGH`
+*   **Feature Under Test:** `ItineraryServiceImpl.getTimelineForGuest()`
+*   **Test File:** `src/test/java/com/AuraMoon/auramoon/booking/service/impl/ItineraryServiceImplTest.java`
+*   **Preconditions:** Đặt phòng cho gói `"stress relief"` hoạt động.
+*   **Act:** Gọi `getTimelineForGuest(guestId)`.
+*   **Assert:** Timeline được tạo ra chứa các hoạt động đặc thù của Stress Relief (ví dụ: *Thiền định*, *Thưởng trà*).
+
+### ITI10-TC-002 — Sinh lịch trình thành công cho gói Detox
+*   **Severity:** `HIGH`
+*   **Feature Under Test:** `ItineraryServiceImpl.getTimelineForGuest()`
+*   **Test File:** `src/test/java/com/AuraMoon/auramoon/booking/service/impl/ItineraryServiceImplTest.java`
+*   **Act:** Gọi `getTimelineForGuest(guestId)`.
+*   **Assert:** Timeline chứa các hoạt động *Cardio* và *Bữa trưa Detox*.
+
+---
+
 ## SECURITY TEST CASES
 
 > Test cases kiểm tra attack vectors — bắt buộc điền OWASP và CWE.
@@ -727,6 +787,17 @@ assertThat(villa.getVillaStatus()).isEqualTo(VillaStatus.OCCUPIED);
 | `RBAC-TC-002` | `RbacSecurityTest.java:56` | `[x]` | `c1e9g55` | — |
 | `IT-TC-001` | `BookingIntegrationTest.java:40` | `[x]` | `d8h3j71` | — |
 | `IT-TC-002` | `CheckInIntegrationTest.java:35` | `[x]` | `d8h3j71` | — |
+| `UC06-TC-001` | `RetreatPackageServiceImplTest.java:31` | `[x]` | `local` | Lấy danh sách gói active |
+| `UC06-TC-002` | `RetreatPackageServiceImplTest.java:51` | `[x]` | `local` | Lọc theo loại |
+| `UC06-TC-003` | `RetreatPackageServiceImplTest.java:73` | `[x]` | `local` | Tìm nâng cao |
+| `UC06-TC-004` | `RetreatPackageServiceImplTest.java:95` | `[x]` | `local` | Chi tiết thành công |
+| `UC06-TC-005` | `RetreatPackageServiceImplTest.java:114` | `[x]` | `local` | Chi tiết thất bại |
+| `UC06-TC-006` | `RetreatPackageServiceImplTest.java:131` | `[x]` | `local` | Lấy các gói nổi bật |
+| `UC06-TC-007` | `RetreatPackageServiceImplTest.java:147` | `[x]` | `local` | Lấy các loại gói |
+| `ITI10-TC-001` | `ItineraryServiceImplTest.java:31` | `[x]` | `local` | Lịch trình Stress Relief |
+| `ITI10-TC-002` | `ItineraryServiceImplTest.java:70` | `[x]` | `local` | Lịch trình Detox |
+| `ITI10-TC-003` | `ItineraryServiceImplTest.java:108` | `[x]` | `local` | Trả về ngoại lệ khi Guest không tìm thấy |
+| `ITI10-TC-004` | `ItineraryServiceImplTest.java:124` | `[x]` | `local` | Trả về ngoại lệ khi không có booking |
 
 ---
 
