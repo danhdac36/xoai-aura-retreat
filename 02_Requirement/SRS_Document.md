@@ -536,6 +536,7 @@ table form as below\]*
 |      24      | View Revenue Analytics Dashboard                          | Analytics and Reporting       | The Resort Manager views revenue charts categorized by package, spa, and F&B income.                                                 |
 |      25      | Export Monthly Occupancy and Therapist Utilization Report | Report Export                 | The Resort Manager exports monthly reports on room occupancy and therapist utilization to Excel.                                     |
 |      26      | Execute Night Audit Process                               | Night Audit                   | The Manager or System executes the Night Audit to consolidate daily POS charges (Spa, F&B) into Guest Folios and lock audited records. |
+|      27      | Generate and Email Consolidated PDF Invoice               | Billing & Communication       | The System automatically generates a PDF version of the Consolidated Invoice in memory and emails it to the guest immediately after Check-out, adhering to Ministry of Finance formatting standards. |
 
 #### 1.3.2 Use Case Diagrams
 
@@ -697,6 +698,7 @@ batch/cron job, service, API, etc.\]*
 |      4      |  Data Management  |   Database Backup Service   |           Performs scheduled database backups.           |
 |      5      |  Night Audit      | Night Audit Scheduled Job   | Automatically consolidates daily POS charges into Guest Folios at 00:00 every night (UC26). |
 |      6      |  Night Audit      | Night Audit Manual Trigger  | Allows Manager to manually trigger Night Audit for early checkout or reconciliation (UC26).  |
+|      7      |  Communication    | PDF Generator & Email Sender | Automatically compiles billing data into a memory-stream PDF format adhering to official standards and dispatches it via email to the guest upon check-out completion (UC27). |
 
 ### 1.5 Entity Relationship Diagram - Ng?c
 
@@ -1465,6 +1467,88 @@ BR-20 – Night Audit Consolidation.</td>
 <td style="text-align: right;">Assumptions:</td>
 <td colspan="3">- Spa and F&B modules correctly update service status (COMPLETED / DELIVERED) upon completion.
 - The system clock is synchronized and accurate for midnight scheduling.</td>
+</tr>
+</tbody>
+</table>
+
+#### 2.5.4 UC27 – Generate and Email Consolidated PDF Invoice
+
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr>
+<td style="text-align: right;">ID and Name:</td>
+<td colspan="3"><strong>UC27 – Generate and Email Consolidated PDF Invoice</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">Primary Actor:</td>
+<td>System</td>
+<td style="text-align: right;">Secondary Actors:</td>
+<td>Receptionist, Guest</td>
+</tr>
+<tr>
+<td style="text-align: right;">Description:</td>
+<td colspan="3">Hệ thống tự động tạo file PDF Hóa đơn gộp trong bộ nhớ (in-memory) và gửi email xác nhận cho Khách hàng ngay khi quá trình trả phòng (Check-out) thành công.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Trigger:</td>
+<td colspan="3">Receptionist hoàn tất thanh toán và xác nhận Check-out thành công ở UC22.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Preconditions:</td>
+<td colspan="3">- Quá trình Check-out (UC22) đã hoàn tất và lưu DB thành công.<br />
+- Khách hàng có địa chỉ email hợp lệ.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Postconditions:</td>
+<td colspan="3">- Email đính kèm file PDF được đưa vào hàng đợi và gửi đi.<br />
+- Lịch sử (Audit Log) về việc gửi email được ghi lại.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Normal Flow:</td>
+<td colspan="3"><ol type="1">
+<li>Hệ thống lắng nghe sự kiện "Check-out hoàn tất" từ UC22.</li>
+<li>Hệ thống thu thập chi tiết Guest Folio.</li>
+<li>Hệ thống tạo file PDF trực tiếp vào bộ nhớ (Stream) theo form chuẩn của Bộ Tài chính (BR-21).</li>
+<li>Hệ thống soạn Email với nội dung cảm ơn và đính kèm luồng PDF.</li>
+<li>Hệ thống gửi Email đến Guest.</li>
+<li>Hệ thống ghi nhận kết quả gửi vào Audit Log (BR-15) và giải phóng bộ nhớ file PDF.</li>
+</ol></td>
+</tr>
+<tr>
+<td style="text-align: right;">Alternative Flows:</td>
+<td colspan="3">- A1. Khách hàng không có Email.<br />
+→ Ghi log cảnh báo MSG-22, hủy việc gửi email.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Exceptions:</td>
+<td colspan="3">- E1. Lỗi SMTP / Không gửi được email.<br />
+→ Ghi lỗi Error Log, báo MSG-23 cho Admin để theo dõi.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Priority:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Frequency of Use:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Business Rules:</td>
+<td colspan="3">BR-15, BR-21.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Other Information:</td>
+<td colspan="3">- File PDF không được lưu trữ vật lý (trên đĩa) để tránh lộ lọt dữ liệu.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Assumptions:</td>
+<td colspan="3">- Máy chủ SMTP và thư viện tạo PDF hoạt động ổn định.</td>
 </tr>
 </tbody>
 </table>
@@ -3306,6 +3390,19 @@ location (e.g., "Page 1 / 8").</td>
 </tbody>
 </table>
 
+### 3.4 Automated System Tasks
+
+#### 3.4.1 Automated PDF Invoice Generation (System-Level)
+
+**[Content #1]**
+
+- **Description:** A headless background process triggered immediately after a successful Checkout (UC22). It aggregates all folio data and generates an in-memory PDF formatted to Ministry of Finance standards (Logo, Tax ID, 10% VAT separation, Total in words).
+- **Mapped Use Case:** UC27 - Generate and Email Consolidated PDF Invoice.
+- **Workflow & Constraints:** 
+  - Generates the PDF as a byte array/stream in RAM.
+  - Attaches the stream directly to an email dispatched to the guest.
+  - Instantly destroys the byte array post-dispatch to ensure absolute data minimization and prevent disk-level data breaches.
+
 ## 4. Non-Functional Requirements - ??c
 
 ### 4.1 External Interfaces
@@ -3503,6 +3600,7 @@ forth.\]*
 |    PF-17    |      Monthly System Uptime      |      = 99.5%      |
 |    PF-18    |          Recovery Time          |   = 30 minutes   |
 |    PF-19    |      Transaction Data Loss      |    Not allowed    |
+|    PF-20    | Asynchronous execution for Email/PDF | Must not block Checkout UI (max 3s). Email completes within 60s. |
 
 #### 4.2.2.2 Related Business Rules
 
@@ -3539,6 +3637,7 @@ forth.\]*
 |    BR-18    |        Authentication and Single Sign-On (SSO)        |                                         The system shall support authentication through Google and Facebook. Accounts registered via SSO must complete email verification before being allowed to book a Retreat Package. The system shall prevent duplicate account creation.                                         |              UC01              |
 |    BR-19    |                 Zero Balance Bypass                   |                                         If a guest's total balance due is exactly 0 VND (e.g., fully pre-paid), the checkout process shall automatically bypass the payment gateway selection and complete the checkout immediately without generating a pending payment transaction.                                         |              UC22              |
 |    BR-20    |           Night Audit Consolidation                   |                                         The system shall automatically or manually consolidate all completed Spa (COMPLETED) and delivered F&B (DELIVERED) charges into the Guest Folio as Folio Items at midnight (00:00) daily. Once audited, these records shall be locked and cannot be modified or deleted.                                         |              UC26              |
+|    BR-21    |          Invoice Formatting Standard                  |                                         File PDF Hóa đơn Gộp được tạo ra bắt buộc phải tuân thủ chuẩn biểu mẫu hóa đơn cơ bản theo quy định của Bộ Tài chính Việt Nam (Bao gồm tên công ty, Mã số thuế, Thuế suất VAT 10% tách riêng, tổng tiền bằng chữ). Không lưu file vật lý.                                         |              UC27              |
 
 ### 5.2 System Messages
 
@@ -3566,6 +3665,8 @@ forth.\]*
 |      19      |     MSG-19     |     Error     |        Unexpected system error        |        An unexpected system error has occurred. Please try again later.        |
 |      20      |     MSG-20     |    Success    |   Night Audit completed successfully  |    Night Audit process completed. All daily charges have been consolidated.    |
 |      21      |     MSG-21     |     Error     |      Night Audit execution failed     |    Night Audit process failed. Please review the error log and retry manually. |
+|      22      |     MSG-22     |    Warning    |       Missing Email address           |    Khách hàng không có địa chỉ email hợp lệ. Vui lòng in hóa đơn giấy tại quầy. |
+|      23      |     MSG-23     |     Error     |       SMTP / Email dispatch error     |    Lỗi hệ thống: Không thể gửi email hóa đơn. Dữ liệu đã được đưa vào hàng đợi gửi lại. |
 
 
 
