@@ -32,19 +32,12 @@ public class AuthController {
     @PostMapping("/register")
     public String registerUser(@ModelAttribute RegisterDto registerDto, Model model) {
         try {
-<<<<<<< HEAD
-            authService.register(registrationDto);
-            model.addAttribute("successMessage", "Link kích hoạt đã được gửi vào hòm thư của bạn. Vui lòng kiểm tra email.");
-            return "auth/register-success";
-        } catch (IllegalArgumentException e) {
-=======
             userService.registerUser(registerDto);
             logger.info("User registered successfully: " + registerDto.getEmail());
             model.addAttribute("success", "Đăng ký thành công!");
             return "redirect:/login";
         } catch (Exception e) {
             logger.warning("Registration error: " + e.getMessage());
->>>>>>> origin/SourceCode
             model.addAttribute("error", e.getMessage());
             model.addAttribute("registerDto", registerDto);
             return "auth/registration";
@@ -57,7 +50,8 @@ public class AuthController {
     }
 
     @PostMapping("/auth")
-    public String doLogin(@RequestParam("email") String email, @RequestParam("password") String password, Model model, HttpSession session) {
+    public String doLogin(@RequestParam("email") String email, @RequestParam("password") String password, Model model,
+            HttpSession session) {
         // Xử lý đăng nhập
         User user = userService.authenticate(email, password);
         if (user == null) {
