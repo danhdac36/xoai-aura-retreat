@@ -47,6 +47,7 @@ public class SpaScheduleController {
     @ResponseBody
     public ResponseEntity<?> getActivePackage(HttpSession session) {
         Integer userId = (Integer) session.getAttribute("userId");
+
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Vui lòng đăng nhập để xem thông tin gói Spa của bạn."));
@@ -86,14 +87,13 @@ public class SpaScheduleController {
     public ResponseEntity<?> scheduleSession(@RequestBody SpaScheduleRequest request, HttpSession session) {
         try {
             Integer userId = (Integer) session.getAttribute("userId");
+
             if (userId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error",
-                                Map.of("code", "AUTH-401", "message", "Vui lòng đăng nhập để tiếp tục.")));
+                        .body(Map.of("error", Map.of("code", "AUTH-401", "message", "Vui lòng đăng nhập để tiếp tục.")));
             }
 
-            // Chống IDOR: Xác minh bookingId trong request có đúng là của khách hàng đang
-            // đăng nhập không
+            // 2. Chống IDOR: Xác minh bookingId trong request có đúng là của khách hàng đang đăng nhập không
             boolean isOwner = treatmentBookingRepository.findUnscheduledBookingsByGuestId(userId).stream()
                     .anyMatch(b -> b.getBookingId().equals(request.getBookingId()));
 
