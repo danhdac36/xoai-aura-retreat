@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/public-layout}">
+<head>
+    <th:block layout:fragment="styles">
+        <link rel="stylesheet" th:href="@{/css/public/spa.css}">
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <main>
+            <!-- Hero Section -->
+            <section class="relative w-full h-[100vh] min-h-[700px] flex items-end pb-section-gap">
+                <div class="absolute inset-0 z-0">
+                    <img alt="Xoai Aura Spa Reception" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbiGhI5VX23V4BgU5ZRf_Ml6VSjXZyD0IbGx58nsozVY58gZicWbhrttlS5k6S2vu4PPIt5FHYUhYlDtPoJsNntYRCTwhEVU9MeFTudPy5Krq8zzIjoJXOjXjT1O9QL7VD4P_jVw1AXx-LkXl6WNdALYppaVupbpXtQYi8PZ11SdmyXkAYiBb7moldMGu9--Ec8EpX4TCeFrCqmrMD-vaOPn6ieY5J7ecFUpDLsx9-M4rNx1xiLLwJq6M45BaRvYnOHuguTKKzAaU"/>
+                    <div class="absolute inset-0 hero-overlay"></div>
+                </div>
+                <div class="relative z-10 w-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+                    <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-white mb-stack-md">Aura Spa &amp; Trị Liệu</h1>
+                    <p class="font-body-lg text-body-lg text-white/95 max-w-2xl leading-relaxed">Tái tạo tâm hồn với các liệu trình được thiết kế riêng cho hồ sơ sức khỏe độc nhất của bạn. Nơi sự tĩnh lặng gặp gỡ khoa học hiện đại và trí tuệ cổ xưa.</p>
+                </div>
+            </section>
+            <!-- Introduction & Personalization -->
+            <section class="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
+                <div class="md:col-span-5 md:col-start-2 flex flex-col gap-stack-lg">
+                    <h2 class="font-headline-lg text-headline-lg text-primary">Hành Trình Trở Về Với Bản Thân</h2>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                        Tại Xoai Aura, chúng tôi tin rằng sức khỏe thực sự không bao giờ là một khuôn mẫu chung cho tất cả. Các liệu pháp của chúng tôi được tuyển chọn tỉ mỉ sau một cuộc tư vấn sức khỏe toàn diện và bảo mật.
+                    </p>
+                    <p class="font-body-md text-body-md text-outline leading-relaxed">
+                        Bằng cách phân tích bối cảnh thể chất và cảm xúc độc đáo của bạn, các chuyên gia của chúng tôi sẽ thiết kế một chuỗi các liệu trình riêng biệt. Quyền riêng tư về dữ liệu của bạn là tối thượng; mọi hồ sơ sức khỏe đều được bảo mật nghiêm ngặt.
+                    </p>
+                    <div>
+                        <a class="inline-flex items-center gap-2 text-secondary border-b border-secondary pb-1 hover:opacity-80 transition-opacity" href="#">
+                            <span class="font-label-md text-label-md uppercase tracking-widest">Đặt Lịch Tư Vấn</span>
+                            <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="md:col-span-4 md:col-start-8 mt-12 md:mt-0">
+                    <div class="bg-surface-container-low rounded-xl p-8 border border-outline-variant/30 shadow-sm">
+                        <h3 class="font-headline-sm text-headline-sm text-primary mb-8 border-b border-outline-variant/20 pb-4">Lộ Trình Aura</h3>
+                        <ul class="flex flex-col gap-8 relative before:absolute before:inset-y-0 before:left-[11px] before:w-[1px] before:bg-outline-variant/50">
+                            <li class="flex gap-6 relative">
+                                <div class="w-6 h-6 rounded-full bg-secondary flex-shrink-0 z-10 flex items-center justify-center">
+                                    <div class="w-2 h-2 rounded-full bg-surface"></div>
+                                </div>
+                                <div>
+                                    <h4 class="font-label-md text-label-md text-primary uppercase tracking-widest mb-1">1. Tư Vấn</h4>
+                                    <p class="text-sm text-on-surface-variant">Đối thoại chăm sóc sức khỏe ban đầu</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-6 relative">
+                                <div class="w-6 h-6 rounded-full bg-surface border border-secondary flex-shrink-0 z-10 flex items-center justify-center">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+                                </div>
+                                <div>
+                                    <h4 class="font-label-md text-label-md text-primary uppercase tracking-widest mb-1">2. Phân Tích Hồ Sơ</h4>
+                                    <p class="text-sm text-on-surface-variant">Thu thập thông tin chuyên sâu</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-6 relative">
+                                <div class="w-6 h-6 rounded-full bg-surface border border-secondary flex-shrink-0 z-10 flex items-center justify-center">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+                                </div>
+                                <div>
+                                    <h4 class="font-label-md text-label-md text-primary uppercase tracking-widest mb-1">3. Lịch Trình Riêng Biệt</h4>
+                                    <p class="text-sm text-on-surface-variant">Phù hợp với thời gian biểu của bạn</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-6 relative">
+                                <div class="w-6 h-6 rounded-full bg-surface border border-secondary flex-shrink-0 z-10 flex items-center justify-center">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+                                </div>
+                                <div>
+                                    <h4 class="font-label-md text-label-md text-primary uppercase tracking-widest mb-1">4. Trị Liệu Toàn Diện</h4>
+                                    <p class="text-sm text-on-surface-variant">Thực hiện lộ trình thiết kế riêng</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            <!-- Categories / Bento Grid -->
+            <section class="py-section-gap bg-surface-container-low px-margin-mobile md:px-margin-desktop">
+                <div class="max-w-[1440px] mx-auto">
+                    <div class="mb-stack-lg flex flex-col md:flex-row justify-between items-end border-b border-outline-variant/30 pb-6">
+                        <div>
+                            <h2 class="font-headline-lg text-headline-lg text-primary mb-2">Liệu Pháp Chọn Lọc</h2>
+                            <p class="font-body-md text-on-surface-variant">Bắt nguồn từ truyền thống, nâng tầm bởi khoa học.</p>
+                        </div>
+                        <a class="hidden md:inline-block font-label-md text-label-md text-secondary hover:opacity-80 transition-opacity uppercase tracking-widest flex items-center gap-2" href="#">
+                            Khám Phá Toàn Bộ <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+                        <!-- Card 1 - Signature / Massage -->
+                        <div class="relative rounded-2xl overflow-hidden bg-surface group h-[600px]">
+                            <img alt="Hot Stone Massage Signature Treatment" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmezDTRBkbtJG2-T2OHieiB55Y-btTWI2qMzisnC2dz0375CgUaFUX0OJxgDGyGjkPfal_jW60AymcaPz0p_xpGG4kRW2I8PlX2LJb68N4YGg_4JbTsB5uMveSeK972Ih-X-VveqSBR9RTFj9cz79IaBrDcfaUtBb53gSUwaslz63ke_s4gu4YbCjsOBaLHDqX92i3CGy3UA7tBZzO_nYZr0BRQDKj6ksvYOMtox6teB9qSSXkoZBwjBsAy5rRJzeHWwFowoLg-6Q"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                            <div class="absolute inset-4 border border-white/30 rounded-xl pointer-events-none transition-opacity group-hover:border-white/50"></div>
+                            <div class="absolute bottom-8 left-8 right-8 flex justify-between items-end text-white">
+                                <div>
+                                    <span class="font-label-md text-label-md uppercase tracking-widest opacity-80 block mb-2">Signature</span>
+                                    <h4 class="font-headline-sm text-headline-sm">Nghi Thức Đặc Trưng</h4>
+                                </div>
+                                <span class="material-symbols-outlined text-3xl">spa</span>
+                            </div>
+                        </div>
+                        <!-- Card 2 - Healing / Foot Soak -->
+                        <div class="relative rounded-2xl overflow-hidden bg-surface group h-[600px]">
+                            <img alt="Traditional Herbal Foot Soak" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCREfInu6WwovSmyJotwYypyq0CFwaiM5JtKzAfG9L7hLIqxUIF5VZ9-TmaUF5FlpIPi89rkPDFdnSU5hqt2CjSBxuojinUGi5fJNt3l_YvzW12pIZFOjcDcIG1LiE8MZnQjtI14-dtFQJu8k4D-H1Po1Sl1RIEDDHknLcnFeqTUJAUyuGZROFndmI1o1VtU-lGc9rPAVx-611WYY2jbGPeeKOl8Mhk2Xa2MQL7U69eZE7-r8OfU9lIPCbycgpcp_HPe4uGF0nC1z0"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                            <div class="absolute inset-4 border border-white/30 rounded-xl pointer-events-none transition-opacity group-hover:border-white/50"></div>
+                            <div class="absolute bottom-8 left-8 right-8 flex justify-between items-end text-white">
+                                <div>
+                                    <span class="font-label-md text-label-md uppercase tracking-widest opacity-80 block mb-2">Healing</span>
+                                    <h4 class="font-headline-sm text-headline-sm">Massage Trị Liệu</h4>
+                                </div>
+                                <span class="material-symbols-outlined text-3xl">self_improvement</span>
+                            </div>
+                        </div>
+                        <!-- Card 3 - Revive / Essential Oils -->
+                        <div class="relative rounded-2xl overflow-hidden bg-surface group h-[600px]">
+                            <img alt="Organic Essential Oils" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvUYEQU0llsVUwRmljGdeiVnBcZ6zlSHicotHBvT0HW1T_HqPg9V0w-XN8srM1347jOxUuDsqsOSpXKRUAzJjPpVEXUbG3I1lkMePrDX1lHznZxDuoycUXFvt5_-bfD9kWP-6G8dwxRQZtJ8UDgKCaGDzdfxsnulqSPPssJWEkm9V44yZ4vE9s39gKMk2-GD7u-7XEbq4f9TvAuFF_EvkPqzhREhDCMbLZ5dDwtTQGZioxpW329-2YN1FFaJokAUTzHZHaZjkEwNc"/>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                            <div class="absolute inset-4 border border-white/30 rounded-xl pointer-events-none transition-opacity group-hover:border-white/50"></div>
+                            <div class="absolute bottom-8 left-8 right-8 flex justify-between items-end text-white">
+                                <div>
+                                    <span class="font-label-md text-label-md uppercase tracking-widest opacity-80 block mb-2">Revive</span>
+                                    <h4 class="font-headline-sm text-headline-sm">Cơ Thể &amp; Làn Da</h4>
+                                </div>
+                                <span class="material-symbols-outlined text-3xl">water_drop</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- CTA Section -->
+            <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap text-center">
+                <h2 class="font-display-lg text-display-lg text-primary mb-stack-md">Bắt đầu hành trình cân bằng.</h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-stack-lg">
+                    Kết nối với bộ phận Wellness Concierge của chúng tôi để thảo luận về trạng thái thể chất hiện tại của bạn và phác thảo chương trình sơ bộ.
+                </p>
+                <a th:href="@{/login}" class="bg-secondary text-on-secondary px-10 py-5 rounded hover:opacity-90 transition-opacity font-label-md text-label-md uppercase tracking-widest shadow-lg inline-block">
+                    Liên hệ Wellness Concierge
+                </a>
+            </section>
+        </main>
+    </div>
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/public/spa.js}"></script>
+    </th:block>
+</body>
+</html>
