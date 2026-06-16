@@ -46,10 +46,10 @@ public class SpaScheduleController {
     @GetMapping("/active-package")
     @ResponseBody
     public ResponseEntity<?> getActivePackage(HttpSession session) {
-        // Lấy userId, chưa đăng nhập thì tự động gán ID = 6 (Guest 1)
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null) {
-            userId = 6;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Vui lòng đăng nhập để xem thông tin gói Spa của bạn."));
         }
 
         Optional<TreatmentBooking> firstBooking = treatmentBookingRepository.findUnscheduledBookingsByGuestId(userId)
@@ -85,6 +85,24 @@ public class SpaScheduleController {
     @ResponseBody
     public ResponseEntity<?> scheduleSession(@RequestBody SpaScheduleRequest request, HttpSession session) {
         try {
+            Integer userId = (Integer) session.getAttribute("userId");
+            if (userId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error",
+                                Map.of("code", "AUTH-401", "message", "Vui lòng đăng nhập để tiếp tục.")));
+            }
+
+            // Chống IDOR: Xác minh bookingId trong request có đúng là của khách hàng đang
+            // đăng nhập không
+            boolean isOwner = treatmentBookingRepository.findUnscheduledBookingsByGuestId(userId).stream()
+                    .anyMatch(b -> b.getBookingId().equals(request.getBookingId()));
+
+            if (!isOwner) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error",
+                                Map.of("code", "AUTH-403", "message", "Bạn không có quyền đặt lịch cho gói này.")));
+            }
+
             SpaScheduleResponse response = spaScheduleService.scheduleSession(request);
 
             Map<String, Object> result = new HashMap<>();

@@ -18,13 +18,14 @@ public interface TherapistRepository extends JpaRepository<Therapist, Integer> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT t FROM Therapist t " +
-           "WHERE t.status = 'Active' " +
-           "AND NOT EXISTS (" +
-           "  SELECT 1 FROM Schedule s " +
-           "  WHERE s.therapist.therapistCode = t.therapistCode AND s.isDelete = false " +
-           "  AND s.startTime < :reqEnd AND s.endTime > :reqStart" +
-           ") ORDER BY t.therapistCode ASC")
-    List<Therapist> findAvailableTherapistsWithLock(@Param("reqStart") LocalDateTime reqStart, @Param("reqEnd") LocalDateTime reqEnd);
+            "WHERE t.status = 'Active' " +
+            "AND NOT EXISTS (" +
+            "  SELECT 1 FROM Schedule s " +
+            "  WHERE s.therapist.therapistCode = t.therapistCode AND s.isDelete = false " +
+            "  AND s.startTime < :reqEnd AND s.endTime > :reqStart" +
+            ") ORDER BY t.therapistCode ASC")
+    List<Therapist> findAvailableTherapistsWithLock(@Param("reqStart") LocalDateTime reqStart,
+            @Param("reqEnd") LocalDateTime reqEnd);
 
     @Query("SELECT u.fullName FROM User u JOIN Therapist t ON u.id = t.id WHERE t.therapistCode = :therapistCode")
     String findTherapistNameByCode(@Param("therapistCode") String therapistCode);

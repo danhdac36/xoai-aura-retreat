@@ -27,10 +27,10 @@ public class TherapistScheduleController {
     public String getDailySchedule(@RequestParam(value = "date", required = false) String dateStr,
             HttpSession session, Model model) {
 
-        // Lấy mã nhân viên, chưa đăng nhập tự gán "TH0001" để test
         String therapistCode = (String) session.getAttribute("therapistCode");
+
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
-            therapistCode = "TH0001";
+            return "redirect:/login";
         }
 
         LocalDate targetDate = LocalDate.now();
@@ -60,8 +60,9 @@ public class TherapistScheduleController {
             RedirectAttributes redirectAttributes) {
 
         String therapistCode = (String) session.getAttribute("therapistCode");
+
         if (therapistCode == null || therapistCode.trim().isEmpty()) {
-            therapistCode = "TH0001";
+            return "redirect:/login";
         }
 
         try {

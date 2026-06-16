@@ -38,16 +38,24 @@ public class SpaReceptionistController {
     }
 
     @GetMapping("/manual")
-    public String showManualBookingPage(Model model) {
-        // Mở toang: Load thẳng danh sách dịch vụ
+    public String showManualBookingPage(HttpSession session, Model model) {
+        String role = (String) session.getAttribute("role");
+        if (role == null || (!"RECEPTIONIST".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role))) {
+            return "redirect:/login";
+        }
+
         model.addAttribute("services", treatmentServiceRepository.findByIsAvailableTrueAndIsDeleteFalse());
         return "spa/receptionist-booking";
     }
 
     @GetMapping("/checked-in-bookings")
     @ResponseBody
-    public ResponseEntity<List<Map<String, Object>>> getCheckedInBookings() {
-        // Mở toang: Trả thẳng dữ liệu API
+    public ResponseEntity<List<Map<String, Object>>> getCheckedInBookings(HttpSession session) {
+        String role = (String) session.getAttribute("role");
+        if (role == null || (!"RECEPTIONIST".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role))) {
+            return ResponseEntity.status(403).build();
+        }
+
         return ResponseEntity.ok(spaBookingRepository.findCheckedInBookingsWithGuestDetails());
     }
 
@@ -60,11 +68,13 @@ public class SpaReceptionistController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        // Lấy userId, nếu chưa đăng nhập thì tự động lấy ID = 1 (Admin/Receptionist) để
-        // chống lỗi DB
+        String role = (String) session.getAttribute("role");
         Integer userId = (Integer) session.getAttribute("userId");
-        if (userId == null) {
-            userId = 1;
+
+        if (role == null || userId == null
+                || (!"RECEPTIONIST".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role))) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền thực hiện hành động này.");
+            return "redirect:/login";
         }
 
         try {

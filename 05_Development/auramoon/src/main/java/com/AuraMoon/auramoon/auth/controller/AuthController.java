@@ -52,30 +52,35 @@ public class AuthController {
     @PostMapping("/auth")
     public String doLogin(@RequestParam("email") String email, @RequestParam("password") String password, Model model,
             HttpSession session) {
-        // Xử lý đăng nhập
+
+        // 1. Xác thực tài khoản
         User user = userService.authenticate(email, password);
         if (user == null) {
             model.addAttribute("error", "Email hoặc mật khẩu không đúng");
             return "auth/login";
         }
 
-        // 1. Vẫn giữ lại code của bạn cậu (để không làm hỏng chức năng khác)
+        // 2. Lưu thông tin cơ bản
         session.setAttribute("currentUser", user);
+        session.setAttribute("userId", user.getId());
 
-        // 2. THÊM MỚI: Lưu các biến lẻ để phục vụ cho Spa Controller của cậu
-        session.setAttribute("userId", user.getId()); // Lưu ID
+        String roleName = user.getRole().getRoleName();
+        session.setAttribute("role", roleName);
 
-        // Lưu Role (Giả sử User Entity của cậu có hàm getRole() và Role có
-        // getRoleName())
-        if (user.getRole() != null) {
-            session.setAttribute("role", user.getRole().getRoleName());
-        }
+        // 3. LOGIC CẤP "THẺ NHÂN VIÊN" CHO THERAPIST
+        // if ("THERAPIST".equalsIgnoreCase(roleName)) {
 
-        // Nếu có logic lấy TherapistCode thì thêm vào đây, ví dụ:
-        // session.setAttribute("therapistCode",
-        // therapistService.getCodeByUserId(user.getUserId()));
+        // // Sếp cần gọi service để chọc xuống bảng THERAPIST, tìm therapist_code dựa
+        // vào
+        // // user_id
+        // // Ví dụ: SELECT therapist_code FROM THERAPIST WHERE therapist_id = ?
+        // String tCode = therapistService.getTherapistCodeByUserId(user.getId());
 
-        session.setMaxInactiveInterval(30 * 60); // 30 minutes
+        // // Nhét vào Session
+        // session.setAttribute("therapistCode", tCode);
+        // }
+
+        session.setMaxInactiveInterval(30 * 60);
         return "redirect:/home";
     }
 
