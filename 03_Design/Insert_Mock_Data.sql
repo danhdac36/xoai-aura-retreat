@@ -24,16 +24,16 @@ SET IDENTITY_INSERT [ROLE] OFF;
 -- Password mặc định: 123456 (Đã hash Bcrypt)
 SET IDENTITY_INSERT [USER] ON;
 INSERT INTO [USER] (user_id, role_id, email, password_hash, full_name, gender, date_of_birth, phone, Identify_code, status, is_delete) VALUES
-(1, 1, 'admin@auramoon.com', '$2a$10$wE9XG8uW4fGf9sPZ4a0e4O5vW0yqXk6Zl7wE9XG8uW4fGf9sPZ4a0', N'Admin Tổng', 'Male', '1990-01-01', '0123456789', 'ID001', 'Active', 0),
-(2, 2, 'guest1@gmail.com', '$2a$10$wE9XG8uW4fGf9sPZ4a0e4O5vW0yqXk6Zl7wE9XG8uW4fGf9sPZ4a0', N'Nguyễn Văn Khách', 'Male', '1995-05-15', '0987654321', 'ID002', 'Active', 0),
-(3, 3, 'therapist1@auramoon.com', '$2a$10$wE9XG8uW4fGf9sPZ4a0e4O5vW0yqXk6Zl7wE9XG8uW4fGf9sPZ4a0', N'Trần Thị Spa', 'Female', '1992-08-20', '0912345678', 'ID003', 'Active', 0),
-(4, 3, 'therapist2@auramoon.com', '$2a$10$wE9XG8uW4fGf9sPZ4a0e4O5vW0yqXk6Zl7wE9XG8uW4fGf9sPZ4a0', N'Lê Văn Massage', 'Male', '1988-11-10', '0933445566', 'ID004', 'Active', 0),
-(5, 2, 'guest2@gmail.com', '$2a$10$wE9XG8uW4fGf9sPZ4a0e4O5vW0yqXk6Zl7wE9XG8uW4fGf9sPZ4a0', N'Hoàng Thị Khách 2', 'Female', '1998-02-12', '0922334455', 'ID005', 'Active', 0);
+(1, 1, 'admin@auramoon.com', '$2a$10$wE9XG8uW4fGf9sPZ4a0e4O5vW0yqXk6Zl7wE9XG8uW4fGf9sPZ4a0', N'Admin Tổng', 'MALE', '1990-01-01', '0123456789', 'ID001', 'ACTIVE', 0),
+(2, 2, 'guest1@gmail.com', '$2a$10$wE9XG8uW4fGf9sPZ4a0e4O5vW0yqXk6Zl7wE9XG8uW4fGf9sPZ4a0', N'Nguyễn Văn Khách', 'MALE', '1995-05-15', '0987654321', 'ID002', 'ACTIVE', 0),
+(3, 3, 'therapist1@auramoon.com', '$2a$10$wE9XG8uW4fGf9sPZ4a0e4O5vW0yqXk6Zl7wE9XG8uW4fGf9sPZ4a0', N'Trần Thị Spa', 'FEMALE', '1992-08-20', '0912345678', 'ID003', 'ACTIVE', 0),
+(4, 3, 'therapist2@auramoon.com', '$2a$10$wE9XG8uW4fGf9sPZ4a0e4O5vW0yqXk6Zl7wE9XG8uW4fGf9sPZ4a0', N'Lê Văn Massage', 'MALE', '1988-11-10', '0933445566', 'ID004', 'ACTIVE', 0),
+(5, 2, 'guest2@gmail.com', '$2a$10$wE9XG8uW4fGf9sPZ4a0e4O5vW0yqXk6Zl7wE9XG8uW4fGf9sPZ4a0', N'Hoàng Thị Khách 2', 'FEMALE', '1998-02-12', '0922334455', 'ID005', 'ACTIVE', 0);
 SET IDENTITY_INSERT [USER] OFF;
 
 INSERT INTO THERAPIST (therapist_id, therapist_code, status) VALUES 
-(3, 'NV001', 'Active'),
-(4, 'NV002', 'Active');
+(3, 'NV001', 'AVAILABLE'),
+(4, 'NV002', 'AVAILABLE');
 
 -- =========================================================================
 -- 2. CHÈN DỮ LIỆU CƠ SỞ VẬT CHẤT (VILLA, SPA ROOM, SERVICES)
@@ -47,11 +47,11 @@ SET IDENTITY_INSERT VILLA_TYPE OFF;
 
 SET IDENTITY_INSERT VILLA ON;
 INSERT INTO VILLA (villa_id, villa_type, villa_code, limit_person, villa_status, cleaning_status, is_delete) VALUES
-(1, 1, 'GV01', 2, 'Available', 'Clean', 0),
-(2, 1, 'GV02', 2, 'Available', 'Clean', 0),
-(3, 2, 'OV01', 4, 'Available', 'Clean', 0),
-(4, 2, 'OV02', 4, 'Occupied', 'Clean', 0),
-(5, 3, 'PR01', 6, 'Available', 'Clean', 0);
+(1, 1, 'GV01', 2, 'AVAILABLE', 'CLEAN', 0),
+(2, 1, 'GV02', 2, 'AVAILABLE', 'CLEAN', 0),
+(3, 2, 'OV01', 4, 'AVAILABLE', 'CLEAN', 0),
+(4, 2, 'OV02', 4, 'OCCUPIED', 'CLEAN', 0),
+(5, 3, 'PR01', 6, 'AVAILABLE', 'CLEAN', 0);
 SET IDENTITY_INSERT VILLA OFF;
 
 SET IDENTITY_INSERT TREATMENT_SERVICE ON;
@@ -63,8 +63,8 @@ SET IDENTITY_INSERT TREATMENT_SERVICE OFF;
 
 SET IDENTITY_INSERT TREATMENT_ROOM ON;
 INSERT INTO TREATMENT_ROOM (room_id, room_code, room_name, status, is_delete) VALUES
-(1, 'RM01', N'Phòng Spa VIP 1', 'Available', 0),
-(2, 'RM02', N'Phòng Spa Đôi 1', 'Available', 0);
+(1, 'RM01', N'Phòng Spa VIP 1', 'AVAILABLE', 0),
+(2, 'RM02', N'Phòng Spa Đôi 1', 'AVAILABLE', 0);
 SET IDENTITY_INSERT TREATMENT_ROOM OFF;
 
 SET IDENTITY_INSERT RETREAT_PACKAGE ON;
@@ -85,23 +85,23 @@ SET IDENTITY_INSERT MENU_ITEM OFF;
 -- =========================================================================
 SET IDENTITY_INSERT BOOKING ON;
 INSERT INTO BOOKING (booking_id, guest_id, package_id, assigned_villa_id, checkin_date, checkout_date, total_guests, booking_status, payment_status, is_delete, create_at) VALUES
-(1, 2, 1, 4, '2026-06-10', '2026-06-13', 2, 'CHECKED-IN', 'DEPOSITED', 0, '2026-06-01 10:00:00'),
+(1, 2, 1, 4, '2026-06-10', '2026-06-13', 2, 'CHECKED_IN', 'PARTIAL', 0, '2026-06-01 10:00:00'),
 (2, 5, 2, null, '2026-06-20', '2026-06-25', 1, 'PENDING', 'UNPAID', 0, '2026-06-05 14:00:00'),
-(3, 2, 1, 1, '2026-05-10', '2026-05-13', 2, 'COMPLETED', 'PAID', 0, '2026-05-01 09:00:00'); -- Booking cũ để test biểu đồ doanh thu tháng 5
+(3, 2, 1, 1, '2026-05-10', '2026-05-13', 2, 'CHECKED_OUT', 'PAID', 0, '2026-05-01 09:00:00'); -- Booking cũ để test biểu đồ doanh thu tháng 5
 SET IDENTITY_INSERT BOOKING OFF;
 
 SET IDENTITY_INSERT GUEST_FOLIO ON;
 INSERT INTO GUEST_FOLIO (folio_id, booking_id, total_package_amout, total_extra_fb, final_amount, status, is_delete) VALUES
-(1, 1, 15000000, 660000, 15660000, 'PENDING', 0),
-(2, 2, 25000000, 0, 25000000, 'PENDING', 0),
-(3, 3, 15000000, 500000, 15500000, 'PAID', 0);
+(1, 1, 15000000, 660000, 15660000, 'OPEN', 0),
+(2, 2, 25000000, 0, 25000000, 'OPEN', 0),
+(3, 3, 15000000, 500000, 15500000, 'CLOSED', 0);
 SET IDENTITY_INSERT GUEST_FOLIO OFF;
 
 SET IDENTITY_INSERT TREATMENT_BOOKING ON;
 INSERT INTO TREATMENT_BOOKING (treatment_id, booking_id, folio_id, service_id, note, status, is_delete) VALUES
-(1, 1, 1, 1, N'Khách đau mỏi vai gáy', 'Confirmed', 0),
-(2, 1, 1, 2, N'Khách da nhạy cảm', 'Pending', 0),
-(3, 3, 3, 1, N'Khách đã hoàn thành', 'Completed', 0);
+(1, 1, 1, 1, N'Khách đau mỏi vai gáy', 'SCHEDULED', 0),
+(2, 1, 1, 2, N'Khách da nhạy cảm', 'PENDING', 0),
+(3, 3, 3, 1, N'Khách đã hoàn thành', 'COMPLETED', 0);
 SET IDENTITY_INSERT TREATMENT_BOOKING OFF;
 
 SET IDENTITY_INSERT SCHEDULE ON;
@@ -113,7 +113,7 @@ SET IDENTITY_INSERT SCHEDULE OFF;
 
 SET IDENTITY_INSERT MEAL_ORDER ON;
 INSERT INTO MEAL_ORDER (meal_order_id, booking_id, folio_id, guest_id, place_order, order_status) VALUES
-(1, 1, 1, 2, 'Room', 'Completed');
+(1, 1, 1, 2, 'Room', 'DELIVERED');
 SET IDENTITY_INSERT MEAL_ORDER OFF;
 
 SET IDENTITY_INSERT MEAL_ORDER_ITEM ON;
@@ -127,9 +127,3 @@ INSERT INTO FOLIO_ITEM (folio_item_id, folio_id, service_category, reference_id,
 (1, 1, 'F&B', 1, N'Đồ ăn phòng: Salad Cá Hồi x 2, Nước Ép x 2', 660000, 'UNPAID'),
 (2, 3, 'Spa', 3, N'Liệu trình phát sinh thêm', 500000, 'PAID');
 SET IDENTITY_INSERT FOLIO_ITEM OFF;
-
-SET IDENTITY_INSERT PAYMENT ON;
-INSERT INTO PAYMENT (payment_id, folio_id, amount, payment_method, payment_gateway, transaction_code, payment_date, status) VALUES
-(1, 1, 5000000, 'Bank', 'VNPay', 'TX123456', '2026-06-01 10:05:00', 'SUCCESS'), -- Cọc
-(2, 3, 15500000, 'Cash', 'Direct', 'TX000000', '2026-05-13 12:00:00', 'SUCCESS'); -- Thanh toán đủ booking tháng 5
-SET IDENTITY_INSERT PAYMENT OFF;
