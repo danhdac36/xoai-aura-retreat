@@ -22,6 +22,7 @@ public class SecurityConfig {
             "/home",
             "/about-us",
             "/auth/login",
+            "/package",
             "/auth/register",
             "/auth/forgot-password",
             "/auth/login-admin",
