@@ -1,4 +1,4 @@
-﻿# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
+# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
 
 # Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 
@@ -24,6 +24,7 @@
 | ---------- | ------------------- | ---------------------------------------------------- |
 | 2026-06-13 | Phùng Giang Hải        | Tạo tài liệu EDS lần đầu — UC25 Export Report |
 | 2026-06-14 | Phùng Giang Hải        | Chuẩn hóa Bảng mã lỗi (Mục 10) về chuẩn 5 cột, bảo toàn dữ liệu MVC |
+| 2026-06-16 | Agent                  | Sửa lỗi logic từ Daily sang Monthly theo chuẩn SRS |
 
 # MỤC LỤC
 
@@ -138,7 +139,7 @@
 ```plantuml
 @startuml
 class OccupancyReportRow <<DTO>> {
-  +date: LocalDate
+  +monthLabel: String
   +totalVillas: Integer
   +occupiedVillas: Integer
   +occupancyRate: Double
@@ -195,9 +196,9 @@ ReportService <|.. ReportServiceImpl
 // === REPORT DTO: OccupancyReportRow ===
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class OccupancyReportRow {
-    private LocalDate date;             // Ngày thống kê
+    private String monthLabel;          // Tháng thống kê (VD: "Tháng 06/2026")
     private Integer totalVillas;        // Tổng số villa
-    private Integer occupiedVillas;     // Số villa đang có khách
+    private Integer occupiedVillas;     // Số villa trung bình có khách
     private Double occupancyRate;       // (occupied / total) * 100
     private Integer availableVillas;    // = total - occupied
 }
@@ -219,8 +220,8 @@ public class ReportDataDTO {
     private String reportType;                          // "OCCUPANCY" | "UTILIZATION" | "ALL"
     private LocalDate startDate;
     private LocalDate endDate;
-    private List<OccupancyReportRow> occupancyRows;     // Dữ liệu lấp đầy theo ngày
-    private List<TherapistUtilizationRow> utilizationRows; // Dữ liệu sử dụng theo therapist
+    private List<OccupancyReportRow> occupancyRows;     // Dữ liệu lấp đầy theo tháng
+    private List<TherapistUtilizationRow> utilizationRows; // Dữ liệu sử dụng theo therapist (trung bình tháng)
     private Double avgOccupancyRate;                    // Trung bình occupancy trong khoảng
     private Double avgUtilizationRate;                  // Trung bình utilization trong khoảng
 }
@@ -256,7 +257,7 @@ Service -> BookRepo: findByBookingStatusAndCheckinDateBetween("CHECKED_IN", star
 BookRepo -> DB: SELECT * FROM BOOKING\nWHERE booking_status IN ('CHECKED_IN','CHECKED_OUT')\nAND checkin_date BETWEEN ? AND ?
 BookRepo --> Service: List<Booking>
 
-Service -> Service: Group bookings by date\nCalculate daily occupancy rate
+Service -> Service: Group bookings by month\nCalculate monthly occupancy rate
 
 == Therapist Utilization ==
 Service -> SchedRepo: findByStartTimeBetween(startDate, endDate)
@@ -449,7 +450,7 @@ public class ReportController {
 
 - Bộ lọc: `th:value="${startDate}"`, `th:value="${endDate}"`, `th:selected="${reportType == 'ALL'}"`
 - KPI Cards: `th:text="${data.avgOccupancyRate} + '%'"`, `th:text="${data.avgUtilizationRate} + '%'"`
-- Bảng Occupancy: `th:each="row : ${data.occupancyRows}"` → `th:text="${row.date}"`, `th:text="${row.occupancyRate}"`
+- Bảng Occupancy: `th:each="row : ${data.occupancyRows}"` → `th:text="${row.monthLabel}"`, `th:text="${row.occupancyRate}"`
 - Bảng Utilization: `th:each="row : ${data.utilizationRows}"` → `th:text="${row.therapistName}"`, `th:text="${row.utilizationRate}"`
 - Nút Export: `th:href="@{/manager/report/export(startDate=${startDate}, endDate=${endDate}, reportType=${reportType})}"`
 
@@ -487,7 +488,7 @@ public class ReportController {
 
 Tạo 3 DTO tại `report/dto/`:
 
-- `OccupancyReportRow`: Dữ liệu lấp đầy theo ngày
+- `OccupancyReportRow`: Dữ liệu lấp đầy theo tháng
 - `TherapistUtilizationRow`: Dữ liệu sử dụng theo therapist
 - `ReportDataDTO`: Container tổng hợp cho preview + export
 
@@ -504,7 +505,7 @@ Tạo `ReportService` interface và `ReportServiceImpl`:
 
 - **generateReportData()**: Query data → Build List`<OccupancyReportRow>` + List`<TherapistUtilizationRow>`
 - **exportToExcel()**: Dùng Apache POI tạo XSSFWorkbook với 2 sheets:
-  - Sheet 1 "Room Occupancy": Date | Total Villas | Occupied | Rate | Available
+  - Sheet 1 "Room Occupancy": Month | Total Villas | Occupied | Rate | Available
   - Sheet 2 "Therapist Utilization": Name | Code | Total | Completed | No-Show | Rate
 
 ### Chặng 4 — Controller Layer
@@ -565,7 +566,7 @@ mvn clean install
 
 | TC ID      | Tên                                             | Mức độ | Kết quả mong đợi                                                      |
 | ---------- | ------------------------------------------------ | --------- | ------------------------------------------------------------------------- |
-| RPT-TC-001 | Generate Occupancy Report data thành công      | HIGH      | List`<OccupancyReportRow>` chứa đúng dữ liệu theo ngày            |
+| RPT-TC-001 | Generate Occupancy Report data thành công      | HIGH      | List`<OccupancyReportRow>` chứa đúng dữ liệu theo tháng            |
 | RPT-TC-002 | Generate Therapist Utilization data thành công | HIGH      | List`<TherapistUtilizationRow>` chứa đúng dữ liệu theo therapist   |
 | RPT-TC-003 | Export file Excel thành công                   | HIGH      | byte[] trả về > 0, file mở được trong Excel                         |
 | RPT-TC-004 | Empty data → Report trả về list rỗng         | MEDIUM    | Không throw exception, file Excel có header nhưng không có data rows |
@@ -645,7 +646,7 @@ Bước 2: Kết quả mong đợi
   - Browser tải file: AuraMoon_Report_20260601_20260630.xlsx
   - Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
   - File mở thành công trong Excel
-  - Sheet 1 "Room Occupancy": 30 rows (1 row/ngày)
+  - Sheet 1 "Room Occupancy": N rows (1 row/tháng)
   - Sheet 2 "Therapist Utilization": N rows (1 row/therapist)
 ```
 

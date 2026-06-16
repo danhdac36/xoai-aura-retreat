@@ -64,6 +64,7 @@ Dự án này được thiết kế thành 5 module độc lập nhưng liên k�
 - **UC24**: Với tư cách là Quản lý, tôi muốn xem Bảng điều khiển Doanh thu (Biểu đồ tròn/cột) phân tách thu nhập theo Gói retreat, Spa và F&B.
 - **UC25**: Với tư cách là Quản lý, tôi muốn xuất báo cáo "Tỷ lệ Lấp đầy phòng & Mức độ sử dụng Chuyên viên trị liệu" hàng tháng ra file Excel.
 - **UC26**: Với tư cách là Quản lý/Hệ thống, tôi muốn thực thi quy trình "Night Audit" (thủ công hoặc tự động lúc 12h đêm) để hệ thống tự động rà soát, chốt doanh thu các điểm bán hàng (POS) trong ngày và tự động cộng phí tiền phòng (Room Charge) vào Guest Folio Item cho ngày hôm đó
+- **UC27**: Với tư cách là Hệ thống, tôi muốn tự động kết xuất Hóa đơn gộp (Consolidated Invoice) dưới định dạng file PDF và gửi tự động vào email của khách hàng ngay sau khi Lễ tân hoàn tất Check-out.
 
 # 5. Quy tắc Nghiệp vụ - Ràng buộc Nghiêm ngặt (Strict Constraints)
 
