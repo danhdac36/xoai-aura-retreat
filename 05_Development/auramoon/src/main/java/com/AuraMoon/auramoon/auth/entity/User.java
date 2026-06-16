@@ -1,10 +1,6 @@
 package com.AuraMoon.auramoon.auth.entity;
 
-<<<<<<< HEAD:05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/entity/User.java
-=======
 import com.AuraMoon.auramoon.auth.config.AesDataEncryptor;
-import com.AuraMoon.auramoon.common.entity.BaseEntity;
->>>>>>> NMNGocc:auramoon/src/main/java/com/AuraMoon/auramoon/auth/entity/User.java
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

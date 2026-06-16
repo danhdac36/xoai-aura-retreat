@@ -67,6 +67,20 @@ public class BookingServiceImpl implements BookingService {
 
         Booking savedBooking = bookingRepository.save(booking);
 
+        // Create GuestFolio immediately so that payment and deposits can reference it
+        GuestFolio guestFolio = GuestFolio.builder()
+                .bookingId(savedBooking.getId())
+                .totalPackageAmount(savedBooking.getRetreatPackage().getPrice().add(
+                        BigDecimal.valueOf(retreatPackage.getDurationDays()).multiply(villaType.getPricePerDay())
+                ))
+                .totalExtraFb(BigDecimal.ZERO)
+                .finalAmount(savedBooking.getRetreatPackage().getPrice().add(
+                        BigDecimal.valueOf(retreatPackage.getDurationDays()).multiply(villaType.getPricePerDay())
+                ))
+                .status("PENDING")
+                .build();
+        guestFolioRepository.save(guestFolio);
+
         return BookingResponseDTO.builder()
                 .bookingId(savedBooking.getId())
                 .guestId(savedBooking.getGuestId())
@@ -90,13 +104,10 @@ public class BookingServiceImpl implements BookingService {
         booking.setPaymentStatus("DEPOSITED");
         bookingRepository.save(booking);
 
-        GuestFolio guestFolio = GuestFolio.builder()
-                .bookingId(booking.getId())
-                .totalPackageAmount(booking.getRetreatPackage().getPrice())
-                .totalExtraFb(BigDecimal.ZERO)
-                .finalAmount(booking.getRetreatPackage().getPrice())
-                .status("OPEN")
-                .build();
+        // Update GuestFolio status to "OPEN" upon successful deposit payment
+        GuestFolio guestFolio = guestFolioRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new RuntimeException("GuestFolio not found for bookingId: " + bookingId));
+        guestFolio.setStatus("OPEN");
         guestFolioRepository.save(guestFolio);
     }
 }

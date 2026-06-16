@@ -12,7 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@EnableJpaAuditing
 public class SecurityConfig {
 
     @Autowired

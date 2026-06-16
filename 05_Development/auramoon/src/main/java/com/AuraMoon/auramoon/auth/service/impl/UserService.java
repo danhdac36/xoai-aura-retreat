@@ -1,7 +1,11 @@
 package com.AuraMoon.auramoon.auth.service.impl;
 
+import com.AuraMoon.auramoon.auth.dto.request.RegisterDto;
+import com.AuraMoon.auramoon.auth.entity.Role;
 import com.AuraMoon.auramoon.auth.entity.User;
+import com.AuraMoon.auramoon.auth.repository.IRoleRepository;
 import com.AuraMoon.auramoon.auth.repository.IUserRepository;
+import com.AuraMoon.auramoon.auth.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,14 +15,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService implements IUserService, UserDetailsService {
 
     @Autowired
     private IUserRepository userRepository;
 
-<<<<<<< HEAD:05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/service/impl/UserService.java
     @Autowired
     private IRoleRepository roleRepository;
 
@@ -35,9 +39,6 @@ public class UserService implements UserDetailsService {
         }
         return user;
     }
-
-    // @Autowired
-    // private PasswordEncoder passwordEncoder;
 
     @Override
     public User createUser(User user) {
@@ -66,28 +67,17 @@ public class UserService implements UserDetailsService {
         }
         if (!register.getPassword().equals(register.getConfirmPassword())) {
             throw new RuntimeException("Mật khẩu xác nhận không khớp!");
-=======
-    @Override
-    @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new UsernameNotFoundException("Không tìm thấy tài khoản ứng với email: " + email);
->>>>>>> NMNGocc:auramoon/src/main/java/com/AuraMoon/auramoon/auth/service/impl/UserService.java
         }
 
-        if ("PENDING".equals(user.getStatus())) {
-            throw new UsernameNotFoundException("Tài khoản chưa kích hoạt. Vui lòng kiểm tra email.");
-        }
+        Role guestRole = roleRepository.findByRoleName("GUEST")
+                .orElseThrow(() -> new RuntimeException("Role GUEST không tồn tại trong hệ thống!"));
 
-<<<<<<< HEAD:05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/service/impl/UserService.java
         User user = new User();
         user.setFullName(register.getFullName());
         user.setEmail(register.getEmail());
         user.setPasswordHash(register.getPassword());
         user.setRole(guestRole);
         user.setStatus("ACTIVE");
-        // user.setIsDelete(false);
 
         return userRepository.save(user);
     }
@@ -99,7 +89,20 @@ public class UserService implements UserDetailsService {
 
     @Override
     public void deleteUser(Long id) {
-=======
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("Không tìm thấy tài khoản ứng với email: " + email);
+        }
+
+        if ("PENDING".equals(user.getStatus())) {
+            throw new UsernameNotFoundException("Tài khoản chưa kích hoạt. Vui lòng kiểm tra email.");
+        }
+
         String roleName = user.getRole().getRoleName();
         if (!roleName.startsWith("ROLE_")) {
             roleName = "ROLE_" + roleName;
@@ -110,6 +113,5 @@ public class UserService implements UserDetailsService {
                 user.getPasswordHash(),
                 Collections.singletonList(new SimpleGrantedAuthority(roleName))
         );
->>>>>>> NMNGocc:auramoon/src/main/java/com/AuraMoon/auramoon/auth/service/impl/UserService.java
     }
 }
