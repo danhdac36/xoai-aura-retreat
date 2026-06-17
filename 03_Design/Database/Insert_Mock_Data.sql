@@ -48,7 +48,7 @@ INSERT INTO VILLA_TYPE (type_id, type_name, price_per_day, is_delete) VALUES
 SET IDENTITY_INSERT VILLA_TYPE OFF;
 
 SET IDENTITY_INSERT VILLA ON;
-INSERT INTO VILLA (villa_id, villa_type, villa_code, max_number, villa_status, cleaning_status, is_delete) VALUES
+INSERT INTO VILLA (villa_id, villa_type, villa_code, limit_person, villa_status, cleaning_status, is_delete) VALUES
 (1, 1, 'GV01', 2, 'AVAILABLE', 'CLEAN', 0),
 (2, 1, 'GV02', 2, 'AVAILABLE', 'CLEAN', 0),
 (3, 2, 'OV01', 4, 'AVAILABLE', 'CLEAN', 0),
