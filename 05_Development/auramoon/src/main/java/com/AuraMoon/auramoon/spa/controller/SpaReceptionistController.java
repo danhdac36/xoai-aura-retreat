@@ -6,7 +6,8 @@ import com.AuraMoon.auramoon.spa.service.SpaManualBookingService;
 import com.AuraMoon.auramoon.spa.repository.SpaBookingRepository;
 import com.AuraMoon.auramoon.spa.repository.TreatmentServiceRepository;
 import com.AuraMoon.auramoon.spa.exception.SpaBusinessException;
-import jakarta.servlet.http.HttpSession;
+import com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,24 +39,14 @@ public class SpaReceptionistController {
     }
 
     @GetMapping("/manual")
-    public String showManualBookingPage(HttpSession session, Model model) {
-        String role = (String) session.getAttribute("role");
-        if (role == null || (!"RECEPTIONIST".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role))) {
-            return "redirect:/login";
-        }
-
+    public String showManualBookingPage(Model model) {
         model.addAttribute("services", treatmentServiceRepository.findByIsAvailableTrueAndIsDeleteFalse());
         return "spa/receptionist-booking";
     }
 
     @GetMapping("/checked-in-bookings")
     @ResponseBody
-    public ResponseEntity<List<Map<String, Object>>> getCheckedInBookings(HttpSession session) {
-        String role = (String) session.getAttribute("role");
-        if (role == null || (!"RECEPTIONIST".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role))) {
-            return ResponseEntity.status(403).build();
-        }
-
+    public ResponseEntity<List<Map<String, Object>>> getCheckedInBookings() {
         return ResponseEntity.ok(spaBookingRepository.findCheckedInBookingsWithGuestDetails());
     }
 
@@ -65,17 +56,10 @@ public class SpaReceptionistController {
             @RequestParam("serviceId") Integer serviceId,
             @RequestParam("startTime") String startTimeStr,
             @RequestParam(value = "note", required = false) String note,
-            HttpSession session,
+            @AuthenticationPrincipal UserDetailsResponse userDetails,
             RedirectAttributes redirectAttributes) {
 
-        String role = (String) session.getAttribute("role");
-        Integer userId = (Integer) session.getAttribute("userId");
-
-        if (role == null || userId == null
-                || (!"RECEPTIONIST".equalsIgnoreCase(role) && !"ADMIN".equalsIgnoreCase(role))) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Bạn không có quyền thực hiện hành động này.");
-            return "redirect:/login";
-        }
+        Integer userId = userDetails.getId();
 
         try {
             SpaScheduleRequest request = new SpaScheduleRequest();

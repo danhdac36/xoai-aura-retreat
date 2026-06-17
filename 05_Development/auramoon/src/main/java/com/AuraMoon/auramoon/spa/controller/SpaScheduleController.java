@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import jakarta.servlet.http.HttpSession;
+import com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,13 +46,8 @@ public class SpaScheduleController {
 
     @GetMapping("/active-package")
     @ResponseBody
-    public ResponseEntity<?> getActivePackage(HttpSession session) {
-        Integer userId = (Integer) session.getAttribute("userId");
-
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Vui lòng đăng nhập để xem thông tin gói Spa của bạn."));
-        }
+    public ResponseEntity<?> getActivePackage(@AuthenticationPrincipal UserDetailsResponse userDetails) {
+        Integer userId = userDetails.getId();
 
         Optional<TreatmentBooking> firstBooking = treatmentBookingRepository.findUnscheduledBookingsByGuestId(userId)
                 .stream().findFirst();
@@ -84,16 +80,13 @@ public class SpaScheduleController {
 
     @PostMapping
     @ResponseBody
-    public ResponseEntity<?> scheduleSession(@RequestBody SpaScheduleRequest request, HttpSession session) {
+    public ResponseEntity<?> scheduleSession(@RequestBody SpaScheduleRequest request,
+            @AuthenticationPrincipal UserDetailsResponse userDetails) {
         try {
-            Integer userId = (Integer) session.getAttribute("userId");
+            Integer userId = userDetails.getId();
 
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", Map.of("code", "AUTH-401", "message", "Vui lòng đăng nhập để tiếp tục.")));
-            }
-
-            // 2. Chống IDOR: Xác minh bookingId trong request có đúng là của khách hàng đang đăng nhập không
+            // 2. Chống IDOR: Xác minh bookingId trong request có đúng là của khách hàng
+            // đang đăng nhập không
             boolean isOwner = treatmentBookingRepository.findUnscheduledBookingsByGuestId(userId).stream()
                     .anyMatch(b -> b.getBookingId().equals(request.getBookingId()));
 
