@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 
 <body>
     <aside th:fragment="sidebar"
@@ -14,19 +15,20 @@
                 <span class="material-symbols-outlined" data-icon="home">home</span>
                 <span class="font-label-md text-label-md">Home</span>
             </a>
+            <!--Phân role sec:authorize="hasRole('ADMIN')"-->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                th:href="@{/manager/dashboard}">
+                sec:authorize="hasRole('ADMIN')" th:href="@{/manager/dashboard}">
                 <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
                 <span class="font-label-md text-label-md">Dashboard (Admin)</span>
             </a>
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                th:href="@{/manager/report}">
+                sec:authorize="hasRole('MANAGER')" th:href="@{/manager/report}">
                 <span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
                 <span class="font-label-md text-label-md">Report Export</span>
             </a>
             <!-- Night Audit (UC26) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                th:href="@{/billing/night-audit}">
+                sec:authorize="hasRole('MANAGER')" th:href="@{/billing/night-audit}">
                 <span class="material-symbols-outlined" data-icon="nightlight_round">nightlight_round</span>
                 <span class="font-label-md text-label-md">Night Audit</span>
             </a>
@@ -43,15 +45,26 @@
             </a>
             <!-- Spa Receptionist Booking (SpaReceptionistController) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                th:href="@{/booking-spa/manual}">
+               sec:authorize="hasAnyRole('RECEPTIONIST','ADMIN')"
+               th:href="@{/booking-spa/manual}">
                 <span class="material-symbols-outlined" data-icon="receipt">receipt_long</span>
                 <span class="font-label-md text-label-md">Spa Receptionist</span>
             </a>
             <!-- Therapist Daily (TherapistScheduleController) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                th:href="@{/therapist/schedules/daily}">
+               sec:authorize="hasRole('THERAPIST')"
+               th:href="@{/therapist/schedules/daily}">
                 <span class="material-symbols-outlined" data-icon="schedule">schedule</span>
                 <span class="font-label-md text-label-md">Therapist Daily</span>
+            </a>
+
+            <!-- Cheff viewer(MealOrderController) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200">
+                <form th:action="@{/auth/logout}" method="post">
+                    <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-all font-medium">
+                        Đăng xuất (Logout)
+                    </button>
+                </form>
             </a>
         </nav>
     </aside>

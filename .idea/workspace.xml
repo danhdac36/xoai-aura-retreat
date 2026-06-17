@@ -5,96 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6bfe7052-55e1-4aba-8b55-3b92a635a8e3" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/03_Design/Database/DataTest.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/03_Design/Database/Database_Status_Standardization.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/03_Design/Database/HoS.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/03_Design/Database/Insert_Mock_Data.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/04_Implement/Module5/UC26/UC26_EDS_Night_Audit.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/04_Implement/Module5/UC26/UC26_TDD_Night_Audit.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/controller/NightAuditController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/dto/NightAuditResultDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/exception/NightAuditAlreadyExecutedException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/service/FolioConsolidationServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/service/IFolioConsolidationService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/service/INightAuditService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/service/NightAuditScheduledTask.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/service/NightAuditServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/AuditLogActionType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/BookingStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/CleaningStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/FolioItemStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/GuestFolioStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/MealOrderStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/PaymentGateway.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/PaymentMethod.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/PaymentStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/PaymentTransactionStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/ServiceCategory.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/TherapistStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/TreatmentBookingStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/TreatmentRoomStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/UserGender.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/UserStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/enums/VillaStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/resources/static/css/billing/night-audit.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/resources/static/js/billing/night-audit.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/resources/templates/billing/night-audit-dashboard.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/billing/service/FolioConsolidationServiceTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/billing/service/NightAuditServiceTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/booking/service/impl/ItineraryServiceImplTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/booking/service/impl/RetreatPackageServiceImplTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/05_Development/auramoon/stitch_home.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/07_Reports/EDS_Module_2.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/07_Reports/Module_2_MVC_Architecture_Report.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/07_Reports/TDD_Module_2.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/02_Requirement/Module5/FR_Module5.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/02_Requirement/Module5/UseCase_Module5.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/02_Requirement/SRS_Document_SWP391_G6.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/04_Implement/Module5/Home/Home_EDS_Public_Web.md" beforeDir="false" afterPath="$PROJECT_DIR$/04_Implement/Module5/Home/Home_EDS_Public_Web.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/04_Implement/Module5/UC21/UC21_EDS_Consolidated_Invoice.md" beforeDir="false" afterPath="$PROJECT_DIR$/04_Implement/Module5/UC21/UC21_EDS_Consolidated_Invoice.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/04_Implement/Module5/UC22/UC22_EDS_Process_Final_Payment.md" beforeDir="false" afterPath="$PROJECT_DIR$/04_Implement/Module5/UC22/UC22_EDS_Process_Final_Payment.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/04_Implement/Module5/UC23/UC23_EDS_Review.md" beforeDir="false" afterPath="$PROJECT_DIR$/04_Implement/Module5/UC23/UC23_EDS_Review.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/04_Implement/Module5/UC24/UC24_EDS_Dashboard.md" beforeDir="false" afterPath="$PROJECT_DIR$/04_Implement/Module5/UC24/UC24_EDS_Dashboard.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/04_Implement/Module5/UC25/UC25_EDS_Report_Export.md" beforeDir="false" afterPath="$PROJECT_DIR$/04_Implement/Module5/UC25/UC25_EDS_Report_Export.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/AuramoonApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/AuramoonApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/config/AesDataEncryptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/config/AesDataEncryptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/controller/CheckoutController.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/controller/CheckoutController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/controller/DepositController.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/controller/DepositController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/entity/GuestFolio.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/entity/GuestFolio.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/repository/AuditLogRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/repository/AuditLogRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/repository/FolioItemRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/repository/FolioItemRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/service/impl/BillingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/billing/service/impl/BillingServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/booking/controller/BookingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/booking/controller/BookingController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/booking/controller/ItineraryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/booking/controller/ItineraryController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/impl/BookingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/impl/BookingServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/impl/CheckInServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/booking/service/impl/CheckInServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/config/ThymeleafConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/common/config/ThymeleafConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/dashboard/controller/DashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/dashboard/controller/DashboardController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/spa/controller/ScheduleController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/spa/controller/SpaReceptionistController.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/spa/controller/SpaReceptionistController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/spa/controller/SpaScheduleController.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/spa/controller/SpaScheduleController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/spa/controller/TherapistScheduleController.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/spa/controller/TherapistScheduleController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/spa/repository/TherapistRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/spa/repository/TherapistRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/resources/templates/fragments/header.html" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/resources/templates/fragments/header.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/resources/templates/fragments/public-header.html" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/resources/templates/fragments/public-header.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/resources/templates/fragments/sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/resources/templates/fragments/sidebar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/resources/templates/public/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/resources/templates/public/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/billing/controller/CheckoutControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/billing/controller/CheckoutControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/booking/service/BookingServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/booking/service/BookingServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/dashboard/DashboardIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/dashboard/DashboardIntegrationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/dashboard/controller/DashboardControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/dashboard/controller/DashboardControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/report/ReportIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/report/ReportIntegrationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/report/controller/ReportControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/test/java/com/AuraMoon/auramoon/report/controller/ReportControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/08_Document_Reperence/Document/Extensions/Future_Extensions.md" beforeDir="false" afterPath="$PROJECT_DIR$/08_Document_References/Extensions/Future_Extensions.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/08_Document_Reperence/Document/Retreat.docx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/08_Document_Reperence/Document/Retreat.md" beforeDir="false" afterPath="$PROJECT_DIR$/08_Document_References/Retreat.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/08_Document_Reperence/Document/~$etreat.docx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/08_Document_Reperence/Template/EDS_TEMPLATE_V2.0.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/08_Document_Reperence/Template/EDS_TEMPLATE_V2.0.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/08_Document_Reperence/Template/TDD_TEMPLATE_V1.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/08_Document_Reperence/Template/TDD_TEMPLATE_V1.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/config/OAuth2LoginSuccessHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/config/OAuth2LoginSuccessHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/config/SecurityConfig.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,37 +67,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "Spring Boot.AuramoonApplication.executor": "Run",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "Merging addData",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Learning/SWP391/su26-swp391-se2023-g6",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "to.speed.mode.migration.done": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Spring Boot.AuramoonApplication.executor&quot;: &quot;Run&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;SourceCode&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Learning/SWP391/su26-swp391-se2023-g6&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlserver"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlserver&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="AuramoonApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
