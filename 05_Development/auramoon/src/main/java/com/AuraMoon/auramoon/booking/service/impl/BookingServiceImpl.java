@@ -77,7 +77,7 @@ public class BookingServiceImpl implements BookingService {
                 .finalAmount(savedBooking.getRetreatPackage().getPrice().add(
                         BigDecimal.valueOf(retreatPackage.getDurationDays()).multiply(villaType.getPricePerDay())
                 ))
-                .status("PENDING")
+                .status("OPEN")
                 .build();
         guestFolioRepository.save(guestFolio);
 

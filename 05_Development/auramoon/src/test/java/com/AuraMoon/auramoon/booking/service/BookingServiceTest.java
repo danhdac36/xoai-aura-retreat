@@ -171,7 +171,7 @@ public class BookingServiceTest {
 
                 GuestFolio guestFolio = GuestFolio.builder()
                                 .bookingId(bookingId)
-                                .status("PENDING")
+                                .status("OPEN")
                                 .build();
 
                 when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
