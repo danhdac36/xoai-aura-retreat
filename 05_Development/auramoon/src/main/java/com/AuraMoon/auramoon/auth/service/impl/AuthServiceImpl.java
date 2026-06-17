@@ -120,6 +120,8 @@ public class AuthServiceImpl implements IAuthService {
         } catch (Exception e) {
             System.err.println("Gửi mail kích hoạt thất bại: " + e.getMessage());
             System.out.println("Link kích hoạt dự phòng: http://localhost:8080/auth/verify-email?token=" + token);
+
+            throw new IllegalStateException("Gửi email xác thực thất bại!", e);
         }
     }
 }

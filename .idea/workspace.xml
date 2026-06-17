@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="6bfe7052-55e1-4aba-8b55-3b92a635a8e3" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/config/OAuth2LoginSuccessHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/config/OAuth2LoginSuccessHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/service/impl/AuthServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/05_Development/auramoon/src/main/java/com/AuraMoon/auramoon/auth/service/impl/AuthServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
