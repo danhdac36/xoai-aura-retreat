@@ -56,11 +56,11 @@ public class User {
     private String status;
 
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "create_at", updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name = "last_update")
+    @Column(name = "update_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "last_login")
