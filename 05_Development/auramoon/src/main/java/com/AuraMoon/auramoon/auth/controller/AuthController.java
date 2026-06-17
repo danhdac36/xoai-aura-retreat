@@ -47,7 +47,7 @@ public class AuthController {
 
         try {
             authService.register(registrationDto);
-            model.addAttribute("successMessage", "Link kích hoạt đã được gửi vào hòm thư của bạn. Vui lòng kiểm tra email.");
+            model.addAttribute("successMessage", "Link kích hoạt đã được gửi vào hòm thư "+registrationDto.getEmail()+" của bạn. Vui lòng kiểm tra email.");
             return "auth/register-success";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
