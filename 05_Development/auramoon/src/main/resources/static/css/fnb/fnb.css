@@ -192,6 +192,7 @@ body {
     flex-grow: 1;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -504,4 +505,15 @@ body {
 .alacarte-link-btn:hover {
     background-color: #4f5f43;
     color: #ffffff;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.menu-empty-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
 }
