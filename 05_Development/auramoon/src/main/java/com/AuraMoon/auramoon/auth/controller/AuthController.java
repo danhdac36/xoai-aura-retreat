@@ -36,7 +36,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public String registerUser(@Valid @ModelAttribute("registerDto") UserRegistrationDto registrationDto,
-                               BindingResult result, Model model) {
+            BindingResult result, Model model) {
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
             result.rejectValue("confirmPassword", "error.confirmPassword", "Mật khẩu xác nhận không khớp!");
         }
@@ -47,7 +47,8 @@ public class AuthController {
 
         try {
             authService.register(registrationDto);
-            model.addAttribute("successMessage", "Link kích hoạt đã được gửi vào hòm thư "+registrationDto.getEmail()+" của bạn. Vui lòng kiểm tra email.");
+            model.addAttribute("successMessage", "Link kích hoạt đã được gửi vào hòm thư " + registrationDto.getEmail()
+                    + " của bạn. Vui lòng kiểm tra email.");
             return "auth/register-success";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
@@ -63,14 +64,14 @@ public class AuthController {
         boolean isVerified = authService.verifyEmail(token);
         if (isVerified) {
             model.addAttribute("status", "success");
-            model.addAttribute("message", "Tài khoản của bạn đã được kích hoạt thành công! Giờ đây bạn có thể đăng nhập.");
+            model.addAttribute("message",
+                    "Tài khoản của bạn đã được kích hoạt thành công! Giờ đây bạn có thể đăng nhập.");
         } else {
             model.addAttribute("status", "error");
             model.addAttribute("message", "Link kích hoạt không hợp lệ hoặc đã hết hạn.");
         }
         return "auth/verify-result";
     }
-    
 
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
