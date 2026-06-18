@@ -119,7 +119,7 @@
 
 ---
 
-## ADR-002 — Khởi tạo GuestFolio tại bước confirmPayment() thay vì createBooking()
+## ADR-002 — Khởi tạo GuestFolio ngay tại bước createBooking()
 
 | Field | Value |
 | --- | --- |
@@ -129,7 +129,7 @@
 | **Supersedes** | N/A |
 
 **Bối cảnh (Context)**
-> Thiết kế ban đầu khởi tạo `GuestFolio` ngay khi gọi `createBooking()`. Tuy nhiên, nếu khách tạo booking nhưng bỏ qua hoặc thất bại ở bước thanh toán đặt cọc trên VNPay, hệ thống sẽ tích lũy nhiều bản ghi Folio rác — gây ô nhiễm dữ liệu và sai lệch báo cáo tài chính.
+> Thiết kế ban đầu định chờ thanh toán VNPay thành công mới tạo GuestFolio. Tuy nhiên, GuestFolio cần được khởi tạo ngay để lưu trữ các khoản phí dự kiến (Package Amount) và làm tham chiếu cho các giao dịch Deposit.
 
 **Các phương án đã xem xét (Options Considered)**
 
@@ -139,12 +139,12 @@
 | B | Tạo Folio tại `confirmPayment()` (sau callback VNPay thành công) | + Folio chỉ tồn tại cho booking thực sự hoạt động | - Logic phức tạp hơn, cần xử lý callback |
 
 **Quyết định (Decision)**
-> Chọn **Phương án B**: `GuestFolio` chỉ được khởi tạo bên trong `confirmPayment()` — sau khi nhận callback VNPay thành công và đổi `paymentStatus = DEPOSITED`. Điều này đảm bảo tính toàn vẹn dữ liệu tài chính.
+> Chọn **Phương án B**: `GuestFolio` được khởi tạo ngay trong `createBooking()` với status `PENDING`. Điều này giúp chuẩn hóa quy trình thanh toán và có ngay mã Folio để đối chiếu.
 
 **Hệ quả (Consequences)**
 
 **Tích cực:**
-* Dữ liệu Folio sạch — chỉ tồn tại cho booking đã thanh toán thực sự.
+* GuestFolio được theo dõi ngay từ đầu, đảm bảo tính nhất quán dữ liệu trước và sau thanh toán.
 * Báo cáo tài chính chính xác hơn.
 
 **Tiêu cực / Trade-offs:**
@@ -154,6 +154,32 @@
 * Tuân thủ BR-01 — Booking chỉ được xác nhận sau khi nhận kết quả thanh toán đặt cọc thành công.
 
 *(Thêm ADR mới bên dưới, không xóa ADR cũ. Nếu ADR bị thay thế, đánh dấu `Superseded by ADR-[NNN]`)*
+
+## ADR-003 — Tách bảng BookingGuest để quản lý thành viên đoàn và cá nhân hóa lịch Spa
+
+| Field | Value |
+| --- | --- |
+| **Status** | Accepted (Chờ Implement) |
+| **Deciders** | `Lê Trà My — Module Lead` + `Phùng Giang Hải — Tech Lead` |
+| **Date** | `2026-06-18` |
+| **Supersedes** | N/A |
+
+**Bối cảnh (Context)**
+> Module 2 chỉ lưu `totalGuests` (Tổng số khách). Tuy nhiên, Module 3 (Spa) yêu cầu lịch trình cá nhân hóa cho từng khách trong cùng một booking. Nếu chỉ dùng `booking_id`, Kỹ thuật viên không thể xếp lịch riêng cho từng người (gây quá tải / overbooking).
+
+**Các phương án đã xem xét (Options Considered)**
+
+| Phương án | Mô tả | Ưu điểm | Nhược điểm |
+| --- | --- | --- | --- |
+| A | Dùng chung 1 booking_id cho tất cả | + Dễ code, không đổi DB | - Spa bị xung đột lịch, không cá nhân hóa được |
+| B | Tách bảng `BookingGuest` | + Giải quyết triệt để bài toán xếp lịch Spa | - Phức tạp hóa DB và API createBooking |
+
+**Quyết định (Decision)**
+> Chọn **Phương án B**: Thêm Entity `BookingGuest` tham chiếu đến `Booking`. Khi `createBooking` chạy, hệ thống sẽ tự động sinh ra `N` bản ghi `BookingGuest` tương ứng với `totalGuests`. Các lịch hẹn Spa sau này sẽ tham chiếu trực tiếp đến `BookingGuest` (bảng `SpaSchedule`).
+
+**Hệ quả (Consequences)**
+**Tích cực:** Tách biệt rõ Người đặt phòng và Người thụ hưởng; giải quyết bài toán xếp lịch cá nhân ở Spa.
+**Tiêu cực:** API `createBooking` phải thêm logic vòng lặp để insert danh sách khách.
 
 # 4. Non-Functional Requirements & SLA
 
@@ -301,7 +327,10 @@ public class Booking {
 
     @ManyToOne private User guest;             // FK → user(user_id)
     @ManyToOne private RetreatPackage pkg;     // FK → retreat_package(package_id)
-    @ManyToOne private VillaType villaType;    // FK → villa_type(type_id) — chọn khi booking (BR-02)
+    // villaType được truyền qua DTO để tạo Folio, không lưu ở Booking
+    private Integer totalGuests;               // Số lượng khách
+    private String bookingStatus;              // PENDING | CONFIRMED
+    private String paymentStatus;              // UNPAID | DEPOSITED
     @ManyToOne private Villa assignedVilla;    // FK → villa(villa_id) — gán khi check-in (BR-02)
 
     private LocalDate checkinDate;
@@ -318,6 +347,18 @@ public class Booking {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long createdBy;                    // userId thực hiện thao tác
+}
+
+@Entity
+@Table(name = "booking_guest")
+public class BookingGuest {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne private Booking booking;        // FK → booking(booking_id)
+    private Integer guestIndex;                // Số thứ tự (1, 2, 3...)
+    private String fullName;                   // Tên thành viên đoàn (Mặc định: Khách 1, Khách 2...)
+    private String phone;                      // Số điện thoại (Tùy chọn)
 }
 
 @Entity
@@ -340,13 +381,11 @@ public class Villa {
 public class GuestFolio {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long folioId;
-    @OneToOne private Booking booking;         // FK → booking(booking_id)
-    private BigDecimal totalAmount;
-    private BigDecimal depositPaid;
-    private BigDecimal outstandingBalance;
-
-    @Enumerated(EnumType.STRING)
-    private FolioStatus status;                // OPEN | SETTLED
+    private Integer bookingId;
+    private BigDecimal totalPackageAmount;
+    private BigDecimal totalExtraFb;
+    private BigDecimal finalAmount;
+    private String status; // PENDING | OPEN
 
     private LocalDateTime createdAt;           // Tạo tại confirmPayment() — ADR-002
     private LocalDateTime updatedAt;
@@ -399,6 +438,12 @@ else availableCount > 0
   Service -> Repo: save(Booking{status=PENDING, paymentStatus=UNPAID})
   Repo -> DB: INSERT INTO booking ...
   DB --> Repo: booking{bookingId}
+  Service -> FolioRepo: save(GuestFolio{bookingId, status=PENDING})
+  FolioRepo -> DB: INSERT INTO guest_folio ...
+  loop totalGuests times
+      Service -> BookingGuestRepo: save(BookingGuest{bookingId, guestIndex})
+      BookingGuestRepo -> DB: INSERT INTO booking_guest ...
+  end
   Service -> Audit: log(BOOKING_CREATED, bookingId, guestId)
   Service --> Controller: BookingOutput{bookingId, depositAmount}
   Controller --> Guest: HTTP 201 {bookingId, vnpayRedirectUrl}
@@ -417,8 +462,7 @@ DB --> Repo: booking{status=PENDING}
 Service -> Service: Validate vnpayStatus == SUCCESS\nKiểm tra paymentStatus != DEPOSITED (idempotent)
 Service -> Repo: update(booking{status=CONFIRMED, paymentStatus=DEPOSITED})
 Repo -> DB: UPDATE booking SET status=CONFIRMED...
-Service -> FolioRepo: save(GuestFolio{bookingId, status=OPEN}) // ADR-002
-FolioRepo -> DB: INSERT INTO guest_folio ...
+// GuestFolio đã được tạo ở bước 1
 Service -> Audit: log(PAYMENT_CONFIRMED, bookingId, transactionCode)
 Service --> Controller: void
 Controller --> VNPay: HTTP 200 {status: "SUCCESS"}
@@ -469,8 +513,8 @@ deactivate Controller
 
 ```plantuml
 @startuml
-[*] --> PENDING : Guest tạo booking (createBooking)
-PENDING --> CONFIRMED : VNPay callback thành công (confirmPayment)\n[Action: Tạo GuestFolio — ADR-002]
+[*] --> PENDING : Guest tạo booking (createBooking)\n[Action: Tạo GuestFolio — ADR-002]
+PENDING --> CONFIRMED : VNPay callback thành công (confirmPayment)
 PENDING --> CANCELLED : Timeout 30 phút hoặc payment failed
 CONFIRMED --> CHECKED_IN : Receptionist check-in (performCheckIn)\n[Action: Gán villa, mã hóa CCCD — ADR-001]
 CHECKED_IN --> CHECKED_OUT : Receptionist check-out sau khi thanh toán cuối kỳ\n[Action: Đóng GuestFolio, villa → NEEDS_CLEANING]
@@ -857,11 +901,12 @@ Feature: Tạo booking gói nghỉ dưỡng
     When createBooking({packageId=1, villaTypeId=2, checkin=2026-07-01, checkout=2026-07-08})
     Then Booking được lưu với status=PENDING và paymentStatus=UNPAID
     And AuditService.log(BOOKING_CREATED) được gọi đúng 1 lần
+    And GuestFolioRepository.save() được gọi đúng 1 lần với status=PENDING
     And Response chứa vnpayRedirectUrl hợp lệ
 ```
 
 **Hàm được test:** `BookingServiceImpl.createBooking()`
-**Invariant kiểm tra:** `GuestFolio KHÔNG được tạo tại bước này — ADR-002`
+**Invariant kiểm tra:** `GuestFolio được tạo ngay tại bước này với status=PENDING — ADR-002`
 
 ---
 
@@ -887,7 +932,7 @@ Feature: Tạo booking gói nghỉ dưỡng
     When confirmPayment({bookingId=1001, transactionCode=TXN-001})
     Then booking.status = CONFIRMED
     And booking.paymentStatus = DEPOSITED
-    And GuestFolioRepository.save() được gọi đúng 1 lần với status=OPEN
+    And Không tạo thêm GuestFolio mới (chỉ update trạng thái Booking)
     And AuditService.log(PAYMENT_CONFIRMED) được gọi
 ```
 

@@ -74,7 +74,7 @@
 
 | # | Spec gốc (sai / thiếu) | Thực tế (schema / policy) | Fix áp dụng trong test |
 | --- | --- | --- | --- |
-| **L1** | `GuestFolio` được tạo ngay trong `createBooking()` | Tạo Folio khi booking chưa thanh toán → sinh dữ liệu rác, sai lệch báo cáo tài chính (ADR-002) | Test `UC07-TC-003` xác nhận: `createBooking()` KHÔNG gọi `GuestFolioRepository.save()`; chỉ `confirmPayment()` mới tạo Folio |
+| **L1** | `GuestFolio` đợi thanh toán mới tạo | Cần lưu lại Deposit nên `GuestFolio` phải được tạo ngay trong `createBooking()` (ADR-002) | Test `UC07-TC-001` xác nhận: `createBooking()` gọi `GuestFolioRepository.save()` với status=PENDING |
 | **L2** | `identifyCode` (CCCD/Passport) được lưu plaintext | Nghị định 356/2025 yêu cầu mã hóa Sensitive-PII (ADR-001, BR-09) | Test `UC08-TC-001` xác nhận: `performCheckIn()` phải gọi `EncryptionService.encrypt()` và giá trị trong DB là ciphertext, KHÔNG phải plaintext |
 | **L3** | Review có thể gửi bất kỳ lúc nào | BR-13: Chỉ booking `CHECKED_OUT` mới được gửi review; mỗi booking chỉ 1 review | Test `REV-TC-002` và `REV-TC-003` xác nhận cả 2 ràng buộc được enforce |
 | **L4** | VNPay callback không được xử lý idempotent | Callback có thể được gửi nhiều lần; xử lý 2 lần sẽ tạo 2 GuestFolio | Test `UC07-TC-004` xác nhận: lần gọi thứ 2 với cùng `bookingId` đã `CONFIRMED` không tạo thêm Folio |
@@ -213,16 +213,16 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 **Expected Result (PASS — hành vi đúng):**
 * `BookingRepository.save()` được gọi đúng 1 lần với `booking.status = PENDING` và `booking.paymentStatus = UNPAID`
 * Response chứa `bookingId = 1001` và `vnpayRedirectUrl` hợp lệ (không null)
-* `GuestFolioRepository.save()` **KHÔNG** được gọi (ADR-002)
+* `GuestFolioRepository.save()` được gọi với `status=PENDING` và `bookingId` hợp lệ
 * `AuditService.log(BOOKING_CREATED, 1001)` được gọi đúng 1 lần
 
 **Expected Result (FAIL — dấu hiệu lỗi):**
-* `GuestFolioRepository.save()` bị gọi → vi phạm ADR-002
+* `GuestFolioRepository.save()` KHÔNG được gọi → vi phạm ADR-002
 * Response thiếu `vnpayRedirectUrl` → integration với VNPay bị broken
 * `booking.status != PENDING` → sai trạng thái khởi tạo
 
 **Current Status:** 🟢 Passing
-**Implementation Note:** Đảm bảo inject `GuestFolioRepository` vào `BookingServiceImpl` nhưng KHÔNG gọi `save()` tại `createBooking()` — chỉ gọi tại `confirmPayment()`.
+**Implementation Note:** Đảm bảo inject `GuestFolioRepository` vào `BookingServiceImpl` và GỌI `save()` tại `createBooking()`.
 
 ---
 
@@ -274,11 +274,11 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 
 **Expected Result (PASS — hành vi đúng):**
 * `booking.status = CONFIRMED` và `booking.paymentStatus = DEPOSITED`
-* `GuestFolioRepository.save()` được gọi đúng **1 lần** với `folio.status = OPEN` và `folio.bookingId = 1001`
+* `GuestFolioRepository.save()` KHÔNG được gọi thêm (GuestFolio đã tạo sẵn ở `createBooking()`)
 * `AuditService.log(PAYMENT_CONFIRMED, 1001, "TXN-SYNTHETIC-001")` được gọi
 
 **Expected Result (FAIL — dấu hiệu lỗi):**
-* `GuestFolioRepository.save()` không được gọi → Folio không được tạo → downstream modules (Spa, F&B billing) bị broken
+* Tạo GuestFolio mới → trùng lặp bản ghi Folio
 * `booking.status` không đổi → booking vẫn PENDING dù đã thanh toán
 
 **Current Status:** 🟢 Passing
@@ -343,12 +343,12 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 * Booking được save với:
   * `booking.status = CHECKED_IN`
   * `booking.assignedVillaId = 5`
-  * `booking.identifyCode = "ENCRYPTED_ABC123"` (ciphertext, KHÔNG phải `"079-SYNTHETIC-TEST"`)
+  * `guest.identifyCode = "ENCRYPTED_ABC123"` (ciphertext, KHÔNG phải `"079-SYNTHETIC-TEST"`)
 * `VillaRepository.save()` được gọi với `villa.status = OCCUPIED`
 * `AuditService.log(GUEST_CHECKED_IN, 1001, 5)` được gọi
 
 **Expected Result (FAIL — dấu hiệu lỗi):**
-* `booking.identifyCode = "079-SYNTHETIC-TEST"` (plaintext) → **Vi phạm nghiêm trọng** Nghị định 356/2025 và CWE-312
+* `guest.identifyCode = "079-SYNTHETIC-TEST"` (plaintext) → **Vi phạm nghiêm trọng** Nghị định 356/2025 và CWE-312
 * `EncryptionService.encrypt()` không được gọi → plaintext storage
 
 **Current Status:** 🟢 Passing
@@ -747,7 +747,7 @@ assertThat(folio.getStatus()).isEqualTo(FolioStatus.OPEN);
 2. Gọi `POST /api/v1/check-in` với `{bookingId=1001, villaId=5, identifyCode="079-SYNTH-TEST"}`
 3. Assert booking `status=CHECKED_IN` và `assignedVillaId=5`
 4. Assert `villa.status=OCCUPIED`
-5. Assert `booking.identifyCode` là ciphertext (KHÔNG bằng `"079-SYNTH-TEST"`)
+5. Assert `guest.identifyCode` là ciphertext (KHÔNG bằng `"079-SYNTH-TEST"`)
 6. Assert audit_log chứa `GUEST_CHECKED_IN` event
 
 **DB Assertion:**
@@ -755,8 +755,8 @@ assertThat(folio.getStatus()).isEqualTo(FolioStatus.OPEN);
 Booking booking = bookingRepo.findById(1001L).orElseThrow();
 assertThat(booking.getBookingStatus()).isEqualTo(BookingStatus.CHECKED_IN);
 assertThat(booking.getAssignedVillaId()).isEqualTo(5L);
-assertThat(booking.getIdentifyCode()).isNotEqualTo("079-SYNTH-TEST"); // Phải là ciphertext
-assertThat(booking.getIdentifyCode()).isNotNull();
+assertThat(guest.getIdentifyCode()).isNotEqualTo("079-SYNTH-TEST"); // Phải là ciphertext
+assertThat(guest.getIdentifyCode()).isNotNull();
 
 Villa villa = villaRepo.findById(5L).orElseThrow();
 assertThat(villa.getVillaStatus()).isEqualTo(VillaStatus.OCCUPIED);
