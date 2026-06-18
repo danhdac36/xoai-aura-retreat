@@ -66,12 +66,12 @@
 | **UC-08** | User Story | Check-in: gán phòng biệt thự vật lý, thu thập và mã hóa CCCD/Passport cho khai báo tạm trú | `CheckInController.POST /check-in` → `CheckInServiceImpl.performCheckIn()` | Luật Cư trú 2020 | ADR-001 |
 | **UC-09** | User Story | Quản lý trạng thái biệt thự vật lý (Available, Occupied, Needs Cleaning, Maintenance) | `VillaController.PATCH /villas/{id}/status` → `VillaServiceImpl.updateVillaStatus()` | PMS operational tracking | — |
 | **UC-10** | User Story | Hiển thị lộ trình Itinerary tổng hợp (Spa, F&B, Yoga) theo từng ngày | `ItineraryController.GET /bookings/{id}/itinerary` → `ItineraryServiceImpl.getItinerary()` | Guest experience mapping | — |
-| **UC-23** | User Story | Khách gửi đánh giá và xếp hạng sau khi hoàn thành kỳ nghỉ (chỉ khi booking đã Completed) | `ReviewController.POST /reviews` → `ReviewServiceImpl.submitReview()` | BR-13 (Reporting & Review Logic) | — |
+
 | **BR-01** | Business Rule | Booking chỉ được xác nhận sau khi hệ thống nhận kết quả thanh toán đặt cọc thành công từ VNPay | `BookingServiceImpl.confirmPayment()` | VNPay payment callback | ADR-002 |
 | **BR-02** | Business Rule | Khách chỉ chọn VillaType khi đặt phòng; Villa cụ thể được Receptionist gán lúc check-in | `BookingServiceImpl.createBooking()`, `CheckInServiceImpl.performCheckIn()` | Hotel PMS best practice | ADR-002 |
 | **BR-03** | Business Rule | Villa không được gán cho >1 booking cùng thời điểm; Villa Maintenance không được phân bổ | `VillaServiceImpl.checkAvailability()` | Hotel operations constraint | — |
 | **BR-09** | Business Rule | Mã hóa AES-256 thông tin CCCD/Passport trước khi lưu vào database | `EncryptionServiceImpl.encrypt(identifyCode)` | Nghị định 356/2025/NĐ-CP | ADR-001 |
-| **BR-13** | Business Rule | Chỉ booking đã hoàn thành (CHECKED_OUT) mới được gửi review; mỗi booking chỉ 1 review | `ReviewServiceImpl.canSubmitReview()` | Revenue & Review integrity | — |
+
 | **BR-14** | Business Rule | Thu thập và lưu trữ thông tin định danh khách (CCCD/Passport) khi check-in để khai báo tạm trú | `CheckInServiceImpl.recordIdentification()` | Luật Cư trú 2020, Điều 32 | ADR-001 |
 | **BR-15** | Business Rule | Ghi audit log cho mọi hành động quan trọng: booking, payment, check-in, check-out | `AuditServiceImpl.log()` | Nghị định 356/2025/NĐ-CP | — |
 
@@ -238,9 +238,7 @@ package "Controller Layer" {
     +updateVillaStatus(villaId: Long, status: VillaStatus): ResponseEntity
     +getAvailableVillas(villaTypeId: Long, from: LocalDate, to: LocalDate): ResponseEntity
   }
-  class ReviewController <<Controller>> {
-    +submitReview(req: SubmitReviewRequest): ResponseEntity
-  }
+
 }
 
 package "Service Layer" {
@@ -267,17 +265,7 @@ package "Service Layer" {
     -auditService: IAuditService
     +performCheckIn(input): void
   }
-  interface IReviewService <<interface>> {
-    +submitReview(input: SubmitReviewInput): void
-    +canSubmitReview(bookingId: Long): boolean
-  }
-  class ReviewServiceImpl {
-    -reviewRepo: IReviewRepository
-    -bookingRepo: IBookingRepository
-    -sanitizer: IHtmlSanitizer
-    +submitReview(input): void
-    +canSubmitReview(bookingId): boolean
-  }
+
 }
 
 package "Repository Layer" {
@@ -295,22 +283,13 @@ package "Repository Layer" {
     +findByBookingId(bookingId: Long): Optional<GuestFolio>
     +save(folio: GuestFolio): GuestFolio
   }
-  interface IReviewRepository <<interface>> {
-    +findByBookingId(bookingId: Long): Optional<Review>
-    +save(review: Review): Review
-  }
+
 }
 
 IBookingService <|.. BookingServiceImpl
 ICheckInService <|.. CheckInServiceImpl
-IReviewService <|.. ReviewServiceImpl
-BookingServiceImpl --> IBookingRepository : uses
-BookingServiceImpl --> IVillaRepository : uses
-BookingServiceImpl --> IGuestFolioRepository : uses
 CheckInServiceImpl --> IBookingRepository : uses
 CheckInServiceImpl --> IVillaRepository : uses
-ReviewServiceImpl --> IReviewRepository : uses
-ReviewServiceImpl --> IBookingRepository : uses
 @enduml
 ```
 
@@ -391,18 +370,7 @@ public class GuestFolio {
     private LocalDateTime updatedAt;
 }
 
-@Entity
-@Table(name = "review")
-public class Review {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long reviewId;
-    @OneToOne private Booking booking;         // FK → booking(booking_id), UNIQUE constraint
-    private Integer ratingScore;               // 1–5
-    @Column(columnDefinition = "TEXT")
-    private String comment;                    // Đã XSS-sanitized trước khi lưu
-    private LocalDateTime createdAt;
-    private Long createdBy;
-}
+
 ```
 
 # 6. Dynamic Modeling (Mô hình Động)
@@ -676,7 +644,6 @@ public interface IVillaRepository {
 | GET | `/api/v1/villas/available` | JWT Bearer | `RECEPTIONIST` | 60/min | Yes |
 | PATCH | `/api/v1/villas/{id}/status` | JWT Bearer | `RECEPTIONIST` | 60/min | Yes |
 | GET | `/api/v1/bookings/{id}/itinerary` | JWT Bearer | `GUEST (own)` | 100/min | Yes |
-| POST | `/api/v1/reviews` | JWT Bearer | `GUEST` | 5/min | No |
 
 ## 9.2. Request / Response Schemas
 
@@ -750,8 +717,6 @@ public interface IVillaRepository {
 | `BOOK-002` | 400 | Villa type unavailable | Biệt thự loại này đã hết phòng trống | Không còn phòng trống trong khoảng thời gian yêu cầu (BR-02) |
 | `BOOK-003` | 400 | Booking state conflict | Trạng thái booking không hợp lệ cho thao tác này | Ví dụ: check-in booking chưa CONFIRMED |
 | `BOOK-004` | 400 | Outstanding charges exist | Còn khoản phí chưa thanh toán | Cố check-out khi còn pending Spa/F&B (BR-12) |
-| `BOOK-005` | 400 | Review not allowed | Chưa đủ điều kiện gửi đánh giá | Booking chưa CHECKED_OUT (BR-13) |
-| `BOOK-006` | 409 | Duplicate review | Đánh giá đã tồn tại | Booking đã có review, không thể gửi lại (BR-13) |
 | `BOOK-404` | 404 | Booking not found | Không tìm thấy đơn đặt phòng | Truy vấn sai bookingId |
 | `BOOK-403` | 403 | Insufficient permissions | Không đủ quyền truy cập | Receptionist cố xem health records (BR-07) |
 | `BOOK-500` | 500 | Internal error | Lỗi hệ thống | Lỗi database hoặc encryption service |

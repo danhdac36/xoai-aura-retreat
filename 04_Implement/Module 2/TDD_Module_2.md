@@ -15,7 +15,7 @@
 
 **References:**
 * `07_Reports/EDS_Module_2.md` (AURAMOON-BOOKING-IMP-002 v2.0) — Technical Specification
-* `02_Requirement/SRS_Document.md` — Functional requirements (UC-06 → UC-10, UC-23)
+* `02_Requirement/SRS_Document.md` — Functional requirements (UC-06 → UC-10)
 * `04_Implement/EDS_TEMPLATE_V2.0.md` — EDS v2.0 Template
 * `04_Implement/TDD_TEMPLATE_V1.md` — TDD Template
 * Nghị định 356/2025/NĐ-CP — Bảo vệ dữ liệu cá nhân (Sensitive-PII)
@@ -76,7 +76,6 @@
 | --- | --- | --- | --- |
 | **L1** | `GuestFolio` đợi thanh toán mới tạo | Cần lưu lại Deposit nên `GuestFolio` phải được tạo ngay trong `createBooking()` (ADR-002) | Test `UC07-TC-001` xác nhận: `createBooking()` gọi `GuestFolioRepository.save()` với status=PENDING |
 | **L2** | `identifyCode` (CCCD/Passport) được lưu plaintext | Nghị định 356/2025 yêu cầu mã hóa Sensitive-PII (ADR-001, BR-09) | Test `UC08-TC-001` xác nhận: `performCheckIn()` phải gọi `EncryptionService.encrypt()` và giá trị trong DB là ciphertext, KHÔNG phải plaintext |
-| **L3** | Review có thể gửi bất kỳ lúc nào | BR-13: Chỉ booking `CHECKED_OUT` mới được gửi review; mỗi booking chỉ 1 review | Test `REV-TC-002` và `REV-TC-003` xác nhận cả 2 ràng buộc được enforce |
 | **L4** | VNPay callback không được xử lý idempotent | Callback có thể được gửi nhiều lần; xử lý 2 lần sẽ tạo 2 GuestFolio | Test `UC07-TC-004` xác nhận: lần gọi thứ 2 với cùng `bookingId` đã `CONFIRMED` không tạo thêm Folio |
 
 ---
@@ -92,13 +91,11 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 ├── Service Layer (Unit Tests — Mockito)
 │   ├── BookingServiceImpl      (UC-06, UC-07: browse, book, confirmPayment)
 │   ├── CheckInServiceImpl      (UC-08: check-in, villa assignment, CCCD encryption)
-│   ├── VillaServiceImpl        (UC-09: villa status management)
-│   └── ReviewServiceImpl       (UC-23: submit review, XSS sanitization)
+│   └── VillaServiceImpl        (UC-09: villa status management)
 │
 ├── Security Tests (RBAC & Attack Vectors)
 │   ├── RBAC-TC-001: Receptionist không được xem health records
-│   ├── RBAC-TC-002: Guest không được thực hiện check-in
-│   └── XSS-TC-001: HTML injection trong review comment
+│   └── RBAC-TC-002: Guest không được thực hiện check-in
 │
 └── Integration Tests (Testcontainers PostgreSQL)
     ├── IT-TC-001: Booking → Payment → GuestFolio flow
@@ -116,7 +113,6 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 | `SRS.md` UC-08 | Receptionist check-in, villa assignment, CCCD collection (BR-14) |
 | `SRS.md` UC-09 | Villa status lifecycle: AVAILABLE → OCCUPIED → NEEDS_CLEANING → AVAILABLE |
 | `SRS.md` UC-10 | Guest view itinerary (cross-module aggregation) |
-| `SRS.md` UC-23 | Guest submit post-stay review — BR-13 constraints |
 | `ADR-001` | Mã hóa AES-256 thông tin CCCD/Passport — security constraint |
 | `ADR-002` | GuestFolio chỉ được tạo tại `confirmPayment()` — data integrity |
 | `BR-01` | Booking confirmed only after successful deposit payment |
@@ -125,7 +121,6 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 | `BR-07` | RBAC & Data Minimization — Receptionist không xem health records |
 | `BR-09` | Sensitive data encryption (CCCD/Passport) |
 | `BR-12` | Check-out blocked if pending Spa/F&B charges exist |
-| `BR-13` | Review only for CHECKED_OUT bookings; 1 review per booking |
 | Nghị định 356/2025 | Bảo vệ dữ liệu cá nhân nhạy cảm (CCCD/Passport) |
 | Luật Cư trú 2020 | Khai báo tạm trú — lưu trữ thông tin định danh |
 
@@ -145,10 +140,6 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 | **TC-COND-008** | CCCD được lưu dưới dạng ciphertext, KHÔNG phải plaintext | `EncryptionService.encrypt()` + `performCheckIn()` | `UC08-TC-001` (assert DB) |
 | **TC-COND-009** | Cập nhật villa status thành công (BR-03 lifecycle) | `VillaService.updateVillaStatus()` | `UC09-TC-001` |
 | **TC-COND-010** | Ngăn gán villa MAINTENANCE cho booking | `VillaService.checkAvailability()` | `UC09-TC-002` |
-| **TC-COND-011** | Gửi review hợp lệ sau khi booking CHECKED_OUT | `ReviewService.submitReview()` | `REV-TC-001` |
-| **TC-COND-012** | Ngăn review khi booking chưa CHECKED_OUT | `ReviewService.canSubmitReview()` | `REV-TC-002` |
-| **TC-COND-013** | Ngăn gửi review lần 2 cho cùng bookingId | `ReviewService.canSubmitReview()` | `REV-TC-003` |
-| **TC-COND-014** | HTML injection trong comment tự động được sanitize | `ReviewService.submitReview()` | `REV-TC-XSS` |
 | **TC-COND-015** | Receptionist bị từ chối khi truy cập health records Guest | RBAC Guard | `RBAC-TC-001` |
 | **TC-COND-016** | Guest bị từ chối khi cố thực hiện check-in | RBAC Guard | `RBAC-TC-002` |
 
@@ -157,11 +148,9 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 | Technique (ISO 29119-4) | Applied To | Rationale |
 | --- | --- | --- |
 | Equivalence Partitioning | `createBooking()` input: available vs. unavailable VillaType | Giảm số test case trong khi đảm bảo coverage |
-| Boundary Value Analysis | `ratingScore` (valid: 1–5, invalid: 0, 6) | Kiểm tra edge case của review rating |
 | State Transition Testing | Booking status FSM: PENDING → CONFIRMED → CHECKED_IN → CHECKED_OUT | Đảm bảo mọi transition hợp lệ được test |
 | State Transition Testing | Villa status FSM: AVAILABLE → OCCUPIED → NEEDS_CLEANING → AVAILABLE | Enforce BR-03 lifecycle |
-| Error Guessing | CCCD plaintext storage, SQL Injection, XSS trong review comment | Phát hiện security vulnerabilities (CWE-312, CWE-79, CWE-89) |
-| Decision Table | `canSubmitReview()`: booking status × review exists | Kiểm tra tổ hợp điều kiện BR-13 |
+| Error Guessing | CCCD plaintext storage, SQL Injection | Phát hiện security vulnerabilities (CWE-312, CWE-89) |
 
 ## TDS-05 — Test Data Requirements
 
@@ -169,7 +158,6 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 | --- | --- | --- | --- |
 | `FX-001` | DB seed | `Booking{id=1001, status=PENDING, paymentStatus=UNPAID}` | Happy path createBooking |
 | `FX-002` | DB seed | `Booking{id=1002, status=CONFIRMED, paymentStatus=DEPOSITED}` | Idempotency test (UC07-TC-004) |
-| `FX-003` | DB seed | `Booking{id=1003, status=CHECKED_OUT}` với Review đã tồn tại | Duplicate review test (REV-TC-003) |
 | `FX-004` | DB seed | `VillaType{id=2, name="Deluxe"}` với 3 phòng available trong [2026-07-01, 2026-07-08] | Available room happy path |
 | `FX-005` | DB seed | `VillaType{id=3, name="Suite"}` với 0 phòng available (fully booked) | No availability error path |
 | `FX-006` | DB seed | `Villa{id=5, villaCode="LOTUS-05", status=AVAILABLE, typeId=2}` | Check-in villa assignment |
@@ -178,7 +166,6 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 | `FX-009` | JWT | `{ sub: "guest-001", role: "GUEST", bookingId: 1001 }` | Guest auth context |
 | `FX-010` | JWT | `{ sub: "recep-001", role: "RECEPTIONIST" }` | Receptionist auth context |
 | `FX-011` | Payload | `identifyCode = "079-SYNTHETIC-TEST"` | CCCD test data (KHÔNG dùng số thật) |
-| `FX-012` | Payload | `comment = "<script>alert('XSS')</script>Tuyệt vời"` | XSS injection test |
 
 ---
 
@@ -458,81 +445,6 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 
 ---
 
-## 4.4. Unit Tests — ReviewService
-
-### REV-TC-001 — Gửi review hợp lệ sau khi booking CHECKED_OUT
-
-**Severity:** `MEDIUM`
-**Feature Under Test:** `ReviewServiceImpl.submitReview()`
-**Test File:** `src/test/java/com/auramoon/booking/ReviewServiceTest.java`
-**TDD Phase:** 🟢 GREEN - Passing
-**Condition Ref:** `TC-COND-011`
-
-**Preconditions:**
-* `Booking(id=2001, status=CHECKED_OUT)` tồn tại
-* Chưa có review nào cho `bookingId=2001`
-
-**Test Steps:**
-1. **Arrange:** Mock `BookingRepository.findById(2001)` → `Booking{status=CHECKED_OUT}`; Mock `ReviewRepository.findByBookingId(2001)` → `Optional.empty()`
-2. **Act:** Gọi `reviewService.submitReview({bookingId=2001, ratingScore=5, comment="Tuyệt vời!"})`
-3. **Assert:**
-
-**Expected Result (PASS — hành vi đúng):**
-* `ReviewRepository.save()` được gọi 1 lần với `ratingScore=5` và comment đã sanitize
-* Response trả về thành công
-
-**Current Status:** 🟢 Passing
-
----
-
-### REV-TC-002 — Ngăn review khi booking chưa CHECKED_OUT
-
-**Severity:** `HIGH`
-**Legal:** BR-13 — Chỉ completed stays mới được submit review
-**Feature Under Test:** `ReviewServiceImpl.canSubmitReview()`
-**Test File:** `src/test/java/com/auramoon/booking/ReviewServiceTest.java`
-**TDD Phase:** 🟢 GREEN - Passing
-**Condition Ref:** `TC-COND-012`
-
-**Test Steps:**
-1. **Arrange:** Mock `BookingRepository.findById(1001)` → `Booking{status=CHECKED_IN}` (chưa checkout)
-2. **Act:** Gọi `reviewService.canSubmitReview(1001)`
-3. **Assert:**
-
-**Expected Result (PASS — hành vi đúng):**
-* Ném `ReviewNotAllowedException` với code `BOOK-005`
-* `ReviewRepository.save()` **KHÔNG** được gọi
-
-**Current Status:** 🟢 Passing
-
----
-
-### REV-TC-003 — Ngăn gửi review lần 2 cho cùng booking
-
-**Severity:** `HIGH`
-**Legal:** BR-13 — Mỗi booking chỉ được 1 review
-**Feature Under Test:** `ReviewServiceImpl.canSubmitReview()`
-**Test File:** `src/test/java/com/auramoon/booking/ReviewServiceTest.java`
-**TDD Phase:** 🟢 GREEN - Passing
-**Condition Ref:** `TC-COND-013`
-
-**Preconditions:**
-* `Booking(id=2002, status=CHECKED_OUT)` tồn tại
-* `Review` với `bookingId=2002` đã tồn tại (FX-003)
-
-**Test Steps:**
-1. **Arrange:** Mock `ReviewRepository.findByBookingId(2002)` → `Optional.of(existingReview)`
-2. **Act:** Gọi `reviewService.submitReview({bookingId=2002, ratingScore=3, comment="Ổn"})`
-3. **Assert:**
-
-**Expected Result (PASS — hành vi đúng):**
-* Ném `DuplicateReviewException` với code `BOOK-006`
-* Không override review cũ
-
-**Current Status:** 🟢 Passing
-
----
-
 ## 4.5. Unit Tests — RetreatPackageService
 
 ### UC06-TC-001 — Lấy tất cả gói nghỉ dưỡng đang hoạt động thành công
@@ -596,38 +508,6 @@ Module 2 — Booking bao gồm các layer được kiểm thử:
 ## SECURITY TEST CASES
 
 > Test cases kiểm tra attack vectors — bắt buộc điền OWASP và CWE.
-
-### REV-TC-XSS — HTML injection trong review comment tự động được sanitize
-
-**Severity:** `HIGH`
-**OWASP:** `A03:2021` — Injection
-**CWE:** `CWE-79` — Improper Neutralization of Input During Web Page Generation (XSS)
-**Legal:** Bảo vệ toàn vẹn dữ liệu hệ thống
-**Feature Under Test:** `ReviewServiceImpl.submitReview()` → `HtmlSanitizer.sanitize()`
-**Test File:** `src/test/java/com/auramoon/booking/ReviewServiceTest.java`
-**TDD Phase:** 🟢 GREEN - Passing
-**Condition Ref:** `TC-COND-014`
-
-**Preconditions:**
-* `Booking(id=2003, status=CHECKED_OUT)` tồn tại
-* Chưa có review cho `bookingId=2003`
-
-**Test Steps (Attack Simulation):**
-1. **Arrange:** Chuẩn bị comment chứa XSS payload (FX-012): `"<script>alert('XSS')</script>Tuyệt vời"`
-2. **Act:** Gọi `reviewService.submitReview({bookingId=2003, ratingScore=4, comment=FX-012})`
-3. **Assert:** Kiểm tra nội dung được lưu vào DB
-
-**Expected Result (PASS = hệ thống an toàn):**
-* `ReviewRepository.save()` được gọi với `comment = "&lt;script&gt;alert('XSS')&lt;/script&gt;Tuyệt vời"` (escaped HTML entities)
-* KHÔNG chứa chuỗi `<script>` dạng raw trong DB
-* Review vẫn được lưu thành công (không bị block hoàn toàn — sanitize, không reject)
-
-**Expected Result (FAIL = lỗ hổng tồn tại):**
-* `comment = "<script>alert('XSS')</script>Tuyệt vời"` được lưu nguyên vẹn → XSS khi render ra UI
-
-**Current Status:** 🟢 Passing
-
----
 
 ### RBAC-TC-001 — Receptionist bị từ chối khi truy cập health records
 
@@ -779,10 +659,6 @@ assertThat(villa.getVillaStatus()).isEqualTo(VillaStatus.OCCUPIED);
 | `UC08-TC-003` | `CheckInServiceTest.java:112` | `[x]` | `e7b3c15` | Tách kiểm tra `villa.status` thành `VillaValidator.assertAvailable()` |
 | `UC09-TC-001` | `VillaServiceTest.java:28` | `[x]` | `f2a1d88` | — |
 | `UC09-TC-002` | `VillaServiceTest.java:55` | `[x]` | `f2a1d88` | — |
-| `REV-TC-001` | `ReviewServiceTest.java:30` | `[x]` | `a9c5e33` | — |
-| `REV-TC-002` | `ReviewServiceTest.java:67` | `[x]` | `a9c5e33` | **Tách `canSubmitReview()` thành method riêng để test độc lập** (L3 fix) |
-| `REV-TC-003` | `ReviewServiceTest.java:98` | `[x]` | `a9c5e33` | — |
-| `REV-TC-XSS` | `ReviewServiceTest.java:135` | `[x]` | `b6d2f47` | Inject `HtmlSanitizer` (OWASP Java HTML Sanitizer) vào `ReviewServiceImpl` |
 | `RBAC-TC-001` | `RbacSecurityTest.java:22` | `[x]` | `c1e9g55` | — |
 | `RBAC-TC-002` | `RbacSecurityTest.java:56` | `[x]` | `c1e9g55` | — |
 | `IT-TC-001` | `BookingIntegrationTest.java:40` | `[x]` | `d8h3j71` | — |
