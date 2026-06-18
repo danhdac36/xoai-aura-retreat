@@ -99,7 +99,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div th:each="vt : ${villaTypes}" class="relative">
                                 <input type="radio" name="villaTypeId" th:value="${vt.id}" th:id="'vt-' + ${vt.id}"
-                                    required th:data-price="${vt.pricePerDay}" class="peer sr-only" />
+                                    required th:data-price="${vt.pricePerDay}" class="peer hidden" />
                                 <label th:for="'vt-' + ${vt.id}"
                                     class="flex gap-4 p-5 bg-white border border-gray-200 hover:border-[#566342]/40 rounded-2xl cursor-pointer transition-all duration-300 peer-checked:border-[#566342] peer-checked:bg-[#566342]/5 shadow-sm hover:shadow-md h-full select-none">
                                     <div class="mt-1 flex-shrink-0">

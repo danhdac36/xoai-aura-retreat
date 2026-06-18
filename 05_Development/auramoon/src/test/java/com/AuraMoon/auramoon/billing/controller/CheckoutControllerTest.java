@@ -36,12 +36,19 @@ class CheckoutControllerTest {
     @Mock
     private VNPayService vnPayService;
 
+    @Mock
+    private com.AuraMoon.auramoon.billing.service.AuditLogService auditLogService;
+
     @InjectMocks
     private CheckoutController checkoutController;
+
+    private com.AuraMoon.auramoon.auth.entity.User mockUser;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(checkoutController).build();
+        mockUser = new com.AuraMoon.auramoon.auth.entity.User();
+        mockUser.setId(1);
     }
 
     @Test
@@ -53,7 +60,8 @@ class CheckoutControllerTest {
         when(billingService.getCheckoutData(bookingId)).thenReturn(dto);
 
         // Act & Assert
-        mockMvc.perform(get("/billing/checkout").param("bookingId", String.valueOf(bookingId)))
+        mockMvc.perform(get("/billing/checkout").param("bookingId", String.valueOf(bookingId))
+                        .sessionAttr("currentUser", mockUser))
                 .andExpect(status().isOk())
                 .andExpect(view().name("billing/checkout/checkout"))
                 .andExpect(model().attributeExists("data"))
@@ -69,11 +77,13 @@ class CheckoutControllerTest {
         Integer bookingId = 1;
         Payment payment = new Payment();
         payment.setId(100);
-        when(billingService.initiatePayment(bookingId, "CASH", "CASH")).thenReturn(payment);
+        when(billingService.getCheckoutData(anyInt())).thenReturn(CheckoutViewDTO.builder().balanceDue(BigDecimal.TEN).build());
+        when(billingService.initiatePayment(bookingId, "CASH", "DIRECT")).thenReturn(payment);
 
         // Act & Assert
         mockMvc.perform(post("/billing/checkout/{bookingId}/pay", bookingId)
-                .param("paymentMethod", "CASH"))
+                .param("paymentMethod", "CASH")
+                .sessionAttr("currentUser", mockUser))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/billing/checkout/success?paymentId=100"))
                 .andExpect(flash().attributeExists("successMessage"));
@@ -86,12 +96,14 @@ class CheckoutControllerTest {
     void processPayment_PendingOrdersExist_RedirectsBackWithError() throws Exception {
         // Arrange
         Integer bookingId = 1;
+        when(billingService.getCheckoutData(anyInt())).thenReturn(CheckoutViewDTO.builder().balanceDue(BigDecimal.TEN).build());
         when(billingService.initiatePayment(anyInt(), anyString(), anyString()))
                 .thenThrow(new PendingOrdersExistException("Còn đơn hàng đang chờ"));
 
         // Act & Assert
         mockMvc.perform(post("/billing/checkout/{bookingId}/pay", bookingId)
-                .param("paymentMethod", "CASH"))
+                .param("paymentMethod", "CASH")
+                .sessionAttr("currentUser", mockUser))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/billing/checkout?bookingId=" + bookingId))
                 .andExpect(flash().attributeExists("errorMessage"));
@@ -108,6 +120,7 @@ class CheckoutControllerTest {
         payment.setId(101);
         payment.setAmount(new BigDecimal("1000000"));
 
+        when(billingService.getCheckoutData(anyInt())).thenReturn(CheckoutViewDTO.builder().balanceDue(BigDecimal.TEN).build());
         when(billingService.initiatePayment(bookingId, "VNPAY", "VNPAY")).thenReturn(payment);
         when(vnPayService.createPaymentUrl(any(BigDecimal.class), eq(101), anyString()))
                 .thenReturn("http://sandbox.vnpayment.vn/testurl");
@@ -116,7 +129,8 @@ class CheckoutControllerTest {
         mockMvc.perform(post("/billing/checkout/{bookingId}/pay", bookingId)
                 .param("paymentMethod", "VNPAY")
                 .header("X-Forwarded-Proto", "http")
-                .header("X-Forwarded-Host", "localhost"))
+                .header("X-Forwarded-Host", "localhost")
+                .sessionAttr("currentUser", mockUser))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("http://sandbox.vnpayment.vn/testurl"));
 
@@ -134,7 +148,8 @@ class CheckoutControllerTest {
                 .param("vnp_TxnRef", "102")
                 .param("vnp_ResponseCode", "00")
                 .param("vnp_TransactionNo", "123456789")
-                .param("vnp_SecureHash", "hash123"))
+                .param("vnp_SecureHash", "hash123")
+                .sessionAttr("currentUser", mockUser))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/billing/checkout/success?paymentId=102"))
                 .andExpect(flash().attributeExists("successMessage"));
@@ -153,7 +168,8 @@ class CheckoutControllerTest {
                 .param("vnp_TxnRef", "103")
                 .param("vnp_ResponseCode", "24")
                 .param("bookingId", "1")
-                .param("vnp_SecureHash", "hash123"))
+                .param("vnp_SecureHash", "hash123")
+                .sessionAttr("currentUser", mockUser))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/billing/checkout?bookingId=1"))
                 .andExpect(flash().attributeExists("errorMessage"));
@@ -173,7 +189,8 @@ class CheckoutControllerTest {
                 .param("vnp_TxnRef", "104")
                 .param("vnp_ResponseCode", "00")
                 .param("bookingId", "1")
-                .param("vnp_SecureHash", "invalidhash"))
+                .param("vnp_SecureHash", "invalidhash")
+                .sessionAttr("currentUser", mockUser))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/billing/checkout?bookingId=1"))
                 .andExpect(flash().attributeExists("errorMessage"));

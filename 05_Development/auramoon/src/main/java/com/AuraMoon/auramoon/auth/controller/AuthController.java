@@ -1,74 +1,84 @@
 package com.AuraMoon.auramoon.auth.controller;
 
-import com.AuraMoon.auramoon.auth.dto.request.RegisterDto;
-import com.AuraMoon.auramoon.auth.entity.User;
-import com.AuraMoon.auramoon.auth.service.impl.UserService;
+import com.AuraMoon.auramoon.auth.dto.UserRegistrationDto;
+import com.AuraMoon.auramoon.auth.service.IAuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.logging.Logger;
 
 @Controller
-
+@RequestMapping("/auth")
 public class AuthController {
 
-    private final Logger logger = Logger.getLogger(AuthController.class.getName());
-
     @Autowired
-    private UserService userService;
+    private IAuthService authService;
+
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "auth/login";
+    }
 
     @GetMapping("/register")
-    public String showRegisterPage(Model model) {
-        model.addAttribute("registerDto", new RegisterDto());
-        return "auth/registration";
+    public String showRegisterForm(Model model) {
+        model.addAttribute("registerDto", new UserRegistrationDto());
+        return "auth/registration"; // Maps to registration.html
     }
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute RegisterDto registerDto, Model model) {
+    public String registerUser(@Valid @ModelAttribute("registerDto") UserRegistrationDto registrationDto,
+            BindingResult result, Model model) {
+        if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
+            result.rejectValue("confirmPassword", "error.confirmPassword", "Mật khẩu xác nhận không khớp!");
+        }
+
+        if (result.hasErrors()) {
+            return "auth/registration";
+        }
+
         try {
-            userService.registerUser(registerDto);
-            logger.info("User registered successfully: " + registerDto.getEmail());
-            model.addAttribute("success", "Đăng ký thành công!");
-            return "redirect:/login";
-        } catch (Exception e) {
-            logger.warning("Registration error: " + e.getMessage());
+            authService.register(registrationDto);
+            model.addAttribute("successMessage", "Link kích hoạt đã được gửi vào hòm thư " + registrationDto.getEmail()
+                    + " của bạn. Vui lòng kiểm tra email.");
+            return "auth/register-success";
+        } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("registerDto", registerDto);
+            return "auth/registration";
+        } catch (Exception e) {
+            model.addAttribute("error", "Đã xảy ra lỗi hệ thống. Vui lòng liên hệ Admin.");
             return "auth/registration";
         }
     }
 
-    @GetMapping("/login")
-    public String showLoginPage() {
-        return "auth/login";
-    }
-
-    @PostMapping("/auth")
-    public String doLogin(@RequestParam("email") String email, @RequestParam("password") String password, Model model, HttpSession session) {
-        // Xử lý đăng nhập
-        User user = userService.authenticate(email, password);
-        if (user == null) {
-            model.addAttribute("error", "Email hoặc mật khẩu không đúng");
-            return "auth/login";
+    @GetMapping("/verify-email")
+    public String verifyEmail(@RequestParam("token") String token, Model model) {
+        boolean isVerified = authService.verifyEmail(token);
+        if (isVerified) {
+            model.addAttribute("status", "success");
+            model.addAttribute("message",
+                    "Tài khoản của bạn đã được kích hoạt thành công! Giờ đây bạn có thể đăng nhập.");
+        } else {
+            model.addAttribute("status", "error");
+            model.addAttribute("message", "Link kích hoạt không hợp lệ hoặc đã hết hạn.");
         }
-        // Lưu user vào session
-        session.setAttribute("currentUser", user);
-        // Optional: set session timeout (seconds)
-        session.setMaxInactiveInterval(30 * 60); // 30 minutes
-        return "redirect:/home";
+        return "auth/verify-result";
     }
 
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        if (session != null) {
-            session.invalidate();
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
         }
-        return "redirect:/login?logout";
+        return "redirect:/auth/login?logout=true";
     }
 }

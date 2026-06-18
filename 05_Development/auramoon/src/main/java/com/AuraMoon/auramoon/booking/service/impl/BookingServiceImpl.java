@@ -76,13 +76,13 @@ public class BookingServiceImpl implements BookingService {
                 GuestFolio guestFolio = GuestFolio.builder()
                                 .bookingId(savedBooking.getId())
                                 .totalPackageAmount(savedBooking.getRetreatPackage().getPrice().add(
-                                                BigDecimal.valueOf(retreatPackage.getDurationDays()).multiply(villaType.getPricePerDay())
-                                ))
+                                                BigDecimal.valueOf(retreatPackage.getDurationDays())
+                                                                .multiply(villaType.getPricePerDay())))
                                 .totalExtraFb(BigDecimal.ZERO)
                                 .finalAmount(savedBooking.getRetreatPackage().getPrice().add(
-                                                BigDecimal.valueOf(retreatPackage.getDurationDays()).multiply(villaType.getPricePerDay())
-                                ))
-                                .status("PENDING")
+                                                BigDecimal.valueOf(retreatPackage.getDurationDays())
+                                                                .multiply(villaType.getPricePerDay())))
+                                .status("OPEN")
                                 .build();
                 guestFolioRepository.save(guestFolio);
 
@@ -109,7 +109,14 @@ public class BookingServiceImpl implements BookingService {
                                                 "Không tìm thấy đơn đặt phòng với ID: " + bookingId));
 
                 booking.setBookingStatus("CONFIRMED");
-                booking.setPaymentStatus("DEPOSITED");
+                booking.setPaymentStatus("PARTIAL");
                 bookingRepository.save(booking);
+
+                // Update GuestFolio status to "OPEN" upon successful deposit payment
+                GuestFolio guestFolio = guestFolioRepository.findByBookingId(bookingId)
+                                .orElseThrow(() -> new RuntimeException(
+                                                "GuestFolio not found for bookingId: " + bookingId));
+                guestFolio.setStatus("OPEN");
+                guestFolioRepository.save(guestFolio);
         }
 }

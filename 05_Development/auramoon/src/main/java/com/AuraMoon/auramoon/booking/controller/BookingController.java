@@ -7,9 +7,15 @@ import com.AuraMoon.auramoon.booking.repository.VillaTypeRepository;
 import com.AuraMoon.auramoon.booking.service.BookingService;
 import com.AuraMoon.auramoon.booking.service.RetreatPackageService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
+
+import com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse;
+import com.AuraMoon.auramoon.auth.entity.User;
 
 @Controller
 @RequestMapping("/booking")
@@ -30,18 +36,30 @@ public class BookingController {
     }
 
     @PostMapping("/create")
-    public String createBooking(@ModelAttribute("bookingRequest") BookingRequestDTO request, jakarta.servlet.http.HttpSession session) {
-        com.AuraMoon.auramoon.auth.entity.User currentUser = (com.AuraMoon.auramoon.auth.entity.User) session.getAttribute("currentUser");
-        if (currentUser == null) {
-            return "redirect:/login";
+    public String createBooking(@ModelAttribute("bookingRequest") BookingRequestDTO request,
+            @AuthenticationPrincipal UserDetailsResponse currentUser) {
+        Integer guestId = null;
+        if (currentUser != null) {
+            guestId = currentUser.getId();
         }
-        Integer guestId = currentUser.getId();
+        /*
+         * if (currentUser == null) {
+         * return "redirect:/login";
+         * }
+         * Integer guestId = currentUser.getId();
+         */
         try {
             BookingResponseDTO response = bookingService.createBooking(guestId, request);
             // Redirect sang controller thanh toán đặt cọc của module billing
             return "redirect:/billing/deposit/pay?bookingId=" + response.getBookingId();
         } catch (Exception e) {
-            return "redirect:/packages/" + request.getRetreatPackageId() + "?error=" + e.getMessage();
+            String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown error";
+            try {
+                errorMsg = java.net.URLEncoder.encode(errorMsg, "UTF-8");
+            } catch (java.io.UnsupportedEncodingException ex) {
+                // ignore
+            }
+            return "redirect:/packages/" + request.getRetreatPackageId() + "?error=" + errorMsg;
         }
     }
 

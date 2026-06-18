@@ -4,6 +4,8 @@ import com.AuraMoon.auramoon.billing.dto.CheckoutViewDTO;
 import com.AuraMoon.auramoon.billing.entity.FolioItem;
 import com.AuraMoon.auramoon.billing.entity.GuestFolio;
 import com.AuraMoon.auramoon.billing.entity.Payment;
+import com.AuraMoon.auramoon.common.enums.PaymentTransactionStatus;
+import com.AuraMoon.auramoon.common.enums.GuestFolioStatus;
 import com.AuraMoon.auramoon.billing.repository.FolioItemRepository;
 import com.AuraMoon.auramoon.billing.repository.GuestFolioRepository;
 import com.AuraMoon.auramoon.billing.repository.PaymentRepository;
@@ -40,18 +42,20 @@ public class BillingServiceImpl implements BillingService {
 
         List<FolioItem> items = folioItemRepository.findByGuestFolioId(folio.getId());
         Map<String, List<FolioItem>> groupedServices = items.stream()
-                .collect(Collectors.groupingBy(item -> item.getServiceCategory() != null ? item.getServiceCategory() : "Khác"));
+                .collect(Collectors
+                        .groupingBy(item -> item.getServiceCategory() != null ? item.getServiceCategory() : "Khác"));
 
         BigDecimal totalExtra = items.stream()
                 .map(item -> item.getAmount() != null ? item.getAmount() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<Payment> payments = paymentRepository.findByGuestFolioIdAndStatus(folio.getId(), "SUCCESS");
+        List<Payment> payments = paymentRepository.findByGuestFolioIdAndStatus(folio.getId(), PaymentTransactionStatus.SUCCESS.name());
         BigDecimal totalPaid = payments.stream()
                 .map(payment -> payment.getAmount() != null ? payment.getAmount() : BigDecimal.ZERO)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal packageAmount = folio.getTotalPackageAmount() != null ? folio.getTotalPackageAmount() : BigDecimal.ZERO;
+        BigDecimal packageAmount = folio.getTotalPackageAmount() != null ? folio.getTotalPackageAmount()
+                : BigDecimal.ZERO;
         BigDecimal totalCost = packageAmount.add(totalExtra);
         BigDecimal balanceDue = totalCost.subtract(totalPaid);
 
@@ -90,7 +94,7 @@ public class BillingServiceImpl implements BillingService {
                 .paymentMethod(method)
                 .paymentGateway(gateway)
                 .paymentDate(LocalDateTime.now())
-                .status("PENDING")
+                .status(PaymentTransactionStatus.PENDING.name())
                 .build();
 
         return paymentRepository.save(payment);
@@ -102,13 +106,35 @@ public class BillingServiceImpl implements BillingService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
-        payment.setStatus("SUCCESS");
+        payment.setStatus(PaymentTransactionStatus.SUCCESS.name());
         payment.setTransactionCode(transactionCode);
         payment.setPaymentDate(LocalDateTime.now());
         paymentRepository.save(payment);
 
         GuestFolio folio = payment.getGuestFolio();
-        folio.setStatus("PAID");
+        folio.setStatus(GuestFolioStatus.CLOSED.name());
+        guestFolioRepository.save(folio);
+
+        Booking booking = bookingRepository.findById(folio.getBookingId())
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        booking.setBookingStatus("COMPLETED");
+        booking.setPaymentStatus("PAID");
+        bookingRepository.save(booking);
+
+        if (booking.getAssignedVilla() != null) {
+            Villa villa = booking.getAssignedVilla();
+            villa.setVillaStatus("VACANT_NEEDS_CLEANING");
+            villaRepository.save(villa);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void completeCheckoutWithoutPayment(Integer bookingId) {
+        GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new RuntimeException("Folio not found"));
+
+        folio.setStatus(GuestFolioStatus.CLOSED.name());
         guestFolioRepository.save(folio);
 
         Booking booking = bookingRepository.findById(folio.getBookingId())
@@ -129,7 +155,7 @@ public class BillingServiceImpl implements BillingService {
     public void markPaymentAsFailed(Integer paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
-        payment.setStatus("FAILED");
+        payment.setStatus(PaymentTransactionStatus.FAILED.name());
         payment.setPaymentDate(LocalDateTime.now());
         paymentRepository.save(payment);
     }

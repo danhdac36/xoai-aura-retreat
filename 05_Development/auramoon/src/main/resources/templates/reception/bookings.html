@@ -77,7 +77,7 @@
                             </td>
                             <td class="py-4 px-6 text-center">
                                 <button th:if="${b.bookingStatus == 'CONFIRMED'}" 
-                                        th:onclick="'openCheckInModal(' + ${b.id} + ', ' + ${b.totalGuests} + ')'"
+                                        th:onclick="'openCheckInModal(' + ${b.id} + ')'"
                                         class="px-4 py-2 bg-[#566342] text-white rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity flex items-center gap-1 mx-auto">
                                     <span class="material-symbols-outlined text-sm">key</span> Check-In
                                 </button>
@@ -113,10 +113,9 @@
                             class="w-full bg-transparent border-gray-300 rounded-lg focus:ring-[#566342] focus:border-[#566342]">
                         <option value="" disabled selected>-- Chọn Villa trống --</option>
                         <option th:each="v : ${allVillas}" 
+                                th:if="${v.villaStatus == 'AVAILABLE'}"
                                 th:value="${v.id}" 
-                                th:data-limit="${v.limitPerson}"
-                                th:data-status="${v.villaStatus}"
-                                th:text="${v.villaCode} + ' - (Sức chứa: ' + ${v.limitPerson} + ' người - ' + ${v.villaStatus} + ')'">
+                                th:text="${v.villaCode} + ' - (Sức chứa: ' + ${v.limitPerson} + ' người)'">
                             Villa Code
                         </option>
                     </select>
