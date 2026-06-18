@@ -1,8 +1,4 @@
 const menuImageMap = {
-    "Cá Hồi Nướng Hương Thảo": "/images/fnb/menu/ca-hoi-nuong-huong-thao.jpg",
-    "Salad Aura Thanh Lọc": "/images/fnb/menu/salad-aura-thanh-loc.jpg",
-    "Bát Cơm Gạo Lứt Chay": "/images/fnb/menu/bat-com-gao-lut-chay.jpg",
-    "Nước Ép Cần Tây Hữu Cơ": "/images/fnb/menu/nuoc-ep-can-tay-huu-co.jpg",
     "Phở bò": "/images/fnb/menu/pho-bo.jpg",
     "Phở gà": "/images/fnb/menu/pho-ga.jpg",
     "Bún bò Huế": "/images/fnb/menu/bun-bo-hue.jpg",
@@ -178,19 +174,26 @@ function removeVietnameseTones(str) {
 }
 
 function getMenuImageUrl(item) {
-    if (!item || !item.itemName) {
+    if (!item) {
         return "/images/fnb/menu/default-food.jpg";
     }
 
-    if (menuImageMap[item.itemName]) {
-        return menuImageMap[item.itemName];
+    const itemName = item.itemName || item.name || item;
+
+    if (!itemName) {
+        return "/images/fnb/menu/default-food.jpg";
     }
 
-    const cleanName = removeVietnameseTones(item.itemName)
+    if (menuImageMap[itemName]) {
+        return menuImageMap[itemName];
+    }
+
+    const cleanName = removeVietnameseTones(itemName)
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, "")
         .replace(/\s+/g, "-")
-        .replace(/-+/g, "-");
+        .replace(/-+/g, "-")
+        .trim();
 
     return `/images/fnb/menu/${cleanName}.jpg`;
 }

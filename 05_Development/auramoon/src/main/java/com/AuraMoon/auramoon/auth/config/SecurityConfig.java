@@ -46,11 +46,12 @@ public class SecurityConfig {
         };
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {
-                        // "/receptionist/**"
+                        "/receptionist/**"
         };
 
         private static final String[] THERAPIST_ENDPOINTS = {
-                        "/therapist/**" };
+                        // "/therapist/**" };
+        };
 
         private static final String[] CHEFF_ENDPOINTS = {
                         "/F&B/**" };

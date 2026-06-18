@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -32,9 +35,8 @@ public class MealOrderController {
         return ResponseEntity.ok(menu);
     }
 
-
     @PostMapping("/api/v1/fnb/meal-orders")
-    public ResponseEntity<MealOrderResponse> createMealOrder(@RequestBody MealOrderRequest request) {
+    public ResponseEntity<MealOrderResponse> createMealOrderApi(@RequestBody MealOrderRequest request) {
         MealOrderResponse response = mealOrderService.createMealOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -48,13 +50,103 @@ public class MealOrderController {
     }
 
     @GetMapping("/fnb/uc16-meal-selection")
-    public String getMealSelectionPage() {
+    public String getMealSelectionPage(
+            @RequestParam(value = "guestId", required = false) Integer guestId,
+            @RequestParam(value = "bookingId", required = false) Integer bookingId,
+            Model model) {
+
+        List<MenuItemResponse> menuItems = new ArrayList<>();
+
+        if (guestId != null && bookingId != null) {
+            try {
+                menuItems = mealOrderService.getFilteredMenu(guestId, bookingId);
+            } catch (Exception e) {
+                model.addAttribute("errorMessage", e.getMessage());
+            }
+        }
+
+        model.addAttribute("menuItems", menuItems);
+        model.addAttribute("guestId", guestId);
+        model.addAttribute("bookingId", bookingId);
+
+        MealOrderRequest orderForm = new MealOrderRequest();
+        orderForm.setGuestId(guestId);
+        orderForm.setBookingId(bookingId);
+        model.addAttribute("orderForm", orderForm);
+
         return "fnb/uc16-meal-selection";
     }
 
+    @PostMapping("/fnb/uc16-meal-selection")
+    public String createMealOrderMvc(
+            @ModelAttribute("orderForm") MealOrderRequest request,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            mealOrderService.createMealOrder(request);
+            redirectAttributes.addFlashAttribute("successMessage", "Đặt món ăn cá nhân thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        if (request != null && request.getGuestId() != null && request.getBookingId() != null) {
+            return "redirect:/fnb/uc16-meal-selection?guestId="
+                    + request.getGuestId()
+                    + "&bookingId="
+                    + request.getBookingId();
+        }
+
+        return "redirect:/fnb/uc16-meal-selection";
+    }
+
     @GetMapping("/fnb/uc19-alacarte-order")
-    public String getAlacarteOrderPage() {
+    public String getAlacarteOrderPage(
+            @RequestParam(value = "guestId", required = false) Integer guestId,
+            @RequestParam(value = "bookingId", required = false) Integer bookingId,
+            Model model) {
+        List<MenuItemResponse> allMenu = mealOrderService.getAllMenu();
+        List<MenuItemResponse> menuItems = new ArrayList<>();
+        if (allMenu != null) {
+            for (MenuItemResponse item : allMenu) {
+                if (item.getIngredient() != null && item.getIngredient().contains("Europe")) {
+                    menuItems.add(item);
+                    if (menuItems.size() >= 50) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        model.addAttribute("menuItems", menuItems);
+        model.addAttribute("guestId", guestId);
+        model.addAttribute("bookingId", bookingId);
+
+        MealOrderRequest orderForm = new MealOrderRequest();
+        orderForm.setGuestId(guestId);
+        orderForm.setBookingId(bookingId);
+        model.addAttribute("orderForm", orderForm);
+
         return "fnb/uc19-alacarte-order";
     }
-}
 
+    @PostMapping("/fnb/uc19-alacarte-order")
+    public String createAlacarteOrder(
+            @ModelAttribute("orderForm") MealOrderRequest request,
+            RedirectAttributes redirectAttributes) {
+        try {
+            mealOrderService.createMealOrder(request);
+            redirectAttributes.addFlashAttribute("successMessage", "Đặt món A-La-Carte thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        if (request != null && request.getGuestId() != null && request.getBookingId() != null) {
+            return "redirect:/fnb/uc19-alacarte-order?guestId="
+                    + request.getGuestId()
+                    + "&bookingId="
+                    + request.getBookingId();
+        }
+
+        return "redirect:/fnb/uc19-alacarte-order";
+    }
+}

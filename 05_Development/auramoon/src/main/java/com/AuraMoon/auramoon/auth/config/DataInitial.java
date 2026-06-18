@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import com.AuraMoon.auramoon.spa.entity.Therapist;
+import com.AuraMoon.auramoon.spa.repository.TherapistRepository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +25,9 @@ public class DataInitial implements CommandLineRunner {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private TherapistRepository therapistRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -46,16 +51,29 @@ public class DataInitial implements CommandLineRunner {
     }
 
     private void createInitialUser(String email, String fullName, String roleName) {
+        User user;
         if (!userRepository.existsByEmail(email)) {
             Role role = roleRepository.findByRoleName(roleName)
                     .orElseThrow(() -> new IllegalStateException("Role " + roleName + " not found"));
-            User user = new User();
+            user = new User();
             user.setEmail(email);
             user.setPasswordHash(passwordEncoder.encode("password123")); // Default test password
             user.setFullName(fullName);
             user.setRole(role);
             user.setStatus("ACTIVE");
-            userRepository.save(user);
+            user = userRepository.save(user);
+        } else {
+            user = userRepository.findByEmail(email);
+        }
+
+        if ("THERAPIST".equals(roleName) && user != null) {
+            if (!therapistRepository.existsById(user.getId())) {
+                Therapist therapist = new Therapist();
+                therapist.setId(user.getId());
+                therapist.setTherapistCode("NV00" + user.getId());
+                therapist.setStatus("AVAILABLE");
+                therapistRepository.save(therapist);
+            }
         }
     }
 }
