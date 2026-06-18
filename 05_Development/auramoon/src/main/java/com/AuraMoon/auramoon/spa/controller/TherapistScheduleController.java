@@ -3,7 +3,10 @@ package com.AuraMoon.auramoon.spa.controller;
 import com.AuraMoon.auramoon.spa.dto.TherapistScheduleDto;
 import com.AuraMoon.auramoon.spa.service.TherapistScheduleService;
 import com.AuraMoon.auramoon.spa.exception.SpaBusinessException;
-import jakarta.servlet.http.HttpSession;
+import com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse;
+import com.AuraMoon.auramoon.spa.entity.Therapist;
+import com.AuraMoon.auramoon.spa.repository.TherapistRepository;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,16 +25,18 @@ import java.util.List;
 public class TherapistScheduleController {
 
     private final TherapistScheduleService therapistScheduleService;
+    private final TherapistRepository therapistRepository;
 
     @GetMapping("/daily")
     public String getDailySchedule(@RequestParam(value = "date", required = false) String dateStr,
-            HttpSession session, Model model) {
+            @AuthenticationPrincipal UserDetailsResponse userDetails, Model model) {
 
-        String therapistCode = (String) session.getAttribute("therapistCode");
-
-        if (therapistCode == null || therapistCode.trim().isEmpty()) {
-            return "redirect:/login";
+        Therapist therapist = therapistRepository.findById(userDetails.getId()).orElse(null);
+        if (therapist == null) {
+            return "redirect:/auth/login";
         }
+
+        String therapistCode = therapist.getTherapistCode();
 
         LocalDate targetDate = LocalDate.now();
         if (dateStr != null && !dateStr.trim().isEmpty()) {
@@ -56,14 +61,15 @@ public class TherapistScheduleController {
             @RequestParam("scheduleId") Integer scheduleId,
             @RequestParam("status") String status,
             @RequestParam("date") String dateStr,
-            HttpSession session,
+            @AuthenticationPrincipal UserDetailsResponse userDetails,
             RedirectAttributes redirectAttributes) {
 
-        String therapistCode = (String) session.getAttribute("therapistCode");
-
-        if (therapistCode == null || therapistCode.trim().isEmpty()) {
-            return "redirect:/login";
+        Therapist therapist = therapistRepository.findById(userDetails.getId()).orElse(null);
+        if (therapist == null) {
+            return "redirect:/auth/login";
         }
+
+        String therapistCode = therapist.getTherapistCode();
 
         try {
             therapistScheduleService.updateSessionStatus(scheduleId, therapistCode, status);
@@ -71,7 +77,8 @@ public class TherapistScheduleController {
         } catch (SpaBusinessException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Đã xảy ra lỗi hệ thống. Vui lòng thử lại.");
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Đã xảy ra lỗi hệ thống. Vui lòng thử lại." + e.getMessage());
         }
 
         return "redirect:/therapist/schedules/daily?date=" + dateStr;

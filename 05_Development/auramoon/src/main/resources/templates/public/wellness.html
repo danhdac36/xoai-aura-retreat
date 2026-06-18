@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/public-layout}">
+<head>
+    <th:block layout:fragment="styles">
+        <link rel="stylesheet" th:href="@{/css/public/wellness.css}">
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content">
+        <main class="flex-grow">
+            <!-- Integrated Hero Section -->
+            <section class="relative w-full h-[819px] min-h-[600px] flex items-end pb-section-gap">
+                <div class="absolute inset-0 z-0">
+                    <img class="w-full h-full object-cover" data-alt="A wide, cinematic shot of a serene outdoor yoga deck at a luxury wellness retreat in Southeast Asia. The deck is made of warm, natural wood and overlooks a lush, misty tropical jungle canopy. Soft, diffused morning sunlight filters through the palm trees, creating a tranquil and airy atmosphere. The visual style is light, sophisticated, and deeply connected to nature, utilizing a color palette of sage greens, earthy browns, and soft atmospheric whites. The scene evokes a profound sense of 'Atmospheric Stillness' and mental clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1jXpA24ka0IVSigXJUTZvytwr-_4aCUml63qPxlJjTXmo5m0ouP-jTPecxEKT8ijEFfHft3B6By2xhSTg_mUaP-Vp-kBsdNp8T9WHm8_EkA-BjJ17E0cp_6ybJ5TQnH5ZpzIy1J-juhDrbta414JKC1dqUsZZJk2t-KfICIYpYoWvuqLSPB-SkfPdygMSgjEFD43htcM_utnQ_unP_yotzGXMM-FNqfliWffURJ26yC_cpReiqj92dlon2vthh9KvDu34iEun2vA">
+                    <div class="absolute inset-0 hero-overlay"></div>
+                </div>
+                <div class="relative z-10 w-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+                    <h1 class="font-display-lg text-display-lg text-on-primary mb-stack-md max-w-2xl">Sự Hòa Hợp Toàn Diện</h1>
+                    <p class="font-body-lg text-on-primary/90 max-w-2xl">Khám phá lộ trình tinh tuyển giúp bạn trở lại trạng thái cân bằng tự nhiên thông qua ý niệm chuẩn xác và kiến trúc wellness.</p>
+                </div>
+            </section>
+            <!-- Intro & Data Approach -->
+            <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-start">
+                    <div class="md:col-span-5 md:col-start-2">
+                        <h2 class="font-headline-lg text-headline-lg text-primary mb-stack-lg">Nâng tầm sự tĩnh lặng thông qua ý niệm chuẩn xác.</h2>
+                    </div>
+                    <div class="md:col-span-5">
+                        <p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-md">
+                            Tại Xoai Aura, wellness không chỉ đơn thuần là một hoạt động; đó là một cách tiếp cận kiến trúc đối với trạng thái sinh lý và tinh thần của bạn. Các chương trình toàn diện của chúng tôi được thiết kế để loại bỏ những ồn ào của cuộc sống hiện đại, mang đến một lộ trình tinh tuyển giúp bạn trở lại trạng thái cân bằng tự nhiên.
+                        </p>
+                        <p class="font-body-md text-body-md text-outline">
+                            Tận dụng cách tiếp cận dựa trên dữ liệu một cách tinh tế, các chuyên gia của chúng tôi đồng bộ hóa lịch trình nghỉ dưỡng cá nhân của bạn với hồ sơ sức khỏe nền tảng được thu thập trước khi bạn đến. Điều này đảm bảo rằng mỗi buổi tập thở, lựa chọn dinh dưỡng và trị liệu cấu trúc đều được căn chỉnh một cách toán học với các yêu cầu cụ thể của cơ thể bạn để trẻ hóa.
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <!-- Offerings Showcase -->
+            <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop mb-section-gap">
+                <div class="flex justify-between items-end mb-stack-lg border-b border-outline-variant/30 pb-4">
+                    <h3 class="font-headline-sm text-headline-sm text-primary">Lịch Trình Wellness Hàng Ngày</h3>
+                    <a class="font-label-md text-label-md uppercase tracking-widest text-secondary hover:opacity-80 transition-opacity flex items-center gap-2" href="#">
+                        Xem Toàn Bộ Lịch Trình <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter h-[600px]">
+                    <!-- Card 1: Massage/Spa -->
+                    <div class="relative rounded-2xl overflow-hidden bg-surface group h-full">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A close-up, serene portrait of a woman receiving a gentle facial and head massage in a light-filled spa room." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBa364BqSVmOOQ76R4Ib325B57tP9uOnCeAiv5nMOhGVszFLs34nXGHNsbnQIb1yjo2MiodOPnA6PQYTTvDD-XFgxC58bVwwFC2Z_O748OUfLUreVVEO8sr4oEehYjkVL40lZWbn82zKGBpxNC0D_-fbnTHLeuIbQL5hNErOSR762uEW2ol3k2G_nTQVO-VcOJ2sy7c0i7vuBZb1Dbew6wO8o5QW3TE5tQxG5auQAgeL5Einjt9KdT4JEa5sgdd7Nnhnb8jQ9N88s0">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                        <div class="absolute inset-4 border border-white/30 rounded-xl pointer-events-none transition-opacity group-hover:border-white/50"></div>
+                        <div class="absolute bottom-8 left-8 right-8 flex justify-between items-end text-on-primary">
+                            <div>
+                                <span class="font-label-md text-label-md uppercase tracking-widest opacity-80 block mb-2">08:00 AM</span>
+                                <h4 class="font-headline-sm text-headline-sm">Cân Bằng Cấu Trúc</h4>
+                            </div>
+                            <span class="material-symbols-outlined icon-fill text-3xl">spa</span>
+                        </div>
+                    </div>
+                    <!-- Card 2: Yoga -->
+                    <div class="relative rounded-2xl overflow-hidden bg-surface group h-full">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A meticulously rolled cork yoga mat lies centered on a polished dark wood deck." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsNgzr1UwCyfRn-z5OmUIMQp60TX4D4N4LMz-lElvKBMwI87UPvUtJYUJeiwfs36TGSss5cNbBFRfCxtYi4wob5a5zZgwAAMevMJBO58yAYGbfIUu_6imTkJVGwmMWiGN8KCO0tjasXA55dgaaZscla8jAJqGnyMqjztXZYJmumTaqHG-OOMobaUuXEUH5eAha2X3nY8ZNHl-7i_o7GfrWosJMIzk3JDJYBgdf2uLNCvmi-n7D9W4yMT_aH9G7ko9g62AwslWb6Rk">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                        <div class="absolute inset-4 border border-white/30 rounded-xl pointer-events-none transition-opacity group-hover:border-white/50"></div>
+                        <div class="absolute bottom-8 left-8 right-8 flex justify-between items-end text-on-primary">
+                            <div>
+                                <span class="font-label-md text-label-md uppercase tracking-widest opacity-80 block mb-2">10:30 AM</span>
+                                <h4 class="font-headline-sm text-headline-sm">Vinyasa &amp; Kiểm Soát Hơi Thở</h4>
+                            </div>
+                            <span class="material-symbols-outlined icon-fill text-3xl">self_improvement</span>
+                        </div>
+                    </div>
+                    <!-- Card 3: Nutrition -->
+                    <div class="relative rounded-2xl overflow-hidden bg-surface group h-full">
+                        <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A beautifully curated wooden bowl overflowing with fresh, vibrantly colored tropical fruits." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBHOw8QwNNMUC3mD7cOqjR7w-X_kojoBVYO_JHqPfP9HA0UDhNZxI1KonOAqnMzODllhgP7ujWWbc28k2CAinQWwXk6GQ5sU4fmpmVw6Uz-Txsig28lW3aDyYclPd5Y2XyHZt9D6-29hCdJrR5jrysVISILriq7fooH6uySC5ByB9M4CNsBpCYK2oNB7XdLQ7mAel57IG2iZtTgmnBAAoNZu96A0MyJIimy644aQToWfdQ_VtPZ3XEm8eZkIjC72NtIPNejicWqDE">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                        <div class="absolute inset-4 border border-white/30 rounded-xl pointer-events-none transition-opacity group-hover:border-white/50"></div>
+                        <div class="absolute bottom-8 left-8 right-8 flex justify-between items-end text-on-primary">
+                            <div>
+                                <span class="font-label-md text-label-md uppercase tracking-widest opacity-80 block mb-2">12:30 PM</span>
+                                <h4 class="font-headline-sm text-headline-sm">Dinh Dưỡng Tế Bào</h4>
+                            </div>
+                            <span class="material-symbols-outlined icon-fill text-3xl">nutrition</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Personalized Programs & Practitioners -->
+            <section class="bg-surface-container-low py-section-gap">
+                <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-24">
+                        <!-- Programs -->
+                        <div>
+                            <h3 class="font-headline-sm text-headline-sm text-primary mb-stack-lg">Lộ Trình Cá Nhân Hóa</h3>
+                            <div class="space-y-stack-lg">
+                                <div class="group cursor-pointer">
+                                    <div class="flex justify-between items-center border-b border-outline-variant/30 pb-4 mb-4">
+                                        <h4 class="font-body-lg text-body-lg text-on-surface group-hover:text-secondary transition-colors">Thanh Lọc Nhận Thức</h4>
+                                        <span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">arrow_outward</span>
+                                    </div>
+                                    <p class="font-body-md text-body-md text-on-surface-variant">Khóa tập trung 5 ngày chuyên sâu về tách biệt kỹ thuật số, nghỉ ngơi thần kinh và giảm cortisol thông qua liệu pháp âm thanh và cách ly giác quan.</p>
+                                </div>
+                                <div class="group cursor-pointer">
+                                    <div class="flex justify-between items-center border-b border-outline-variant/30 pb-4 mb-4">
+                                        <h4 class="font-body-lg text-body-lg text-on-surface group-hover:text-secondary transition-colors">Tái Tạo Chuyển Hóa</h4>
+                                        <span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">arrow_outward</span>
+                                    </div>
+                                    <p class="font-body-md text-body-md text-on-surface-variant">Một chương trình hoạt động thể chất kết hợp yoga cường độ cao hàng ngày với chế độ dinh dưỡng kháng viêm đặc thù dựa trên các chẩn đoán sơ bộ của bạn.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Practitioners -->
+                        <div>
+                            <h3 class="font-headline-sm text-headline-sm text-primary mb-stack-lg">Chuyên Gia Của Chúng Tôi</h3>
+                            <p class="font-body-md text-body-md text-on-surface-variant mb-stack-lg">
+                                Đội ngũ của chúng tôi bao gồm các chuyên gia được cấp chứng chỉ quốc tế về vận động cơ thể, dinh dưỡng lâm sàng và các truyền thống trị liệu phương Đông.
+                            </p>
+                            <div class="flex flex-col gap-6">
+                                <div class="flex items-center gap-6 bg-surface p-6 rounded-lg border border-outline-variant/10">
+                                    <div class="w-16 h-16 rounded-full bg-surface-variant overflow-hidden flex-shrink-0">
+                                        <img class="w-full h-full object-cover" data-alt="A professional headshot of Elena Rostova." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZzk0XHJI3fWcliOl4MHsxfnA3XphPFdOTT0rXAqZPEjWwDME5ILKjjRnvsR18DvzbT03mO-fYbeC1beEUKgEl3FRj4vxsRLDcgNOACjbpor6CR0LSi-AATMn9cc8_PFRI_ESTBMFSfiLHedvlRnc4il5n__VTbbvRUdA9OfQjMwFJl_S7ICJmKZhXGsxqngr2rYE2_nNAr3U9JUXop7Z68ivh32OZZ9i2OhwBmPp-vFoH4XmspdnlNPzf3JDAILQzW7EScvD5IAE">
+                                    </div>
+                                    <div>
+                                        <h5 class="font-body-lg text-body-lg font-medium text-on-surface">Elena Rostova</h5>
+                                        <p class="font-body-md text-body-md text-outline">Chuyên Gia Trị Liệu Cơ Thể Chính</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-6 bg-surface p-6 rounded-lg border border-outline-variant/10">
+                                    <div class="w-16 h-16 rounded-full bg-surface-variant overflow-hidden flex-shrink-0">
+                                        <img class="w-full h-full object-cover" data-alt="A professional headshot of Dr. Lin Wei." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMX4Q1Zu_ha7QJizbgnmqyWlqhNc6nvUq3CI7EvzD-IPxQbzZ4lUbN4Vivu409z02F5xyNX2GTkz7QUcza8Rh2DzJV0mvHjYho2-w_vioToRjGQxZGhL25g31lUq1IbGp4-tbbXOWU4gmwB6vTq96wl4hnG6s8elLPOK1bXr3Q5CgG7CNfwpijWCFTsGObe-kYU_xFWsGxaDw0aIeVVVJ5x6FoobdV6DWuFmVYXaG20MLaY9m83vPrbzoPiIR-RPzrG0t4kk2Vx8E">
+                                    </div>
+                                    <div>
+                                        <h5 class="font-body-lg text-body-lg font-medium text-on-surface">Dr. Lin Wei</h5>
+                                        <p class="font-body-md text-body-md text-outline">Kiến Trúc Sư Dinh Dưỡng</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- CTA Section -->
+            <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap text-center">
+                <h2 class="font-display-lg text-display-lg text-primary mb-stack-md">Bắt đầu hành trình cân bằng.</h2>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-stack-lg">
+                    Kết nối với bộ phận Wellness Concierge của chúng tôi để thảo luận về trạng thái thể chất hiện tại của bạn và phác thảo chương trình sơ bộ trước khi đặt lịch nghỉ dưỡng.
+                </p>
+                <a th:href="@{/auth/login}" class="bg-secondary text-on-secondary px-8 py-4 rounded hover:opacity-90 transition-opacity font-label-md text-label-md uppercase tracking-widest inline-block">
+                    Liên hệ Wellness Concierge
+                </a>
+            </section>
+        </main>
+    </div>
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/public/wellness.js}"></script>
+    </th:block>
+</body>
+</html>
