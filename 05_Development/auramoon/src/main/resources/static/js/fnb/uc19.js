@@ -1,281 +1,262 @@
-let allMenuItems = [];
-let alacarteItems = [];
 let cartItems = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    loadAlacarteMenu();
+    bindLoadMenuButton();
+    bindSelectButtons();
+    bindOrderForm();
+    applyMenuImages();
+    renderCartPanel();
+    updateHiddenFormInputs();
 });
 
-// Load menu items from static data and filter for European dishes
-async function loadAlacarteMenu() {
-    const guestId = document.getElementById("input-guest-id").value;
-    const bookingId = document.getElementById("input-booking-id").value;
+function bindLoadMenuButton() {
+    const searchBtn = document.querySelector(".btn-search");
+    if (!searchBtn) return;
+    searchBtn.addEventListener("click", () => {
+        const guestEl = document.getElementById("input-guest-id");
+        const bookingEl = document.getElementById("input-booking-id");
+        const guestId = guestEl ? guestEl.value : "";
+        const bookingId = bookingEl ? bookingEl.value : "";
 
-    if (!guestId || !bookingId) {
-        showToast("Vui lòng nhập đầy đủ Guest ID và Booking ID", "error");
-        return;
-    }
-
-    try {
-        const response = await fetch("/api/v1/fnb/menu/all");
-
-        if (!response.ok) {
-            const err = await response.json();
-            throw new Error(err.message || err.error || "Lỗi tải thực đơn gọi món ngoài");
+        if (!guestId || !bookingId) {
+            showToast("Vui lòng nhập đầy đủ Guest ID và Booking ID", "error");
+            return;
         }
-
-        const data = await response.json();
-
-        alacarteItems = data
-            .filter(item => item.ingredient && item.ingredient.toLowerCase().includes("europe"))
-            .slice(0, 50)
-            .map(item => ({
-                ...item,
-                isAllergic: false
-            }));
-
-        cartItems = [];
-        renderMenu();
-        renderCartPanel();
-
-        showToast(`Tải ${alacarteItems.length} món A-La-Carte thành công`, "success");
-    } catch (error) {
-        console.error("Load A-La-Carte menu error:", error);
-        showToast(error.message || "Lỗi tải thực đơn gọi món ngoài", "error");
-    }
-}
-
-
-// Render European menu cards
-function renderMenu() {
-    const grid = document.getElementById("menu-grid");
-    grid.innerHTML = "";
-
-    if (alacarteItems.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-style: italic;">Không có món ăn A-La-Carte nào khả dụng cho khách hàng này.</p>';
-        return;
-    }
-
-    alacarteItems.forEach(item => {
-        const imageUrl = getMenuImageUrl(item);
-        const cartItem = cartItems.find(i => i.id === item.id);
-        const isSelected = !!cartItem;
-        const isAllergic = item.isAllergic;
-
-        const card = document.createElement("article");
-        card.className = `menu-card ${isAllergic ? 'allergic-card' : ''}`;
-
-        let buttonHtml = "";
-        if (isAllergic) {
-            buttonHtml = `
-                <button type="button" class="btn-select disabled" disabled style="background-color: #E6D5D5; color: var(--danger-red); border: 1px solid #D9B3B3; cursor: not-allowed;">
-                    CÓ THỂ GÂY DỊ ỨNG ⚠️
-                </button>
-            `;
-        } else {
-            buttonHtml = `
-                <button type="button" class="btn-select ${isSelected ? 'selected' : ''}" onclick="addToCart(${item.id})">
-                    ${isSelected ? `ĐÃ CHỌN (${cartItem.quantity})` : 'CHỌN MÓN'}
-                </button>
-            `;
-        }
-
-        card.innerHTML = `
-            <div class="card-img-wrap" style="${isAllergic ? 'opacity: 0.65;' : ''}">
-                <img src="${imageUrl}" alt="${item.itemName}" class="card-img" onerror="this.src='/images/fnb/menu/default-food.jpg'">
-            </div>
-            <div class="card-body" style="${isAllergic ? 'background-color: #FAF2F2;' : ''}">
-                <h3 class="card-title" style="${isAllergic ? 'color: var(--danger-red);' : ''}">${item.itemName}</h3>
-                <div class="card-price">${formatVND(item.price)}</div>
-                <p class="card-ingredients">${item.ingredient || "Món ăn cao cấp chuẩn Âu"}</p>
-                ${isAllergic ? `<p style="color: var(--danger-red); font-size: 0.8rem; font-weight: 600; margin-bottom: 0.75rem;">⚠️ Cảnh báo: Chứa nguyên liệu gây dị ứng trong hồ sơ của bạn!</p>` : ''}
-                ${buttonHtml}
-            </div>
-        `;
-        grid.appendChild(card);
+        window.location.href = `/fnb/uc19-alacarte-order?guestId=${encodeURIComponent(guestId)}&bookingId=${encodeURIComponent(bookingId)}`;
     });
 }
 
-
-// Manage Cart
-function addToCart(itemId) {
-    const item = alacarteItems.find(i => i.id === itemId);
-    if (!item) return;
-
-    const existing = cartItems.find(i => i.id === itemId);
-    if (existing) {
-        existing.quantity += 1;
-    } else {
-        cartItems.push({
-            id: item.id,
-            itemName: item.itemName,
-            price: item.price,
-            quantity: 1
+function bindSelectButtons() {
+    const selectButtons = document.querySelectorAll(".btn-select");
+    selectButtons.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            toggleCartItem(e.currentTarget);
         });
-    }
-
-    renderMenu();
-    renderCartPanel();
+    });
 }
 
-function updateCartQuantity(itemId, delta) {
-    const item = cartItems.find(i => i.id === itemId);
-    if (!item) return;
+function toggleCartItem(buttonEl) {
+    const itemId = parseInt(buttonEl.getAttribute("data-id"), 10);
+    const itemName = buttonEl.getAttribute("data-name");
+    const price = parseFloat(buttonEl.getAttribute("data-price"));
 
-    item.quantity += delta;
-    if (item.quantity <= 0) {
-        const index = cartItems.indexOf(item);
-        cartItems.splice(index, 1);
-    }
-
-    renderMenu();
-    renderCartPanel();
-}
-
-function removeFromCart(itemId) {
-    const index = cartItems.findIndex(i => i.id === itemId);
-    if (index > -1) {
-        cartItems.splice(index, 1);
-    }
-    renderMenu();
-    renderCartPanel();
-}
-
-// Render cart list
-function renderCartPanel() {
-    const cartList = document.getElementById("cart-items-list");
-    const badge = document.getElementById("cart-badge");
-
-    if (!cartList) {
-        console.error("Không tìm thấy element #cart-items-list");
+    if (!itemId || !itemName || Number.isNaN(price)) {
+        showToast("Dữ liệu món ăn không hợp lệ", "error");
         return;
     }
 
+    const existingIndex = cartItems.findIndex(item => item.id === itemId);
+    if (existingIndex > -1) {
+        cartItems.splice(existingIndex, 1);
+        buttonEl.classList.remove("selected");
+        buttonEl.textContent = "CHỌN MÓN";
+    } else {
+        cartItems.push({
+            id: itemId,
+            itemName: itemName,
+            price: price,
+            quantity: 1
+        });
+        buttonEl.classList.add("selected");
+        buttonEl.textContent = "ĐÃ CHỌN (1)";
+    }
+    renderCartPanel();
+    updateHiddenFormInputs();
+}
+
+function updateItemQuantity(itemId, delta) {
+    const item = cartItems.find(item => item.id === itemId);
+    if (!item) return;
+
+    item.quantity += delta;
+
+    const buttons = document.querySelectorAll(`.btn-select[data-id="${itemId}"]`);
+    if (item.quantity <= 0) {
+        const index = cartItems.indexOf(item);
+        cartItems.splice(index, 1);
+        buttons.forEach(btn => {
+            btn.classList.remove("selected");
+            btn.textContent = "CHỌN MÓN";
+        });
+    } else {
+        buttons.forEach(btn => {
+            btn.classList.add("selected");
+            btn.textContent = `ĐÃ CHỌN (${item.quantity})`;
+        });
+    }
+    renderCartPanel();
+    updateHiddenFormInputs();
+}
+
+function removeCartItem(itemId) {
+    const index = cartItems.findIndex(item => item.id === itemId);
+    if (index > -1) {
+        cartItems.splice(index, 1);
+    }
+    const buttons = document.querySelectorAll(`.btn-select[data-id="${itemId}"]`);
+    buttons.forEach(btn => {
+        btn.classList.remove("selected");
+        btn.textContent = "CHỌN MÓN";
+    });
+    renderCartPanel();
+    updateHiddenFormInputs();
+}
+
+function renderCartPanel() {
+    const cartList = document.getElementById("cart-items-list") || document.getElementById("selected-items-list");
+    const badge = document.getElementById("cart-badge");
+
+    if (!cartList) return;
     cartList.innerHTML = "";
 
+    const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
     if (badge) {
-        badge.textContent = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+        badge.textContent = totalQuantity;
     }
 
     if (cartItems.length === 0) {
-        cartList.innerHTML = `<p class="empty-cart-msg">Chưa chọn món nào</p>`;
+        const emptyMsg = document.createElement("p");
+        emptyMsg.className = "cart-empty";
+        emptyMsg.textContent = "Chưa chọn món nào";
+        cartList.appendChild(emptyMsg);
         updateCostSummary(0);
         return;
     }
 
     cartItems.forEach(item => {
-        const fullItem = allMenuItems.find(i => i.id === item.id) || item;
-        const imageUrl = getMenuImageUrl(fullItem);
+        let imageUrl = "/images/fnb/menu/default-food.jpg";
+        if (typeof getMenuImageUrl === "function") {
+            imageUrl = getMenuImageUrl({ itemName: item.itemName });
+        }
 
         const row = document.createElement("div");
         row.className = "cart-item";
-
         row.innerHTML = `
-            <img src="${imageUrl}"
-                 alt="${fullItem.itemName}"
-                 class="cart-item-img"
-                 onerror="this.src='/images/fnb/menu/default-food.jpg'">
-
+            <img src="${imageUrl}" alt="${item.itemName}" class="cart-item-img" onerror="this.src='/images/fnb/menu/default-food.jpg'">
             <div class="cart-item-details">
-                <div class="cart-item-name">${fullItem.itemName}</div>
-                <div class="cart-item-price">${formatVND(fullItem.price)}</div>
-
+                <div class="cart-item-name">${item.itemName}</div>
+                <div class="cart-item-price">${formatVND(item.price)}</div>
                 <div class="cart-item-qty-row">
-                    <button type="button" class="qty-btn" onclick="updateCartItemQuantity(${item.id}, -1)">-</button>
+                    <button type="button" class="qty-btn minus-btn">-</button>
                     <span>${item.quantity}</span>
-                    <button type="button" class="qty-btn" onclick="updateCartItemQuantity(${item.id}, 1)">+</button>
+                    <button type="button" class="qty-btn plus-btn">+</button>
                 </div>
             </div>
-
-            <button type="button" class="cart-item-remove" onclick="removeCartItem(${item.id})">
-                Xóa
-            </button>
+            <button type="button" class="cart-item-remove">Xóa</button>
         `;
+
+        row.querySelector(".minus-btn").addEventListener("click", () => {
+            updateItemQuantity(item.id, -1);
+        });
+        row.querySelector(".plus-btn").addEventListener("click", () => {
+            updateItemQuantity(item.id, 1);
+        });
+        row.querySelector(".cart-item-remove").addEventListener("click", () => {
+            removeCartItem(item.id);
+        });
 
         cartList.appendChild(row);
     });
 
-    const subtotal = cartItems.reduce((acc, item) => {
-        return acc + Number(item.price || 0) * Number(item.quantity || 1);
-    }, 0);
-
+    const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     updateCostSummary(subtotal);
 }
 
-// Update Subtotal, 5% Service fee, and Total amounts
 function updateCostSummary(subtotal) {
     const serviceFee = subtotal * 0.05;
     const total = subtotal + serviceFee;
 
-    document.getElementById("price-subtotal").textContent = formatVND(subtotal);
-    document.getElementById("price-service-charge").textContent = formatVND(serviceFee);
-    document.getElementById("price-total").textContent = formatVND(total);
+    const subtotalEl = document.getElementById("price-subtotal");
+    const serviceChargeEl = document.getElementById("price-service-charge");
+    const totalEl = document.getElementById("price-total");
+
+    if (subtotalEl) subtotalEl.textContent = formatVND(subtotal);
+    if (serviceChargeEl) serviceChargeEl.textContent = formatVND(serviceFee);
+    if (totalEl) totalEl.textContent = formatVND(total);
 }
 
-// Submit Alacarte Order
-function submitAlacarteOrder() {
-    if (cartItems.length === 0) {
-        showToast("Vui lòng chọn ít nhất 1 món ăn trước khi xác nhận", "error");
-        return;
-    }
+function updateHiddenFormInputs() {
+    const container = document.getElementById("hidden-items-container");
+    if (!container) return;
+    container.innerHTML = "";
 
-    const guestId = parseInt(document.getElementById("input-guest-id").value, 10);
-    const bookingId = parseInt(document.getElementById("input-booking-id").value, 10);
-    const placeOrder = document.getElementById("order-place").value;
-    const note = document.getElementById("order-note").value;
+    cartItems.forEach((item, index) => {
+        const idInput = document.createElement("input");
+        idInput.type = "hidden";
+        idInput.name = `items[${index}].menuItemId`;
+        idInput.value = item.id;
 
-    const requestBody = {
-        bookingId: bookingId,
-        guestId: guestId,
-        placeOrder: placeOrder || "Villa V101",
-        note: note || "",
-        items: cartItems.map(item => ({
-            menuItemId: item.id,
-            quantity: item.quantity
-        }))
-    };
+        const qtyInput = document.createElement("input");
+        qtyInput.type = "hidden";
+        qtyInput.name = `items[${index}].quantity`;
+        qtyInput.value = item.quantity;
 
-    fetch("/api/v1/fnb/meal-orders", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(requestBody)
-    })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => {
-                    throw new Error(err.error?.message || "Lỗi khi đặt món");
-                });
+        container.appendChild(idInput);
+        container.appendChild(qtyInput);
+    });
+}
+
+function bindOrderForm() {
+    const form = document.getElementById("alacarte-order-form");
+    if (!form) return;
+    form.addEventListener("submit", (e) => {
+        if (cartItems.length === 0) {
+            e.preventDefault();
+            showToast("Vui lòng chọn ít nhất 1 món ăn trước khi xác nhận", "error");
+            return;
+        }
+
+        const guestEl = document.getElementById("input-guest-id");
+        const bookingEl = document.getElementById("input-booking-id");
+        const placeEl = document.getElementById("order-place");
+        const noteEl = document.getElementById("order-note");
+
+        const formGuestId = document.getElementById("form-guest-id");
+        const formBookingId = document.getElementById("form-booking-id");
+        const formPlaceOrder = document.getElementById("form-place-order");
+        const formNote = document.getElementById("form-note");
+
+        if (formGuestId && guestEl) formGuestId.value = guestEl.value;
+        if (formBookingId && bookingEl) formBookingId.value = bookingEl.value;
+        if (formPlaceOrder) formPlaceOrder.value = placeEl ? placeEl.value : "Villa V101";
+        if (formNote) formNote.value = noteEl ? noteEl.value : "";
+
+        updateHiddenFormInputs();
+    });
+}
+
+function applyMenuImages() {
+    const images = document.querySelectorAll(".card-img");
+    images.forEach(img => {
+        const itemName = img.getAttribute("data-item-name");
+        if (typeof getMenuImageUrl === "function" && itemName) {
+            img.src = getMenuImageUrl({ itemName: itemName });
+        }
+
+        img.addEventListener("error", function onError() {
+            if (!img.dataset.fallbackApplied) {
+                img.dataset.fallbackApplied = "true";
+                img.src = "/images/fnb/menu/default-food.jpg";
             }
-            return response.json();
-        })
-        .then(data => {
-            showToast("Đặt món A-La-Carte thành công!", "success");
-            cartItems = [];
-            renderMenu();
-            renderCartPanel();
-            document.getElementById("order-note").value = "";
-        })
-        .catch(err => {
-            console.error(err);
-            showToast(err.message, "error");
         });
+    });
 }
 
-// Helper: format number to VND currency
 function formatVND(value) {
-    if (value === undefined || value === null) return "0đ";
-    return value.toLocaleString('vi-VN') + "đ";
+    if (value === undefined || value === null || Number.isNaN(Number(value))) {
+        return "0đ";
+    }
+    return Number(value).toLocaleString("vi-VN") + "đ";
 }
 
-// Helper: Toast Notifications
 function showToast(message, type) {
     const toast = document.getElementById("toast-notification");
+    if (!toast) return;
     toast.textContent = message;
-    toast.className = `toast show ${type}`;
+    toast.className = "toast show " + type;
 
     setTimeout(() => {
         toast.className = "toast";
+        toast.textContent = "";
     }, 3000);
 }

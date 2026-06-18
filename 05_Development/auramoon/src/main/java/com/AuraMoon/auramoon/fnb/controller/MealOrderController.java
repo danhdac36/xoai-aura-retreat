@@ -100,7 +100,53 @@ public class MealOrderController {
     }
 
     @GetMapping("/fnb/uc19-alacarte-order")
-    public String getAlacarteOrderPage() {
+    public String getAlacarteOrderPage(
+            @RequestParam(value = "guestId", required = false) Integer guestId,
+            @RequestParam(value = "bookingId", required = false) Integer bookingId,
+            Model model) {
+        List<MenuItemResponse> allMenu = mealOrderService.getAllMenu();
+        List<MenuItemResponse> menuItems = new ArrayList<>();
+        if (allMenu != null) {
+            for (MenuItemResponse item : allMenu) {
+                if (item.getIngredient() != null && item.getIngredient().contains("Europe")) {
+                    menuItems.add(item);
+                    if (menuItems.size() >= 50) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        model.addAttribute("menuItems", menuItems);
+        model.addAttribute("guestId", guestId);
+        model.addAttribute("bookingId", bookingId);
+
+        MealOrderRequest orderForm = new MealOrderRequest();
+        orderForm.setGuestId(guestId);
+        orderForm.setBookingId(bookingId);
+        model.addAttribute("orderForm", orderForm);
+
         return "fnb/uc19-alacarte-order";
+    }
+
+    @PostMapping("/fnb/uc19-alacarte-order")
+    public String createAlacarteOrder(
+            @ModelAttribute("orderForm") MealOrderRequest request,
+            RedirectAttributes redirectAttributes) {
+        try {
+            mealOrderService.createMealOrder(request);
+            redirectAttributes.addFlashAttribute("successMessage", "Đặt món A-La-Carte thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        if (request != null && request.getGuestId() != null && request.getBookingId() != null) {
+            return "redirect:/fnb/uc19-alacarte-order?guestId="
+                    + request.getGuestId()
+                    + "&bookingId="
+                    + request.getBookingId();
+        }
+
+        return "redirect:/fnb/uc19-alacarte-order";
     }
 }
