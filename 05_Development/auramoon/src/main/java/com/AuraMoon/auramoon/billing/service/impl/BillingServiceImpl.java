@@ -123,7 +123,8 @@ public class BillingServiceImpl implements BillingService {
 
         if (booking.getAssignedVilla() != null) {
             Villa villa = booking.getAssignedVilla();
-            villa.setVillaStatus("VACANT_NEEDS_CLEANING");
+            villa.setVillaStatus("AVAILABLE");
+            villa.setCleaningStatus("DIRTY");
             villaRepository.save(villa);
         }
     }
@@ -145,7 +146,8 @@ public class BillingServiceImpl implements BillingService {
 
         if (booking.getAssignedVilla() != null) {
             Villa villa = booking.getAssignedVilla();
-            villa.setVillaStatus("VACANT_NEEDS_CLEANING");
+            villa.setVillaStatus("AVAILABLE");
+            villa.setCleaningStatus("DIRTY");
             villaRepository.save(villa);
         }
     }
