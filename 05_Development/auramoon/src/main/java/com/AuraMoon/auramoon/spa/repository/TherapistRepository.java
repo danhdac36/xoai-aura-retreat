@@ -18,7 +18,7 @@ public interface TherapistRepository extends JpaRepository<Therapist, Integer> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT t FROM Therapist t " +
-            "WHERE t.status = 'Active' " +
+            "WHERE t.status = 'AVAILABLE' " +
             "AND NOT EXISTS (" +
             "  SELECT 1 FROM Schedule s " +
             "  WHERE s.therapist.therapistCode = t.therapistCode AND s.isDelete = false " +

@@ -16,7 +16,7 @@ public interface TreatmentRoomRepository extends JpaRepository<TreatmentRoom, In
     
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM TreatmentRoom r " +
-           "WHERE r.status = 'Active' AND r.isDelete = false " +
+           "WHERE r.status = 'AVAILABLE' AND r.isDelete = false " +
            "AND NOT EXISTS (" +
            "  SELECT 1 FROM Schedule s " +
            "  WHERE s.room.id = r.id AND s.isDelete = false " +

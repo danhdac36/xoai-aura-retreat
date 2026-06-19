@@ -109,8 +109,8 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
 
     @Override
     public List<String> getAvailableTimeSlots(LocalDate date, Integer durationMinutes) {
-        long totalRooms = roomRepository.countByStatusAndIsDeleteFalse("Active");
-        long totalTherapists = therapistRepository.countByStatus("Active");
+        long totalRooms = roomRepository.countByStatusAndIsDeleteFalse("AVAILABLE");
+        long totalTherapists = therapistRepository.countByStatus("AVAILABLE");
 
         if (totalRooms == 0 || totalTherapists == 0) {
             return new ArrayList<>(); // No resources available at all
