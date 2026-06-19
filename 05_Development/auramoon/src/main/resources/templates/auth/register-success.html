@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Đăng ký thành công - Aura Moon</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#5f5e5b",
+                        secondary: "#566342",
+                        background: "#fbf9f8",
+                        surface: "#ffffff"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background font-sans min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-md w-full bg-surface p-8 rounded-xl shadow-md border border-neutral-200 text-center">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <h2 class="font-serif text-3xl text-secondary mb-4">Đăng ký thành công!</h2>
+        <p class="text-neutral-600 mb-6 text-sm" th:text="${successMessage}"></p>
+        <a th:href="@{/auth/login}" class="inline-block w-full bg-secondary text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-all text-sm">
+            Quay lại đăng nhập
+        </a>
+    </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-CREATE DATABASE HoS;
+--CREATE DATABASE HoS;
 GO
 USE HoS;
 GO
@@ -19,12 +19,15 @@ CREATE TABLE [USER] (
     gender VARCHAR(6),
     date_of_birth DATE,
     phone VARCHAR(20),
-    Identify_code VARCHAR(20),
+    Identify_code VARCHAR(255),
     avatar VARCHAR(MAX),
     last_update DATETIME DEFAULT GETDATE(),
     status VARCHAR(10),
     created_at DATETIME DEFAULT GETDATE(),
     last_login DATETIME,
+    verify_token VARCHAR(255),
+    booking_id INT,
+    is_delete BIT DEFAULT 0, 
     CONSTRAINT FK_USER_ROLE FOREIGN KEY (role_id) REFERENCES [ROLE](role_id)
 );
 
@@ -92,6 +95,7 @@ CREATE TABLE TREATMENT_ROOM (
 CREATE TABLE VILLA_TYPE (
     type_id INT IDENTITY(1,1) PRIMARY KEY,
     type_name NVARCHAR(50) NOT NULL,
+    limit_person INT,
     image NVARCHAR(MAX),
     price_per_day DECIMAL(18, 2),
     is_delete BIT DEFAULT 0
@@ -102,7 +106,7 @@ CREATE TABLE VILLA (
     villa_id INT IDENTITY(1,1) PRIMARY KEY,
     villa_type INT NOT NULL,
     villa_code VARCHAR(10) NOT NULL UNIQUE,
-    limit_person INT,
+    max_number INT,
     villa_status VARCHAR(10),
     cleaning_status VARCHAR(10),
     is_delete BIT DEFAULT 0,
@@ -121,7 +125,7 @@ CREATE TABLE RETREAT_PACKAGE (
     is_delete BIT DEFAULT 0,
     price DECIMAL(18, 2),
     create_at DATETIME DEFAULT GETDATE(),
-    update_at DATETIME DEFAULT GETDATE(),
+    update_at DATETIME DEFAULT GETDATE()
 );
 
 -- 12. Table BOOKING
@@ -208,7 +212,7 @@ CREATE TABLE MEAL_ORDER (
     place_order VARCHAR(100),
     note NVARCHAR(MAX),
     order_status VARCHAR(10),
-    CONSTRAINT FK_MEAL_BOOKING FOREIGN KEY (booking_id) REFERENCES BOOKING(booking_id),
+    CONSTRAINT FK_MEAL_BOOKING FOREIGN KEY (booking_id) REFERENCES BOOKING(booking_id)
 );
 
 -- 18. Table MEAL_ORDER_ITEM
@@ -257,7 +261,6 @@ CREATE TABLE PAYMENT (
     status VARCHAR(10),
     CONSTRAINT FK_PAYMENT_FOLIO FOREIGN KEY (folio_id) REFERENCES GUEST_FOLIO(folio_id)
 );
-
 -- 22. Table AUDIT_LOG
 CREATE TABLE AUDIT_LOG (
     log_id INT IDENTITY(1,1) PRIMARY KEY,

@@ -1,15 +1,45 @@
 package com.AuraMoon.auramoon.auth.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class HomeController {
 
-    @GetMapping({ "/", "/home" })
+    @GetMapping("/auth")
+    public String index(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/auth/login";
+        }
+
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            String role = authority.getAuthority();
+            if ("ROLE_ADMIN".equals(role)) {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                System.out.println("this is " + auth.getAuthorities());
+                return "redirect:/admin/home";
+            } else if ("ROLE_GUEST".equals(role)) {
+                return "redirect:/profile/home";
+            } else if ("ROLE_RECEPTIONIST".equals(role)) {
+                return "redirect:/receptionist/home";
+            } else if ("ROLE_THERAPIST".equals(role)) {
+                return "redirect:/therapist/home";
+            } else if ("ROLE_CHEFF".equals(role)) {
+                return "redirect:/F&B/home";
+            } else if ("ROLE_MANAGER".equals(role)) {
+                return "redirect:/management/home";
+            }
+        }
+
+        return "redirect:/auth/login";
+    }
+
+    @GetMapping({"/", "/home"})
     public String showHomePage(Model model) {
         model.addAttribute("pageTitle", "Trang Chủ - Xoai Aura Retreat");
         return "public/home";
@@ -27,6 +57,7 @@ public class HomeController {
         return "public/wellness";
     }
 
+
     @GetMapping("/spa")
     public String showSpaPage(Model model) {
         model.addAttribute("pageTitle", "Aura Spa & Therapies - Xoai Aura Retreat");
@@ -39,9 +70,5 @@ public class HomeController {
         return "public/culinary";
     }
 
-    @PostMapping
-    public String loginPost() {
 
-        return "redirect:/home";
-    }
 }

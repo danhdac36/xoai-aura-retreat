@@ -4,6 +4,8 @@ import com.AuraMoon.auramoon.dashboard.dto.RevenueDashboardDTO;
 import com.AuraMoon.auramoon.dashboard.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 
-@Controller
+@Controller("managerDashboardController")
 @RequestMapping("/manager")
 @RequiredArgsConstructor
 public class DashboardController {
@@ -46,6 +48,8 @@ public class DashboardController {
         model.addAttribute("endDate", endDate);
         model.addAttribute("category", category);
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("this is " + auth.getAuthorities());
         return "manager/dashboard";
     }
 }
