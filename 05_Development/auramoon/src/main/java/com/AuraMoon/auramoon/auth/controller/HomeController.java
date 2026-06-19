@@ -11,34 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class HomeController {
 
-    @GetMapping("/auth")
-    public String index(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return "redirect:/auth/login";
-        }
-
-        for (GrantedAuthority authority : authentication.getAuthorities()) {
-            String role = authority.getAuthority();
-            if ("ROLE_ADMIN".equals(role)) {
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-                System.out.println("this is " + auth.getAuthorities());
-                return "redirect:/admin/home";
-            } else if ("ROLE_GUEST".equals(role)) {
-                return "redirect:/profile/home";
-            } else if ("ROLE_RECEPTIONIST".equals(role)) {
-                return "redirect:/receptionist/home";
-            } else if ("ROLE_THERAPIST".equals(role)) {
-                return "redirect:/therapist/home";
-            } else if ("ROLE_CHEFF".equals(role)) {
-                return "redirect:/F&B/home";
-            } else if ("ROLE_MANAGER".equals(role)) {
-                return "redirect:/management/home";
-            }
-        }
-
-        return "redirect:/auth/login";
-    }
-
     @GetMapping({"/", "/home"})
     public String showHomePage(Model model) {
         model.addAttribute("pageTitle", "Trang Chủ - Xoai Aura Retreat");

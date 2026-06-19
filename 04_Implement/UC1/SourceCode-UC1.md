@@ -214,7 +214,7 @@ public class UserRegistrationDto {
 ```java
 package com.AuraMoon.auramoon.auth.service;
 
-import com.AuraMoon.auramoon.auth.dto.UserRegistrationDto;
+import com.AuraMoon.auramoon.auth.dto.request.UserRegistrationDto;
 import com.AuraMoon.auramoon.auth.entity.User;
 
 public interface IAuthService {
@@ -231,7 +231,7 @@ public interface IAuthService {
 ```java
 package com.AuraMoon.auramoon.auth.service.impl;
 
-import com.AuraMoon.auramoon.auth.dto.UserRegistrationDto;
+import com.AuraMoon.auramoon.auth.dto.request.UserRegistrationDto;
 import com.AuraMoon.auramoon.auth.entity.Role;
 import com.AuraMoon.auramoon.auth.entity.User;
 import com.AuraMoon.auramoon.auth.repository.IRoleRepository;
@@ -549,7 +549,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 ```java
 package com.AuraMoon.auramoon.auth.controller;
 
-import com.AuraMoon.auramoon.auth.dto.UserRegistrationDto;
+import com.AuraMoon.auramoon.auth.dto.request.UserRegistrationDto;
 import com.AuraMoon.auramoon.auth.service.IAuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
