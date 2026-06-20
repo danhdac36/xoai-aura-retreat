@@ -537,6 +537,9 @@ table form as below\]*
 |      25      | Export Monthly Occupancy and Therapist Utilization Report | Report Export                 | The Resort Manager exports monthly reports on room occupancy and therapist utilization to Excel.                                     |
 |      26      | Execute Night Audit Process                               | Night Audit                   | The Manager or System executes the Night Audit to consolidate daily POS charges (Spa, F&B) into Guest Folios and lock audited records. |
 |      27      | Generate and Email Consolidated PDF Invoice               | Billing & Communication       | The System automatically generates a PDF version of the Consolidated Invoice in memory and emails it to the guest immediately after Check-out, adhering to Ministry of Finance formatting standards. |
+|      28      | Manage Housekeeping Tasks                                 | Housekeeping Management       | The Housekeeping Manager views dirty villas, assigns tasks, inspects them, and updates the status to clean after the guest checks out.                                                                 |
+|      29      | Record Time Attendance                                    | HR Management                 | Staff members (Receptionist, Therapist, Chef) check-in and check-out to record their daily working hours into the timesheet.                                                                           |
+|      30      | Calculate Commission Payroll                              | HR & Analytics                | The Manager calculates the monthly payroll for Spa Therapists based on base salary from timesheets and commissions from completed spa sessions.                                                        |
 
 #### 1.3.2 Use Case Diagrams
 
@@ -683,6 +686,10 @@ specific system user role names\]*
 | Daily ID Report                 |                |                        |                    |                      |        X        |
 | Excel Reports                   |                |                        |                    |                      |        X        |
 | Night Audit Dashboard           |                |                        |                    |                      |        X        |
+| Housekeeping Dashboard          |                |                        |                    |                      |        X        |
+| Inspect & Update Status[Action] |                |                        |                    |                      |        X        |
+| Time Attendance Screen          |                |           X            |          X         |          X           |        X        |
+| Payroll Dashboard               |                |                        |                    |                      |        X        |
 
 #### 1.4.3 Non-UI Functions
 
@@ -737,6 +744,7 @@ ERD `</u>`](https://drive.google.com/file/d/1oWAww-BpAlODydsSWfGnFlNlPFawkdOB/vi
 | 20           | Meal_Order_Item         | Details the specific food items included in a meal order.                             |
 | 21           | Menu_Item               | Catalog of food items available on the menu.                                          |
 | 22           | Audit_Log               | Records system activity logs for critical operations including login, payment, checkout, and night audit for traceability and compliance. |
+| 23           | Timesheet               | Records staff check-in and check-out times for payroll and attendance tracking.                       |
 
 ## 2. Use Case Specifications - ??c
 
@@ -1739,6 +1747,93 @@ reviews after completing their retreat experience.</td>
 <tr>
 <td style="text-align: right;">Assumptions:</td>
 <td colspan="3">- Guests provide honest feedback.</td>
+</tr>
+</tbody>
+</table>
+
+### 2.7 Housekeeping Management
+
+#### 2.7.1 UC28 – Manage Housekeeping Tasks
+
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr>
+<td style="text-align: right;">ID and Name:</td>
+<td colspan="3"><strong>UC28 – Manage Housekeeping Tasks</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">Primary Actor:</td>
+<td>Housekeeping Manager</td>
+<td style="text-align: right;">Secondary Actors:</td>
+<td>Housekeeper (Staff), Receptionist</td>
+</tr>
+<tr>
+<td style="text-align: right;">Description:</td>
+<td colspan="3">This use case allows the Housekeeping Manager to view a list of dirty villas (after guest check-out), assign cleaning tasks to staff, and inspect/update the villa status to CLEAN/AVAILABLE so the Receptionist can assign the room to new guests.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Trigger:</td>
+<td colspan="3">A guest completes Check-out (UC22), and the Villa status is automatically changed to DIRTY/Needs Cleaning.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Preconditions:</td>
+<td colspan="3">- Manager is logged in.
+- Villa is currently in DIRTY status.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Postconditions:</td>
+<td colspan="3">- Villa status is updated to CLEAN/AVAILABLE.
+- Cleaning log and inspector name are recorded.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Normal Flow:</td>
+<td colspan="3"><ol type="1">
+<li>Manager opens the Housekeeping Dashboard.</li>
+<li>System retrieves and displays all Villas with status DIRTY.</li>
+<li>Manager selects a Villa and assigns a Housekeeper to clean it.</li>
+<li>Housekeeper cleans the room and reports completion.</li>
+<li>Manager inspects the room for Quality Assurance (QA).</li>
+<li>Manager clicks "Approve & Update to Clean" on the system.</li>
+<li>System updates the Villa status to AVAILABLE.</li>
+<li>System records the audit log with the Manager's ID.</li>
+<li>System displays success message.</li>
+</ol></td>
+</tr>
+<tr>
+<td style="text-align: right;">Alternative Flows:</td>
+<td colspan="3">- A1. Room fails inspection.<br />
+→ Manager rejects and assigns it back to the Housekeeper for recleaning. Status remains DIRTY.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Exceptions:</td>
+<td colspan="3">- E1. Database error updating status.<br />
+→ System displays error message and prompts retry.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Priority:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Frequency of Use:</td>
+<td colspan="3">High (Multiple times daily)</td>
+</tr>
+<tr>
+<td style="text-align: right;">Business Rules:</td>
+<td colspan="3">BR-22 – Only Housekeeping Managers can change status from DIRTY to CLEAN. Receptionists can only change from CLEAN to OCCUPIED.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Other Information:</td>
+<td colspan="3">- This acts as the critical bridge between Check-out and the next Check-in.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Assumptions:</td>
+<td colspan="3">- Housekeepers communicate completion verbally or via radio to the Manager.</td>
 </tr>
 </tbody>
 </table>
@@ -3403,6 +3498,17 @@ location (e.g., "Page 1 / 8").</td>
   - Attaches the stream directly to an email dispatched to the guest.
   - Instantly destroys the byte array post-dispatch to ensure absolute data minimization and prevent disk-level data breaches.
 
+### 3.7 Housekeeping & HR Management
+
+#### 3.7.1 Housekeeping Operations
+- **Description**: A dedicated interface for the Housekeeping Manager to oversee villa statuses. Automatically flags villas as DIRTY upon guest check-out (UC22). Managers assign staff, conduct QA inspections, and update statuses to CLEAN/AVAILABLE to re-enter the booking pool (UC28).
+
+#### 3.7.2 Time Attendance (Timesheet)
+- **Description**: A module for staff (Receptionist, Therapist, Chef) to clock in and out (UC29). Records timestamps into the `timesheet` table to track daily working hours, directly linked to their user profiles.
+
+#### 3.7.3 Commission & Payroll Calculation
+- **Description**: An automated dashboard for managers to generate monthly payroll for Spa Therapists (UC30). Combines base salary (from `timesheet` data) with performance commission (from completed Spa Sessions tracked in Module 3) to output a finalized salary sheet.
+
 ## 4. Non-Functional Requirements - ??c
 
 ### 4.1 External Interfaces
@@ -3638,6 +3744,8 @@ forth.\]*
 |    BR-19    |                 Zero Balance Bypass                   |                                         If a guest's total balance due is exactly 0 VND (e.g., fully pre-paid), the checkout process shall automatically bypass the payment gateway selection and complete the checkout immediately without generating a pending payment transaction.                                         |              UC22              |
 |    BR-20    |           Night Audit Consolidation                   |                                         The system shall automatically or manually consolidate all completed Spa (COMPLETED) and delivered F&B (DELIVERED) charges into the Guest Folio as Folio Items at midnight (00:00) daily. Once audited, these records shall be locked and cannot be modified or deleted.                                         |              UC26              |
 |    BR-21    |          Invoice Formatting Standard                  |                                         File PDF Hóa đơn Gộp được tạo ra bắt buộc phải tuân thủ chuẩn biểu mẫu hóa đơn cơ bản theo quy định của Bộ Tài chính Việt Nam (Bao gồm tên công ty, Mã số thuế, Thuế suất VAT 10% tách riêng, tổng tiền bằng chữ). Không lưu file vật lý.                                         |              UC27              |
+|    BR-22    |     Housekeeping Status Constraint                    |                                         Only users with the Housekeeping Manager (or equivalent Admin) role may change a Villa status from DIRTY to CLEAN. Receptionists are restricted to changing status from CLEAN to OCCUPIED.                                         |              UC28              |
+|    BR-23    |     Payroll Commission Logic                          |                                         The monthly payroll calculation for Therapists must strictly use the number of COMPLETED spa sessions multiplied by the commission rate, in addition to base pay determined by valid Timesheet entries.                                         |              UC30              |
 
 ### 5.2 System Messages
 
