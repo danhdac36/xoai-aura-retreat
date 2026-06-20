@@ -108,6 +108,8 @@ public class BookingServiceImpl implements BookingService {
                                 .orElseThrow(() -> new BookingNotFoundException(
                                                 "Không tìm thấy đơn đặt phòng với ID: " + bookingId));
 
+                if ("CONFIRMED".equals(booking.getBookingStatus())) return;
+
                 booking.setBookingStatus("CONFIRMED");
                 booking.setPaymentStatus("PARTIAL");
                 bookingRepository.save(booking);

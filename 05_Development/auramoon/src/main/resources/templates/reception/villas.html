@@ -17,8 +17,8 @@
             <span class="font-serif text-xl tracking-wider font-semibold">AuraMoon Reception</span>
         </div>
         <nav class="flex gap-6 text-sm font-semibold">
-            <a th:href="@{/reception/bookings}" class="hover:underline text-gray-200">Quản lý Đặt phòng</a>
-            <a th:href="@{/reception/villas}" class="hover:underline text-white underline-offset-4 decoration-2">Sơ đồ Villa</a>
+            <a th:href="@{/receptionist/bookings}" class="hover:underline text-gray-200">Quản lý Đặt phòng</a>
+            <a th:href="@{/receptionist/villa}" class="hover:underline text-white underline-offset-4 decoration-2">Sơ đồ Villa</a>
             <a th:href="@{/packages}" class="hover:underline text-gray-200">Xem Gói Trị Liệu</a>
         </nav>
     </header>
@@ -63,14 +63,14 @@
                         </div>
                         <div class="flex justify-between">
                             <span>Vệ sinh:</span>
-                            <span th:if="${v.cleaningStatus == 'CLEANED'}" class="text-green-600 font-semibold">Đã dọn dẹp</span>
+                            <span th:if="${v.cleaningStatus == 'CLEAN'}" class="text-green-600 font-semibold">Đã dọn dẹp</span>
                             <span th:if="${v.cleaningStatus == 'DIRTY'}" class="text-red-500 font-semibold">Chưa dọn dẹp</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Update Status Form -->
-                <form th:action="@{/reception/villas/{id}/status(id=${v.id})}" method="post" class="mt-6 border-t border-gray-100 pt-4 grid grid-cols-2 gap-2">
+                <form th:action="@{/receptionist/villa/{id}/status(id=${v.id})}" method="post" class="mt-6 border-t border-gray-100 pt-4 grid grid-cols-2 gap-2">
                     <select name="villaStatus" class="bg-gray-50 border border-gray-200 rounded-lg text-xs p-2 focus:ring-[#566342] focus:border-[#566342]">
                         <option value="AVAILABLE" th:selected="${v.villaStatus == 'AVAILABLE'}">Trống</option>
                         <option value="OCCUPIED" th:selected="${v.villaStatus == 'OCCUPIED'}">Đang ở</option>
@@ -78,8 +78,9 @@
                     </select>
 
                     <select name="cleaningStatus" class="bg-gray-50 border border-gray-200 rounded-lg text-xs p-2 focus:ring-[#566342] focus:border-[#566342]">
-                        <option value="CLEANED" th:selected="${v.cleaningStatus == 'CLEANED'}">Sạch</option>
+                        <option value="CLEAN" th:selected="${v.cleaningStatus == 'CLEAN'}">Sạch</option>
                         <option value="DIRTY" th:selected="${v.cleaningStatus == 'DIRTY'}">Bẩn</option>
+                        <option value="CLEANING" th:selected="${v.cleaningStatus == 'CLEANING'}">Đang dọn</option>
                     </select>
 
                     <button type="submit" class="col-span-2 mt-2 py-2 bg-gray-100 text-[#566342] font-semibold text-xs rounded-lg hover:bg-[#566342]/10 transition-colors">

@@ -9,11 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
 @Controller
-@RequestMapping("/reception")
+@RequestMapping("/receptionist")
 @RequiredArgsConstructor
 public class CheckInController {
 
@@ -33,12 +34,15 @@ public class CheckInController {
     }
 
     @PostMapping("/checkin")
-    public String performCheckIn(@ModelAttribute("checkInRequest") CheckInRequestDTO request, Model model) {
+    public String performCheckIn(@ModelAttribute("checkInRequest") CheckInRequestDTO request,
+                                 RedirectAttributes redirectAttributes) {
         try {
             checkInService.performCheckIn(request);
-            return "redirect:/reception/bookings?success=Check-in thành công!";
+            redirectAttributes.addAttribute("success", "Check-in thành công!");
+            return "redirect:/receptionist/bookings";
         } catch (Exception e) {
-            return "redirect:/reception/bookings?error=" + e.getMessage();
+            redirectAttributes.addAttribute("error", e.getMessage());
+            return "redirect:/receptionist/bookings";
         }
     }
 }

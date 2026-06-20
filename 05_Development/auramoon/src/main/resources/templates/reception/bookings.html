@@ -17,7 +17,7 @@
             <span class="font-serif text-xl tracking-wider font-semibold">AuraMoon Reception</span>
         </div>
         <nav class="flex gap-6 text-sm font-semibold">
-            <a th:href="@{/reception/bookings}" class="hover:underline text-white underline-offset-4 decoration-2">Quản lý Đặt phòng</a>
+            <a th:href="@{/receptionist/bookings}" class="hover:underline text-white underline-offset-4 decoration-2">Quản lý Đặt phòng</a>
             <a th:href="@{/reception/villas}" class="hover:underline text-gray-200">Sơ đồ Villa</a>
             <a th:href="@{/packages}" class="hover:underline text-gray-200">Xem Gói Trị Liệu</a>
         </nav>
@@ -70,7 +70,7 @@
                             </td>
                             <td class="py-4 px-6">
                                 <span th:if="${b.bookingStatus == 'CONFIRMED'}" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-600">CONFIRMED</span>
-                                <span th:if="${b.bookingStatus == 'CHECKED-IN'}" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-600">CHECKED-IN</span>
+                                <span th:if="${b.bookingStatus == 'CHECKED_IN'}" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-600">CHECKED-IN</span>
                                 <span th:if="${b.bookingStatus == 'PENDING'}" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-yellow-50 text-yellow-600">PENDING</span>
                                 <span th:if="${b.bookingStatus == 'CHECKED-OUT'}" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-gray-50 text-gray-600">CHECKED-OUT</span>
                                 <span th:if="${b.bookingStatus == 'CANCELLED'}" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-600">CANCELLED</span>
@@ -81,7 +81,12 @@
                                         class="px-4 py-2 bg-[#566342] text-white rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity flex items-center gap-1 mx-auto">
                                     <span class="material-symbols-outlined text-sm">key</span> Check-In
                                 </button>
-                                <span th:if="${b.bookingStatus != 'CONFIRMED'}" class="text-gray-400 text-xs">-</span>
+                                <a th:if="${b.bookingStatus == 'CHECKED_IN'}" 
+                                   th:href="@{/billing/checkout(bookingId=${b.id})}"
+                                   class="px-4 py-2 bg-yellow-500 text-white rounded-lg text-xs font-semibold hover:bg-yellow-600 transition-colors flex items-center justify-center gap-1 mx-auto w-fit">
+                                    <span class="material-symbols-outlined text-sm">logout</span> Checkout
+                                </a>
+                                <span th:if="${b.bookingStatus != 'CONFIRMED' and b.bookingStatus != 'CHECKED_IN'}" class="text-gray-400 text-xs">-</span>
                             </td>
                         </tr>
                     </tbody>
@@ -96,7 +101,7 @@
             <h2 class="text-2xl font-serif text-gray-900 mb-2">Xác Nhận Check-In Khách</h2>
             <p class="text-sm text-gray-500 mb-6">Mã hóa CCCD/Passport bảo mật PII và gán phòng vật lý tương ứng.</p>
 
-            <form th:action="@{/reception/checkin}" method="post" th:object="${checkInRequest}">
+            <form th:action="@{/receptionist/checkin}" method="post" th:object="${checkInRequest}">
                 <input type="hidden" name="bookingId" id="modalBookingId" />
 
                 <!-- Identify Code Input -->
