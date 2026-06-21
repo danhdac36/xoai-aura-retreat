@@ -40,4 +40,22 @@ public interface FolioItemRepository extends JpaRepository<FolioItem, Integer> {
 
     @Query("SELECT COALESCE(SUM(f.amount), 0) FROM FolioItem f WHERE f.guestFolio.id = :folioId AND f.serviceCategory = :category AND CAST(f.createAt AS date) = CURRENT_DATE")
     BigDecimal sumChargesByFolioAndCategoryToday(@Param("folioId") Integer folioId, @Param("category") String category);
+
+    @Query("SELECT COALESCE(SUM(f.amount), 0) FROM FolioItem f WHERE f.serviceCategory = :category AND CAST(f.createAt AS date) = :date")
+    BigDecimal sumChargesByCategoryAndDate(@Param("category") String category, @Param("date") java.time.LocalDate date);
+
+    @Query(value = "SELECT ISNULL(SUM(moi.quantity * moi.price), 0) FROM MEAL_ORDER mo JOIN MEAL_ORDER_ITEM moi ON mo.meal_order_id = moi.meal_order_id WHERE mo.order_status = 'DELIVERED' AND NOT EXISTS (SELECT 1 FROM FOLIO_ITEM fi WHERE fi.reference_id = mo.meal_order_id AND fi.service_category = 'F_AND_B')", nativeQuery = true)
+    BigDecimal sumPendingFnbCharges();
+
+    @Query(value = "SELECT ISNULL(SUM(ts.price), 0) FROM TREATMENT_BOOKING tb JOIN TREATMENT_SERVICE ts ON tb.service_id = ts.service_id WHERE tb.status = 'COMPLETED' AND NOT EXISTS (SELECT 1 FROM FOLIO_ITEM fi WHERE fi.reference_id = tb.treatment_id AND fi.service_category = 'SPA')", nativeQuery = true)
+    BigDecimal sumPendingSpaCharges();
+
+    @Query(value = "SELECT TOP 10 u.full_name, b.booking_id, fi.service_category, fi.amount " +
+            "FROM FOLIO_ITEM fi " +
+            "JOIN GUEST_FOLIO gf ON fi.folio_id = gf.folio_id " +
+            "JOIN BOOKING b ON gf.booking_id = b.booking_id " +
+            "JOIN [USER] u ON b.guest_id = u.user_id " +
+            "WHERE CAST(fi.create_at AS DATE) = :date " +
+            "ORDER BY fi.create_at DESC", nativeQuery = true)
+    List<Object[]> getRecentFolioTransactions(@Param("date") java.time.LocalDate date);
 }
