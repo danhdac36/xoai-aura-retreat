@@ -19,6 +19,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.AuraMoon.auramoon.auth.repository.IUserRepository;
+import com.AuraMoon.auramoon.auth.entity.User;
+import com.AuraMoon.auramoon.billing.dto.CheckoutCompletedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,6 +38,8 @@ public class BillingServiceImpl implements BillingService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final VillaRepository villaRepository;
+    private final IUserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public CheckoutViewDTO getCheckoutData(Integer bookingId) {
@@ -123,9 +129,14 @@ public class BillingServiceImpl implements BillingService {
 
         if (booking.getAssignedVilla() != null) {
             Villa villa = booking.getAssignedVilla();
-            villa.setVillaStatus("VACANT_NEEDS_CLEANING");
+            villa.setVillaStatus("AVAILABLE");
+            villa.setCleaningStatus("DIRTY");
             villaRepository.save(villa);
         }
+
+        User guest = userRepository.findById(booking.getGuestId()).orElse(null);
+        String guestEmail = (guest != null) ? guest.getEmail() : null;
+        eventPublisher.publishEvent(new CheckoutCompletedEvent(this, booking.getId(), guestEmail, folio.getId()));
     }
 
     @Override
@@ -145,9 +156,14 @@ public class BillingServiceImpl implements BillingService {
 
         if (booking.getAssignedVilla() != null) {
             Villa villa = booking.getAssignedVilla();
-            villa.setVillaStatus("VACANT_NEEDS_CLEANING");
+            villa.setVillaStatus("AVAILABLE");
+            villa.setCleaningStatus("DIRTY");
             villaRepository.save(villa);
         }
+
+        User guest = userRepository.findById(booking.getGuestId()).orElse(null);
+        String guestEmail = (guest != null) ? guest.getEmail() : null;
+        eventPublisher.publishEvent(new CheckoutCompletedEvent(this, booking.getId(), guestEmail, folio.getId()));
     }
 
     @Override

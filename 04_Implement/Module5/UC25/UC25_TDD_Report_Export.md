@@ -31,6 +31,7 @@
 | Ngày      | Người thực hiện | Nội dung thay đổi                                     |
 | ---------- | ------------------- | -------------------------------------------------------- |
 | 2026-06-13 | Sinh viên 5        | Khởi tạo tài liệu — TDD spec cho UC25 Export Report |
+| 2026-06-16 | Agent               | Cập nhật Test Cases từ Daily sang Monthly logic      |
 
 # MỤC LỤC
 
@@ -94,7 +95,7 @@
 
 | Condition ID | Test Condition                                             | Coverage Item                              | Test Cases     |
 | ------------ | ---------------------------------------------------------- | ------------------------------------------ | -------------- |
-| TC-COND-001  | Tính Occupancy data chính xác theo ngày                | `ReportServiceImpl.generateReportData()` | `RPT-TC-001` |
+| TC-COND-001  | Tính Occupancy data chính xác theo tháng                | `ReportServiceImpl.generateReportData()` | `RPT-TC-001` |
 | TC-COND-002  | Tính Therapist Utilization chính xác theo therapist     | `ReportServiceImpl.generateReportData()` | `RPT-TC-002` |
 | TC-COND-003  | Export Excel thành công (2 sheets, header, data)         | `ReportServiceImpl.exportToExcel()`      | `RPT-TC-003` |
 | TC-COND-004  | Empty data → File Excel có header nhưng không có data | `ReportServiceImpl.exportToExcel()`      | `RPT-TC-004` |
@@ -146,15 +147,15 @@
 **Expected Result (PASS — hành vi đúng):**
 
 * `occupancyRows` có ≥ 1 row
-* Mỗi row có: `date`, `totalVillas = 10`, `occupiedVillas`, `occupancyRate` = (occupied/10) × 100
-* `avgOccupancyRate` tính đúng trung bình các ngày
+* Mỗi row có: `monthLabel`, `totalVillas = 10`, `occupiedVillas`, `occupancyRate` = (occupied/10) × 100
+* `avgOccupancyRate` tính đúng trung bình các tháng
 
 **Expected Result (FAIL — dấu hiệu lỗi):**
 
 * `occupancyRows` rỗng, hoặc `totalVillas` = 0, hoặc rate > 100%
 
 **Current Status:** 🔴 Not written
-**Implementation Note:** Cần loop qua từng ngày trong khoảng, đếm số booking active vào ngày đó.
+**Implementation Note:** Cần loop qua từng tháng trong khoảng thời gian, đếm số booking active vào tháng đó.
 
 ## RPT-TC-002 — Generate Therapist Utilization Data (Happy Path)
 

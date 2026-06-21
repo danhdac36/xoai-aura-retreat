@@ -12,4 +12,7 @@ public interface VillaRepository extends JpaRepository<Villa, Integer> {
     
     long countByIsDeleteFalse();
     long countByVillaStatusAndIsDeleteFalse(String status);
+
+    // UC28 - Housekeeping Management
+    List<Villa> findByCleaningStatusInAndIsDeleteFalse(List<String> cleaningStatuses);
 }
