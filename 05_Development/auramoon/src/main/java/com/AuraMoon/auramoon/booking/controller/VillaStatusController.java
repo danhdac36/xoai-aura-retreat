@@ -21,13 +21,13 @@ public class VillaStatusController {
 
     @GetMapping
     public String showVillaDiagram(Model model) {
-        List<Villa> villas = villaRepository.findAll();
+        List<com.AuraMoon.auramoon.booking.dto.VillaDisplayDTO> villas = villaService.getAllVillasForDisplay();
         model.addAttribute("villas", villas);
         return "reception/villas";
     }
 
-    @PostMapping("/{id}/status")
-    public String updateVillaStatus(@PathVariable("id") Integer id,
+    @PostMapping("/status")
+    public String updateVillaStatus(@RequestParam("villaId") Integer id,
                                     @RequestParam("villaStatus") String villaStatus,
                                     @RequestParam("cleaningStatus") String cleaningStatus,
                                     RedirectAttributes redirectAttributes) {

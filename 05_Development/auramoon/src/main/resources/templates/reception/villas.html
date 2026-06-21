@@ -46,7 +46,7 @@
                     <!-- Villa Code & Type -->
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <span class="text-xs font-semibold uppercase text-gray-400 block" th:text="${v.villaType.typeName}">Ocean View</span>
+                            <span class="text-xs font-semibold uppercase text-gray-400 block" th:text="${v.villaTypeName}">Ocean View</span>
                             <span class="text-xl font-bold text-gray-900 mt-1 block" th:text="${v.villaCode}">VIL-101</span>
                         </div>
                         
@@ -70,7 +70,8 @@
                 </div>
 
                 <!-- Update Status Form -->
-                <form th:action="@{/receptionist/villa/{id}/status(id=${v.id})}" method="post" class="mt-6 border-t border-gray-100 pt-4 grid grid-cols-2 gap-2">
+                <form th:action="@{/receptionist/villa/status}" method="post" class="mt-6 border-t border-gray-100 pt-4 grid grid-cols-2 gap-2">
+                    <input type="hidden" name="villaId" th:value="${v.id}" />
                     <select name="villaStatus" class="bg-gray-50 border border-gray-200 rounded-lg text-xs p-2 focus:ring-[#566342] focus:border-[#566342]">
                         <option value="AVAILABLE" th:selected="${v.villaStatus == 'AVAILABLE'}">Trống</option>
                         <option value="OCCUPIED" th:selected="${v.villaStatus == 'OCCUPIED'}">Đang ở</option>

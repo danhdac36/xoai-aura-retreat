@@ -19,7 +19,7 @@ public class ItineraryController {
         this.itineraryService = itineraryService;
     }
 
-    @GetMapping("/itinerary")
+    @GetMapping("/booking/itinerary")
     public String showItinerary(@RequestParam(value = "guestId", required = false) Integer guestId, Model model, HttpSession session) {
         User currentUser = (User) session.getAttribute("currentUser");
         
@@ -43,8 +43,8 @@ public class ItineraryController {
             model.addAttribute("timeline", timeline);
             return "guest/itinerary";
         } catch (IllegalArgumentException e) {
-            // Chuẩn hóa Redirect theo EDS
-            return "redirect:/guest/dashboard?error=no_booking";
+            // Chuẩn hóa Redirect theo EDS sang trang dashboard thực tế (/profile/home)
+            return "redirect:/profile/home?error=no_booking";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "error";

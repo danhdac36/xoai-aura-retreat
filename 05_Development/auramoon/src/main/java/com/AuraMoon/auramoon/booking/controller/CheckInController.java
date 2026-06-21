@@ -24,7 +24,7 @@ public class CheckInController {
 
     @GetMapping("/bookings")
     public String listBookings(Model model) {
-        List<Booking> bookings = bookingRepository.findAll();
+        List<com.AuraMoon.auramoon.booking.dto.BookingDisplayDTO> bookings = checkInService.getAllBookingsForDisplay();
         // Lấy danh sách các Villa đang trống (AVAILABLE) để lễ tân gán khi check-in
         model.addAttribute("bookings", bookings);
         model.addAttribute("villas", villaRepository.findByVillaType_IdAndVillaStatusAndIsDeleteFalse(1, "AVAILABLE")); // default type 1 or list all
@@ -33,7 +33,7 @@ public class CheckInController {
         return "reception/bookings";
     }
 
-    @PostMapping("/checkin")
+    @PostMapping("/check-in")
     public String performCheckIn(@ModelAttribute("checkInRequest") CheckInRequestDTO request,
                                  RedirectAttributes redirectAttributes) {
         try {

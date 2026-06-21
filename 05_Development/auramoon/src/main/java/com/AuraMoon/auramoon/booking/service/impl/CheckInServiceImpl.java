@@ -11,6 +11,8 @@ import com.AuraMoon.auramoon.booking.repository.VillaRepository;
 import com.AuraMoon.auramoon.booking.service.CheckInService;
 import com.AuraMoon.auramoon.booking.service.VillaService;
 import com.AuraMoon.auramoon.common.enums.BookingStatus;
+import com.AuraMoon.auramoon.auth.entity.Consent;
+import com.AuraMoon.auramoon.auth.repository.ConsentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class CheckInServiceImpl implements CheckInService {
     private final VillaRepository villaRepository;
     private final UserRepository userRepository;
     private final VillaService villaService;
+    private final ConsentRepository consentRepository;
 
     private static final java.util.logging.Logger auditLogger =
             java.util.logging.Logger.getLogger(CheckInServiceImpl.class.getName());
@@ -44,6 +48,12 @@ public class CheckInServiceImpl implements CheckInService {
         if (!BookingStatus.CONFIRMED.name().equalsIgnoreCase(booking.getBookingStatus())) {
             throw new IllegalStateException(
                     "[BOOK-400] Đơn đặt phòng #" + booking.getId() + " không ở trạng thái CONFIRMED (hiện tại: " + booking.getBookingStatus() + ")");
+        }
+
+        // 2.1 Kiểm tra ngày check-in thực tế — không được check-in trước ngày checkinDate
+        if (booking.getCheckinDate() != null && booking.getCheckinDate().isAfter(LocalDate.now())) {
+            throw new IllegalStateException(
+                    "[BOOK-400] Không thể check-in trước ngày nhận phòng thực tế (" + booking.getCheckinDate() + ")");
         }
 
         // 3. Load Villa — BOOK-411 nếu không tìm thấy
@@ -69,6 +79,15 @@ public class CheckInServiceImpl implements CheckInService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "[BOOK-413] Không tìm thấy thông tin khách hàng với ID: " + booking.getGuestId()));
 
+        // 6.1 Kiểm tra sự đồng ý bảo mật (Consent Check)
+        Consent consent = consentRepository.findFirstByUser_IdOrderByUpdatedAtDesc(guest.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "[BOOK-400] Khách hàng chưa đồng ý điều khoản bảo mật dữ liệu cá nhân (CCCD)"));
+        if (!Boolean.TRUE.equals(consent.getConsentStatus())) {
+            throw new IllegalStateException(
+                    "[BOOK-400] Khách hàng chưa đồng ý điều khoản bảo mật dữ liệu cá nhân (CCCD)");
+        }
+
         // 7. Gán CCCD trực tiếp — JPA (AesDataEncryptor) tự động mã hóa trước khi lưu (BR-09, ADR-001)
         guest.setIdentifyCode(request.getIdentifyCode());
 
@@ -92,5 +111,29 @@ public class CheckInServiceImpl implements CheckInService {
                 " | Physical Villa assigned: " + villa.getVillaCode() +
                 " | Performed by: " + performedBy +
                 " | Timestamp: " + Instant.now());
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public java.util.List<com.AuraMoon.auramoon.booking.dto.BookingDisplayDTO> getAllBookingsForDisplay() {
+        java.util.List<Booking> bookings = bookingRepository.findAll();
+        java.util.List<com.AuraMoon.auramoon.booking.dto.BookingDisplayDTO> dtos = new java.util.ArrayList<>();
+        for (Booking b : bookings) {
+            boolean consentApproved = consentRepository.findFirstByUser_IdOrderByUpdatedAtDesc(b.getGuestId())
+                    .map(Consent::getConsentStatus)
+                    .orElse(false);
+
+            dtos.add(com.AuraMoon.auramoon.booking.dto.BookingDisplayDTO.builder()
+                    .id(b.getId())
+                    .guestId(b.getGuestId())
+                    .packageName(b.getRetreatPackage() != null ? b.getRetreatPackage().getPackageName() : "N/A")
+                    .checkinDate(b.getCheckinDate())
+                    .checkoutDate(b.getCheckoutDate())
+                    .assignedVillaCode(b.getAssignedVilla() != null ? b.getAssignedVilla().getVillaCode() : null)
+                    .bookingStatus(b.getBookingStatus())
+                    .consentApproved(consentApproved)
+                    .build());
+        }
+        return dtos;
     }
 }
