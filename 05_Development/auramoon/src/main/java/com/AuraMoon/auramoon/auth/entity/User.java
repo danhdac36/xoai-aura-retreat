@@ -1,8 +1,10 @@
 package com.AuraMoon.auramoon.auth.entity;
 
+import com.AuraMoon.auramoon.auth.config.AesDataEncryptor;
 import com.AuraMoon.auramoon.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,13 +12,11 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "[USER]")
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@AttributeOverride(name = "updatedAt", column = @Column(name = "last_update"))
-public class User extends BaseEntity {
-
+@EntityListeners(AuditingEntityListener.class)
+public class User extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -44,7 +44,8 @@ public class User extends BaseEntity {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(name = "Identify_code", length = 20)
+    @Convert(converter = AesDataEncryptor.class)
+    @Column(name = "Identify_code", length = 255)
     private String identifyCode;
 
     @Lob
@@ -56,4 +57,11 @@ public class User extends BaseEntity {
 
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
+
+    @Column(name = "verify_token")
+    private String verifyToken;
+
+    @Column(name = "booking_id")
+    private String bookingId;
+
 }

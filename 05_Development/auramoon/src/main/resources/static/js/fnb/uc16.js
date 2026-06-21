@@ -1,250 +1,467 @@
-let allMenuItems = [];
 let selectedItems = [];
 let currentPage = 1;
-const itemsPerPage = 10;
+const itemsPerPage = 12;
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadPersonalizedMenu();
-});
-
-// Load menu items from static data
-function loadPersonalizedMenu() {
-    const userEl = document.getElementById("input-user-id") || document.getElementById("input-guest-id");
-    const guestId = userEl ? userEl.value : "";
-    const bookingId = document.getElementById("input-booking-id").value;
-
-    if (!guestId || !bookingId) {
-        showToast("Vui lòng nhập đầy đủ User ID và Booking ID", "error");
-        return;
-    }
-
-    // Read directly from static menuData
-    allMenuItems = menuData || [];
-    currentPage = 1;
-    renderMenu();
+document.addEventListener("DOMContentLoaded", function () {
+    bindLoadMenuButton();
+    bindSelectButtons();
+    bindOrderForm();
+    bindPaginationButtons();
+    applyMenuImages();
     renderPagination();
     renderSelectedPanel();
-    showToast("Tải thực đơn cá nhân thành công", "success");
-}
+    updateHiddenFormInputs();
+});
 
+function bindLoadMenuButton() {
+    const searchBtn = document.querySelector(".btn-search");
 
-// Render menu cards for current page
-function renderMenu() {
-    const grid = document.getElementById("menu-grid");
-    grid.innerHTML = "";
-
-    if (allMenuItems.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-style: italic;">Không có món ăn nào khả dụng.</p>';
+    if (!searchBtn) {
         return;
     }
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(startIndex + itemsPerPage, allMenuItems.length);
-    const pageItems = allMenuItems.slice(startIndex, endIndex);
+    searchBtn.addEventListener("click", function () {
+        const userEl = document.getElementById("input-user-id") || document.getElementById("input-guest-id");
+        const bookingEl = document.getElementById("input-booking-id");
 
-    pageItems.forEach(item => {
-        const imageUrl = getMenuImageUrl(item);
-        const isSelected = selectedItems.some(i => i.id === item.id);
+        const guestId = userEl ? userEl.value : "";
+        const bookingId = bookingEl ? bookingEl.value : "";
 
-        const card = document.createElement("article");
-        card.className = "menu-card";
-        card.innerHTML = `
-            <div class="card-img-wrap">
-                <img src="${imageUrl}" alt="${item.itemName}" class="card-img" onerror="this.src='/images/fnb/menu/default-food.jpg'">
-            </div>
-            <div class="card-body">
-                <h3 class="card-title">${item.itemName}</h3>
-                <div class="card-price">${formatVND(item.price)}</div>
-                <p class="card-ingredients">${item.ingredient || "Thành phần tự nhiên từ vườn Aura"}</p>
-                <button type="button" class="btn-select ${isSelected ? 'selected' : ''}" onclick="toggleItemSelection(${item.id})">
-                    ${isSelected ? 'ĐÃ CHỌN ✓' : 'CHỌN MÓN'}
-                </button>
-            </div>
-        `;
-        grid.appendChild(card);
+        if (!guestId || !bookingId) {
+            showToast("Vui lòng nhập đầy đủ User ID và Booking ID", "error");
+            return;
+        }
+
+        window.location.href = "/fnb/uc16-meal-selection?guestId="
+            + encodeURIComponent(guestId)
+            + "&bookingId="
+            + encodeURIComponent(bookingId);
     });
 }
 
-// Render Pagination Controls
-function renderPagination() {
-    const container = document.getElementById("pagination-controls");
-    if (allMenuItems.length <= itemsPerPage) {
-        container.style.display = "none";
+function bindSelectButtons() {
+    const selectButtons = document.querySelectorAll(".btn-select");
+
+    selectButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            toggleItemSelection(button);
+        });
+    });
+}
+
+function bindOrderForm() {
+    const form = document.getElementById("order-submit-form");
+
+    if (!form) {
         return;
     }
 
-    container.style.display = "flex";
-    const totalPages = Math.ceil(allMenuItems.length / itemsPerPage);
-    document.getElementById("page-info").textContent = `Trang ${currentPage} / ${totalPages}`;
-    document.getElementById("btn-prev").disabled = currentPage === 1;
-    document.getElementById("btn-next").disabled = currentPage === totalPages;
+    form.addEventListener("submit", function (event) {
+        if (selectedItems.length === 0) {
+            event.preventDefault();
+            showToast("Vui lòng chọn ít nhất 1 món ăn trước khi xác nhận", "error");
+            return;
+        }
+
+        const guestInput = document.getElementById("input-user-id") || document.getElementById("input-guest-id");
+        const bookingInput = document.getElementById("input-booking-id");
+        const placeOrderInput = document.getElementById("order-place");
+        const noteInput = document.getElementById("order-note");
+
+        const formGuestId = document.getElementById("form-guest-id");
+        const formBookingId = document.getElementById("form-booking-id");
+        const formPlaceOrder = document.getElementById("form-place-order");
+        const formNote = document.getElementById("form-note");
+
+        if (formGuestId && guestInput) {
+            formGuestId.value = guestInput.value;
+        }
+
+        if (formBookingId && bookingInput) {
+            formBookingId.value = bookingInput.value;
+        }
+
+        if (formPlaceOrder) {
+            formPlaceOrder.value = placeOrderInput && placeOrderInput.value
+                ? placeOrderInput.value
+                : "Villa V101";
+        }
+
+        if (formNote) {
+            formNote.value = noteInput && noteInput.value
+                ? noteInput.value
+                : "";
+        }
+
+        updateHiddenFormInputs();
+    });
 }
 
-function changePage(direction) {
-    const totalPages = Math.ceil(allMenuItems.length / itemsPerPage);
-    const newPage = currentPage + direction;
-    if (newPage >= 1 && newPage <= totalPages) {
-        currentPage = newPage;
-        renderMenu();
-        renderPagination();
-    }
-}
+function bindPaginationButtons() {
+    const prevBtn = document.getElementById("btn-prev");
+    const nextBtn = document.getElementById("btn-next");
 
-// Manage Selection (Add / Remove)
-function toggleItemSelection(itemId) {
-    const item = allMenuItems.find(i => i.id === itemId);
-    if (!item) return;
-
-    const existingIndex = selectedItems.findIndex(i => i.id === itemId);
-    if (existingIndex > -1) {
-        // Remove item
-        selectedItems.splice(existingIndex, 1);
-    } else {
-        // Add item
-        selectedItems.push({
-            id: item.id,
-            itemName: item.itemName,
-            price: item.price,
-            quantity: 1
+    if (prevBtn) {
+        prevBtn.addEventListener("click", function () {
+            changePage(-1);
         });
     }
 
-    renderMenu();
+    if (nextBtn) {
+        nextBtn.addEventListener("click", function () {
+            changePage(1);
+        });
+    }
+}
+
+function applyMenuImages() {
+    const images = document.querySelectorAll(".card-img");
+
+    images.forEach(function (img) {
+        const itemName = img.getAttribute("data-item-name");
+
+        if (typeof getMenuImageUrl === "function" && itemName) {
+            img.src = getMenuImageUrl({ itemName: itemName });
+        }
+
+        img.addEventListener("error", function () {
+            if (!img.dataset.fallbackApplied) {
+                img.dataset.fallbackApplied = "true";
+                img.src = "/images/fnb/menu/default-food.jpg";
+            }
+        });
+    });
+}
+
+function toggleItemSelection(buttonEl) {
+    const itemId = parseInt(buttonEl.getAttribute("data-id"), 10);
+    const itemName = buttonEl.getAttribute("data-name");
+    const price = parseFloat(buttonEl.getAttribute("data-price"));
+
+    if (!itemId || !itemName || Number.isNaN(price)) {
+        showToast("Dữ liệu món ăn không hợp lệ", "error");
+        return;
+    }
+
+    const existingIndex = selectedItems.findIndex(function (item) {
+        return item.id === itemId;
+    });
+
+    if (existingIndex > -1) {
+        selectedItems.splice(existingIndex, 1);
+        buttonEl.classList.remove("selected");
+        buttonEl.textContent = "CHỌN MÓN";
+    } else {
+        selectedItems.push({
+            id: itemId,
+            itemName: itemName,
+            price: price,
+            quantity: 1
+        });
+
+        buttonEl.classList.add("selected");
+        buttonEl.textContent = "ĐÃ CHỌN ✓";
+    }
+
     renderSelectedPanel();
+    updateHiddenFormInputs();
 }
 
 function updateItemQuantity(itemId, delta) {
-    const item = selectedItems.find(i => i.id === itemId);
-    if (!item) return;
+    const item = selectedItems.find(function (selectedItem) {
+        return selectedItem.id === itemId;
+    });
+
+    if (!item) {
+        return;
+    }
 
     item.quantity += delta;
+
     if (item.quantity <= 0) {
-        const index = selectedItems.indexOf(item);
+        removeItemSelection(itemId);
+        return;
+    }
+
+    renderSelectedPanel();
+    updateHiddenFormInputs();
+}
+
+function removeItemSelection(itemId) {
+    const index = selectedItems.findIndex(function (item) {
+        return item.id === itemId;
+    });
+
+    if (index > -1) {
         selectedItems.splice(index, 1);
     }
 
-    renderMenu();
+    const buttons = document.querySelectorAll('.btn-select[data-id="' + itemId + '"]');
+    buttons.forEach(function (button) {
+        button.classList.remove("selected");
+        button.textContent = "CHỌN MÓN";
+    });
+
     renderSelectedPanel();
+    updateHiddenFormInputs();
 }
 
-// Render selected items sidebar list
+function updateHiddenFormInputs() {
+    const container = document.getElementById("hidden-items-container");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    selectedItems.forEach(function (item, index) {
+        const idInput = document.createElement("input");
+        idInput.type = "hidden";
+        idInput.name = "items[" + index + "].menuItemId";
+        idInput.value = item.id;
+
+        const qtyInput = document.createElement("input");
+        qtyInput.type = "hidden";
+        qtyInput.name = "items[" + index + "].quantity";
+        qtyInput.value = item.quantity;
+
+        container.appendChild(idInput);
+        container.appendChild(qtyInput);
+    });
+}
+
 function renderSelectedPanel() {
     const listContainer = document.getElementById("selected-items-list");
-    const emptyMsg = document.getElementById("empty-cart-msg");
     const badge = document.getElementById("selected-badge");
+
+    if (!listContainer) {
+        return;
+    }
 
     listContainer.innerHTML = "";
 
-    badge.textContent = selectedItems.reduce((acc, i) => acc + i.quantity, 0);
+    const totalQuantity = selectedItems.reduce(function (total, item) {
+        return total + item.quantity;
+    }, 0);
+
+    if (badge) {
+        badge.textContent = totalQuantity;
+    }
 
     if (selectedItems.length === 0) {
-        listContainer.appendChild(emptyMsg);
+        const emptyMessage = document.createElement("p");
+        emptyMessage.className = "cart-empty";
+        emptyMessage.textContent = "Chưa chọn món nào";
+        listContainer.appendChild(emptyMessage);
+
         updateCostSummary(0);
         return;
     }
 
-    selectedItems.forEach(item => {
-        const fullItem = allMenuItems.find(i => i.id === item.id) || item;
-        const imageUrl = getMenuImageUrl(fullItem);
-
-        const row = document.createElement("div");
-        row.className = "cart-item";
-        row.innerHTML = `
-            <img src="${imageUrl}" alt="${item.itemName}" class="cart-item-img" onerror="this.src='/images/fnb/menu/default-food.jpg'">
-            <div class="cart-item-details">
-                <div class="cart-item-name">${item.itemName}</div>
-                <div class="cart-item-price">${formatVND(item.price)}</div>
-                <div class="cart-item-qty-row">
-                    <button class="qty-btn" onclick="updateItemQuantity(${item.id}, -1)">-</button>
-                    <span>${item.quantity}</span>
-                    <button class="qty-btn" onclick="updateItemQuantity(${item.id}, 1)">+</button>
-                </div>
-            </div>
-            <button class="cart-item-remove" onclick="toggleItemSelection(${item.id})">Xóa</button>
-        `;
+    selectedItems.forEach(function (item) {
+        const row = createSelectedItemRow(item);
         listContainer.appendChild(row);
     });
 
-    const subtotal = selectedItems.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+    const subtotal = selectedItems.reduce(function (total, item) {
+        return total + item.price * item.quantity;
+    }, 0);
+
     updateCostSummary(subtotal);
 }
 
-// Update Subtotal, 5% Service fee, and Total amounts
+function createSelectedItemRow(item) {
+    const row = document.createElement("div");
+    row.className = "cart-item";
+
+    const image = document.createElement("img");
+    image.className = "cart-item-img";
+    image.alt = item.itemName;
+
+    if (typeof getMenuImageUrl === "function") {
+        image.src = getMenuImageUrl({ itemName: item.itemName });
+    } else {
+        image.src = "/images/fnb/menu/default-food.jpg";
+    }
+
+    image.addEventListener("error", function () {
+        if (!image.dataset.fallbackApplied) {
+            image.dataset.fallbackApplied = "true";
+            image.src = "/images/fnb/menu/default-food.jpg";
+        }
+    });
+
+    const details = document.createElement("div");
+    details.className = "cart-item-details";
+
+    const name = document.createElement("div");
+    name.className = "cart-item-name";
+    name.textContent = item.itemName;
+
+    const price = document.createElement("div");
+    price.className = "cart-item-price";
+    price.textContent = formatVND(item.price);
+
+    const qtyRow = document.createElement("div");
+    qtyRow.className = "cart-item-qty-row";
+
+    const minusBtn = document.createElement("button");
+    minusBtn.type = "button";
+    minusBtn.className = "qty-btn";
+    minusBtn.textContent = "-";
+    minusBtn.addEventListener("click", function () {
+        updateItemQuantity(item.id, -1);
+    });
+
+    const qtyText = document.createElement("span");
+    qtyText.textContent = item.quantity;
+
+    const plusBtn = document.createElement("button");
+    plusBtn.type = "button";
+    plusBtn.className = "qty-btn";
+    plusBtn.textContent = "+";
+    plusBtn.addEventListener("click", function () {
+        updateItemQuantity(item.id, 1);
+    });
+
+    qtyRow.appendChild(minusBtn);
+    qtyRow.appendChild(qtyText);
+    qtyRow.appendChild(plusBtn);
+
+    details.appendChild(name);
+    details.appendChild(price);
+    details.appendChild(qtyRow);
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "cart-item-remove";
+    removeBtn.textContent = "Xóa";
+    removeBtn.addEventListener("click", function () {
+        removeItemSelection(item.id);
+    });
+
+    row.appendChild(image);
+    row.appendChild(details);
+    row.appendChild(removeBtn);
+
+    return row;
+}
+
 function updateCostSummary(subtotal) {
     const serviceFee = subtotal * 0.05;
     const total = subtotal + serviceFee;
 
-    document.getElementById("price-subtotal").textContent = formatVND(subtotal);
-    document.getElementById("price-service-charge").textContent = formatVND(serviceFee);
-    document.getElementById("price-total").textContent = formatVND(total);
+    const subtotalEl = document.getElementById("price-subtotal");
+    const serviceFeeEl = document.getElementById("price-service-charge");
+    const totalEl = document.getElementById("price-total");
+
+    if (subtotalEl) {
+        subtotalEl.textContent = formatVND(subtotal);
+    }
+
+    if (serviceFeeEl) {
+        serviceFeeEl.textContent = formatVND(serviceFee);
+    }
+
+    if (totalEl) {
+        totalEl.textContent = formatVND(total);
+    }
 }
 
-// Submit Order (POST Request to API)
-function submitOrder() {
-    if (selectedItems.length === 0) {
-        showToast("Vui lòng chọn ít nhất 1 món ăn trước khi xác nhận", "error");
+function renderPagination() {
+    const cards = Array.from(document.querySelectorAll(".menu-card"));
+    const paginationContainer = document.getElementById("pagination-controls");
+    const pageInfo = document.getElementById("page-info");
+    const prevBtn = document.getElementById("btn-prev");
+    const nextBtn = document.getElementById("btn-next");
+
+    if (!paginationContainer) {
         return;
     }
 
-    const userEl = document.getElementById("input-user-id") || document.getElementById("input-guest-id");
-    const guestId = userEl ? parseInt(userEl.value, 10) : 1;
-    const bookingId = parseInt(document.getElementById("input-booking-id").value, 10);
-    const placeOrder = document.getElementById("order-place").value;
-    const note = document.getElementById("order-note").value;
-
-    const requestBody = {
-        bookingId: bookingId,
-        guestId: guestId,
-        placeOrder: placeOrder || "Villa V101",
-        note: note || "",
-
-        items: selectedItems.map(item => ({
-            menuItemId: item.id,
-            quantity: item.quantity
-        }))
-    };
-
-    fetch("/api/v1/fnb/meal-orders", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(requestBody)
-    })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => {
-                    throw new Error(err.error?.message || "Lỗi khi đặt món");
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            showToast("Đặt món ăn cá nhân thành công!", "success");
-            selectedItems = [];
-            renderMenu();
-            renderSelectedPanel();
-            document.getElementById("order-note").value = "";
-        })
-        .catch(err => {
-            console.error(err);
-            showToast(err.message, "error");
+    if (cards.length <= itemsPerPage) {
+        paginationContainer.classList.add("hidden");
+        cards.forEach(function (card) {
+            card.classList.remove("hidden");
         });
+        return;
+    }
+
+    paginationContainer.classList.remove("hidden");
+
+    const totalPages = Math.ceil(cards.length / itemsPerPage);
+
+    if (currentPage < 1) {
+        currentPage = 1;
+    }
+
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    cards.forEach(function (card, index) {
+        if (index >= startIndex && index < endIndex) {
+            card.classList.remove("hidden");
+        } else {
+            card.classList.add("hidden");
+        }
+    });
+
+    if (pageInfo) {
+        pageInfo.textContent = "Trang " + currentPage + " / " + totalPages;
+    }
+
+    if (prevBtn) {
+        prevBtn.disabled = currentPage === 1;
+    }
+
+    if (nextBtn) {
+        nextBtn.disabled = currentPage === totalPages;
+    }
 }
 
-// Helper: format number to VND currency
+function changePage(direction) {
+    const cards = document.querySelectorAll(".menu-card");
+    const totalPages = Math.ceil(cards.length / itemsPerPage);
+
+    if (totalPages <= 1) {
+        return;
+    }
+
+    const newPage = currentPage + direction;
+
+    if (newPage < 1 || newPage > totalPages) {
+        return;
+    }
+
+    currentPage = newPage;
+    renderPagination();
+}
+
 function formatVND(value) {
-    if (value === undefined || value === null) return "0đ";
-    return value.toLocaleString('vi-VN') + "đ";
+    if (value === undefined || value === null || Number.isNaN(Number(value))) {
+        return "0đ";
+    }
+
+    return Number(value).toLocaleString("vi-VN") + "đ";
 }
 
-// Helper: Toast Notifications
 function showToast(message, type) {
     const toast = document.getElementById("toast-notification");
-    toast.textContent = message;
-    toast.className = `toast show ${type}`;
 
-    setTimeout(() => {
+    if (!toast) {
+        return;
+    }
+
+    toast.textContent = message;
+    toast.className = "toast show " + type;
+
+    setTimeout(function () {
         toast.className = "toast";
+        toast.textContent = "";
     }, 3000);
 }

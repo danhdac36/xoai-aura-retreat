@@ -1,0 +1,9 @@
+/* Specific CSS for Report Export */
+.aura-input {
+    outline: none;
+    transition: border-color 0.2s;
+}
+.aura-input:focus {
+    border-color: #566342;
+    box-shadow: 0 0 0 1px #566342;
+}

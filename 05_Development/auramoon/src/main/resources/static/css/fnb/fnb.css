@@ -192,6 +192,7 @@ body {
     flex-grow: 1;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -469,4 +470,50 @@ body {
 
 .toast.error {
     background-color: var(--danger-red);
+}
+
+.filter-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+}
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;
+}
+
+.alacarte-link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 18px;
+    background-color: #5f6f52;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.alacarte-link-btn:hover {
+    background-color: #4f5f43;
+    color: #ffffff;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.menu-empty-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
 }
