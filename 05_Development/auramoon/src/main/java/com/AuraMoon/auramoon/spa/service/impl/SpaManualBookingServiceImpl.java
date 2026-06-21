@@ -35,12 +35,12 @@ public class SpaManualBookingServiceImpl implements SpaManualBookingService {
     private final BillingIntegrationService billingService;
 
     public SpaManualBookingServiceImpl(SpaBookingRepository bookingRepository,
-                                       TreatmentBookingRepository treatmentBookingRepository,
-                                       TreatmentServiceRepository treatmentServiceRepository,
-                                       TreatmentRoomRepository roomRepository,
-                                       TherapistRepository therapistRepository,
-                                       ScheduleRepository scheduleRepository,
-                                       BillingIntegrationService billingService) {
+            TreatmentBookingRepository treatmentBookingRepository,
+            TreatmentServiceRepository treatmentServiceRepository,
+            TreatmentRoomRepository roomRepository,
+            TherapistRepository therapistRepository,
+            ScheduleRepository scheduleRepository,
+            BillingIntegrationService billingService) {
         this.bookingRepository = bookingRepository;
         this.treatmentBookingRepository = treatmentBookingRepository;
         this.treatmentServiceRepository = treatmentServiceRepository;
@@ -56,10 +56,12 @@ public class SpaManualBookingServiceImpl implements SpaManualBookingService {
         // 1. Validation: Kiểm tra booking tồn tại và status = 'Checked-In'
         Booking booking = bookingRepository.findById(request.getBookingId())
                 .orElseThrow(() -> new SpaBusinessException("SPA-001", "Không tìm thấy thông tin đặt phòng"));
-                
-        if (booking.getBookingStatus() == null || 
-            (!"Checked-In".equalsIgnoreCase(booking.getBookingStatus()) && !"CHECKED_IN".equalsIgnoreCase(booking.getBookingStatus()))) {
-            throw new SpaBusinessException("SPA-002", "Chỉ cho phép đặt thêm Spa đối với Guest có trạng thái Checked-In.");
+
+        if (booking.getBookingStatus() == null ||
+                (!"Checked-In".equalsIgnoreCase(booking.getBookingStatus())
+                        && !"CHECKED_IN".equalsIgnoreCase(booking.getBookingStatus()))) {
+            throw new SpaBusinessException("SPA-002",
+                    "Chỉ cho phép đặt thêm Spa đối với Guest có trạng thái Checked-In.");
         }
 
         // 2. Kiểm tra service tồn tại
@@ -68,21 +70,25 @@ public class SpaManualBookingServiceImpl implements SpaManualBookingService {
 
         // 3. Tìm folioId tương ứng với bookingId thông qua BillingIntegrationService
         Integer folioId = billingService.findFolioIdByBookingId(booking.getId())
-                .orElseThrow(() -> new SpaBusinessException("SPA-003", "Không tìm thấy tài khoản Folio của khách hàng"));
+                .orElseThrow(
+                        () -> new SpaBusinessException("SPA-003", "Không tìm thấy tài khoản Folio của khách hàng"));
 
         // 4. Tìm Therapist + Room trống bằng Pessimistic Lock (BR-04)
         LocalDateTime startTime = request.getStartTime();
-        LocalDateTime endTime = startTime.plusMinutes(service.getDurationMinutes() != null ? service.getDurationMinutes() : 60);
+        LocalDateTime endTime = startTime
+                .plusMinutes(service.getDurationMinutes() != null ? service.getDurationMinutes() : 60);
 
         List<TreatmentRoom> availableRooms = roomRepository.findAvailableRoomsWithLock(startTime, endTime);
         if (availableRooms.isEmpty()) {
-            throw new SpaBusinessException("SPA-010", "Không tìm thấy Therapist hoặc Phòng điều trị khả dụng. Vui lòng chọn thời gian khác.");
+            throw new SpaBusinessException("SPA-010",
+                    "Không tìm thấy Therapist hoặc Phòng điều trị khả dụng. Vui lòng chọn thời gian khác.");
         }
         TreatmentRoom selectedRoom = availableRooms.get(0);
 
         List<Therapist> availableTherapists = therapistRepository.findAvailableTherapistsWithLock(startTime, endTime);
         if (availableTherapists.isEmpty()) {
-            throw new SpaBusinessException("SPA-010", "Không tìm thấy Therapist hoặc Phòng điều trị khả dụng. Vui lòng chọn thời gian khác.");
+            throw new SpaBusinessException("SPA-010",
+                    "Không tìm thấy Therapist hoặc Phòng điều trị khả dụng. Vui lòng chọn thời gian khác.");
         }
         Therapist selectedTherapist = availableTherapists.get(0);
 
@@ -109,18 +115,19 @@ public class SpaManualBookingServiceImpl implements SpaManualBookingService {
 
         // 7. Ghi nợ vào Folio (Dual-Write)
         try {
-            String description = "Dịch vụ Spa: " + service.getServiceName() + " (" + service.getDurationMinutes() + " phút)";
+            String description = "Dịch vụ Spa: " + service.getServiceName() + " (" + service.getDurationMinutes()
+                    + " phút)";
             billingService.createFolioItem(
                     folioId,
                     treatmentBooking.getId(),
                     "Extra Spa",
                     description,
                     service.getPrice(),
-                    receptionistUserId
-            );
+                    receptionistUserId);
         } catch (Exception e) {
             // Ném lỗi SPA-019 để kích hoạt Transaction Rollback
-            throw new SpaBusinessException("SPA-019", "Đã xảy ra lỗi hệ thống trong quá trình xử lý giao dịch. Vui lòng thử lại.");
+            throw new SpaBusinessException("SPA-019",
+                    "Đã xảy ra lỗi hệ thống trong quá trình xử lý giao dịch. Vui lòng thử lại.");
         }
 
         // 8. Trả về response
