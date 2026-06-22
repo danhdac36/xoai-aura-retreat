@@ -80,6 +80,15 @@ public class CheckInServiceImpl implements CheckInService {
                         "[BOOK-413] Không tìm thấy thông tin khách hàng với ID: " + booking.getGuestId()));
 
         // 6.1 Kiểm tra sự đồng ý bảo mật (Consent Check)
+        if (Boolean.TRUE.equals(request.getPrivacyConsent())) {
+            Consent newConsent = Consent.builder()
+                    .user(guest)
+                    .consentStatus(true)
+                    .consentVersion("v1.0")
+                    .build();
+            consentRepository.save(newConsent);
+        }
+
         Consent consent = consentRepository.findFirstByUser_IdOrderByUpdatedAtDesc(guest.getId())
                 .orElseThrow(() -> new IllegalStateException(
                         "[BOOK-400] Khách hàng chưa đồng ý điều khoản bảo mật dữ liệu cá nhân (CCCD)"));
@@ -88,7 +97,19 @@ public class CheckInServiceImpl implements CheckInService {
                     "[BOOK-400] Khách hàng chưa đồng ý điều khoản bảo mật dữ liệu cá nhân (CCCD)");
         }
 
-        // 7. Gán CCCD trực tiếp — JPA (AesDataEncryptor) tự động mã hóa trước khi lưu (BR-09, ADR-001)
+        // 7. Cập nhật thông tin cá nhân và số định danh của khách (JPA converter tự động mã hóa CCCD)
+        if (request.getFullName() != null && !request.getFullName().trim().isEmpty()) {
+            guest.setFullName(request.getFullName().trim());
+        }
+        if (request.getPhone() != null && !request.getPhone().trim().isEmpty()) {
+            guest.setPhone(request.getPhone().trim());
+        }
+        if (request.getGender() != null && !request.getGender().trim().isEmpty()) {
+            guest.setGender(request.getGender().trim());
+        }
+        if (request.getDateOfBirth() != null) {
+            guest.setDateOfBirth(request.getDateOfBirth());
+        }
         guest.setIdentifyCode(request.getIdentifyCode());
 
         // 8. Cập nhật trạng thái Booking và gán phòng (BR-02)
@@ -123,6 +144,12 @@ public class CheckInServiceImpl implements CheckInService {
                     .map(Consent::getConsentStatus)
                     .orElse(false);
 
+            User guest = userRepository.findById(b.getGuestId()).orElse(null);
+            String guestName = guest != null ? guest.getFullName() : null;
+            String guestPhone = guest != null ? guest.getPhone() : null;
+            String guestGender = guest != null ? guest.getGender() : null;
+            LocalDate guestDateOfBirth = guest != null ? guest.getDateOfBirth() : null;
+
             dtos.add(com.AuraMoon.auramoon.booking.dto.BookingDisplayDTO.builder()
                     .id(b.getId())
                     .guestId(b.getGuestId())
@@ -132,6 +159,10 @@ public class CheckInServiceImpl implements CheckInService {
                     .assignedVillaCode(b.getAssignedVilla() != null ? b.getAssignedVilla().getVillaCode() : null)
                     .bookingStatus(b.getBookingStatus())
                     .consentApproved(consentApproved)
+                    .guestName(guestName)
+                    .guestPhone(guestPhone)
+                    .guestGender(guestGender)
+                    .guestDateOfBirth(guestDateOfBirth)
                     .build());
         }
         return dtos;

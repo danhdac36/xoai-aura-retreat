@@ -35,7 +35,12 @@ public class CheckInController {
 
     @PostMapping("/check-in")
     public String performCheckIn(@ModelAttribute("checkInRequest") CheckInRequestDTO request,
+                                 org.springframework.validation.BindingResult bindingResult,
                                  RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addAttribute("error", "Ngày sinh hoặc thông tin nhập vào không đúng định dạng!");
+            return "redirect:/receptionist/bookings";
+        }
         try {
             checkInService.performCheckIn(request);
             redirectAttributes.addAttribute("success", "Check-in thành công!");

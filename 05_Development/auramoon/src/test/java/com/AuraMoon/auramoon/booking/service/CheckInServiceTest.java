@@ -61,6 +61,10 @@ public class CheckInServiceTest {
                 .bookingId(bookingId)
                 .identifyCode(rawIdentity)
                 .villaId(villaId)
+                .fullName("Nguyen Van B")
+                .phone("0987654321")
+                .gender("Female")
+                .dateOfBirth(LocalDate.of(1995, 5, 5))
                 .build();
 
         VillaType villaType = VillaType.builder()
@@ -112,6 +116,10 @@ public class CheckInServiceTest {
         assertEquals("CHECKED_IN", booking.getBookingStatus());
         assertEquals(villa, booking.getAssignedVilla());
         assertEquals(rawIdentity, guest.getIdentifyCode());
+        assertEquals("Nguyen Van B", guest.getFullName());
+        assertEquals("0987654321", guest.getPhone());
+        assertEquals("Female", guest.getGender());
+        assertEquals(LocalDate.of(1995, 5, 5), guest.getDateOfBirth());
 
         verify(bookingRepository, times(1)).save(booking);
         verify(userRepository, times(1)).save(guest);
@@ -262,5 +270,77 @@ public class CheckInServiceTest {
         });
         assertTrue(exception.getMessage().contains("Khách hàng chưa đồng ý điều khoản bảo mật dữ liệu cá nhân"));
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("UC08-TC-006: Check-in thành công khi lễ tân xác nhận khách đồng ý bảo mật tại quầy")
+    public void checkIn_receptionistConfirmsConsent_savesConsentAndSucceeds() {
+        // Arrange
+        Integer bookingId = 100;
+        Integer guestId = 10;
+        Integer villaId = 5;
+        String rawIdentity = "012345678901";
+
+        CheckInRequestDTO request = CheckInRequestDTO.builder()
+                .bookingId(bookingId)
+                .identifyCode(rawIdentity)
+                .villaId(villaId)
+                .privacyConsent(true)
+                .build();
+
+        VillaType villaType = VillaType.builder()
+                .id(2)
+                .typeName("Ocean View Villa")
+                .build();
+
+        RetreatPackage retreatPackage = RetreatPackage.builder()
+                .id(1)
+                .packageName("Detox Program")
+                .build();
+
+        Booking booking = Booking.builder()
+                .id(bookingId)
+                .guestId(guestId)
+                .retreatPackage(retreatPackage)
+                .bookingStatus("CONFIRMED")
+                .checkinDate(LocalDate.now())
+                .build();
+
+        Villa villa = Villa.builder()
+                .id(villaId)
+                .villaCode("VIL-101")
+                .villaType(villaType)
+                .villaStatus("AVAILABLE")
+                .build();
+
+        User guest = User.builder()
+                .id(guestId)
+                .fullName("Nguyen Van A")
+                .status("ACTIVE")
+                .build();
+
+        Consent consent = Consent.builder()
+                .id(1)
+                .user(guest)
+                .consentStatus(true)
+                .build();
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+        when(villaRepository.findById(villaId)).thenReturn(Optional.of(villa));
+        when(userRepository.findById(guestId)).thenReturn(Optional.of(guest));
+        when(consentRepository.findFirstByUser_IdOrderByUpdatedAtDesc(guestId)).thenReturn(Optional.of(consent));
+
+        // Act
+        checkInService.performCheckIn(request);
+
+        // Assert
+        assertEquals("CHECKED_IN", booking.getBookingStatus());
+        assertEquals(villa, booking.getAssignedVilla());
+        assertEquals(rawIdentity, guest.getIdentifyCode());
+
+        verify(consentRepository, times(1)).save(any(Consent.class));
+        verify(bookingRepository, times(1)).save(booking);
+        verify(userRepository, times(1)).save(guest);
+        verify(villaService, times(1)).updateVillaStatuses(villaId, "OCCUPIED", "CLEAN");
     }
 }

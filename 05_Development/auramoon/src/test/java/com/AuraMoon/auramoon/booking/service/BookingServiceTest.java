@@ -14,6 +14,10 @@ import com.AuraMoon.auramoon.booking.repository.RetreatPackageRepository;
 import com.AuraMoon.auramoon.booking.repository.VillaRepository;
 import com.AuraMoon.auramoon.booking.repository.VillaTypeRepository;
 import com.AuraMoon.auramoon.booking.service.impl.BookingServiceImpl;
+import com.AuraMoon.auramoon.auth.repository.UserRepository;
+import com.AuraMoon.auramoon.auth.repository.ConsentRepository;
+import com.AuraMoon.auramoon.auth.entity.User;
+import com.AuraMoon.auramoon.auth.entity.Consent;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,6 +54,12 @@ public class BookingServiceTest {
 
         @Mock
         private VillaService villaService;
+
+        @Mock
+        private UserRepository userRepository;
+
+        @Mock
+        private ConsentRepository consentRepository;
 
         @InjectMocks
         private BookingServiceImpl bookingService;
@@ -185,5 +195,68 @@ public class BookingServiceTest {
                 assertEquals("PARTIAL", booking.getPaymentStatus());
                 verify(bookingRepository, times(1)).save(booking);
                 verify(guestFolioRepository, times(1)).save(any(GuestFolio.class));
+        }
+
+        @Test
+        @DisplayName("UC07-TC-004: Đặt gói thành công và tự động lưu đồng ý bảo mật của khách hàng")
+        public void createBooking_withPrivacyConsent_savesConsent() {
+                // Arrange
+                Integer guestId = 1;
+                LocalDate checkinDate = LocalDate.now().plusDays(2);
+                BookingRequestDTO request = BookingRequestDTO.builder()
+                                .retreatPackageId(1)
+                                .villaTypeId(2)
+                                .checkinDate(checkinDate)
+                                .totalGuests(2)
+                                .privacyConsent(true)
+                                .build();
+
+                RetreatPackage retreatPackage = RetreatPackage.builder()
+                                .id(1)
+                                .packageName("Mindfulness Retreat")
+                                .durationDays(3)
+                                .price(BigDecimal.valueOf(15000000))
+                                .isActive(true)
+                                .build();
+
+                VillaType villaType = VillaType.builder()
+                                .id(2)
+                                .typeName("Ocean View Villa")
+                                .pricePerDay(BigDecimal.valueOf(5000000))
+                                .build();
+
+                User guest = User.builder()
+                                .id(guestId)
+                                .email("guest@auramoon.com")
+                                .build();
+
+                when(retreatPackageRepository.findByIdAndIsActiveTrueAndIsDeleteFalse(1))
+                                .thenReturn(Optional.of(retreatPackage));
+                when(villaTypeRepository.findById(2)).thenReturn(Optional.of(villaType));
+                when(villaService.checkVillaAvailability(eq(2), eq(checkinDate), eq(checkinDate.plusDays(3))))
+                                .thenReturn(true);
+                when(userRepository.findById(guestId)).thenReturn(Optional.of(guest));
+
+                Booking savedBooking = Booking.builder()
+                                .id(100)
+                                .guestId(guestId)
+                                .retreatPackage(retreatPackage)
+                                .checkinDate(checkinDate)
+                                .checkoutDate(checkinDate.plusDays(3))
+                                .totalGuests(2)
+                                .bookingStatus("PENDING")
+                                .paymentStatus("UNPAID")
+                                .build();
+
+                when(bookingRepository.save(any(Booking.class))).thenReturn(savedBooking);
+
+                // Act
+                BookingResponseDTO response = bookingService.createBooking(guestId, request);
+
+                // Assert
+                assertNotNull(response);
+                assertEquals(100, response.getBookingId());
+                verify(bookingRepository, times(1)).save(any(Booking.class));
+                verify(consentRepository, times(1)).save(any(Consent.class));
         }
 }

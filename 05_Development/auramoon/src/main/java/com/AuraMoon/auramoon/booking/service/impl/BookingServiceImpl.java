@@ -14,6 +14,10 @@ import com.AuraMoon.auramoon.booking.repository.RetreatPackageRepository;
 import com.AuraMoon.auramoon.booking.repository.VillaTypeRepository;
 import com.AuraMoon.auramoon.booking.service.BookingService;
 import com.AuraMoon.auramoon.booking.service.VillaService;
+import com.AuraMoon.auramoon.auth.entity.User;
+import com.AuraMoon.auramoon.auth.repository.UserRepository;
+import com.AuraMoon.auramoon.auth.entity.Consent;
+import com.AuraMoon.auramoon.auth.repository.ConsentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +34,8 @@ public class BookingServiceImpl implements BookingService {
         private final VillaTypeRepository villaTypeRepository;
         private final GuestFolioRepository guestFolioRepository;
         private final VillaService villaService;
+        private final UserRepository userRepository;
+        private final ConsentRepository consentRepository;
 
         @Override
         @Transactional
@@ -71,6 +77,18 @@ public class BookingServiceImpl implements BookingService {
                                 .build();
 
                 Booking savedBooking = bookingRepository.save(booking);
+
+                // Save privacy consent if provided during booking
+                if (guestId != null && Boolean.TRUE.equals(request.getPrivacyConsent())) {
+                        User guest = userRepository.findById(guestId)
+                                        .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin khách hàng với ID: " + guestId));
+                        Consent consent = Consent.builder()
+                                        .user(guest)
+                                        .consentStatus(true)
+                                        .consentVersion("v1.0")
+                                        .build();
+                        consentRepository.save(consent);
+                }
 
                 // Create GuestFolio immediately so that payment and deposits can reference it
                 GuestFolio guestFolio = GuestFolio.builder()

@@ -15,4 +15,5 @@ public class BookingRequestDTO {
     private Integer villaTypeId;
     private LocalDate checkinDate;
     private Integer totalGuests;
+    private Boolean privacyConsent;
 }
