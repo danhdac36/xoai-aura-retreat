@@ -37,6 +37,20 @@
                 <span class="material-symbols-outlined" data-icon="nightlight_round">nightlight_round</span>
                 <span class="font-label-md text-label-md">Night Audit</span>
             </a>
+            <!-- Quản lý Đặt phòng (Chỉ hiển thị cho RECEPTIONIST và ADMIN) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('RECEPTIONIST','ADMIN')" th:href="@{/receptionist/bookings}">
+                <span class="material-symbols-outlined" data-icon="book">book</span>
+                <span class="font-label-md text-label-md">Quản lý Đặt phòng</span>
+            </a>
+
+            <!-- Sơ đồ Villa (Chỉ hiển thị cho RECEPTIONIST và ADMIN) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('RECEPTIONIST','ADMIN')" th:href="@{/receptionist/villa}">
+                <span class="material-symbols-outlined" data-icon="bed">bed</span>
+                <span class="font-label-md text-label-md">Sơ đồ Villa</span>
+            </a>
+
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
                 th:href="@{/packages}">
                 <span class="material-symbols-outlined" data-icon="package">package_2</span>

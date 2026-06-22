@@ -95,7 +95,7 @@ class ItineraryServiceImplTest {
         Booking booking = Booking.builder()
                 .id(102)
                 .guestId(guestId)
-                .bookingStatus("CHECKED-IN")
+                .bookingStatus("CHECKED_IN")
                 .checkinDate(LocalDate.of(2026, 6, 20))
                 .checkoutDate(LocalDate.of(2026, 6, 22))
                 .retreatPackage(retreatPackage)
