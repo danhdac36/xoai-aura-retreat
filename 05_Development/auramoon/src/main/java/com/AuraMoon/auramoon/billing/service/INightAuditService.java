@@ -4,4 +4,5 @@ import com.AuraMoon.auramoon.billing.dto.NightAuditResultDTO;
 
 public interface INightAuditService {
     NightAuditResultDTO executeAudit(String triggerType, Integer actorId);
+    boolean hasRunToday();
 }

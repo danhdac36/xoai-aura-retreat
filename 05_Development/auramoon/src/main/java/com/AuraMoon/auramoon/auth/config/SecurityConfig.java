@@ -42,7 +42,8 @@ public class SecurityConfig {
         private static final String[] ADMIN_ENDPOINTS = {
                         "/admin/**",
                         "/dashboard/**",
-                        "/manage/**"
+                        "/manage/**",
+                        "/manager/housekeeping/**"
         };
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {
@@ -57,7 +58,8 @@ public class SecurityConfig {
                         "/F&B/**" };
 
         private static final String[] MANAGER_ENDPOINTS = {
-                        "/management/**" };
+                        "/management/**"
+        };
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

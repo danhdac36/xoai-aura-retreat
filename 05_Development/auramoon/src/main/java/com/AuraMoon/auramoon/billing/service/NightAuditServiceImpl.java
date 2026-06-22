@@ -46,4 +46,10 @@ public class NightAuditServiceImpl implements INightAuditService {
 
         return result;
     }
+
+    @Override
+    public boolean hasRunToday() {
+        return auditLogRepository.existsByActionTypeAndTimestampDate("NIGHT_AUDIT_MANUAL", LocalDate.now())
+                || auditLogRepository.existsByActionTypeAndTimestampDate("NIGHT_AUDIT_AUTO", LocalDate.now());
+    }
 }

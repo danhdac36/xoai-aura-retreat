@@ -319,6 +319,20 @@ view the guest's physical medical records</td>
 </tr>
 <tr>
 <td style="text-align: center;"><strong>8</strong></td>
+<td style="text-align: center;">Night Audit & Daily Revenue Consolidation</td>
+<td style="text-align: center;"><strong>1. Activity:</strong>
+- System automatically executes at 00:00 daily (or Manager triggers manually).
+- System scans all completed Spa sessions and delivered F&B orders for the business day.
+- System posts each unaudited charge as a new Folio Item into the guest's Guest Folio.
+- System locks audited records to prevent post-audit modification.
+<strong>2. Input:</strong> Completed Spa Bookings (COMPLETED), Delivered F&B Orders (DELIVERED), Active Guest Folios (OPEN).
+<strong>3. Output:</strong> New Folio Items posted, Audit log recorded, Daily revenue summary available for Dashboard.</td>
+<td style="text-align: center;">System, Manager</td>
+<td style="text-align: center;"><strong>Constraint:</strong> Audited records
+cannot be modified after the Night Audit process completes (BR-20). Manager can trigger manually for early checkout scenarios.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>9</strong></td>
 <td style="text-align: center;">Check-out & Consolidated Bill</td>
 <td style="text-align: center;"><strong>1. Activity:</strong>
 - Receptionist clicks Check-out. System scans to check if there are
@@ -334,7 +348,7 @@ Cleaning".</td>
 CANNOT check out if there are pending orders.</td>
 </tr>
 <tr>
-<td style="text-align: center;"><strong>9</strong></td>
+<td style="text-align: center;"><strong>10</strong></td>
 <td style="text-align: center;">Review & Data Deletion</td>
 <td style="text-align: center;"><strong>1. Activity:</strong>
 - Guest submits a Retreat quality review form.
@@ -521,6 +535,11 @@ table form as below\]*
 |      23      | Submit Post-stay Review and Rating                        | Feedback Management           | The Guest submits a review and rating after completing the stay.                                                                     |
 |      24      | View Revenue Analytics Dashboard                          | Analytics and Reporting       | The Resort Manager views revenue charts categorized by package, spa, and F&B income.                                                 |
 |      25      | Export Monthly Occupancy and Therapist Utilization Report | Report Export                 | The Resort Manager exports monthly reports on room occupancy and therapist utilization to Excel.                                     |
+|      26      | Execute Night Audit Process                               | Night Audit                   | The Manager or System executes the Night Audit to consolidate daily POS charges (Spa, F&B) into Guest Folios and lock audited records. |
+|      27      | Generate and Email Consolidated PDF Invoice               | Billing & Communication       | The System automatically generates a PDF version of the Consolidated Invoice in memory and emails it to the guest immediately after Check-out, adhering to Ministry of Finance formatting standards. |
+|      28      | Manage Housekeeping Tasks                                 | Housekeeping Management       | The Housekeeping Manager views dirty villas, assigns tasks, inspects them, and updates the status to clean after the guest checks out.                                                                 |
+|      29      | Record Time Attendance                                    | HR Management                 | Staff members (Receptionist, Therapist, Chef) check-in and check-out to record their daily working hours into the timesheet.                                                                           |
+|      30      | Calculate Commission Payroll                              | HR & Analytics                | The Manager calculates the monthly payroll for Spa Therapists based on base salary from timesheets and commissions from completed spa sessions.                                                        |
 
 #### 1.3.2 Use Case Diagrams
 
@@ -666,6 +685,11 @@ specific system user role names\]*
 | Export Center                   |                |                        |                    |                      |        X        |
 | Daily ID Report                 |                |                        |                    |                      |        X        |
 | Excel Reports                   |                |                        |                    |                      |        X        |
+| Night Audit Dashboard           |                |                        |                    |                      |        X        |
+| Housekeeping Dashboard          |                |                        |                    |                      |        X        |
+| Inspect & Update Status[Action] |                |                        |                    |                      |        X        |
+| Time Attendance Screen          |                |           X            |          X         |          X           |        X        |
+| Payroll Dashboard               |                |                        |                    |                      |        X        |
 
 #### 1.4.3 Non-UI Functions
 
@@ -679,6 +703,9 @@ batch/cron job, service, API, etc.\]*
 |      2      |      Payment      |  VNPay Payment Gateway API  |         Processes online payments through VNPay.         |
 |      3      |      Payment      | Payment Verification Service | Verifies transaction status and updates booking records. |
 |      4      |  Data Management  |   Database Backup Service   |           Performs scheduled database backups.           |
+|      5      |  Night Audit      | Night Audit Scheduled Job   | Automatically consolidates daily POS charges into Guest Folios at 00:00 every night (UC26). |
+|      6      |  Night Audit      | Night Audit Manual Trigger  | Allows Manager to manually trigger Night Audit for early checkout or reconciliation (UC26).  |
+|      7      |  Communication    | PDF Generator & Email Sender | Automatically compiles billing data into a memory-stream PDF format adhering to official standards and dispatches it via email to the guest upon check-out completion (UC27). |
 
 ### 1.5 Entity Relationship Diagram - Ng?c
 
@@ -716,6 +743,8 @@ ERD `</u>`](https://drive.google.com/file/d/1oWAww-BpAlODydsSWfGnFlNlPFawkdOB/vi
 | 19           | Meal_Order              | Manages food orders placed by guests.                                                 |
 | 20           | Meal_Order_Item         | Details the specific food items included in a meal order.                             |
 | 21           | Menu_Item               | Catalog of food items available on the menu.                                          |
+| 22           | Audit_Log               | Records system activity logs for critical operations including login, payment, checkout, and night audit for traceability and compliance. |
+| 23           | Timesheet               | Records staff check-in and check-out times for payroll and attendance tracking.                       |
 
 ## 2. Use Case Specifications - ??c
 
@@ -1348,6 +1377,190 @@ confirmed.</td>
 </tbody>
 </table>
 
+#### 2.5.3 UC26 – Execute Night Audit Process
+
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr>
+<td style="text-align: right;">ID and Name:</td>
+<td colspan="3"><strong>UC26 – Execute Night Audit Process</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">Primary Actor:</td>
+<td>System (Automated) / Manager (Manual)</td>
+<td style="text-align: right;">Secondary Actors:</td>
+<td>None</td>
+</tr>
+<tr>
+<td style="text-align: right;">Description:</td>
+<td colspan="3">This use case allows the system to automatically (at midnight 00:00) or the Manager to manually trigger the Night Audit process. The process consolidates all completed Spa sessions and delivered F&B orders from the current business day into the Guest Folio as individual Folio Items, then locks the audited source records to prevent post-audit tampering.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Trigger:</td>
+<td colspan="3">- Automatic: System scheduled job (Cron) executes at 00:00 daily.<br />
+- Manual: Manager selects "Run Night Audit" from the Night Audit Dashboard.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Preconditions:</td>
+<td colspan="3">- At least one guest booking exists with status CHECKED_IN.
+- Spa and F&B services have been recorded for the business day.
+- Night Audit has not already been executed for the current business date.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Postconditions:</td>
+<td colspan="3">- All completed Spa charges are posted as Folio Items.
+- All delivered F&B charges are posted as Folio Items.
+- Audited source records are locked (marked as audited).
+- Audit log is recorded with execution details.
+- Daily revenue summary is available for reporting (UC24).</td>
+</tr>
+<tr>
+<td style="text-align: right;">Normal Flow:</td>
+<td colspan="3"><ol type="1">
+- System or Manager initiates Night Audit.
+- System validates that Night Audit has not already been run for the current date.
+- System retrieves all active Guest Folios (status = OPEN).
+- System scans completed Spa Treatment Bookings (status = COMPLETED) that have not been audited for the day.
+- System scans delivered F&B Meal Orders (status = DELIVERED) that have not been audited for the day.
+- System creates a new Folio Item for each unaudited Spa charge, linked to the guest's Folio via Booking_ID (BR-11).
+- System creates a new Folio Item for each unaudited F&B charge, linked to the guest's Folio via Booking_ID (BR-11).
+- System marks each source record (Spa Booking, Meal Order) as audited to prevent duplication (BR-20).
+- System records an Audit Log entry with execution timestamp, number of records processed, and total revenue consolidated (BR-15).
+- System displays MSG-20 upon successful completion.
+</ol></td>
+</tr>
+<tr>
+<td style="text-align: right;">Alternative Flows:</td>
+<td colspan="3">- A1. Manager triggers Night Audit manually before midnight (e.g., for early checkout).<br />
+→ System executes the same consolidation logic for all unaudited records up to the current time.
+- A2. No unaudited charges exist for the day.<br />
+→ System completes with zero records processed and logs a "No new charges" entry.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Exceptions:</td>
+<td colspan="3">- E1. Night Audit already executed for the current date.<br />
+→ System rejects execution and displays a warning: "Night Audit has already been completed for this date."
+- E2. Database transaction failure during consolidation.<br />
+→ System rolls back all changes and displays MSG-21.
+- E3. Guest Folio not found for a booking.<br />
+→ System skips the record, logs the error, and continues processing remaining records.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Priority:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Frequency of Use:</td>
+<td colspan="3">Daily (once per night, automated at 00:00 or manual)</td>
+</tr>
+<tr>
+<td style="text-align: right;">Business Rules:</td>
+<td colspan="3">BR-11 – Guest Folio Consolidation.
+BR-15 – Audit Trail Management.
+BR-20 – Night Audit Consolidation.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Other Information:</td>
+<td colspan="3">- Night Audit is a standard hospitality industry accounting procedure (AHLEI standard).
+- The Manager can use the manual trigger to consolidate charges for early checkout scenarios where the guest departs before the scheduled midnight audit.
+- This process does not post Room Charges because the room cost is already included in the pre-paid Retreat Package amount (total_package_amount).</td>
+</tr>
+<tr>
+<td style="text-align: right;">Assumptions:</td>
+<td colspan="3">- Spa and F&B modules correctly update service status (COMPLETED / DELIVERED) upon completion.
+- The system clock is synchronized and accurate for midnight scheduling.</td>
+</tr>
+</tbody>
+</table>
+
+#### 2.5.4 UC27 – Generate and Email Consolidated PDF Invoice
+
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr>
+<td style="text-align: right;">ID and Name:</td>
+<td colspan="3"><strong>UC27 – Generate and Email Consolidated PDF Invoice</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">Primary Actor:</td>
+<td>System</td>
+<td style="text-align: right;">Secondary Actors:</td>
+<td>Receptionist, Guest</td>
+</tr>
+<tr>
+<td style="text-align: right;">Description:</td>
+<td colspan="3">Hệ thống tự động tạo file PDF Hóa đơn gộp trong bộ nhớ (in-memory) và gửi email xác nhận cho Khách hàng ngay khi quá trình trả phòng (Check-out) thành công.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Trigger:</td>
+<td colspan="3">Receptionist hoàn tất thanh toán và xác nhận Check-out thành công ở UC22.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Preconditions:</td>
+<td colspan="3">- Quá trình Check-out (UC22) đã hoàn tất và lưu DB thành công.<br />
+- Khách hàng có địa chỉ email hợp lệ.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Postconditions:</td>
+<td colspan="3">- Email đính kèm file PDF được đưa vào hàng đợi và gửi đi.<br />
+- Lịch sử (Audit Log) về việc gửi email được ghi lại.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Normal Flow:</td>
+<td colspan="3"><ol type="1">
+<li>Hệ thống lắng nghe sự kiện "Check-out hoàn tất" từ UC22.</li>
+<li>Hệ thống thu thập chi tiết Guest Folio.</li>
+<li>Hệ thống tạo file PDF trực tiếp vào bộ nhớ (Stream) theo form chuẩn của Bộ Tài chính (BR-21).</li>
+<li>Hệ thống soạn Email với nội dung cảm ơn và đính kèm luồng PDF.</li>
+<li>Hệ thống gửi Email đến Guest.</li>
+<li>Hệ thống ghi nhận kết quả gửi vào Audit Log (BR-15) và giải phóng bộ nhớ file PDF.</li>
+</ol></td>
+</tr>
+<tr>
+<td style="text-align: right;">Alternative Flows:</td>
+<td colspan="3">- A1. Khách hàng không có Email.<br />
+→ Ghi log cảnh báo MSG-22, hủy việc gửi email.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Exceptions:</td>
+<td colspan="3">- E1. Lỗi SMTP / Không gửi được email.<br />
+→ Ghi lỗi Error Log, báo MSG-23 cho Admin để theo dõi.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Priority:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Frequency of Use:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Business Rules:</td>
+<td colspan="3">BR-15, BR-21.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Other Information:</td>
+<td colspan="3">- File PDF không được lưu trữ vật lý (trên đĩa) để tránh lộ lọt dữ liệu.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Assumptions:</td>
+<td colspan="3">- Máy chủ SMTP và thư viện tạo PDF hoạt động ổn định.</td>
+</tr>
+</tbody>
+</table>
+
 ### 2.6 Revenue Analytics & Reporting
 
 #### 2.6.1 **UC24 ? View Revenue Dashboard**
@@ -1534,6 +1747,93 @@ reviews after completing their retreat experience.</td>
 <tr>
 <td style="text-align: right;">Assumptions:</td>
 <td colspan="3">- Guests provide honest feedback.</td>
+</tr>
+</tbody>
+</table>
+
+### 2.7 Housekeeping Management
+
+#### 2.7.1 UC28 – Manage Housekeeping Tasks
+
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr>
+<td style="text-align: right;">ID and Name:</td>
+<td colspan="3"><strong>UC28 – Manage Housekeeping Tasks</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">Primary Actor:</td>
+<td>Housekeeping Manager</td>
+<td style="text-align: right;">Secondary Actors:</td>
+<td>Housekeeper (Staff), Receptionist</td>
+</tr>
+<tr>
+<td style="text-align: right;">Description:</td>
+<td colspan="3">This use case allows the Housekeeping Manager to view a list of dirty villas (after guest check-out), assign cleaning tasks to staff, and inspect/update the villa status to CLEAN/AVAILABLE so the Receptionist can assign the room to new guests.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Trigger:</td>
+<td colspan="3">A guest completes Check-out (UC22), and the Villa status is automatically changed to DIRTY/Needs Cleaning.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Preconditions:</td>
+<td colspan="3">- Manager is logged in.
+- Villa is currently in DIRTY status.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Postconditions:</td>
+<td colspan="3">- Villa status is updated to CLEAN/AVAILABLE.
+- Cleaning log and inspector name are recorded.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Normal Flow:</td>
+<td colspan="3"><ol type="1">
+<li>Manager opens the Housekeeping Dashboard.</li>
+<li>System retrieves and displays all Villas with status DIRTY.</li>
+<li>Manager selects a Villa and assigns a Housekeeper to clean it.</li>
+<li>Housekeeper cleans the room and reports completion.</li>
+<li>Manager inspects the room for Quality Assurance (QA).</li>
+<li>Manager clicks "Approve & Update to Clean" on the system.</li>
+<li>System updates the Villa status to AVAILABLE.</li>
+<li>System records the audit log with the Manager's ID.</li>
+<li>System displays success message.</li>
+</ol></td>
+</tr>
+<tr>
+<td style="text-align: right;">Alternative Flows:</td>
+<td colspan="3">- A1. Room fails inspection.<br />
+→ Manager rejects and assigns it back to the Housekeeper for recleaning. Status remains DIRTY.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Exceptions:</td>
+<td colspan="3">- E1. Database error updating status.<br />
+→ System displays error message and prompts retry.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Priority:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Frequency of Use:</td>
+<td colspan="3">High (Multiple times daily)</td>
+</tr>
+<tr>
+<td style="text-align: right;">Business Rules:</td>
+<td colspan="3">BR-22 – Only Housekeeping Managers can change status from DIRTY to CLEAN. Receptionists can only change from CLEAN to OCCUPIED.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Other Information:</td>
+<td colspan="3">- This acts as the critical bridge between Check-out and the next Check-in.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Assumptions:</td>
+<td colspan="3">- Housekeepers communicate completion verbally or via radio to the Manager.</td>
 </tr>
 </tbody>
 </table>
@@ -2635,6 +2935,94 @@ in .csv or .xlsx format.</td>
 </tbody>
 </table>
 
+#### 3.1.14 Night Audit Dashboard Screen
+
+**\[Content \#1\]**
+
+- The interface utilizes a clean operational dashboard layout, accessible
+  only to the Manager/Admin role via the left navigation sidebar.
+- The top section features a date header displaying the current business
+  date, alongside a prominent "Run Night Audit" action button.
+- The mid-section contains summary KPI cards showing the number of
+  active folios processed, total Spa charges consolidated, total F&B
+  charges consolidated, and the grand total revenue posted.
+- The bottom section displays a detailed Data Grid listing each
+  individual Folio Item that was posted during the audit, grouped by
+  guest booking.
+
+**\[Content \#2\]**
+
+- **Description:** This operational screen provides the Management team
+  with control over the Night Audit process – a standard hospitality
+  accounting procedure (AHLEI). The system automatically executes this
+  process at midnight (00:00) via a scheduled job, but the Manager can
+  also trigger it manually from this dashboard for early checkout
+  scenarios or reconciliation purposes. The screen displays the audit
+  execution results and allows the Manager to review all charges that
+  were consolidated into Guest Folios.
+- **Mapped Use Case:** UC26 - As a Manager/System, I want to execute the
+  Night Audit process (manually or automatically at midnight) to
+  consolidate daily POS charges into Guest Folios and lock audited
+  records.
+
+**\[Content \#3\]**
+
+<table style="width:97%;">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 76%" />
+</colgroup>
+<tbody>
+<tr>
+<td><strong>Field Name</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr>
+<td colspan="2"><strong>Field Group: Audit Control & Status</strong></td>
+</tr>
+<tr>
+<td>(1) Business Date Header</td>
+<td>Data type: LocalDate. Displays the current business date (e.g., Monday, June 16, 2026). Read-only, defaults to the current system date.</td>
+</tr>
+<tr>
+<td>(2) Audit Status Indicator</td>
+<td>Data type: Enum Badge.
+<strong>Logic:</strong> Displays the current Night Audit status for the selected date:
+- "Chưa chạy" (NOT_RUN) – in gray.
+- "Đã hoàn tất" (COMPLETED) – in green, with the execution timestamp.
+- "Đang xử lý" (IN_PROGRESS) – in yellow/animated.</td>
+</tr>
+<tr>
+<td>(3) "Chạy Night Audit" (Run Night Audit) Button</td>
+<td>Action: Triggers manual Night Audit execution.
+<strong>Strict Constraint:</strong> The button must be disabled if the audit has already been completed for the current date (Status = COMPLETED). Upon clicking, the system must display a confirmation dialog before executing. The backend must run the entire consolidation process within a single database transaction to ensure atomicity (BR-20).</td>
+</tr>
+<tr>
+<td colspan="2"><em><strong>Field Group: Audit Summary KPIs</strong></em></td>
+</tr>
+<tr>
+<td>(4) Summary KPI Cards</td>
+<td>Read-only dynamic metrics. The system calculates and displays:
+- Total Active Folios Processed (count of OPEN Guest Folios with new charges).
+- Spa Charges Posted (sum of all Spa Folio Items created during audit).
+- F&B Charges Posted (sum of all F&B Folio Items created during audit).
+- Grand Total Revenue (total monetary amount consolidated).</td>
+</tr>
+<tr>
+<td colspan="2"><em><strong>Field Group: Audit Detail Data Grid</strong></em></td>
+</tr>
+<tr>
+<td>(5) Consolidated Charges Table</td>
+<td>Read-only Data Grid. Displays a paginated list of all Folio Items posted during the Night Audit, with columns: Guest Name, Booking ID, Service Category (SPA / FNB), Description, Amount, and Timestamp.
+<strong>Logic:</strong> Records are grouped by Guest/Booking for easy review. Each row links back to the source record (Treatment Booking or Meal Order) for traceability.</td>
+</tr>
+<tr>
+<td>(6) Audit History Log</td>
+<td>Read-only expandable section. Displays a chronological list of past Night Audit executions, including: Date, Trigger Type (AUTOMATIC / MANUAL), Executor (System or Manager name), Records Processed, and Total Amount. This provides a complete audit trail for compliance and accountability (BR-15).</td>
+</tr>
+</tbody>
+</table>
+
 ### 3.2 User Authentication
 
 #### 3.2.1 Authentication & Login Screen
@@ -3097,6 +3485,30 @@ location (e.g., "Page 1 / 8").</td>
 </tbody>
 </table>
 
+### 3.4 Automated System Tasks
+
+#### 3.4.1 Automated PDF Invoice Generation (System-Level)
+
+**[Content #1]**
+
+- **Description:** A headless background process triggered immediately after a successful Checkout (UC22). It aggregates all folio data and generates an in-memory PDF formatted to Ministry of Finance standards (Logo, Tax ID, 10% VAT separation, Total in words).
+- **Mapped Use Case:** UC27 - Generate and Email Consolidated PDF Invoice.
+- **Workflow & Constraints:** 
+  - Generates the PDF as a byte array/stream in RAM.
+  - Attaches the stream directly to an email dispatched to the guest.
+  - Instantly destroys the byte array post-dispatch to ensure absolute data minimization and prevent disk-level data breaches.
+
+### 3.7 Housekeeping & HR Management
+
+#### 3.7.1 Housekeeping Operations
+- **Description**: A dedicated interface for the Housekeeping Manager to oversee villa statuses. Automatically flags villas as DIRTY upon guest check-out (UC22). Managers assign staff, conduct QA inspections, and update statuses to CLEAN/AVAILABLE to re-enter the booking pool (UC28).
+
+#### 3.7.2 Time Attendance (Timesheet)
+- **Description**: A module for staff (Receptionist, Therapist, Chef) to clock in and out (UC29). Records timestamps into the `timesheet` table to track daily working hours, directly linked to their user profiles.
+
+#### 3.7.3 Commission & Payroll Calculation
+- **Description**: An automated dashboard for managers to generate monthly payroll for Spa Therapists (UC30). Combines base salary (from `timesheet` data) with performance commission (from completed Spa Sessions tracked in Module 3) to output a finalized salary sheet.
+
 ## 4. Non-Functional Requirements - ??c
 
 ### 4.1 External Interfaces
@@ -3294,6 +3706,7 @@ forth.\]*
 |    PF-17    |      Monthly System Uptime      |      = 99.5%      |
 |    PF-18    |          Recovery Time          |   = 30 minutes   |
 |    PF-19    |      Transaction Data Loss      |    Not allowed    |
+|    PF-20    | Asynchronous execution for Email/PDF | Must not block Checkout UI (max 3s). Email completes within 60s. |
 
 #### 4.2.2.2 Related Business Rules
 
@@ -3324,10 +3737,15 @@ forth.\]*
 |    BR-12    |                 Check-out Constraints                 |                                                                      Guests shall not be allowed to complete the Check-out process if any Spa or F&B charges remain unpaid. Any previously paid deposit shall be deducted from the final invoice.                                                                      |           UC21, UC22           |
 |    BR-13    |               Reporting and Review Logic               |                                                          Revenue and occupancy reports shall only include completed transactions. Only guests who have completed their retreat stay may submit reviews and ratings. Each booking may submit only one review.                                                          |        UC23, UC24, UC25        |
 |    BR-14    |          Guest Stay Registration Information          |                                                                                      During Check-in, the system shall collect and store guest identification information to comply with accommodation registration regulations.                                                                                      |    UC08, Residence Law 2020    |
-|    BR-15    |                 Audit Trail Management                 |                                                                        The system shall maintain audit logs for critical activities such as login, health data access, booking, payment, and Check-out to support monitoring and traceability.                                                                        |     UC07, UC11, UC21, UC22     |
+|    BR-15    |                 Audit Trail Management                 |                                                                        The system shall maintain audit logs for critical activities such as login, health data access, booking, payment, Check-out, and invoice email dispatch to support monitoring and traceability.                                                                        |     UC07, UC11, UC21, UC22, UC27     |
 |    BR-16    |               Meal Order Status Workflow               |                                                       Meal Order status shall only progress in the following sequence: Pending ? Preparing ? Ready for Delivery. Status reversal shall not be permitted. Only Chefs or F&B Staff may update Meal Order status.                                                       |              UC18              |
 |    BR-17    |    Spa Appointment Notification and Synchronization    |                                                            After a Spa appointment is successfully booked, the system shall send confirmation and reminder notifications to the guest. Notification failures shall not invalidate a confirmed appointment.                                                            |              UC11              |
 |    BR-18    |        Authentication and Single Sign-On (SSO)        |                                         The system shall support authentication through Google and Facebook. Accounts registered via SSO must complete email verification before being allowed to book a Retreat Package. The system shall prevent duplicate account creation.                                         |              UC01              |
+|    BR-19    |                 Zero Balance Bypass                   |                                         If a guest's total balance due is exactly 0 VND (e.g., fully pre-paid), the checkout process shall automatically bypass the payment gateway selection and complete the checkout immediately without generating a pending payment transaction.                                         |              UC22              |
+|    BR-20    |           Night Audit Consolidation                   |                                         The system shall automatically or manually consolidate all completed Spa (COMPLETED) and delivered F&B (DELIVERED) charges into the Guest Folio as Folio Items at midnight (00:00) daily. Once audited, these records shall be locked and cannot be modified or deleted.                                         |              UC26              |
+|    BR-21    |          Invoice Formatting Standard                  |                                         File PDF Hóa đơn Gộp được tạo ra bắt buộc phải tuân thủ chuẩn biểu mẫu hóa đơn cơ bản theo quy định của Bộ Tài chính Việt Nam (Bao gồm tên công ty, Mã số thuế, Thuế suất VAT 10% tách riêng, tổng tiền bằng chữ). Không lưu file vật lý.                                         |              UC27              |
+|    BR-22    |     Housekeeping Status Constraint                    |                                         Only users with the Housekeeping Manager (or equivalent Admin) role may change a Villa status from DIRTY to CLEAN. Receptionists are restricted to changing status from CLEAN to OCCUPIED.                                         |              UC28              |
+|    BR-23    |     Payroll Commission Logic                          |                                         The monthly payroll calculation for Therapists must strictly use the number of COMPLETED spa sessions multiplied by the commission rate, in addition to base pay determined by valid Timesheet entries.                                         |              UC30              |
 
 ### 5.2 System Messages
 
@@ -3353,6 +3771,10 @@ forth.\]*
 |      17      |     MSG-17     |    Success    |  Excel report exported successfully  |                          Report exported successfully.                          |
 |      18      |     MSG-18     |     Error     |          Unauthorized access          |               You do not have permission to access this function.               |
 |      19      |     MSG-19     |     Error     |        Unexpected system error        |        An unexpected system error has occurred. Please try again later.        |
+|      20      |     MSG-20     |    Success    |   Night Audit completed successfully  |    Night Audit process completed. All daily charges have been consolidated.    |
+|      21      |     MSG-21     |     Error     |      Night Audit execution failed     |    Night Audit process failed. Please review the error log and retry manually. |
+|      22      |     MSG-22     |    Warning    |       Missing Email address           |    Khách hàng không có địa chỉ email hợp lệ. Vui lòng in hóa đơn giấy tại quầy. |
+|      23      |     MSG-23     |     Error     |       SMTP / Email dispatch error     |    Lỗi hệ thống: Không thể gửi email hóa đơn. Dữ liệu đã được đưa vào hàng đợi gửi lại. |
 
 
 

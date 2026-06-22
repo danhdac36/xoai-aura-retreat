@@ -26,4 +26,24 @@ public class RevenueDashboardDTO {
             this.percentage = percentage;
         }
     }
+
+    public Double getPackagePercentage() {
+        return (totalRevenue != null && totalRevenue > 0) ? (packageRevenue / totalRevenue) * 100 : 0.0;
+    }
+
+    public Double getSpaPercentage() {
+        return (totalRevenue != null && totalRevenue > 0) ? (spaRevenue / totalRevenue) * 100 : 0.0;
+    }
+
+    public Double getFbPercentage() {
+        return (totalRevenue != null && totalRevenue > 0) ? (fbRevenue / totalRevenue) * 100 : 0.0;
+    }
+
+    public Double getSpaOffset() {
+        return -getPackagePercentage();
+    }
+
+    public Double getFbOffset() {
+        return -(getPackagePercentage() + getSpaPercentage());
+    }
 }
