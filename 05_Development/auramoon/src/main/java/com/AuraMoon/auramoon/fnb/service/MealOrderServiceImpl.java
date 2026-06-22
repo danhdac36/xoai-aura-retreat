@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -278,6 +279,109 @@ public class MealOrderServiceImpl implements IMealOrderService {
 
         order.setOrderStatus(status);
         mealOrderRepository.save(order);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ChefDashboardOrderResponse> getChefDashboardOrders(LocalDate date) {
+        if (date == null) {
+            date = LocalDate.now();
+        }
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+
+        List<Object[]> orderRows = mealOrderRepository.findChefDashboardOrdersByDateRange(startOfDay, endOfDay);
+        List<ChefDashboardOrderResponse> orderResponses = new ArrayList<>();
+
+        for (Object[] row : orderRows) {
+            Integer orderId = row[0] != null ? ((Number) row[0]).intValue() : null;
+            Integer bookingId = row[1] != null ? ((Number) row[1]).intValue() : null;
+            Integer guestId = row[2] != null ? ((Number) row[2]).intValue() : null;
+            String placeOrder = row[3] != null ? row[3].toString() : null;
+            String note = row[4] != null ? row[4].toString() : null;
+            String orderStatus = row[5] != null ? row[5].toString() : null;
+
+            LocalDateTime orderedAt = null;
+            if (row[6] != null) {
+                if (row[6] instanceof java.sql.Timestamp) {
+                    orderedAt = ((java.sql.Timestamp) row[6]).toLocalDateTime();
+                } else if (row[6] instanceof LocalDateTime) {
+                    orderedAt = (LocalDateTime) row[6];
+                } else {
+                    orderedAt = LocalDateTime.parse(row[6].toString());
+                }
+            }
+
+            String foodAllergies = null;
+            if (guestId != null) {
+                Optional<DietaryProfile> profileOpt = dietaryProfileRepository.findByUserId(guestId);
+                foodAllergies = profileOpt.map(DietaryProfile::getFoodAllergies).orElse(null);
+            }
+
+            List<Object[]> itemRows = orderId != null ?
+                    mealOrderItemRepository.findChefDashboardItemsByOrderId(orderId) : new ArrayList<>();
+            List<ChefDashboardItemResponse> itemResponses = new ArrayList<>();
+            boolean orderHasAllergy = false;
+
+            for (Object[] itemRow : itemRows) {
+                Integer menuItemId = itemRow[0] != null ? ((Number) itemRow[0]).intValue() : null;
+                String itemName = itemRow[1] != null ? itemRow[1].toString() : null;
+                Integer quantity = itemRow[2] != null ? ((Number) itemRow[2]).intValue() : null;
+
+                BigDecimal price = null;
+                if (itemRow[3] != null) {
+                    if (itemRow[3] instanceof BigDecimal) {
+                        price = (BigDecimal) itemRow[3];
+                    } else if (itemRow[3] instanceof Number) {
+                        price = BigDecimal.valueOf(((Number) itemRow[3]).doubleValue());
+                    } else {
+                        price = new BigDecimal(itemRow[3].toString());
+                    }
+                }
+
+                String ingredient = itemRow[4] != null ? itemRow[4].toString() : null;
+
+                boolean isAllergic = false;
+                if (ingredient != null && !ingredient.trim().isEmpty() && foodAllergies != null && !foodAllergies.trim().isEmpty()) {
+                    String[] allergyArray = foodAllergies.split(",");
+                    for (String allergy : allergyArray) {
+                        String cleanAllergy = allergy.trim();
+                        if (!cleanAllergy.isEmpty() && hasAllergyConflict(ingredient, cleanAllergy)) {
+                            isAllergic = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (isAllergic) {
+                    orderHasAllergy = true;
+                }
+
+                itemResponses.add(ChefDashboardItemResponse.builder()
+                        .menuItemId(menuItemId)
+                        .itemName(itemName)
+                        .quantity(quantity)
+                        .price(price)
+                        .ingredient(ingredient)
+                        .isAllergic(isAllergic)
+                        .build());
+            }
+
+            orderResponses.add(ChefDashboardOrderResponse.builder()
+                    .orderId(orderId)
+                    .bookingId(bookingId)
+                    .guestId(guestId)
+                    .placeOrder(placeOrder)
+                    .note(note)
+                    .orderStatus(orderStatus)
+                    .orderedAt(orderedAt)
+                    .foodAllergies(foodAllergies)
+                    .hasAllergyWarning(orderHasAllergy)
+                    .items(itemResponses)
+                    .build());
+        }
+
+        return orderResponses;
     }
 
     private boolean isSafe(MenuItem item, String allergies) {
