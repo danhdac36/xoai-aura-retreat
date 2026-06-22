@@ -13,4 +13,5 @@ public interface GuestFolioRepository extends JpaRepository<GuestFolio, Integer>
     Optional<GuestFolio> findByBookingId(Integer bookingId);
     List<GuestFolio> findByStatusAndCreatedAtBetween(String status, LocalDateTime start, LocalDateTime end);
     List<GuestFolio> findByStatus(String status);
+    long countByStatus(String status);
 }
