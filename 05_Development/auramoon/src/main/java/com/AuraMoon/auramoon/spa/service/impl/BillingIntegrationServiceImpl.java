@@ -46,7 +46,7 @@ public class BillingIntegrationServiceImpl implements BillingIntegrationService 
                 .amount(amount)
                 .createBy(createdBy)
                 .createAt(LocalDateTime.now())
-                .status("Pending")
+                .status("UNPAID")
                 .build();
                 
         entityManager.persist(folioItem);

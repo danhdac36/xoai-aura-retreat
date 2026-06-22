@@ -81,10 +81,10 @@ class SpaManualBookingServiceTest {
                 .build();
         service.setId(serviceId);
 
-        TreatmentRoom room = TreatmentRoom.builder().status("Active").build();
+        TreatmentRoom room = TreatmentRoom.builder().status("AVAILABLE").build();
         room.setId(1);
 
-        Therapist therapist = Therapist.builder().therapistCode("T002").status("Active").build();
+        Therapist therapist = Therapist.builder().therapistCode("T002").status("AVAILABLE").build();
 
         TreatmentBooking treatmentBooking = TreatmentBooking.builder()
                 .bookingId(bookingId)
@@ -202,7 +202,7 @@ class SpaManualBookingServiceTest {
                 .build();
         service.setId(serviceId);
 
-        TreatmentRoom room = TreatmentRoom.builder().status("Active").build();
+        TreatmentRoom room = TreatmentRoom.builder().status("AVAILABLE").build();
         room.setId(1);
 
         SpaScheduleRequest request = new SpaScheduleRequest();
@@ -249,10 +249,10 @@ class SpaManualBookingServiceTest {
                 .build();
         service.setId(serviceId);
 
-        TreatmentRoom room = TreatmentRoom.builder().status("Active").build();
+        TreatmentRoom room = TreatmentRoom.builder().status("AVAILABLE").build();
         room.setId(1);
 
-        Therapist therapist = Therapist.builder().therapistCode("T002").status("Active").build();
+        Therapist therapist = Therapist.builder().therapistCode("T002").status("AVAILABLE").build();
 
         TreatmentBooking treatmentBooking = TreatmentBooking.builder()
                 .bookingId(bookingId)

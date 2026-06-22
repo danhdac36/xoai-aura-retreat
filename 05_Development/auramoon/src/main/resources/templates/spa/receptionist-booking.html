@@ -203,7 +203,7 @@
     </div>
 
     <!-- Main Booking Form Grid -->
-    <form th:action="@{/booking-spa/manual}" method="post" id="manualBookingForm" class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start relative z-10">
+    <form th:action="@{/receptionist/booking-spa/manual}" method="post" id="manualBookingForm" class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start relative z-10">
         
         <!-- Left panel: Selection & Info -->
         <div class="lg:col-span-7 flex flex-col gap-gutter animate-fade-in-up opacity-0" style="animation-delay: 150ms">
@@ -358,7 +358,7 @@
     // Fetch Checked-in Guests once on load
     document.addEventListener('DOMContentLoaded', async () => {
         try {
-            const res = await fetch('/booking-spa/checked-in-bookings');
+            const res = await fetch('/receptionist/booking-spa/checked-in-bookings');
             if (res.ok) {
                 checkedInBookings = await res.json();
             } else {
@@ -502,7 +502,7 @@
         document.getElementById('time-slots-evening').innerHTML = '';
 
         try {
-            const res = await fetch(`/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}`);
+            const res = await fetch(`/receptionist/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}`);
             if (!res.ok) throw new Error("Connection failed");
             
             const availableTimes = await res.json();

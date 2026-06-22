@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{layout/admin-layout :: layout(~{::div.manager-therapists-content})}">
+
+<body>
+    <div class="manager-therapists-content">
+        <!-- Header Section -->
+        <div class="flex items-center justify-between mb-10 animate-[fadeIn_0.6s_ease-out]">
+            <div>
+                <h1 class="font-headline-lg text-4xl text-secondary mb-3 drop-shadow-sm">Quản lý Nhân sự Spa</h1>
+                <p class="font-body-md text-on-surface-variant flex items-center gap-2">
+                    <span class="material-symbols-outlined text-tertiary" data-icon="spa">spa</span>
+                    Điều phối nhân sự và theo dõi lịch trình làm việc
+                </p>
+            </div>
+            <div
+                class="flex items-center gap-3 bg-white/60 backdrop-blur-md px-5 py-3 rounded-2xl shadow-sm border border-white/50">
+                <div class="bg-secondary/10 p-2 rounded-xl text-secondary">
+                    <span class="material-symbols-outlined block" data-icon="calendar_month">calendar_month</span>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-outline uppercase tracking-wider mb-0.5">Hôm nay</p>
+                    <span class="font-label-md text-on-surface"
+                        th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy')}"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div th:if="${successMessage}"
+            class="bg-tertiary-container/80 backdrop-blur-sm border-l-4 border-tertiary p-4 rounded-xl shadow-sm mb-8 flex items-start animate-[fadeIn_0.4s_ease-out]">
+            <span class="material-symbols-outlined text-tertiary mt-0.5 mr-3"
+                data-icon="check_circle">check_circle</span>
+            <div>
+                <p class="text-sm text-on-tertiary-container font-medium" th:text="${successMessage}"></p>
+            </div>
+        </div>
+        <div th:if="${errorMessage}"
+            class="bg-error-container/80 backdrop-blur-sm border-l-4 border-error p-4 rounded-xl shadow-sm mb-8 flex items-start animate-[fadeIn_0.4s_ease-out]">
+            <span class="material-symbols-outlined text-error mt-0.5 mr-3" data-icon="error">error</span>
+            <div>
+                <p class="text-sm text-on-error-container font-medium" th:text="${errorMessage}"></p>
+            </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8 h-[calc(100vh-220px)]">
+            <!-- Danh sách nhân viên -->
+            <div
+                class="bg-white/70 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/60 overflow-hidden flex-1 flex flex-col animate-[fadeIn_0.8s_ease-out]">
+                <div
+                    class="px-8 py-6 border-b border-surface-variant flex justify-between items-center bg-gradient-to-r from-white/40 to-transparent">
+                    <h2 class="text-xl font-headline-sm text-secondary flex items-center gap-3">
+                        <div class="bg-secondary/10 p-2 rounded-lg text-secondary">
+                            <span class="material-symbols-outlined block" data-icon="groups">groups</span>
+                        </div>
+                        Danh sách Therapist
+                    </h2>
+                    <span
+                        class="text-xs font-semibold text-on-surface-variant bg-surface-container-low px-3 py-1.5 rounded-full shadow-sm"
+                        th:text="${therapists.size()} + ' nhân viên'"></span>
+                </div>
+                <div class="overflow-x-auto overflow-y-auto p-4 flex-1">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-[-16px] bg-white/95 backdrop-blur-md z-10 shadow-sm">
+                            <tr
+                                class="text-on-surface-variant text-[11px] uppercase tracking-widest font-semibold border-b border-surface-variant">
+                                <th class="px-3 py-4 w-20 text-center">Mã NV</th>
+                                <th class="px-3 py-4 text-center">Họ Tên</th>
+                                <th class="px-3 py-4 text-center">Trạng thái</th>
+                                <th class="px-3 py-4 text-center">Số ca</th>
+                                <th class="px-3 py-4 text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-surface-variant/50 text-sm">
+                            <tr th:each="therapist : ${therapists}"
+                                class="hover:bg-surface-container-lowest/50 transition-all duration-300 group">
+                                <td class="px-3 py-4 font-mono text-outline font-medium text-center align-middle"
+                                    th:text="${therapist.therapistCode}"></td>
+                                <td class="px-3 py-4 align-middle">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <div
+                                            class="w-7 h-7 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-bold text-xs shrink-0">
+                                            <span th:text="${#strings.substring(therapist.fullName, 0, 1)}"></span>
+                                        </div>
+                                        <span class="font-semibold text-on-surface whitespace-nowrap"
+                                            th:text="${therapist.fullName}"></span>
+                                    </div>
+                                </td>
+                                <td class="px-3 py-4 text-center align-middle">
+                                    <span th:if="${therapist.status == 'AVAILABLE'}"
+                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#d1ffcb]/50 text-tertiary border border-[#d1ffcb] whitespace-nowrap">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-tertiary mr-1.5 shrink-0"></span> Sẵn
+                                        sàng
+                                    </span>
+                                    <span th:if="${therapist.status == 'BUSY'}"
+                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-secondary-container/50 text-secondary border border-secondary-container whitespace-nowrap">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-secondary mr-1.5 shrink-0"></span> Đang
+                                        bận
+                                    </span>
+                                    <span th:if="${therapist.status == 'OFF_DUTY'}"
+                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-error-container/50 text-error border border-error-container whitespace-nowrap">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-error mr-1.5 shrink-0"></span> Nghỉ ca
+                                    </span>
+                                </td>
+                                <td class="px-3 py-4 text-center align-middle">
+                                    <div class="inline-flex items-center justify-center w-7 h-7 rounded-full"
+                                        th:classappend="${therapist.todaySessionCount > 0 ? 'bg-secondary/10 text-secondary font-bold' : 'bg-surface-variant/30 text-outline'}">
+                                        <span class="text-xs" th:text="${therapist.todaySessionCount}"></span>
+                                    </div>
+                                </td>
+                                <td class="px-3 py-4 text-center align-middle whitespace-nowrap">
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        <form th:action="@{/manager/spa/therapists/status}" method="post"
+                                            class="relative">
+                                            <input type="hidden" name="therapistCode"
+                                                th:value="${therapist.therapistCode}">
+                                            <select name="status" onchange="this.form.submit()"
+                                                class="text-[11px] font-medium border-surface-variant rounded-lg focus:border-secondary focus:ring-secondary py-1.5 pl-2 pr-6 cursor-pointer bg-white shadow-sm hover:border-secondary/50 transition-colors text-on-surface">
+                                                <option value="" disabled selected>Cập nhật TT</option>
+                                                <option value="AVAILABLE"
+                                                    th:disabled="${therapist.status == 'AVAILABLE'}">Sẵn sàng</option>
+                                                <option value="BUSY" th:disabled="${therapist.status == 'BUSY'}">Đang
+                                                    bận</option>
+                                                <option value="OFF_DUTY"
+                                                    th:disabled="${therapist.status == 'OFF_DUTY'}">Nghỉ ca</option>
+                                            </select>
+                                        </form>
+
+                                        <a th:href="@{/manager/spa/therapists(selectedCode=${therapist.therapistCode})}"
+                                            class="inline-flex items-center text-secondary hover:text-white bg-secondary/10 hover:bg-secondary px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all duration-300 shadow-sm hover:shadow-md">
+                                            <span class="material-symbols-outlined text-[14px] mr-1"
+                                                data-icon="event_note">event_note</span> Lịch
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(therapists)}">
+                                <td colspan="5" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center text-outline-variant">
+                                        <span class="material-symbols-outlined text-5xl mb-3 block"
+                                            data-icon="folder_open">folder_open</span>
+                                        <p class="text-sm font-medium">Không tìm thấy nhân viên nào</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Lịch làm việc Panel -->
+            <div th:if="${selectedCode != null}" class="w-full lg:w-[400px] h-full">
+                <div
+                    class="bg-white/70 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white/60 overflow-hidden h-full flex flex-col animate-[fadeIn_1s_ease-out]">
+                    <div
+                        class="px-6 py-5 border-b border-surface-variant bg-gradient-to-r from-secondary-container/20 to-transparent flex justify-between items-center shrink-0">
+                        <h2 class="text-lg font-headline-sm text-secondary flex items-center gap-2">
+                            <span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+                            Lịch trình
+                        </h2>
+                        <span
+                            class="text-xs bg-white border border-surface-variant px-3 py-1 rounded-full font-mono font-bold text-secondary shadow-sm"
+                            th:text="${selectedCode}"></span>
+                    </div>
+
+                    <div class="p-5 bg-surface-container-lowest/50 border-b border-surface-variant shrink-0">
+                        <form th:action="@{/manager/spa/therapists}" method="get" class="flex items-center gap-3">
+                            <input type="hidden" name="selectedCode" th:value="${selectedCode}">
+                            <div class="relative flex-1">
+                                <span
+                                    class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]"
+                                    data-icon="event">event</span>
+                                <input type="date" name="date" th:value="${selectedDate}"
+                                    class="w-full rounded-xl border-surface-variant shadow-sm focus:border-secondary focus:ring-secondary text-sm py-2.5 pl-10 bg-white font-medium text-on-surface">
+                            </div>
+                            <button type="submit"
+                                class="bg-secondary text-white px-5 py-2.5 rounded-xl hover:bg-[#434d34] text-sm font-bold shadow-sm hover:shadow-md transition-all duration-300">Lọc</button>
+                        </form>
+                    </div>
+
+                    <div class="p-0 flex-1 overflow-y-auto">
+                        <ul class="divide-y divide-surface-variant/50" th:if="${not #lists.isEmpty(schedules)}">
+                            <li th:each="schedule : ${schedules}"
+                                class="p-6 hover:bg-surface-container-lowest transition-colors relative group">
+                                <!-- Timeline indicator -->
+                                <div
+                                    class="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-secondary transition-colors">
+                                </div>
+
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-14 text-center">
+                                        <div class="text-sm font-bold text-secondary bg-secondary/10 py-1 rounded-lg mb-1"
+                                            th:text="${schedule.startTime}"></div>
+                                        <div class="text-xs text-outline font-medium" th:text="${schedule.endTime}">
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 pt-1">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <h4 class="text-sm font-bold text-on-surface leading-tight pr-2"
+                                                th:text="${schedule.treatmentName}"></h4>
+
+                                            <span th:if="${schedule.status == 'Scheduled'}"
+                                                class="shrink-0 px-2 py-1 rounded-md text-[9px] font-bold bg-surface-variant/70 text-on-surface-variant uppercase tracking-widest border border-surface-variant">Đã
+                                                đặt</span>
+                                            <span th:if="${schedule.status == 'Ongoing'}"
+                                                class="shrink-0 px-2 py-1 rounded-md text-[9px] font-bold bg-secondary-container text-secondary uppercase tracking-widest border border-secondary/20">Đang
+                                                làm</span>
+                                            <span th:if="${schedule.status == 'Completed'}"
+                                                class="shrink-0 px-2 py-1 rounded-md text-[9px] font-bold bg-[#d1ffcb] text-tertiary uppercase tracking-widest border border-[#a5d2a2]">Hoàn
+                                                thành</span>
+                                            <span th:if="${schedule.status == 'No-Show'}"
+                                                class="shrink-0 px-2 py-1 rounded-md text-[9px] font-bold bg-error-container text-error uppercase tracking-widest border border-error-container">Vắng
+                                                mặt</span>
+                                        </div>
+                                        <div
+                                            class="text-xs text-on-surface-variant mb-1.5 flex items-center gap-1.5 bg-surface-bright px-2 py-1.5 rounded-lg border border-surface-variant/50">
+                                            <span class="material-symbols-outlined text-[14px] text-tertiary"
+                                                data-icon="person">person</span>
+                                            <span class="font-medium"
+                                                th:text="${schedule.customerName ?: 'Khách ẩn danh'}"></span>
+                                        </div>
+                                        <div
+                                            class="text-xs text-on-surface-variant flex items-center gap-1.5 bg-surface-bright px-2 py-1.5 rounded-lg border border-surface-variant/50">
+                                            <span class="material-symbols-outlined text-[14px] text-secondary"
+                                                data-icon="meeting_room">meeting_room</span>
+                                            <span th:text="${schedule.roomName}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <div th:if="${#lists.isEmpty(schedules)}"
+                            class="p-12 text-center flex flex-col items-center justify-center h-full">
+                            <div class="bg-surface-variant/30 p-4 rounded-full mb-4">
+                                <span class="material-symbols-outlined text-4xl text-outline-variant"
+                                    data-icon="event_busy">event_busy</span>
+                            </div>
+                            <p class="text-sm font-medium text-outline">Không có lịch trình nào trong ngày này</p>
+                            <p class="text-xs text-outline-variant mt-1">Nhân viên đang trống lịch</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
