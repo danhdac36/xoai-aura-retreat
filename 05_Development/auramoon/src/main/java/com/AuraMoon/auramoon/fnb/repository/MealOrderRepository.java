@@ -2,6 +2,7 @@ package com.AuraMoon.auramoon.fnb.repository;
 
 import com.AuraMoon.auramoon.fnb.entity.MealOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
+<<<<<<< HEAD
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,4 +21,10 @@ public interface MealOrderRepository extends JpaRepository<MealOrder, Integer> {
     List<Object[]> findChefDashboardOrdersByDateRange(
             @Param("startOfDay") LocalDateTime startOfDay,
             @Param("endOfDay") LocalDateTime endOfDay);
+=======
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface MealOrderRepository extends JpaRepository<MealOrder, Integer> {
+>>>>>>> origin/SourceCode
 }

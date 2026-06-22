@@ -62,12 +62,14 @@ public class DepositController {
 
     @GetMapping("/vnpay-return")
     public String vnpayReturn(@RequestParam Map<String, String> params,
-                              @RequestParam Integer bookingId,
+                              @RequestParam(required = false) Integer bookingId,
                               RedirectAttributes redirectAttributes) {
         if (vnPayService.verifySignature(params)) {
             Integer paymentId = Integer.parseInt(params.get("vnp_TxnRef"));
             Payment payment = paymentRepository.findById(paymentId)
                     .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+            Integer actualBookingId = payment.getGuestFolio().getBookingId();
 
             if ("00".equals(params.get("vnp_ResponseCode"))) {
                 payment.setStatus(PaymentTransactionStatus.SUCCESS.name());
@@ -76,9 +78,9 @@ public class DepositController {
                 paymentRepository.save(payment);
 
                 // Cập nhật trạng thái Booking
-                bookingService.confirmPayment(bookingId, params.get("vnp_TransactionNo"));
+                bookingService.confirmPayment(actualBookingId, params.get("vnp_TransactionNo"));
                 
-                return "redirect:/booking/success?bookingId=" + bookingId;
+                return "redirect:/booking/success?bookingId=" + actualBookingId;
             } else {
                 payment.setStatus(PaymentTransactionStatus.FAILED.name());
                 payment.setPaymentDate(LocalDateTime.now());
