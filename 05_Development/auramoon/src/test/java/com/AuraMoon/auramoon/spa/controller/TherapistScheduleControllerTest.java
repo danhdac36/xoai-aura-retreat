@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doNothing;
@@ -33,6 +35,9 @@ public class TherapistScheduleControllerTest {
 
         @Mock
         private TherapistScheduleService therapistScheduleService;
+
+        @Mock
+        private com.AuraMoon.auramoon.spa.repository.TherapistRepository therapistRepository;
 
         @InjectMocks
         private TherapistScheduleController therapistScheduleController;
@@ -123,7 +128,7 @@ public class TherapistScheduleControllerTest {
                 String therapistCode = "TH01";
                 session.setAttribute("therapistCode", therapistCode);
 
-                doNothing().when(therapistScheduleService).updateSessionStatus(scheduleId, therapistCode, status);
+                doNothing().when(therapistScheduleService).updateSessionStatus(eq(scheduleId), eq(therapistCode), eq(status));
 
                 // Act & Assert
                 mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/therapist/schedules/update-status")
@@ -146,7 +151,7 @@ public class TherapistScheduleControllerTest {
                 session.setAttribute("therapistCode", therapistCode);
 
                 doThrow(new com.AuraMoon.auramoon.spa.exception.SpaBusinessException("SPA-012", "Trạng thái không hợp lệ"))
-                                .when(therapistScheduleService).updateSessionStatus(scheduleId, therapistCode, status);
+                                .when(therapistScheduleService).updateSessionStatus(eq(scheduleId), eq(therapistCode), eq(status));
 
                 // Act & Assert
                 mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/therapist/schedules/update-status")

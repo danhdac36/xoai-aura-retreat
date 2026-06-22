@@ -7,10 +7,16 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
 @Converter
+@org.springframework.stereotype.Component
 public class AesDataEncryptor implements AttributeConverter<String, String> {
 
     private static final String ALGORITHM = "AES/ECB/PKCS5Padding";
-    private static final String SECRET_KEY = "AuraMoonEncrypt!"; // exactly 16 bytes for AES-128
+    private static String secretKey = "AuraMoonRetreatWellnessSystem206"; // exactly 32 bytes for AES-256
+
+    @org.springframework.beans.factory.annotation.Value("${app.encryption.key:AuraMoonRetreatWellnessSystem206}")
+    public void setSecretKey(String key) {
+        AesDataEncryptor.secretKey = key;
+    }
 
     @Override
     public String convertToDatabaseColumn(String attribute) {
@@ -19,7 +25,7 @@ public class AesDataEncryptor implements AttributeConverter<String, String> {
         }
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            SecretKeySpec key = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            SecretKeySpec key = new SecretKeySpec(secretKey.getBytes(), "AES");
             cipher.init(Cipher.ENCRYPT_MODE, key);
             return Base64.getEncoder().encodeToString(cipher.doFinal(attribute.getBytes()));
         } catch (Exception e) {
@@ -34,7 +40,7 @@ public class AesDataEncryptor implements AttributeConverter<String, String> {
         }
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
-            SecretKeySpec key = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            SecretKeySpec key = new SecretKeySpec(secretKey.getBytes(), "AES");
             cipher.init(Cipher.DECRYPT_MODE, key);
             return new String(cipher.doFinal(Base64.getDecoder().decode(dbData)));
         } catch (Exception e) {

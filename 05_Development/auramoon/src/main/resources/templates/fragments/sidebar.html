@@ -37,6 +37,20 @@
                 <span class="material-symbols-outlined" data-icon="nightlight_round">nightlight_round</span>
                 <span class="font-label-md text-label-md">Night Audit</span>
             </a>
+            <!-- Quản lý Đặt phòng (Chỉ hiển thị cho RECEPTIONIST và ADMIN) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('RECEPTIONIST','ADMIN')" th:href="@{/receptionist/bookings}">
+                <span class="material-symbols-outlined" data-icon="book">book</span>
+                <span class="font-label-md text-label-md">Quản lý Đặt phòng</span>
+            </a>
+
+            <!-- Sơ đồ Villa (Chỉ hiển thị cho RECEPTIONIST và ADMIN) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('RECEPTIONIST','ADMIN')" th:href="@{/receptionist/villa}">
+                <span class="material-symbols-outlined" data-icon="bed">bed</span>
+                <span class="font-label-md text-label-md">Sơ đồ Villa</span>
+            </a>
+
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
                 th:href="@{/packages}">
                 <span class="material-symbols-outlined" data-icon="package">package_2</span>
@@ -44,13 +58,13 @@
             </a>
             <!-- Spa Schedule (SpaScheduleController) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                th:href="@{/booking-spa}">
+                th:href="@{/guest/booking-spa}">
                 <span class="material-symbols-outlined" data-icon="calendar">calendar_month</span>
                 <span class="font-label-md text-label-md">Spa Booking</span>
             </a>
             <!-- Spa Receptionist Booking (SpaReceptionistController) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasAnyRole('RECEPTIONIST','ADMIN')" th:href="@{/booking-spa/manual}">
+                sec:authorize="hasAnyRole('RECEPTIONIST','ADMIN')" th:href="@{/receptionist/booking-spa/manual}">
                 <span class="material-symbols-outlined" data-icon="receipt">receipt_long</span>
                 <span class="font-label-md text-label-md">Spa Receptionist</span>
             </a>
@@ -61,10 +75,16 @@
                 <span class="font-label-md text-label-md">Therapist Daily</span>
             </a>
 
-            <!-- Cheff viewer(MealOrderController) -->
-            <a
-                class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200">
-                <form th:action="@{/auth/logout}" method="post">
+            <!-- MANAGER - SPA MANAGEMENT -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('MANAGER', 'ADMIN')" th:href="@{/manager/spa/therapists}">
+                <span class="material-symbols-outlined" data-icon="group">group</span>
+                <span class="font-label-md text-label-md">Spa Staff Management</span>
+            </a>
+
+            <!-- Logout -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200">
+                <form th:action="@{/auth/logout}" method="post" class="w-full">
                     <button type="submit"
                         class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-all font-medium">
                         Đăng xuất (Logout)

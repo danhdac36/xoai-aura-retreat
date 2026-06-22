@@ -45,6 +45,7 @@ Dự án này được thiết kế thành 5 module độc lập nhưng liên k�
 - **UC11**: Với tư cách là Khách hàng (người đã đặt gói), tôi muốn lên lịch các phiên Spa/Trị liệu đi kèm bằng cách chọn ngày và khung giờ.
 - **UC12**: Với tư cách là Hệ thống, tôi phải tự động tìm một khung giờ trống bằng cách khớp đồng thời MỘT Chuyên viên trị liệu rảnh VÀ MỘT Phòng điều trị trống.
 - **UC13**: Với tư cách là Chuyên viên Spa, tôi muốn xem lịch trình hàng ngày của mình và truy cập các ghi chú y tế cụ thể (ví dụ: đau lưng) của các khách hàng được giao.
+- **UC13.1**: Với tư cách là Quản lý, tôi muốn xem danh sách nhân viên Spa, lịch làm việc của họ, và cập nhật trạng thái (Nghỉ/Bận). Nếu cập nhật thành "Nghỉ", hệ thống sẽ tự động chuyển ca cho các lịch đã đặt sang chuyên viên khác.
 - **UC14**: Với tư cách là Chuyên viên Spa, tôi muốn đánh dấu một phiên là "Đã hoàn thành" hoặc "Vắng mặt (No-Show)".
 - **UC15**: Với tư cách là Lễ tân, tôi muốn đặt thủ công các dịch vụ Spa bổ sung cho khách và tính phí vào tài khoản (folio) Villa của họ.
 

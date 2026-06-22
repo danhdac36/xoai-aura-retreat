@@ -29,7 +29,8 @@ public class TherapistScheduleServiceImpl implements TherapistScheduleService {
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
 
-        List<Schedule> schedules = scheduleRepository.findDailyScheduleForTherapist(therapistCode, startOfDay, endOfDay);
+        List<Schedule> schedules = scheduleRepository.findDailyScheduleForTherapist(therapistCode, startOfDay,
+                endOfDay);
 
         return schedules.stream()
                 .map(this::mapToDto)
@@ -39,8 +40,8 @@ public class TherapistScheduleServiceImpl implements TherapistScheduleService {
     @Override
     @Transactional
     public void updateSessionStatus(Integer scheduleId, String therapistCode, String newStatus) {
-        if (!"Scheduled".equalsIgnoreCase(newStatus) && !"Ongoing".equalsIgnoreCase(newStatus) && 
-            !"Completed".equalsIgnoreCase(newStatus) && !"No-Show".equalsIgnoreCase(newStatus)) {
+        if (!"Scheduled".equalsIgnoreCase(newStatus) && !"Ongoing".equalsIgnoreCase(newStatus) &&
+                !"Completed".equalsIgnoreCase(newStatus) && !"No-Show".equalsIgnoreCase(newStatus)) {
             throw new SpaBusinessException("SPA-012", "Trạng thái không hợp lệ");
         }
 
@@ -56,12 +57,13 @@ public class TherapistScheduleServiceImpl implements TherapistScheduleService {
             throw new SpaBusinessException("SPA-013", "Không tìm thấy lượt đặt dịch vụ tương ứng");
         }
 
-        // Standardize newStatus to Title Case ("Scheduled", "Ongoing", "Completed", "No-Show")
+        // Standardize newStatus to Title Case ("Scheduled", "Ongoing", "Completed",
+        // "No-Show")
         String normalizedStatus = newStatus.substring(0, 1).toUpperCase() + newStatus.substring(1).toLowerCase();
         if (newStatus.equalsIgnoreCase("no-show")) {
             normalizedStatus = "No-Show";
         }
-        
+
         booking.setStatus(normalizedStatus);
         treatmentBookingRepository.save(booking);
     }
@@ -81,7 +83,8 @@ public class TherapistScheduleServiceImpl implements TherapistScheduleService {
                     status = "Completed";
                 } else if (rawStatus.equalsIgnoreCase("ongoing")) {
                     status = "Ongoing";
-                } else if (rawStatus.equalsIgnoreCase("no-show") || rawStatus.equalsIgnoreCase("noshow") || rawStatus.equalsIgnoreCase("no_show")) {
+                } else if (rawStatus.equalsIgnoreCase("no-show") || rawStatus.equalsIgnoreCase("noshow")
+                        || rawStatus.equalsIgnoreCase("no_show")) {
                     status = "No-Show";
                 } else if (rawStatus.equalsIgnoreCase("scheduled")) {
                     status = "Scheduled";

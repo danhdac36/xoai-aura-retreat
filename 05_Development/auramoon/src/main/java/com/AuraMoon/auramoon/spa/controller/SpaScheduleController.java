@@ -27,7 +27,7 @@ import com.AuraMoon.auramoon.spa.repository.TreatmentBookingRepository;
 import com.AuraMoon.auramoon.spa.service.SpaScheduleService;
 
 @Controller
-@RequestMapping("/booking-spa")
+@RequestMapping("/guest/booking-spa")
 public class SpaScheduleController {
 
     private final SpaScheduleService spaScheduleService;
