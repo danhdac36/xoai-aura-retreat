@@ -18,6 +18,8 @@ public interface VillaRepository extends JpaRepository<Villa, Integer> {
 
     List<Villa> findByVillaStatusAndIsDeleteFalse(String status);
 
+    List<Villa> findByCleaningStatusInAndIsDeleteFalse(List<String> cleaningStatuses);
+
     @Query("SELECT COUNT(v) FROM Villa v WHERE v.villaType.id = :villaTypeId " +
            "AND v.villaStatus = 'AVAILABLE' AND v.isDelete = false " +
            "AND v.id NOT IN (" +

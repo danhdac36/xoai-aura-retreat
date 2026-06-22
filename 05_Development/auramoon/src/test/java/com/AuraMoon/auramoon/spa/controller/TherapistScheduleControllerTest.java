@@ -2,6 +2,9 @@ package com.AuraMoon.auramoon.spa.controller;
 
 import com.AuraMoon.auramoon.spa.dto.TherapistScheduleDto;
 import com.AuraMoon.auramoon.spa.service.TherapistScheduleService;
+import com.AuraMoon.auramoon.spa.entity.Therapist;
+import com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse;
+import com.AuraMoon.auramoon.auth.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,15 +14,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.core.MethodParameter;
+import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.bind.support.WebDataBinderFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -46,7 +54,24 @@ public class TherapistScheduleControllerTest {
 
         @BeforeEach
         public void setup() {
-                mockMvc = MockMvcBuilders.standaloneSetup(therapistScheduleController).build();
+                mockMvc = MockMvcBuilders.standaloneSetup(therapistScheduleController)
+                                .setCustomArgumentResolvers(new HandlerMethodArgumentResolver() {
+                                        @Override
+                                        public boolean supportsParameter(MethodParameter parameter) {
+                                                return parameter.getParameterType().equals(UserDetailsResponse.class);
+                                        }
+
+                                        @Override
+                                        public Object resolveArgument(MethodParameter parameter,
+                                                                      ModelAndViewContainer mavContainer,
+                                                                      NativeWebRequest webRequest,
+                                                                      WebDataBinderFactory binderFactory) throws Exception {
+                                                User user = new User();
+                                                user.setId(1);
+                                                return new UserDetailsResponse(user);
+                                        }
+                                })
+                                .build();
                 session = new MockHttpSession();
         }
 
@@ -58,19 +83,26 @@ public class TherapistScheduleControllerTest {
                 String dateStr = "2026-06-15";
                 LocalDate targetDate = LocalDate.parse(dateStr);
 
+                Therapist mockTherapist = Therapist.builder()
+                                .id(1)
+                                .therapistCode(therapistCode)
+                                .status("AVAILABLE")
+                                .build();
+                when(therapistRepository.findById(anyInt())).thenReturn(Optional.of(mockTherapist));
+
                 List<TherapistScheduleDto> schedules = Arrays.asList(
                                 TherapistScheduleDto.builder()
-                                                .scheduleId(1)
-                                                .serviceName("Massage")
-                                                .roomName("Room 1")
-                                                .startTime(LocalDateTime.of(2026, 6, 15, 9, 0))
-                                                .build(),
+                                                 .scheduleId(1)
+                                                 .serviceName("Massage")
+                                                 .roomName("Room 1")
+                                                 .startTime(LocalDateTime.of(2026, 6, 15, 9, 0))
+                                                 .build(),
                                 TherapistScheduleDto.builder()
-                                                .scheduleId(2)
-                                                .serviceName("Facial")
-                                                .roomName("Room 2")
-                                                .startTime(LocalDateTime.of(2026, 6, 15, 11, 0))
-                                                .build());
+                                                 .scheduleId(2)
+                                                 .serviceName("Facial")
+                                                 .roomName("Room 2")
+                                                 .startTime(LocalDateTime.of(2026, 6, 15, 11, 0))
+                                                 .build());
 
                 when(therapistScheduleService.getDailySchedule(eq(therapistCode), eq(targetDate)))
                                 .thenReturn(schedules);
@@ -93,6 +125,13 @@ public class TherapistScheduleControllerTest {
                 String dateStr = "2026-06-15";
                 LocalDate targetDate = LocalDate.parse(dateStr);
 
+                Therapist mockTherapist = Therapist.builder()
+                                .id(1)
+                                .therapistCode(therapistCode)
+                                .status("AVAILABLE")
+                                .build();
+                when(therapistRepository.findById(anyInt())).thenReturn(Optional.of(mockTherapist));
+
                 when(therapistScheduleService.getDailySchedule(eq(therapistCode), eq(targetDate)))
                                 .thenReturn(Collections.emptyList());
 
@@ -109,14 +148,14 @@ public class TherapistScheduleControllerTest {
         @Test
         public void getDailySchedule_InvalidOrMissingTherapistCode_RedirectsToLogin() throws Exception {
                 // Arrange
-                // No therapistCode in session
+                when(therapistRepository.findById(anyInt())).thenReturn(Optional.empty());
 
                 // Act & Assert
                 mockMvc.perform(get("/therapist/schedules/daily")
                                 .param("date", "2026-06-15")
                                 .session(session))
                                 .andExpect(status().is3xxRedirection())
-                                .andExpect(redirectedUrl("/login"));
+                                .andExpect(redirectedUrl("/auth/login"));
         }
 
         @Test
@@ -127,6 +166,13 @@ public class TherapistScheduleControllerTest {
                 String dateStr = "2026-06-15";
                 String therapistCode = "TH01";
                 session.setAttribute("therapistCode", therapistCode);
+
+                Therapist mockTherapist = Therapist.builder()
+                                .id(1)
+                                .therapistCode(therapistCode)
+                                .status("AVAILABLE")
+                                .build();
+                when(therapistRepository.findById(anyInt())).thenReturn(Optional.of(mockTherapist));
 
                 doNothing().when(therapistScheduleService).updateSessionStatus(eq(scheduleId), eq(therapistCode), eq(status));
 
@@ -149,6 +195,13 @@ public class TherapistScheduleControllerTest {
                 String dateStr = "2026-06-15";
                 String therapistCode = "TH01";
                 session.setAttribute("therapistCode", therapistCode);
+
+                Therapist mockTherapist = Therapist.builder()
+                                .id(1)
+                                .therapistCode(therapistCode)
+                                .status("AVAILABLE")
+                                .build();
+                when(therapistRepository.findById(anyInt())).thenReturn(Optional.of(mockTherapist));
 
                 doThrow(new com.AuraMoon.auramoon.spa.exception.SpaBusinessException("SPA-012", "Trạng thái không hợp lệ"))
                                 .when(therapistScheduleService).updateSessionStatus(eq(scheduleId), eq(therapistCode), eq(status));

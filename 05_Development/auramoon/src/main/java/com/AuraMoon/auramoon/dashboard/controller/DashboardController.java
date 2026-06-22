@@ -49,7 +49,9 @@ public class DashboardController {
         model.addAttribute("category", category);
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("this is " + auth.getAuthorities());
+        if (auth != null) {
+            System.out.println("this is " + auth.getAuthorities());
+        }
         return "manager/dashboard";
     }
 }
