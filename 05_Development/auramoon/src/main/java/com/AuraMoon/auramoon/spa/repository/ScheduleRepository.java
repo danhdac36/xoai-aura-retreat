@@ -59,4 +59,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
                "AND s.treatmentBooking.status = 'Scheduled' " +
                "ORDER BY s.startTime ASC")
         List<Schedule> findFutureSchedules(@Param("therapistCode") String therapistCode, @Param("now") LocalDateTime now);
+
+        List<Schedule> findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(Integer bookingId);
 }
+
