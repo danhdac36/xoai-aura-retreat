@@ -27,6 +27,10 @@ public class SecurityConfig {
                         "/auth/forgot-password",
                         "/auth/login-admin",
                         "/auth/verify-email",
+                        "/wellness",
+                        "/spa",
+                        "/culinary",
+                        "/villas",
                         "/css/**",
                         "/js/**",
                         "/images/**"
