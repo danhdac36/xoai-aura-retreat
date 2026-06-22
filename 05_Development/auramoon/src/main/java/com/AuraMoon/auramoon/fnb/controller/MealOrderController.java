@@ -1,24 +1,17 @@
 package com.AuraMoon.auramoon.fnb.controller;
 
+import com.AuraMoon.auramoon.fnb.dto.ChefDashboardOrderResponse;
 import com.AuraMoon.auramoon.fnb.dto.MealOrderRequest;
-import com.AuraMoon.auramoon.fnb.dto.MealOrderResponse;
 import com.AuraMoon.auramoon.fnb.dto.MenuItemResponse;
 import com.AuraMoon.auramoon.fnb.service.IMealOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-<<<<<<< HEAD
-import org.springframework.format.annotation.DateTimeFormat;
-import com.AuraMoon.auramoon.fnb.dto.ChefDashboardOrderResponse;
 
 import java.time.LocalDate;
-=======
-
->>>>>>> origin/SourceCode
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,34 +20,6 @@ public class MealOrderController {
 
     @Autowired
     private IMealOrderService mealOrderService;
-
-    @GetMapping("/api/v1/fnb/menu")
-    public ResponseEntity<List<MenuItemResponse>> getFilteredMenu(
-            @RequestParam("bookingId") Integer bookingId,
-            @RequestParam("guestId") Integer guestId) {
-        List<MenuItemResponse> menu = mealOrderService.getFilteredMenu(guestId, bookingId);
-        return ResponseEntity.ok(menu);
-    }
-
-    @GetMapping("/api/v1/fnb/menu/all")
-    public ResponseEntity<List<MenuItemResponse>> getAllMenu() {
-        List<MenuItemResponse> menu = mealOrderService.getAllMenu();
-        return ResponseEntity.ok(menu);
-    }
-
-    @PostMapping("/api/v1/fnb/meal-orders")
-    public ResponseEntity<MealOrderResponse> createMealOrderApi(@RequestBody MealOrderRequest request) {
-        MealOrderResponse response = mealOrderService.createMealOrder(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @PatchMapping("/api/v1/fnb/chef/orders/{id}/status")
-    public ResponseEntity<Void> updatePrepStatus(
-            @PathVariable("id") Integer id,
-            @RequestParam("status") String status) {
-        mealOrderService.updatePrepStatus(id, status);
-        return ResponseEntity.ok().build();
-    }
 
     @GetMapping("/fnb/uc16-meal-selection")
     public String getMealSelectionPage(
@@ -156,7 +121,6 @@ public class MealOrderController {
 
         return "redirect:/fnb/uc19-alacarte-order";
     }
-<<<<<<< HEAD
 
     @GetMapping("/fnb/chef/dashboard")
     public String getChefDashboard(
@@ -190,6 +154,4 @@ public class MealOrderController {
         }
         return "redirect:/fnb/chef/dashboard";
     }
-=======
->>>>>>> origin/SourceCode
 }
