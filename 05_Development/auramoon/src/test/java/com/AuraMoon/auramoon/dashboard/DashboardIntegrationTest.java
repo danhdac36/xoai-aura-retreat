@@ -11,6 +11,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse;
 import com.AuraMoon.auramoon.auth.entity.User;
 
 @SpringBootTest
@@ -31,7 +34,7 @@ class DashboardIntegrationTest {
 
         // Expected to fail initially (RED)
         mockMvc.perform(get("/manager/dashboard")
-                .sessionAttr("currentUser", mockUser)
+                .with(user(new UserDetailsResponse(mockUser)))
                 .param("startDate", "2026-06-01")
                 .param("endDate", "2026-06-30"))
                .andExpect(status().isOk())

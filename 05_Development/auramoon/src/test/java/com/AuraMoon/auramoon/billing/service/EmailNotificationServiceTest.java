@@ -26,7 +26,7 @@ public class EmailNotificationServiceTest {
         MimeMessage mimeMessage = mock(MimeMessage.class);
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
-        byte[] dummyPdf = new byte[]{1, 2, 3};
+        byte[] dummyPdf = new byte[] { 1, 2, 3 };
         emailNotificationService.sendInvoiceEmail("test@qa.com", dummyPdf);
 
         verify(javaMailSender, times(1)).send(mimeMessage);

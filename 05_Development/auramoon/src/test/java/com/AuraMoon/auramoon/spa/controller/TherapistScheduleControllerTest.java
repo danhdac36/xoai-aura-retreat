@@ -46,8 +46,25 @@ public class TherapistScheduleControllerTest {
 
         @BeforeEach
         public void setup() {
-                mockMvc = MockMvcBuilders.standaloneSetup(therapistScheduleController).build();
-                session = new MockHttpSession();
+                com.AuraMoon.auramoon.auth.entity.User mockUser = new com.AuraMoon.auramoon.auth.entity.User();
+        mockUser.setId(1);
+        com.AuraMoon.auramoon.auth.entity.Role mockRole = new com.AuraMoon.auramoon.auth.entity.Role();
+        mockRole.setRoleName("ROLE_USER");
+        mockUser.setRole(mockRole);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(therapistScheduleController)
+            .setCustomArgumentResolvers(new org.springframework.web.method.support.HandlerMethodArgumentResolver() {
+                @Override
+                public boolean supportsParameter(org.springframework.core.MethodParameter parameter) {
+                    return parameter.getParameterType().isAssignableFrom(com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse.class);
+                }
+                @Override
+                public Object resolveArgument(org.springframework.core.MethodParameter parameter, org.springframework.web.method.support.ModelAndViewContainer mavContainer, org.springframework.web.context.request.NativeWebRequest webRequest, org.springframework.web.bind.support.WebDataBinderFactory binderFactory) {
+                    return new com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse(mockUser);
+                }
+            })
+            .build();
+        session = new MockHttpSession();
         }
 
         @Test
@@ -74,6 +91,7 @@ public class TherapistScheduleControllerTest {
 
                 when(therapistScheduleService.getDailySchedule(eq(therapistCode), eq(targetDate)))
                                 .thenReturn(schedules);
+                when(therapistRepository.findById(1)).thenReturn(java.util.Optional.of(com.AuraMoon.auramoon.spa.entity.Therapist.builder().therapistCode("TH01").build()));
 
                 // Act & Assert
                 mockMvc.perform(get("/therapist/schedules/daily")
@@ -95,6 +113,7 @@ public class TherapistScheduleControllerTest {
 
                 when(therapistScheduleService.getDailySchedule(eq(therapistCode), eq(targetDate)))
                                 .thenReturn(Collections.emptyList());
+                when(therapistRepository.findById(1)).thenReturn(java.util.Optional.of(com.AuraMoon.auramoon.spa.entity.Therapist.builder().therapistCode("TH02").build()));
 
                 // Act & Assert
                 mockMvc.perform(get("/therapist/schedules/daily")
@@ -128,10 +147,13 @@ public class TherapistScheduleControllerTest {
                 String therapistCode = "TH01";
                 session.setAttribute("therapistCode", therapistCode);
 
-                doNothing().when(therapistScheduleService).updateSessionStatus(eq(scheduleId), eq(therapistCode), eq(status));
+                doNothing().when(therapistScheduleService).updateSessionStatus(eq(scheduleId), eq(therapistCode),
+                                eq(status));
+                when(therapistRepository.findById(1)).thenReturn(java.util.Optional.of(com.AuraMoon.auramoon.spa.entity.Therapist.builder().therapistCode("TH01").build()));
 
                 // Act & Assert
-                mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/therapist/schedules/update-status")
+                mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                                .post("/therapist/schedules/update-status")
                                 .param("scheduleId", scheduleId.toString())
                                 .param("status", status)
                                 .param("date", dateStr)
@@ -150,11 +172,15 @@ public class TherapistScheduleControllerTest {
                 String therapistCode = "TH01";
                 session.setAttribute("therapistCode", therapistCode);
 
-                doThrow(new com.AuraMoon.auramoon.spa.exception.SpaBusinessException("SPA-012", "Trạng thái không hợp lệ"))
-                                .when(therapistScheduleService).updateSessionStatus(eq(scheduleId), eq(therapistCode), eq(status));
+                doThrow(new com.AuraMoon.auramoon.spa.exception.SpaBusinessException("SPA-012",
+                                "Trạng thái không hợp lệ"))
+                                .when(therapistScheduleService)
+                                .updateSessionStatus(eq(scheduleId), eq(therapistCode), eq(status));
+                when(therapistRepository.findById(1)).thenReturn(java.util.Optional.of(com.AuraMoon.auramoon.spa.entity.Therapist.builder().therapistCode("TH01").build()));
 
                 // Act & Assert
-                mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/therapist/schedules/update-status")
+                mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                                .post("/therapist/schedules/update-status")
                                 .param("scheduleId", scheduleId.toString())
                                 .param("status", status)
                                 .param("date", dateStr)

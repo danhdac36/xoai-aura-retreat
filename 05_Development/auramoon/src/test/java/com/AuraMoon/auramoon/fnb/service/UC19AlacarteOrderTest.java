@@ -1,21 +1,21 @@
-package com.AuraMoon.auramoon;
+package com.AuraMoon.auramoon.fnb.service;
 
 import com.AuraMoon.auramoon.billing.entity.FolioItem;
 import com.AuraMoon.auramoon.billing.entity.GuestFolio;
+import com.AuraMoon.auramoon.billing.repository.FolioItemRepository;
+import com.AuraMoon.auramoon.billing.repository.GuestFolioRepository;
 import com.AuraMoon.auramoon.booking.entity.Booking;
-import com.AuraMoon.auramoon.fnb.dto.*;
+import com.AuraMoon.auramoon.booking.repository.BookingRepository;
+import com.AuraMoon.auramoon.fnb.dto.MealOrderRequest;
+import com.AuraMoon.auramoon.fnb.dto.MealOrderResponse;
+import com.AuraMoon.auramoon.fnb.dto.OrderItemDto;
 import com.AuraMoon.auramoon.fnb.entity.DietaryProfile;
 import com.AuraMoon.auramoon.fnb.entity.MealOrder;
 import com.AuraMoon.auramoon.fnb.entity.MenuItem;
-import com.AuraMoon.auramoon.booking.repository.BookingRepository;
-import com.AuraMoon.auramoon.billing.repository.GuestFolioRepository;
-import com.AuraMoon.auramoon.billing.repository.FolioItemRepository;
-import com.AuraMoon.auramoon.fnb.repository.MenuItemRepository;
-import com.AuraMoon.auramoon.fnb.repository.MealOrderRepository;
-import com.AuraMoon.auramoon.fnb.repository.MealOrderItemRepository;
 import com.AuraMoon.auramoon.fnb.repository.DietaryProfileRepository;
-import com.AuraMoon.auramoon.fnb.service.FnbException;
-import com.AuraMoon.auramoon.fnb.service.MealOrderServiceImpl;
+import com.AuraMoon.auramoon.fnb.repository.MealOrderItemRepository;
+import com.AuraMoon.auramoon.fnb.repository.MealOrderRepository;
+import com.AuraMoon.auramoon.fnb.repository.MenuItemRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,16 +24,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class FnbModule4ServiceTest {
+public class UC19AlacarteOrderTest {
 
     @Mock
     private MenuItemRepository menuItemRepository;
@@ -60,82 +61,7 @@ public class FnbModule4ServiceTest {
     private MealOrderServiceImpl mealOrderService;
 
     @Test
-    @DisplayName("UC16 - Lấy thực đơn đã lọc dị ứng thành công cho khách")
-    public void getFilteredMenu_guestHasDietaryProfile_returnsFilteredSafeMenu() {
-        // Arrange
-        Integer guestId = 1;
-        Integer bookingId = 100;
-
-        Booking booking = Booking.builder()
-                .guestId(guestId)
-                .bookingStatus("Checked-In")
-                .build();
-        booking.setId(bookingId);
-
-        DietaryProfile profile = DietaryProfile.builder()
-                .userId(guestId)
-                .foodAllergies("Peanuts")
-                .build();
-
-        MenuItem item1 = MenuItem.builder()
-                .itemName("Món xào tỏi")
-                .price(BigDecimal.valueOf(50000))
-                .ingredient("tỏi, rau xanh, dầu ăn")
-                .isAvailable(true)
-                .build();
-        item1.setId(1);
-
-        MenuItem item2 = MenuItem.builder()
-                .itemName("Gỏi khô bò")
-                .price(BigDecimal.valueOf(60000))
-                .ingredient("bò khô, rau thơm, đậu phộng, đu đủ")
-                .isAvailable(true)
-                .build();
-        item2.setId(2);
-
-        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
-        when(dietaryProfileRepository.findByUserId(guestId)).thenReturn(Optional.of(profile));
-        when(menuItemRepository.findByIsAvailableTrue()).thenReturn(List.of(item1, item2));
-
-        // Act
-        List<MenuItemResponse> result = mealOrderService.getFilteredMenu(guestId, bookingId);
-
-        // Assert
-        assertEquals(1, result.size());
-        assertEquals(1, result.get(0).getId());
-        assertEquals("Món xào tỏi", result.get(0).getItemName());
-        verify(bookingRepository, times(1)).findById(bookingId);
-        verify(dietaryProfileRepository, times(1)).findByUserId(guestId);
-        verify(menuItemRepository, times(1)).findByIsAvailableTrue();
-    }
-
-    @Test
-    @DisplayName("UC16 - Lấy thực đơn với Booking ID không hợp lệ ném ra ngoại lệ")
-    public void getFilteredMenu_invalidBookingId_throwsValidationException() {
-        // Act & Assert
-        FnbException exception = assertThrows(FnbException.class, () -> {
-            mealOrderService.getFilteredMenu(1, -5);
-        });
-        assertEquals("FNB-002", exception.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("UC16 - Lấy thực đơn khi không tìm thấy Booking ID ném lỗi 404")
-    public void getFilteredMenu_bookingNotFound_throwsResourceNotFoundException() {
-        // Arrange
-        Integer guestId = 1;
-        Integer bookingId = 99999;
-        when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        FnbException exception = assertThrows(FnbException.class, () -> {
-            mealOrderService.getFilteredMenu(guestId, bookingId);
-        });
-        assertEquals("FNB-003", exception.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("UC19 - Khách hàng đặt món a-la-carte thành công và ghi nợ vào Guest Folio")
+    @DisplayName("FNB-TC-008 - Gọi món A-la-carte và ghi nợ thành công")
     public void createAlacarteOrder_validAcarteSelection_savesOrderAndChargesFolio() {
         // Arrange
         Integer guestId = 1;
@@ -184,6 +110,7 @@ public class FnbModule4ServiceTest {
                 .guestId(guestId)
                 .placeOrder("VILLA_V101")
                 .note("Ít đá")
+                .isExtraCharge(true)
                 .items(List.of(OrderItemDto.builder().menuItemId(1).quantity(2).build())) // Total: 30000
                 .build();
 
@@ -206,12 +133,13 @@ public class FnbModule4ServiceTest {
     }
 
     @Test
-    @DisplayName("UC19 - Khách hàng đặt món với số lượng không hợp lệ ném ra ngoại lệ")
+    @DisplayName("FNB-TC-009 - Gọi món với số lượng không hợp lệ")
     public void createAlacarteOrder_invalidQuantity_throwsValidationException() {
         // Arrange
         MealOrderRequest request = MealOrderRequest.builder()
                 .bookingId(100)
                 .guestId(1)
+                .isExtraCharge(true)
                 .items(List.of(OrderItemDto.builder().menuItemId(1).quantity(-5).build()))
                 .build();
 
@@ -223,7 +151,7 @@ public class FnbModule4ServiceTest {
     }
 
     @Test
-    @DisplayName("UC19 - Khách hàng đặt món ăn không tồn tại ném lỗi 404")
+    @DisplayName("FNB-TC-010 - Khách hàng gọi món không tồn tại")
     public void createAlacarteOrder_menuItemNotFound_throwsNotFoundException() {
         // Arrange
         Integer guestId = 1;
@@ -241,6 +169,7 @@ public class FnbModule4ServiceTest {
         MealOrderRequest request = MealOrderRequest.builder()
                 .bookingId(bookingId)
                 .guestId(guestId)
+                .isExtraCharge(true)
                 .items(List.of(OrderItemDto.builder().menuItemId(999).quantity(1).build()))
                 .build();
 
@@ -252,7 +181,7 @@ public class FnbModule4ServiceTest {
     }
 
     @Test
-    @DisplayName("UC19 - Khách đặt món có chứa nguyên liệu dị ứng ném lỗi FNB-001")
+    @DisplayName("FNB-TC-011 - Khách gọi món chứa nguyên liệu cấm kỵ (Dị ứng)")
     public void createAlacarteOrder_allergenConflict_throwsAllergenConflictException() {
         // Arrange
         Integer guestId = 1;
@@ -284,6 +213,7 @@ public class FnbModule4ServiceTest {
         MealOrderRequest request = MealOrderRequest.builder()
                 .bookingId(bookingId)
                 .guestId(guestId)
+                .isExtraCharge(true)
                 .items(List.of(OrderItemDto.builder().menuItemId(10).quantity(1).build()))
                 .build();
 
@@ -297,64 +227,5 @@ public class FnbModule4ServiceTest {
         assertEquals("menuItemId", exception.getDetails().get(0).getField());
         assertEquals(10, exception.getDetails().get(0).getRejectedValue());
         assertEquals("Peanuts", exception.getDetails().get(0).getAllergenMatched());
-    }
-
-    @Test
-    @DisplayName("UC18 - Đầu bếp cập nhật trạng thái đơn món ăn thành công")
-    public void updatePrepStatus_validOrderAndChefRole_updatesStatusAndSaves() {
-        // Arrange
-        Integer orderId = 55;
-        MealOrder order = MealOrder.builder()
-                .bookingId(100)
-                .folioId(200)
-                .guestId(1)
-                .orderStatus("PENDING")
-                .build();
-        order.setId(orderId);
-
-        when(mealOrderRepository.findById(orderId)).thenReturn(Optional.of(order));
-
-        // Act
-        mealOrderService.updatePrepStatus(orderId, "PREPARING");
-
-        // Assert
-        assertEquals("PREPARING", order.getOrderStatus());
-        verify(mealOrderRepository, times(1)).save(order);
-    }
-
-    @Test
-    @DisplayName("UC18 - Cập nhật trạng thái lùi hoặc sai quy trình ném lỗi FNB-001")
-    public void updatePrepStatus_invalidStatusTransition_throwsValidationException() {
-        // Arrange
-        Integer orderId = 55;
-        MealOrder order = MealOrder.builder()
-                .bookingId(100)
-                .folioId(200)
-                .guestId(1)
-                .orderStatus("READY")
-                .build();
-        order.setId(orderId);
-
-        when(mealOrderRepository.findById(orderId)).thenReturn(Optional.of(order));
-
-        // Act & Assert
-        FnbException exception = assertThrows(FnbException.class, () -> {
-            mealOrderService.updatePrepStatus(orderId, "PENDING"); // READY -> PENDING is invalid
-        });
-        assertEquals("FNB-001", exception.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("UC18 - Cập nhật trạng thái đơn không tồn tại ném lỗi FNB-003")
-    public void updatePrepStatus_orderIdNotFound_throwsNotFoundException() {
-        // Arrange
-        Integer orderId = 9999;
-        when(mealOrderRepository.findById(orderId)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        FnbException exception = assertThrows(FnbException.class, () -> {
-            mealOrderService.updatePrepStatus(orderId, "PREPARING");
-        });
-        assertEquals("FNB-003", exception.getErrorCode());
     }
 }

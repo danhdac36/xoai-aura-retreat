@@ -68,8 +68,9 @@
                             <td class="py-4 px-6 text-gray-600" th:text="${b.guestId}">Guest 1</td>
                             <td class="py-4 px-6 text-gray-900 font-medium" th:text="${b.packageName}">Mindfulness</td>
                             <td class="py-4 px-6 text-gray-600">
-                                <span th:text="${b.checkinDate}">2026-06-11</span> đến <span
-                                    th:text="${b.checkoutDate}">2026-06-14</span>
+                                <span th:text="${#temporals.format(b.checkinDate, 'HH:mm dd/MM/yyyy')}">2026-06-11</span> đến 
+                                <span th:if="${b.checkoutDate != null}" th:text="${#temporals.format(b.checkoutDate, 'HH:mm dd/MM/yyyy')}">2026-06-14</span>
+                                <span th:if="${b.checkoutDate == null}">Chưa xác định</span>
                             </td>
                             <td class="py-4 px-6 text-gray-600 font-semibold">
                                 <span th:if="${b.assignedVillaCode != null}" th:text="${b.assignedVillaCode}"
@@ -99,7 +100,7 @@
                             </td>
                             <td class="py-4 px-6 text-center">
                                 <button
-                                    th:if="${b.bookingStatus == 'CONFIRMED' and not b.checkinDate.isAfter(T(java.time.LocalDate).now())}"
+                                    th:if="${b.bookingStatus == 'CONFIRMED' and not b.checkinDate.toLocalDate().isAfter(T(java.time.LocalDate).now())}"
                                     th:data-booking-id="${b.id}" th:data-guest-name="${b.guestName}"
                                     th:data-guest-phone="${b.guestPhone}" th:data-guest-gender="${b.guestGender}"
                                     th:data-guest-dob="${b.guestDateOfBirth}" onclick="openCheckInModal(this)"
@@ -107,7 +108,7 @@
                                     <span class="material-symbols-outlined text-sm">key</span> Check-In
                                 </button>
                                 <span
-                                    th:if="${b.bookingStatus == 'CONFIRMED' and b.checkinDate.isAfter(T(java.time.LocalDate).now())}"
+                                    th:if="${b.bookingStatus == 'CONFIRMED' and b.checkinDate.toLocalDate().isAfter(T(java.time.LocalDate).now())}"
                                     class="text-gray-400 text-xs italic font-medium">
                                     Chưa đến ngày
                                 </span>

@@ -7,13 +7,13 @@
 | **Document ID**    | `AURAMOON-BOOKING-EDS-UC07`                                  |
 | **Version**        | 1.0                                                            |
 | **Date**           | 2026-06-19                                                     |
-| **Status**         | Approved                                                       |
+| **Status**         | In Review                                                      |
 | **Document Owner** | Lê Trà My — Module 2 Lead                                  |
-| **Author**         | Lê Trà My — Full-stack Developer                           |
+| **Author**         | Phùng Giang Hải                                            |
 | **Reviewed by**    | Phùng Giang Hải                                              |
 | **DPO Sign-off**   | `[x] Approved — 2026-06-19` (xử lý PII cơ bản: guestId) |
 | **Approved by**    | Phùng Giang Hải — Tech Lead                               |
-| **Last Review**    | 2026-06-20                                                  |
+| **Last Review**    | 2026-06-23                                                  |
 | **Based on EDS**   | v2.0                                                           |
 
 # CHANGELOG
@@ -21,6 +21,9 @@
 | Ngày      | Người thực hiện | Nội dung thay đổi                                          |
 | ---------- | ------------------- | ------------------------------------------------------------- |
 | 2026-06-19 | Student 2           | Tạo tài liệu lần đầu — UC07 Book Package & Pay Deposit |
+| 2026-06-23 | Phùng Giang Hải     | Cập nhật logic sinh N vé Spa theo durationDays (N-1) |
+| 2026-06-23 | Phùng Giang Hải     | Thêm BR-24: Chặn Guest đặt nhiều gói (Max 1 Active Booking) |
+| 2026-06-23 | Phùng Giang Hải     | Cập nhật BR-15 để checkoutDate là null cho đến khi Check-in |
 
 ---
 
@@ -49,7 +52,18 @@
 | **UC07**  | User Story    | Guest chọn gói, ngày, villaType và thanh toán deposit                 | `BookingController.POST /booking/create` → `BookingServiceImpl.createBooking()` | VNPay Sandbox           | ADR-001        |
 | **BR-01** | Business Rule | Booking chỉ CONFIRMED sau khi deposit payment thành công                | `BookingServiceImpl.confirmPayment()`                                              | VNPay callback          | ADR-001        |
 | **BR-02** | Business Rule | Guest chỉ chọn VillaType; Receptionist gán villa cụ thể lúc check-in | `BookingRequestDTO.villaTypeId` (không có `villaId`)                           | Hotel PMS Best Practice | —             |
+| **BR-03** | Business Rule | Hệ thống tự động tạo N bản ghi `TreatmentBooking` (N = durationDays của Gói Retreat) với trạng thái `PENDING` khi thanh toán cọc thành công | `BookingServiceImpl.confirmPayment()`                                              | Spa Integration         | —             |
+| **BR-14** | Business Rule | Gán User (Guest) vào Booking | `booking.setGuestId(userId)` | System Design | — |
+| **BR-15** | Business Rule | `checkoutDate` tạm tính khi check logic nhưng lưu là NULL lúc Booking | `checkoutDate` chỉ được xác định lại thực tế lúc Check-in. | System Design | — |
+| **BR-16** | Notification | Khách hàng phải nhận được email xác nhận | (Out of scope M2, trigger qua MQ/Event) | UX/Communication | — |
 | **BR-15** | Business Rule | Audit log bắt buộc cho mọi hành động tạo booking                    | `AuditService.log(BOOKING_CREATED, bookingId)`                                     | Nghị định 356/2025   | —             |
+
+## 2.1.2 Business Rules liên quan đến UC07
+
+| ID | Tên Business Rule | Mô tả |
+| :--- | :--- | :--- |
+| **BR-02** | Chọn loại biệt thự | Khách hàng chỉ chọn `VillaType` trực tuyến. Số phòng vật lý cụ thể chỉ được gán tại quầy lễ tân khi Check-in. |
+| **BR-24** | Giới hạn số lượng Booking Active | Mỗi khách hàng (Guest) tại một thời điểm chỉ được phép có TỐI ĐA 1 Booking ở trạng thái `PENDING`, `CONFIRMED` hoặc `CHECKED_IN`. Khách phải hoàn thành hoặc hủy Booking hiện tại trước khi được đặt gói mới. |
 
 ---
 
@@ -354,6 +368,11 @@ FolioRepo --> Svc: GuestFolio
 
 note over Svc: GuestFolio đã OPEN từ createBooking()\nchỉ cần verify, không tạo lại
 
+Svc -> Svc: get active TreatmentService\nloop durationDays times
+Svc -> DB: save TreatmentBooking{status=PENDING}
+DB --> Svc: TreatmentBooking
+end
+
 Svc --> CB: void (success)
 deactivate Svc
 @enduml
@@ -540,7 +559,7 @@ Location: /billing/deposit/pay?bookingId=1001
 **Response — 302 Redirect (Error — Villa Not Available):**
 
 ```
-Location: /packages/1?error=Lo%E1%BA%A1i+bi%E1%BB%87t+th%E1%BB%B1+%C4%91%C3%A3+ch%E1%BB%8Dn+kh%C3%B4ng+c%C3%B2n+ph%C3%B2ng+tr%E1%BB%91ng
+Location: /packages/1?error=Lo%E1%BA%A1i+bi%E1%BB%87t+th%E1%BB%B1+%C4%91%C3%A3+ch%E1%BB%8Dn+kh%E1%B4%B4ng+c%C3%B2n+ph%C3%B2ng+tr%E1%BB%91ng
 ```
 
 ### POST `/billing/deposit/confirm` — VNPay Callback
@@ -667,6 +686,24 @@ public void confirmPayment(Integer bookingId, String transactionCode) {
     guestFolioRepository.findByBookingId(bookingId)
         .orElseThrow(() -> new RuntimeException("GuestFolio not found"));
     // status vẫn OPEN — không thay đổi
+
+    // Auto create TreatmentBooking (Spa Ticket)
+    int durationDays = booking.getRetreatPackage().getDurationDays() != null 
+            ? booking.getRetreatPackage().getDurationDays() : 1;
+            
+    treatmentServiceRepository.findAll().stream()
+        .filter(s -> Boolean.TRUE.equals(s.getIsAvailable()) && Boolean.FALSE.equals(s.getIsDelete()))
+        .findFirst()
+        .ifPresent(service -> {
+            for (int i = 0; i < durationDays; i++) {
+                TreatmentBooking tb = new TreatmentBooking();
+                tb.setBookingId(bookingId);
+                tb.setTreatmentService(service);
+                tb.setStatus("PENDING");
+                tb.setIsDelete(false);
+                treatmentBookingRepository.save(tb);
+            }
+        });
 }
 ```
 

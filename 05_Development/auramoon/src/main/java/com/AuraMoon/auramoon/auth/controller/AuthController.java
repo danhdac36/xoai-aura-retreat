@@ -1,6 +1,6 @@
 package com.AuraMoon.auramoon.auth.controller;
 
-import com.AuraMoon.auramoon.auth.dto.UserRegistrationDto;
+import com.AuraMoon.auramoon.auth.dto.request.UserRegistrationDto;
 import com.AuraMoon.auramoon.auth.service.IAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,8 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.logging.Logger;
 
 @Controller
 @RequestMapping("/auth")

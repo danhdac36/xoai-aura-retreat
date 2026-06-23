@@ -32,6 +32,17 @@ public class BookingController {
         model.addAttribute("pkg", retreatPackage);
         model.addAttribute("villaTypes", villaTypeRepository.findAll());
         model.addAttribute("bookingRequest", new BookingRequestDTO());
+
+        // Check if the current user has an active booking
+        boolean hasActiveBooking = false;
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse) {
+            com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse userDetails = (com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse) auth.getPrincipal();
+            if (userDetails != null) {
+                hasActiveBooking = bookingService.hasActiveBooking(userDetails.getId());
+            }
+        }
+        model.addAttribute("hasActiveBooking", hasActiveBooking);
         return "booking/create-form";
     }
 

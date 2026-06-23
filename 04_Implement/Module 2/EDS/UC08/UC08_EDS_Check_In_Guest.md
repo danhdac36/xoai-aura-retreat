@@ -6,13 +6,13 @@
 | **Document ID** | `AURAMOON-BOOKING-EDS-UC08` |
 | **Version** | 1.0 |
 | **Date** | 2026-06-19 |
-| **Status** | Approved |
+| **Status** | In Review |
 | **Document Owner** | Student 2 — Module 2 Lead |
-| **Author** | Student 2 — Full-stack Developer |
+| **Author** | Phùng Giang Hải |
 | **Reviewed by** | Tech Lead |
 | **DPO Sign-off** | `[x] Approved — 2026-06-19` **(Bắt buộc — xử lý Sensitive-PII: CCCD/Passport)** |
 | **Approved by**  | Phùng Giang Hải — Tech Lead |
-| **Last Review**  | 2026-06-20 |
+| **Last Review**  | 2026-06-23 |
 | **Based on EDS** | v2.0 |
 
 # CHANGELOG
@@ -20,6 +20,7 @@
 | Ngày | Người thực hiện | Nội dung thay đổi |
 | --- | --- | --- |
 | 2026-06-19 | Student 2 | Tạo tài liệu lần đầu — UC08 Check In Guest |
+| 2026-06-23 | Phùng Giang Hải | Cập nhật logic tính checkout_date theo Chu kỳ 24h từ giờ Check-in |
 
 ---
 
@@ -48,6 +49,7 @@
 | **UC08** | User Story | Receptionist check-in, gán villa, thu thập CCCD | `CheckInServiceImpl.performCheckIn()` | Luật Cư trú 2020 | ADR-001 |
 | **BR-02** | Business Rule | Villa cụ thể được gán lúc check-in (không phải khi đặt) | `booking.setAssignedVilla(villa)` tại check-in | Hotel PMS Practice | — |
 | **BR-03** | Business Rule | Villa MAINTENANCE/OCCUPIED không được gán cho khách | `Villa.villaStatus` validation | Hotel Operations | — |
+| **BR-04** | Business Rule | Chu kỳ lưu trú 24h (24-hour cycle) | Hệ thống tự động lấy `LocalDateTime.now()` gán vào `checkinDate` và tính `checkoutDate = checkinDate + durationDays` | Hotel Operations | — |
 | **BR-07** | Business Rule | Receptionist KHÔNG được xem health records của khách | RBAC — Controller level security | Nghị định 356/2025 | — |
 | **BR-09** | Business Rule | Mã hóa AES-256 CCCD/Passport trước khi lưu DB | `EncryptionService.encrypt(identifyCode)` | Nghị định 356/2025, Điều 4 | ADR-001 |
 | **BR-14** | Business Rule | Thu thập CCCD để khai báo tạm trú | `CheckInRequestDTO.identifyCode`, `user.identifyCode` | Luật Cư trú 2020, Điều 32 | ADR-001 |

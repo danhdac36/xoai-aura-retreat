@@ -14,6 +14,9 @@ import com.AuraMoon.auramoon.spa.repository.TreatmentBookingRepository;
 import com.AuraMoon.auramoon.spa.repository.TreatmentRoomRepository;
 import com.AuraMoon.auramoon.spa.repository.TreatmentServiceRepository;
 import com.AuraMoon.auramoon.spa.service.impl.SpaScheduleServiceImpl;
+import com.AuraMoon.auramoon.booking.repository.BookingRepository;
+import com.AuraMoon.auramoon.booking.entity.Booking;
+import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +46,8 @@ class SpaScheduleServiceImplTest {
     private TreatmentBookingRepository treatmentBookingRepository;
     @Mock
     private TreatmentServiceRepository treatmentServiceRepository;
+    @Mock
+    private BookingRepository bookingRepository;
 
     @InjectMocks
     private SpaScheduleServiceImpl spaScheduleService;
@@ -63,6 +68,11 @@ class SpaScheduleServiceImplTest {
         TreatmentService service = new TreatmentService();
         service.setDurationMinutes(60);
         when(treatmentServiceRepository.findById(10)).thenReturn(Optional.of(service));
+
+        Booking guestBooking = new Booking();
+        guestBooking.setCheckinDate(LocalDateTime.of(2024, 6, 19, 14, 0));
+        guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
+        when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
 
         TreatmentRoom room = new TreatmentRoom();
         room.setId(5);
@@ -102,11 +112,17 @@ class SpaScheduleServiceImplTest {
         request.setServiceId(10);
         request.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
 
-        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10)).thenReturn(List.of(new TreatmentBooking()));
-        
+        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10))
+                .thenReturn(List.of(new TreatmentBooking()));
+
         TreatmentService service = new TreatmentService();
         service.setDurationMinutes(60);
         when(treatmentServiceRepository.findById(10)).thenReturn(Optional.of(service));
+
+        Booking guestBooking = new Booking();
+        guestBooking.setCheckinDate(LocalDateTime.of(2024, 6, 19, 14, 0));
+        guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
+        when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
 
         when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(Collections.emptyList());
 
@@ -129,11 +145,17 @@ class SpaScheduleServiceImplTest {
         request.setServiceId(10);
         request.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
 
-        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10)).thenReturn(List.of(new TreatmentBooking()));
-        
+        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10))
+                .thenReturn(List.of(new TreatmentBooking()));
+
         TreatmentService service = new TreatmentService();
         service.setDurationMinutes(60);
         when(treatmentServiceRepository.findById(10)).thenReturn(Optional.of(service));
+
+        Booking guestBooking = new Booking();
+        guestBooking.setCheckinDate(LocalDateTime.of(2024, 6, 19, 14, 0));
+        guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
+        when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
 
         when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(new TreatmentRoom()));
         when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(Collections.emptyList());
@@ -157,7 +179,8 @@ class SpaScheduleServiceImplTest {
         request.setServiceId(10);
         request.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
 
-        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10)).thenReturn(Collections.emptyList());
+        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10))
+                .thenReturn(Collections.emptyList());
 
         // Act & Assert
         SpaBusinessException exception = assertThrows(SpaBusinessException.class, () -> {

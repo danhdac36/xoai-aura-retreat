@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Performance Report - Luxe Wellness</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline-variant": "#c3c8c1",
+            "on-tertiary": "#ffffff",
+            "tertiary-fixed-dim": "#bfc9c1",
+            "surface-bright": "#f4fafd",
+            "surface-container": "#e9eff2",
+            "on-secondary-container": "#536858",
+            "tertiary": "#3a443e",
+            "on-primary": "#ffffff",
+            "inverse-surface": "#2b3134",
+            "primary-container": "#4a5d4e",
+            "on-background": "#161d1f",
+            "primary-fixed-dim": "#b7ccb9",
+            "on-secondary-fixed-variant": "#374b3d",
+            "on-secondary-fixed": "#0c1f13",
+            "surface-variant": "#dde3e6",
+            "surface-dim": "#d5dbde",
+            "secondary-container": "#cee6d2",
+            "on-surface": "#161d1f",
+            "error-container": "#ffdad6",
+            "on-surface-variant": "#434843",
+            "error": "#ba1a1a",
+            "surface-container-high": "#e3e9ec",
+            "on-secondary": "#ffffff",
+            "inverse-primary": "#b7ccb9",
+            "tertiary-container": "#515b55",
+            "on-tertiary-fixed": "#151d19",
+            "on-error": "#ffffff",
+            "secondary": "#4f6354",
+            "primary-fixed": "#d3e8d5",
+            "secondary-fixed": "#d1e8d4",
+            "surface-container-highest": "#dde3e6",
+            "on-primary-fixed-variant": "#394b3d",
+            "background": "#f4fafd",
+            "tertiary-fixed": "#dbe5dd",
+            "surface-tint": "#506354",
+            "on-tertiary-container": "#c8d2ca",
+            "outline": "#737872",
+            "surface": "#f4fafd",
+            "on-primary-fixed": "#0e1f13",
+            "surface-container-lowest": "#ffffff",
+            "on-error-container": "#93000a",
+            "secondary-fixed-dim": "#b6ccb9",
+            "primary": "#334537",
+            "surface-container-low": "#eef5f7",
+            "on-tertiary-fixed-variant": "#404943",
+            "on-primary-container": "#c0d5c2",
+            "inverse-on-surface": "#ecf2f5"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "data-row-height": "40px",
+            "gutter": "16px",
+            "unit": "4px",
+            "container-padding": "32px",
+            "cell-padding-x": "12px"
+          },
+          "fontFamily": {
+            "data-mono": ["JetBrains Mono"],
+            "headline-md": ["Hanken Grotesk"],
+            "body-sm": ["Hanken Grotesk"],
+            "body-md": ["Hanken Grotesk"],
+            "display-lg": ["Hanken Grotesk"],
+            "label-caps": ["Hanken Grotesk"]
+          },
+          "fontSize": {
+            "data-mono": ["13px", {"lineHeight": "16px", "fontWeight": "500"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    body {
+      background-color: #f4fafd;
+      font-family: 'Hanken Grotesk', sans-serif;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .custom-shadow {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body class="text-on-surface">
+<!-- SideNavBar Anchor -->
+<aside class="fixed h-full left-0 w-64 bg-surface border-r border-outline-variant flex flex-col py-spacing-container-padding z-30">
+<div class="px-6 mb-10">
+<h1 class="font-headline-md text-headline-md text-primary font-extrabold tracking-tight">Luxe Wellness</h1>
+<p class="text-on-surface-variant font-body-sm opacity-70">Management Portal</p>
+</div>
+<nav class="flex-grow">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer group" href="#">
+<span class="material-symbols-outlined mr-3 group-hover:text-primary">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-6 py-3 text-primary font-bold border-r-2 border-primary bg-surface-container-low cursor-pointer" href="#">
+<span class="material-symbols-outlined mr-3">assessment</span>
+<span class="font-body-md">Reports</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer group" href="#">
+<span class="material-symbols-outlined mr-3 group-hover:text-primary">domain</span>
+<span class="font-body-md">Villa Management</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer group" href="#">
+<span class="material-symbols-outlined mr-3 group-hover:text-primary">group_work</span>
+<span class="font-body-md">Staff Performance</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-6">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+</li>
+<li>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer" href="#">
+<span class="material-symbols-outlined mr-3">help</span>
+<span class="font-body-md">Support</span>
+</a>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Main Wrapper -->
+<div class="ml-64 min-h-screen flex flex-col">
+<!-- TopAppBar Anchor -->
+<header class="sticky top-0 w-full bg-surface-container-lowest border-b border-outline-variant z-20 flex justify-between items-center px-gutter h-data-row-height">
+<div class="flex items-center flex-1">
+<div class="relative w-64 mr-8">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-body-md">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-1 text-body-sm focus:ring-1 focus:ring-primary" placeholder="Search reports..." type="text"/>
+</div>
+<nav class="hidden md:flex gap-6">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-opacity duration-150" href="#">Overview</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-opacity duration-150" href="#">Calendar</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-opacity duration-150" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+<div class="flex items-center gap-3 ml-2 border-l border-outline-variant pl-4 h-6">
+<span class="font-body-sm font-medium">Alex Rivera</span>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container text-xs font-bold border border-outline">
+            AR
+          </div>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<main class="flex-grow p-container-padding max-w-7xl mx-auto w-full">
+<!-- Filter Bar Section -->
+<section class="flex flex-wrap items-center justify-between mb-8 gap-4">
+<div class="flex items-center gap-3">
+<div class="flex flex-col">
+<span class="text-label-caps font-label-caps text-on-surface-variant mb-1 uppercase opacity-60">Month</span>
+<div class="relative">
+<select class="appearance-none bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 pr-10 text-body-sm focus:border-primary focus:ring-0 cursor-pointer min-w-[140px]">
+<option>June</option>
+<option>May</option>
+<option>April</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-label-caps font-label-caps text-on-surface-variant mb-1 uppercase opacity-60">Year</span>
+<div class="relative">
+<select class="appearance-none bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 pr-10 text-body-sm focus:border-primary focus:ring-0 cursor-pointer min-w-[100px]">
+<option>2024</option>
+<option>2023</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+</div>
+<button class="bg-primary hover:bg-primary-container text-on-primary px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-sm active:scale-95 font-body-md font-semibold">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">table_chart</span>
+          Export to Excel
+        </button>
+</section>
+<!-- Grid for Data Tables -->
+<div class="grid grid-cols-1 gap-8">
+<!-- Room Occupancy Table -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden custom-shadow">
+<div class="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-white">
+<h2 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">bed</span>
+              Room Occupancy
+            </h2>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-label-caps font-label-caps">Monthly Target: 85%</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-6 py-3 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Villa Name</th>
+<th class="px-6 py-3 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider text-right">Total Nights</th>
+<th class="px-6 py-3 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider text-right">Occupied Nights</th>
+<th class="px-6 py-3 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider text-right">Occupancy Rate %</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit font-body-md">V-101 (Seaside)</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">30</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">28</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 93.3%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">93.3%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit font-body-md">V-102 (Garden)</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">30</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">24</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 80%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">80.0%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit font-body-md">Forest Suite 01</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">30</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">30</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 100%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">100.0%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit font-body-md">Forest Suite 02</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">30</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">18</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 60%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">60.0%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit font-body-md">Summit Lodge</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">30</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">22</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 73.3%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">73.3%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit font-body-md">Creek Cabin</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">30</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">26</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 86.7%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">86.7%</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Therapist Utilization Table -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden custom-shadow">
+<div class="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-white">
+<h2 class="font-headline-md text-headline-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">spa</span>
+              Therapist Utilization
+            </h2>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed rounded-full text-label-caps font-label-caps">Resource Optimization Active</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-6 py-3 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Therapist Name</th>
+<th class="px-6 py-3 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider text-right">Total Hours</th>
+<th class="px-6 py-3 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider text-right">Booked Hours</th>
+<th class="px-6 py-3 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider text-right">Utilization Rate %</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-xs uppercase">sm</div>
+<span class="font-body-md">Sarah Miller</span>
+</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">160</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">148</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 92.5%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">92.5%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-bold text-xs uppercase">ja</div>
+<span class="font-body-md">Julian Aris</span>
+</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">160</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">120</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 75%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">75.0%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-bold text-xs uppercase">ec</div>
+<span class="font-body-md">Elena Chen</span>
+</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">140</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">135</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 96.4%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">96.4%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold text-xs uppercase">mj</div>
+<span class="font-body-md">Marcus Jordan</span>
+</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">160</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">110</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 68.7%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">68.7%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-bold text-xs uppercase">lv</div>
+<span class="font-body-md">Lara Vance</span>
+</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">120</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">98</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 81.6%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">81.6%</span>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-6 py-spacing-unit flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-bold text-xs uppercase">dk</div>
+<span class="font-body-md">David Kim</span>
+</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">160</td>
+<td class="px-6 py-spacing-unit font-data-mono text-data-mono text-right">155</td>
+<td class="px-6 py-spacing-unit text-right">
+<div class="flex items-center justify-end gap-3">
+<div class="w-24 bg-surface-container rounded-full h-1.5 hidden md:block">
+<div class="bg-primary h-1.5 rounded-full" style="width: 96.8%"></div>
+</div>
+<span class="font-data-mono text-data-mono font-bold text-primary">96.8%</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Quick Stats / Insights Overlay -->
+<section class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container border border-outline-variant p-6 rounded-xl flex items-center gap-4">
+<div class="p-3 bg-primary rounded-lg text-on-primary">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant opacity-70">Average Occupancy</p>
+<p class="text-headline-md font-headline-md text-primary">82.4%</p>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant p-6 rounded-xl flex items-center gap-4">
+<div class="p-3 bg-primary-container rounded-lg text-on-primary-container">
+<span class="material-symbols-outlined">groups</span>
+</div>
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant opacity-70">Staff Efficiency</p>
+<p class="text-headline-md font-headline-md text-primary">85.5%</p>
+</div>
+</div>
+<div class="bg-surface-container border border-outline-variant p-6 rounded-xl flex items-center gap-4">
+<div class="p-3 bg-secondary rounded-lg text-on-secondary">
+<span class="material-symbols-outlined">star</span>
+</div>
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant opacity-70">Top Performer</p>
+<p class="text-headline-md font-headline-md text-primary">Forest Suite</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Meta -->
+<footer class="p-gutter text-center border-t border-outline-variant bg-surface-container-low mt-auto">
+<p class="text-label-caps font-label-caps text-on-surface-variant opacity-50">Luxe Wellness Portal v2.4.1 — Report Generated: June 24, 2024</p>
+</footer>
+</div>
+<script>
+    // Micro-interactions
+    document.querySelectorAll('tr').forEach(row => {
+      row.addEventListener('click', () => {
+        row.classList.add('bg-surface-container-highest');
+        setTimeout(() => row.classList.remove('bg-surface-container-highest'), 300);
+      });
+    });
+
+    // Simple ripple effect for buttons
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        let x = e.clientX - e.target.offsetLeft;
+        let y = e.clientY - e.target.offsetTop;
+        let ripple = document.createElement('span');
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.classList.add('ripple');
+        // this.appendChild(ripple); // Requires relative positioning and overflow-hidden
+      });
+    });
+  </script>
+</body></html>

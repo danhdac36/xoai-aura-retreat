@@ -19,7 +19,7 @@ public class RevenueDashboardDTO {
         private String label;
         private Double revenue;
         private Double percentage;
-        
+
         public TrendItem(String label, Double revenue, Double percentage) {
             this.label = label;
             this.revenue = revenue;

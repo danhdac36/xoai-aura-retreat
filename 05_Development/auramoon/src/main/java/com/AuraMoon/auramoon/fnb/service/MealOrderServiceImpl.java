@@ -18,8 +18,11 @@ import com.AuraMoon.auramoon.billing.repository.FolioItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +52,9 @@ public class MealOrderServiceImpl implements IMealOrderService {
 
     @Autowired
     private FolioItemRepository folioItemRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     @Transactional(readOnly = true)
@@ -123,7 +129,7 @@ public class MealOrderServiceImpl implements IMealOrderService {
                 .orElseThrow(() -> new FnbException("FNB-002", "Booking not found with ID: " + request.getBookingId()));
 
         String bStatus = booking.getBookingStatus();
-        if (bStatus == null || (!bStatus.equalsIgnoreCase("Checked-In") && !bStatus.equalsIgnoreCase("Checked-in")
+        if (bStatus == null || (!bStatus.equalsIgnoreCase(com.AuraMoon.auramoon.common.enums.BookingStatus.CHECKED_IN.name()) && !bStatus.equalsIgnoreCase("Checked-in")
                 && !bStatus.equalsIgnoreCase("ACTIVE"))) {
             throw new FnbException("FNB-002", "Lượt đặt phòng không ở trạng thái ACTIVE tại thời điểm gọi món.");
         }
@@ -180,6 +186,25 @@ public class MealOrderServiceImpl implements IMealOrderService {
                     allergenConflicts);
         }
 
+        if (!Boolean.TRUE.equals(request.getIsExtraCharge())) {
+            int totalGuests = booking.getTotalGuests() != null ? booking.getTotalGuests() : 1;
+            int maxAllowedQuantity = totalGuests * 3;
+
+            LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+            LocalDateTime endOfDay = LocalDate.now().plusDays(1).atStartOfDay();
+            int alreadyOrderedToday = mealOrderRepository.sumQuantityOfFreeMealOrdersToday(booking.getId(), startOfDay, endOfDay);
+            int totalRequestedQuantity = request.getItems().stream().mapToInt(OrderItemDto::getQuantity).sum();
+
+            if (alreadyOrderedToday + totalRequestedQuantity > maxAllowedQuantity) {
+                int remainingFreeMeals = maxAllowedQuantity - alreadyOrderedToday;
+                if (remainingFreeMeals <= 0) {
+                    throw new FnbException("FNB-005", "Quý khách đã sử dụng hết " + maxAllowedQuantity + " phần ăn miễn phí của ngày hôm nay. Vui lòng đặt qua Thực đơn A-La-Carte nếu có nhu cầu phát sinh.");
+                } else {
+                    throw new FnbException("FNB-005", "Quý khách chỉ còn lại " + remainingFreeMeals + " phần ăn miễn phí trong ngày hôm nay. Đơn hàng yêu cầu " + totalRequestedQuantity + " phần. Vui lòng giảm số lượng hoặc đặt qua Thực đơn A-La-Carte.");
+                }
+            }
+        }
+
         GuestFolio folio = guestFolioRepository.findByBookingId(booking.getId())
                 .orElseThrow(() -> new FnbException("FNB-002",
                         "Resort Guest Folio not found for booking: " + booking.getId()));
@@ -211,25 +236,27 @@ public class MealOrderServiceImpl implements IMealOrderService {
         mealOrderItemRepository.saveAll(orderItems);
         mealOrderItemRepository.saveAll(orderItems);
 
-        // Update Folio charges
-        BigDecimal currentExtra = folio.getTotalExtraFb() == null ? BigDecimal.ZERO : folio.getTotalExtraFb();
-        folio.setTotalExtraFb(currentExtra.add(totalAmount));
-        BigDecimal packageAmt = folio.getTotalPackageAmount() == null ? BigDecimal.ZERO : folio.getTotalPackageAmount();
-        folio.setFinalAmount(packageAmt.add(folio.getTotalExtraFb()));
-        guestFolioRepository.save(folio);
+        // Update Folio charges if this is an A-la-carte order
+        if (Boolean.TRUE.equals(request.getIsExtraCharge())) {
+            BigDecimal currentExtra = folio.getTotalExtraFb() == null ? BigDecimal.ZERO : folio.getTotalExtraFb();
+            folio.setTotalExtraFb(currentExtra.add(totalAmount));
+            BigDecimal packageAmt = folio.getTotalPackageAmount() == null ? BigDecimal.ZERO : folio.getTotalPackageAmount();
+            folio.setFinalAmount(packageAmt.add(folio.getTotalExtraFb()));
+            guestFolioRepository.save(folio);
 
-        // Create Folio Item record
-        FolioItem folioItem = FolioItem.builder()
-                .guestFolio(folio)
-                .serviceCategory("Extra F&B")
-                .referenceId(order.getId())
-                .description("Extra F&B Order #" + order.getId())
-                .amount(totalAmount)
-                .createAt(LocalDateTime.now())
-                .createBy(request.getGuestId())
-                .status("PENDING")
-                .build();
-        folioItemRepository.save(folioItem);
+            // Create Folio Item record
+            FolioItem folioItem = FolioItem.builder()
+                    .guestFolio(folio)
+                    .serviceCategory("Extra F&B")
+                    .referenceId(order.getId())
+                    .description("Extra F&B Order #" + order.getId())
+                    .amount(totalAmount)
+                    .createAt(LocalDateTime.now())
+                    .createBy(request.getGuestId())
+                    .status("UNPAID")
+                    .build();
+            folioItemRepository.save(folioItem);
+        }
 
         return MealOrderResponse.builder()
                 .mealOrderId(order.getId())
@@ -278,6 +305,138 @@ public class MealOrderServiceImpl implements IMealOrderService {
 
         order.setOrderStatus(status);
         mealOrderRepository.save(order);
+
+        // If status is CANCELLED, void the corresponding FolioItem and deduct the charge
+        if (status.equalsIgnoreCase("CANCELLED")) {
+            String queryStr = "SELECT fi FROM FolioItem fi WHERE fi.serviceCategory = :category AND fi.referenceId = :refId";
+            List<FolioItem> folioItems = entityManager.createQuery(queryStr, FolioItem.class)
+                    .setParameter("category", "Extra F&B")
+                    .setParameter("refId", orderId)
+                    .getResultList();
+            for (FolioItem folioItem : folioItems) {
+                if (!"VOIDED".equalsIgnoreCase(folioItem.getStatus())) {
+                    folioItem.setStatus("VOIDED");
+                    entityManager.merge(folioItem);
+
+                    GuestFolio folio = folioItem.getGuestFolio();
+                    if (folio != null) {
+                        BigDecimal currentExtra = folio.getTotalExtraFb() == null ? BigDecimal.ZERO : folio.getTotalExtraFb();
+                        BigDecimal newExtra = currentExtra.subtract(folioItem.getAmount());
+                        if (newExtra.compareTo(BigDecimal.ZERO) < 0) {
+                            newExtra = BigDecimal.ZERO;
+                        }
+                        folio.setTotalExtraFb(newExtra);
+
+                        BigDecimal packageAmt = folio.getTotalPackageAmount() == null ? BigDecimal.ZERO : folio.getTotalPackageAmount();
+                        folio.setFinalAmount(packageAmt.add(folio.getTotalExtraFb()));
+                        entityManager.merge(folio);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ChefDashboardOrderResponse> getChefDashboardOrders(LocalDate date) {
+        if (date == null) {
+            date = LocalDate.now();
+        }
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+
+        List<Object[]> orderRows = mealOrderRepository.findChefDashboardOrdersByDateRange(startOfDay, endOfDay);
+        List<ChefDashboardOrderResponse> orderResponses = new ArrayList<>();
+
+        for (Object[] row : orderRows) {
+            Integer orderId = row[0] != null ? ((Number) row[0]).intValue() : null;
+            Integer bookingId = row[1] != null ? ((Number) row[1]).intValue() : null;
+            Integer guestId = row[2] != null ? ((Number) row[2]).intValue() : null;
+            String placeOrder = row[3] != null ? row[3].toString() : null;
+            String note = row[4] != null ? row[4].toString() : null;
+            String orderStatus = row[5] != null ? row[5].toString() : null;
+
+            LocalDateTime orderedAt = null;
+            if (row[6] != null) {
+                if (row[6] instanceof java.sql.Timestamp) {
+                    orderedAt = ((java.sql.Timestamp) row[6]).toLocalDateTime();
+                } else if (row[6] instanceof LocalDateTime) {
+                    orderedAt = (LocalDateTime) row[6];
+                } else {
+                    orderedAt = LocalDateTime.parse(row[6].toString());
+                }
+            }
+
+            String foodAllergies = null;
+            if (guestId != null) {
+                Optional<DietaryProfile> profileOpt = dietaryProfileRepository.findByUserId(guestId);
+                foodAllergies = profileOpt.map(DietaryProfile::getFoodAllergies).orElse(null);
+            }
+
+            List<Object[]> itemRows = orderId != null ?
+                    mealOrderItemRepository.findChefDashboardItemsByOrderId(orderId) : new ArrayList<>();
+            List<ChefDashboardItemResponse> itemResponses = new ArrayList<>();
+            boolean orderHasAllergy = false;
+
+            for (Object[] itemRow : itemRows) {
+                Integer menuItemId = itemRow[0] != null ? ((Number) itemRow[0]).intValue() : null;
+                String itemName = itemRow[1] != null ? itemRow[1].toString() : null;
+                Integer quantity = itemRow[2] != null ? ((Number) itemRow[2]).intValue() : null;
+
+                BigDecimal price = null;
+                if (itemRow[3] != null) {
+                    if (itemRow[3] instanceof BigDecimal) {
+                        price = (BigDecimal) itemRow[3];
+                    } else if (itemRow[3] instanceof Number) {
+                        price = BigDecimal.valueOf(((Number) itemRow[3]).doubleValue());
+                    } else {
+                        price = new BigDecimal(itemRow[3].toString());
+                    }
+                }
+
+                String ingredient = itemRow[4] != null ? itemRow[4].toString() : null;
+
+                boolean isAllergic = false;
+                if (ingredient != null && !ingredient.trim().isEmpty() && foodAllergies != null && !foodAllergies.trim().isEmpty()) {
+                    String[] allergyArray = foodAllergies.split(",");
+                    for (String allergy : allergyArray) {
+                        String cleanAllergy = allergy.trim();
+                        if (!cleanAllergy.isEmpty() && hasAllergyConflict(ingredient, cleanAllergy)) {
+                            isAllergic = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (isAllergic) {
+                    orderHasAllergy = true;
+                }
+
+                itemResponses.add(ChefDashboardItemResponse.builder()
+                        .menuItemId(menuItemId)
+                        .itemName(itemName)
+                        .quantity(quantity)
+                        .price(price)
+                        .ingredient(ingredient)
+                        .isAllergic(isAllergic)
+                        .build());
+            }
+
+            orderResponses.add(ChefDashboardOrderResponse.builder()
+                    .orderId(orderId)
+                    .bookingId(bookingId)
+                    .guestId(guestId)
+                    .placeOrder(placeOrder)
+                    .note(note)
+                    .orderStatus(orderStatus)
+                    .orderedAt(orderedAt)
+                    .foodAllergies(foodAllergies)
+                    .hasAllergyWarning(orderHasAllergy)
+                    .items(itemResponses)
+                    .build());
+        }
+
+        return orderResponses;
     }
 
     private boolean isSafe(MenuItem item, String allergies) {
@@ -315,5 +474,14 @@ public class MealOrderServiceImpl implements IMealOrderService {
                 && (ing.contains("tôm") || ing.contains("cua") || ing.contains("hải sản") || ing.contains("seafood")))
             return true;
         return false;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int getSumQuantityOfFreeMealOrdersToday(Integer bookingId, LocalDateTime start, LocalDateTime end) {
+        if (bookingId == null || start == null || end == null) {
+            return 0;
+        }
+        return mealOrderRepository.sumQuantityOfFreeMealOrdersToday(bookingId, start, end);
     }
 }

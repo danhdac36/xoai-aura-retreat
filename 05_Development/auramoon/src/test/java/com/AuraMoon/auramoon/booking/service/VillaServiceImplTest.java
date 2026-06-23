@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -52,8 +52,8 @@ public class VillaServiceImplTest {
     public void checkVillaAvailability_withDatesNoOverlap_returnsTrue() {
         // Arrange
         Integer villaTypeId = 1;
-        LocalDate checkin = LocalDate.now();
-        LocalDate checkout = LocalDate.now().plusDays(2);
+        LocalDateTime checkin = LocalDateTime.now();
+        LocalDateTime checkout = LocalDateTime.now().plusDays(2);
         when(villaRepository.countAvailableVillasWithoutOverlap(villaTypeId, checkin, checkout)).thenReturn(1L);
 
         // Act
@@ -70,8 +70,8 @@ public class VillaServiceImplTest {
     public void checkVillaAvailability_withDatesOverlap_returnsFalse() {
         // Arrange
         Integer villaTypeId = 1;
-        LocalDate checkin = LocalDate.now();
-        LocalDate checkout = LocalDate.now().plusDays(2);
+        LocalDateTime checkin = LocalDateTime.now();
+        LocalDateTime checkout = LocalDateTime.now().plusDays(2);
         when(villaRepository.countAvailableVillasWithoutOverlap(villaTypeId, checkin, checkout)).thenReturn(0L);
 
         // Act
