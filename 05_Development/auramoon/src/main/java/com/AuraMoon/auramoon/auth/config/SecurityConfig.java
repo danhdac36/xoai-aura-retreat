@@ -44,10 +44,9 @@ public class SecurityConfig {
         };
 
         private static final String[] ADMIN_ENDPOINTS = {
-                        // "/admin/**",
-                        // "/dashboard/**",
-                        // "/manage/**",
-                        // "/manager/housekeeping/**"
+                        "/admin/**",
+                        "/dashboard/**",
+                        "/manage/**"
         };
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {
@@ -62,7 +61,8 @@ public class SecurityConfig {
                         "/F&B/**" };
 
         private static final String[] MANAGER_ENDPOINTS = {
-                        // "/management/**"
+                        "/management/**",
+                        "/manager/housekeeping/**"
         };
 
         @Bean
@@ -75,7 +75,7 @@ public class SecurityConfig {
                                                 .requestMatchers(RECEPTIONIST_ENDPOINTS).hasRole("RECEPTIONIST")
                                                 .requestMatchers(THERAPIST_ENDPOINTS).hasRole("THERAPIST")
                                                 .requestMatchers(CHEFF_ENDPOINTS).hasRole("CHEFF")
-                                                .requestMatchers(MANAGER_ENDPOINTS).hasRole("MANAGER")
+                                                .requestMatchers(MANAGER_ENDPOINTS).hasAnyRole("MANAGER", "ADMIN")
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/aut" +

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org"><head>
+<!DOCTYPE html><html class="light" lang="vi" style=""><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -111,11 +111,8 @@
     </script>
 </head>
 <body class="bg-background text-on-surface font-body-md text-body-md overflow-x-hidden">
-<!-- Insert Sidebar -->
-<th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
-
 <!-- TopAppBar -->
-<header class="fixed top-0 w-full md:w-[calc(100%-16rem)] md:ml-64 z-40 bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline flat no shadows flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16">
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline flat no shadows flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16">
 <div class="font-display-lg-mobile text-display-lg-mobile text-primary dark:text-primary-fixed-dim">
         Xoai Aura Retreat
     </div>
@@ -130,21 +127,17 @@
 <button class="material-symbols-outlined p-2 hover:bg-surface-variant rounded-full transition-colors">person</button>
 </div>
 </header>
-<main class="pt-32 pb-32 md:ml-64">
+<main class="pt-32 pb-32">
 <!-- Hero Section -->
 <section class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mb-stack-lg">
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-stack-md border-b border-outline-variant pb-stack-lg">
 <div class="max-w-2xl">
 <h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-stack-sm">Lịch Trình</h1>
-<p class="text-on-surface-variant font-body-lg text-body-lg italic" th:text="'Hành trình tìm lại chính mình qua từng khoảnh khắc trong ngày tại Xoai Aura, ' + ${timeline.guestName} + '.'">Hành trình tìm lại chính mình qua từng khoảnh khắc trong ngày tại Xoai Aura.</p>
+<p class="text-on-surface-variant font-body-lg text-body-lg italic">Hành trình tìm lại chính mình qua từng khoảnh khắc trong ngày tại Xoai Aura.</p>
 </div>
-<div class="flex flex-col items-end text-secondary font-headline-sm text-headline-sm gap-2">
-    <div class="flex items-center gap-4">
-        <span class="material-symbols-outlined text-[32px]">event</span>
-        <span th:if="${timeline.checkoutDate != null}" th:text="${#temporals.format(timeline.checkinDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(timeline.checkoutDate, 'dd/MM/yyyy')}">Thứ Hai, 24 Tháng 5</span>
-        <span th:if="${timeline.checkoutDate == null}" th:text="${#temporals.format(timeline.checkinDate, 'dd/MM/yyyy')} + ' - (Chưa xác định)'">Thứ Hai, 24 Tháng 5</span>
-    </div>
-    <div class="text-base text-on-surface-variant font-body-md" th:text="'Phòng: ' + ${timeline.villaName} + ' | Gói: ' + ${timeline.packageName}">Phòng: Xoai 01 | Gói: Detox</div>
+<div class="flex items-center text-secondary font-headline-sm text-headline-sm gap-4">
+<span class="material-symbols-outlined text-[32px]">event</span>
+<span class="">Thứ Hai, 24 Tháng 5</span>
 </div>
 </div>
 </section>
@@ -153,31 +146,144 @@
 <!-- Vertical Axis Line (Aligned to new column split) -->
 <div class="absolute left-[20px] md:left-[25%] top-0 bottom-0 w-[1px] timeline-line transform md:-translate-x-1/2 z-0"></div>
 <div class="space-y-section-gap relative z-10">
-<!-- Dynamic Loop for Events -->
-<div th:each="e, stat : ${timeline.events}" class="flex flex-col md:flex-row items-start md:items-center w-full">
+<!-- 07:00 - Detox Breakfast -->
+<div class="flex flex-col md:flex-row items-start md:items-center w-full">
 <div class="w-full md:w-1/4 md:pr-12 flex items-center md:justify-end mb-4 md:mb-0">
-<div class="text-primary font-display-lg text-display-lg-mobile md:text-headline-lg flex flex-col md:items-end gap-1">
-<div class="flex items-center gap-4">
+<div class="text-primary font-display-lg text-display-lg-mobile md:text-headline-lg flex items-center gap-4">
 <span class="md:hidden w-8 h-[1px] bg-outline"></span>
-    <span th:text="${#temporals.format(e.time, 'HH:mm')}">07:00</span>
-</div>
-<span class="text-base text-on-surface-variant font-body-md ml-12 md:ml-0" th:text="${#temporals.format(e.time, 'dd/MM')}">24/05</span>
-</div>
+                        07:00
+                    </div>
 </div>
 <!-- Milestone Dot -->
-<div class="md:absolute md:left-[25%] md:-translate-x-1/2 w-4 h-4 rounded-full border-4 shadow-sm hidden md:block z-20"
-     th:classappend="${stat.index % 2 == 0 ? 'bg-secondary border-surface' : 'bg-primary-container border-secondary'}"></div>
+<div class="md:absolute md:left-[25%] md:-translate-x-1/2 w-4 h-4 rounded-full bg-secondary border-4 border-surface shadow-sm hidden md:block z-20"></div>
 <div class="w-full md:w-3/4 md:pl-16">
-<div class="bg-surface-container-low p-8 border border-outline-variant rounded-lg transition-transform hover:-translate-y-1 hover:shadow-lg"
-     th:classappend="${stat.index % 2 != 0 ? 'bg-white shadow-[0px_12px_32px_rgba(51,51,51,0.04)]' : ''}">
+<div class="bg-surface-container-low p-8 border border-outline-variant rounded-lg transition-transform hover:-translate-y-1 hover:shadow-lg">
 <div class="flex justify-between items-start mb-4">
-<h3 class="font-headline-sm text-headline-sm text-secondary" th:text="${e.eventName}">Tên sự kiện</h3>
-<span class="material-symbols-outlined text-primary" data-icon="event">event</span>
+<h3 class="font-headline-sm text-headline-sm text-secondary">Ăn sáng Detox</h3>
+<span class="material-symbols-outlined text-primary" data-icon="restaurant">restaurant</span>
 </div>
-<p class="text-on-surface-variant mb-6" th:text="${e.description}">Mô tả chi tiết sự kiện.</p>
+<p class="text-on-surface-variant mb-6">Khởi đầu ngày mới với nước ép ép lạnh hữu cơ và các loại hạt giàu dinh dưỡng, giúp thanh lọc cơ thể từ bên trong.</p>
 <div class="flex items-center gap-2 text-label-md text-primary opacity-80">
 <span class="material-symbols-outlined text-[18px]">location_on</span>
-<span th:text="${e.location != null ? e.location : 'Chưa có địa điểm'}">Nhà hàng Thực dưỡng</span>
+<span class="">Nhà hàng Thực dưỡng</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 09:30 - Singing Bowl Meditation -->
+<div class="flex flex-col md:flex-row items-start md:items-center w-full">
+<div class="w-full md:w-1/4 md:pr-12 flex items-center md:justify-end mb-4 md:mb-0">
+<div class="text-primary font-display-lg text-display-lg-mobile md:text-headline-lg flex items-center gap-4">
+<span class="md:hidden w-8 h-[1px] bg-outline"></span>
+                        09:30
+                    </div>
+</div>
+<div class="md:absolute md:left-[25%] md:-translate-x-1/2 w-4 h-4 rounded-full bg-primary-container border-4 border-secondary hidden md:block z-20"></div>
+<div class="w-full md:w-3/4 md:pl-16">
+<div class="bg-surface-white p-8 border border-outline-variant rounded-lg transition-transform hover:-translate-y-1 hover:shadow-lg bg-white shadow-[0px_12px_32px_rgba(51,51,51,0.04)]">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-headline-sm text-headline-sm text-secondary">Thiền Chuông Xoay</h3>
+<span class="material-symbols-outlined text-primary" data-icon="graphic_eq">graphic_eq</span>
+</div>
+<p class="text-on-surface-variant mb-6">Sóng âm từ chuông xoay vùng Himalaya giúp cân bằng các luân xa, mang lại trạng thái thư giãn sâu và ổn định tâm trí.</p>
+<div class="flex items-center gap-2 text-label-md text-primary opacity-80">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="">Shala Thiền</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 12:00 - Macrobiotic Lunch -->
+<div class="flex flex-col md:flex-row items-start md:items-center w-full">
+<div class="w-full md:w-1/4 md:pr-12 flex items-center md:justify-end mb-4 md:mb-0">
+<div class="text-primary font-display-lg text-display-lg-mobile md:text-headline-lg flex items-center gap-4">
+<span class="md:hidden w-8 h-[1px] bg-outline"></span>
+                        12:00
+                    </div>
+</div>
+<div class="md:absolute md:left-[25%] md:-translate-x-1/2 w-4 h-4 rounded-full bg-secondary border-4 border-surface shadow-sm hidden md:block z-20"></div>
+<div class="w-full md:w-3/4 md:pl-16">
+<div class="bg-surface-container-low p-8 border border-outline-variant rounded-lg transition-transform hover:-translate-y-1 hover:shadow-lg">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-headline-sm text-headline-sm text-secondary">Ăn trưa Thực dưỡng</h3>
+<span class="material-symbols-outlined text-primary" data-icon="local_florist">local_florist</span>
+</div>
+<p class="text-on-surface-variant mb-6">Thực đơn chay cân bằng âm dương, sử dụng nguyên liệu địa phương theo mùa để tối ưu hóa năng lượng sống.</p>
+<div class="flex items-center gap-2 text-label-md text-primary opacity-80">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="">Nhà hàng Thực dưỡng</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 14:00 - Swedish Massage -->
+<div class="flex flex-col md:flex-row items-start md:items-center w-full">
+<div class="w-full md:w-1/4 md:pr-12 flex items-center md:justify-end mb-4 md:mb-0">
+<div class="text-primary font-display-lg text-display-lg-mobile md:text-headline-lg flex items-center gap-4">
+<span class="md:hidden w-8 h-[1px] bg-outline"></span>
+                        14:00
+                    </div>
+</div>
+<div class="md:absolute md:left-[25%] md:-translate-x-1/2 w-4 h-4 rounded-full bg-primary-container border-4 border-secondary hidden md:block z-20"></div>
+<div class="w-full md:w-3/4 md:pl-16">
+<div class="relative overflow-hidden group bg-surface-white p-8 border border-outline-variant rounded-lg transition-transform hover:-translate-y-1 hover:shadow-lg bg-white opacity-100 translate-y-0">
+<div class="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none">
+<img alt="Spa" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHRf2uS8OivxFlVMnVDgjBGse1CT0mIs8tlauvACS1mYlqOnxX6hmqM36-1pd3et0Jo7HvNAMw7Bk9c7gtObC6PLqoBQmw-KEBo4PNtEQRJYlYF4Sa-ML2IANHVmrzyh9eGKShnX1tVCjJuXLE3F4wI-1-32s8FfTZ1TPmk5UdozeQwINX1f8520rMPw9sIIOSmoqNjkXoFO1kSIovXSnza09R22Fr7QxemgBG9U9aloSG0UF7W8lt5-OasNT4UxPRpsdthk2_mZU">
+</div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<h3 class="font-headline-sm text-headline-sm text-secondary">Massage Thụy Điển</h3>
+<span class="material-symbols-outlined text-primary" data-icon="spa">spa</span>
+</div>
+<p class="text-on-surface-variant mb-6 relative z-10">Kỹ thuật massage cổ điển giúp xua tan căng thẳng cơ bắp và cải thiện lưu thông máu, mang lại sự nhẹ nhõm tuyệt đối.</p>
+<div class="flex items-center gap-2 text-label-md text-primary opacity-80 relative z-10">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="">Aura Spa</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 16:30 - Sunset Yoga -->
+<div class="flex flex-col md:flex-row items-start md:items-center w-full">
+<div class="w-full md:w-1/4 md:pr-12 flex items-center md:justify-end mb-4 md:mb-0">
+<div class="text-primary font-display-lg text-display-lg-mobile md:text-headline-lg flex items-center gap-4">
+<span class="md:hidden w-8 h-[1px] bg-outline"></span>
+                        16:30
+                    </div>
+</div>
+<div class="md:absolute md:left-[25%] md:-translate-x-1/2 w-4 h-4 rounded-full bg-secondary border-4 border-surface shadow-sm hidden md:block z-20"></div>
+<div class="w-full md:w-3/4 md:pl-16">
+<div class="bg-surface-container-low p-8 border border-outline-variant rounded-lg transition-transform hover:-translate-y-1 hover:shadow-lg">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-headline-sm text-headline-sm text-secondary">Yoga Hoàng hôn</h3>
+<span class="material-symbols-outlined text-primary" data-icon="self_improvement">self_improvement</span>
+</div>
+<p class="text-on-surface-variant mb-6">Chào mặt trời trong ánh hoàng hôn dịu nhẹ, kết nối cơ thể và hơi thở giữa thiên nhiên bao quanh Xoai Aura.</p>
+<div class="flex items-center gap-2 text-label-md text-primary opacity-80">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="">Shala Thiền</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 19:00 - Light Dinner -->
+<div class="flex flex-col md:flex-row items-start md:items-center w-full">
+<div class="w-full md:w-1/4 md:pr-12 flex items-center md:justify-end mb-4 md:mb-0">
+<div class="text-primary font-display-lg text-display-lg-mobile md:text-headline-lg flex items-center gap-4">
+<span class="md:hidden w-8 h-[1px] bg-outline"></span>
+                        19:00
+                    </div>
+</div>
+<div class="md:absolute md:left-[25%] md:-translate-x-1/2 w-4 h-4 rounded-full bg-primary-container border-4 border-secondary hidden md:block z-20"></div>
+<div class="w-full md:w-3/4 md:pl-16">
+<div class="bg-surface-white p-8 border border-outline-variant rounded-lg transition-transform hover:-translate-y-1 hover:shadow-lg bg-white">
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-headline-sm text-headline-sm text-secondary">Ăn tối Nhẹ</h3>
+<span class="material-symbols-outlined text-primary" data-icon="nights_stay">nights_stay</span>
+</div>
+<p class="text-on-surface-variant mb-6">Các món súp nóng và salad tươi mát giúp dạ dày nghỉ ngơi, chuẩn bị cho một giấc ngủ sâu và trọn vẹn.</p>
+<div class="flex items-center gap-2 text-label-md text-primary opacity-80">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="">Nhà hàng Thực dưỡng</span>
 </div>
 </div>
 </div>

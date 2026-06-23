@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -13,8 +14,8 @@ import java.time.LocalDate;
 public class BookingResponseDTO {
     private Integer bookingId;
     private Integer guestId;
-    private LocalDate checkinDate;
-    private LocalDate checkoutDate;
+    private LocalDateTime checkinDate;
+    private LocalDateTime checkoutDate;
     private Integer totalGuests;
     private String bookingStatus;
     private String paymentStatus;

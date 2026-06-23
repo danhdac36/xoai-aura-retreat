@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface MealOrderRepository extends JpaRepository<MealOrder, Integer> {
-
+    List<MealOrder> findByBookingId(Integer bookingId);
         @Query(value = "SELECT mo.meal_order_id, mo.booking_id, mo.guest_id, mo.place_order, mo.note, mo.order_status, mo.ordered_at "
                         +
                         "FROM MEAL_ORDER mo " +
@@ -38,4 +38,5 @@ public interface MealOrderRepository extends JpaRepository<MealOrder, Integer> {
                         @Param("bookingId") Integer bookingId,
                         @Param("startOfDay") LocalDateTime startOfDay,
                         @Param("endOfDay") LocalDateTime endOfDay);
+
 }

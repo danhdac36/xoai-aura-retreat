@@ -23,8 +23,9 @@ public class EmailNotificationServiceImpl implements IEmailNotificationService {
 
         helper.setTo(toEmail);
         helper.setSubject("Consolidated Invoice - Xoai Aura Retreat");
-        helper.setText("Dear Guest,\n\nThank you for your stay at Xoai Aura Retreat. Please find attached your consolidated invoice.\n\nBest regards,\nXoai Aura Retreat Team");
-        
+        helper.setText(
+                "Dear Guest,\n\nThank you for your stay at Xoai Aura Retreat. Please find attached your consolidated invoice.\n\nBest regards,\nXoai Aura Retreat Team");
+
         helper.addAttachment("Invoice.pdf", new ByteArrayResource(pdfAttachment));
 
         javaMailSender.send(message);

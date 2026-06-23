@@ -70,15 +70,15 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
                 .orElseThrow(() -> new SpaBusinessException("SPA-001", "Booking not found"));
 
         LocalDateTime startTime = request.getStartTime();
-        LocalDate bookingCheckin = guestBooking.getCheckinDate();
-        LocalDate bookingCheckout = guestBooking.getCheckoutDate();
+        LocalDateTime bookingCheckin = guestBooking.getCheckinDate();
+        LocalDateTime bookingCheckout = guestBooking.getCheckoutDate();
 
         if (bookingCheckin != null && bookingCheckout != null) {
             LocalDate spaDate = startTime.toLocalDate();
-            if (spaDate.isBefore(bookingCheckin) || spaDate.isAfter(bookingCheckout)) {
+            if (spaDate.isBefore(bookingCheckin.toLocalDate()) || spaDate.isAfter(bookingCheckout.toLocalDate())) {
                 throw new SpaBusinessException("SPA-011",
                         "Lịch hẹn Spa phải nằm trong thời gian lưu trú (từ " +
-                                bookingCheckin + " đến " + bookingCheckout + ").");
+                                bookingCheckin.toLocalDate() + " đến " + bookingCheckout.toLocalDate() + ").");
             }
         }
 

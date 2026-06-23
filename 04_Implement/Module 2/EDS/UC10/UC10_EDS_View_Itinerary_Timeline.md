@@ -7,13 +7,13 @@
 | **Document ID**    | `AURAMOON-BOOKING-EDS-UC10`                                               |
 | **Version**        | 1.0                                                                         |
 | **Date**           | 2026-06-19                                                                  |
-| **Status**         | Approved                                                                    |
-| **Document Owner** | Lê Trà My — Module 2 Lead                                               |
-| **Author**         | Lê Trà My — Full-stack Developer                                        |
-| **Reviewed by**    | Phùng Giang Hải                                                           |
+| **Status**         | In Review                                                      |
+| **Document Owner** | Lê Trà My — Module 2 Lead                                  |
+| **Author**         | Phùng Giang Hải                                            |
+| **Reviewed by**    | Phùng Giang Hải                                              |
 | **DPO Sign-off**   | `[x] Approved` — Chỉ hiển thị dữ liệu của chính Guest (IDOR-safe) |
-| **Approved by**    | Phùng Giang Hải — Tech Lead                                              |
-| **Last Review**    | 2026-06-20                                                                  |
+| **Approved by**    | Phùng Giang Hải — Tech Lead                               |
+| **Last Review**    | 2026-06-23                                                  |
 | **Based on EDS**   | v2.0                                                                        |
 
 # CHANGELOG
@@ -21,12 +21,13 @@
 | Ngày      | Người thực hiện | Nội dung thay đổi                                                         |
 | ---------- | ------------------- | ---------------------------------------------------------------------------- |
 | 2026-06-19 | Student 2           | Tạo tài liệu lần đầu — UC10 View Booking Details & Itinerary Timeline |
+| 2026-06-23 | Phùng Giang Hải     | Cập nhật chỉ hiển thị Check-out nếu checkoutDate không null |
 
 ---
 
 # 1. Tổng quan UC
 
-> **UC10** cho phép Guest xem toàn bộ thông tin booking của mình và lịch trình kỳ nghỉ (Itinerary Timeline) được generate tự động dựa trên gói nghỉ dưỡng và loại gói. Timeline tổng hợp sự kiện theo từng ngày: Check-in, Yoga/Thiền, Bữa ăn, Spa, Check-out.
+> **UC10** cho phép Guest xem toàn bộ thông tin booking của mình và lịch trình kỳ nghỉ (Itinerary Timeline). Timeline này được tổng hợp **động (dynamic)** dựa trên các dữ liệu thực tế do Guest đã đặt bao gồm: Check-in, Check-out (từ bảng `Booking`), các lịch hẹn Spa (từ bảng `Spa_Booking`), và các bữa ăn đã chọn (từ bảng `Meal_Order`).
 
 | Field                           | Value                                                                     |
 | ------------------------------- | ------------------------------------------------------------------------- |
@@ -36,7 +37,7 @@
 | **Bounded Context**       | `booking`                                                               |
 | **Data Classification**   | `PII` (guestName, bookingId — của chính Guest)                       |
 | **Compliance Scope**      | IDOR Prevention — Guest chỉ xem booking của chính mình               |
-| **Upstream Dependencies** | UC07 (Booking phải tồn tại),`auth` (UserRepository — lấy fullName) |
+| **Upstream Dependencies** | UC07 (Booking), UC11 (Spa_Booking), UC16 (Meal_Order)                     |
 | **Downstream Consumers**  | Không có downstream — Read-only view                                   |
 
 ---
@@ -45,35 +46,33 @@
 
 | Requirement ID    | Loại      | Mô tả yêu cầu                        | Thành phần Code                                   | Compliance Target | ADR liên quan |
 | ----------------- | ---------- | ---------------------------------------- | --------------------------------------------------- | ----------------- | -------------- |
-| **UC10**    | User Story | Guest xem booking và itinerary timeline | `ItineraryServiceImpl.getTimelineForGuest()`      | IDOR Prevention   | ADR-UC10-001   |
-| **BR-IDOR** | Security   | Guest chỉ xem booking của chính mình | Controller lấy guestId từ JWT, không từ request | OWASP API-01      | ADR-UC10-001   |
+| **UC10**    | User Story | Guest xem booking và itinerary timeline động | `ItineraryServiceImpl.getTimelineForGuest()`      | IDOR Prevention   | ADR-UC10-001   |
+| **BR-IDOR** | Security   | Guest chỉ xem booking của chính mình | Controller lấy guestId từ JWT, không từ request | OWASP API-01      | ADR-UC10-002   |
 
 ---
 
 # 3. Architecture Decision Records (ADR)
 
-## ADR-UC10-001 — Itinerary được generate server-side dựa trên packageType
+## ADR-UC10-001 — Itinerary được tổng hợp động từ các thực thể thực tế (Spa, Meal)
 
 | Field            | Value      |
 | ---------------- | ---------- |
 | **Status** | Accepted   |
-| **Date**   | 2026-06-19 |
+| **Date**   | 2026-06-22 |
 
 **Bối cảnh:**
-Itinerary không được lưu trực tiếp trong DB mà được tạo động tại runtime bởi `ItineraryServiceImpl`. Logic tạo event dựa trên `typePackage` của gói đã book.
+Timeline của khách hàng cần phải phản ánh đúng thực tế những gì khách hàng đã đặt (VD: Khách tự chọn món ăn qua UC16, tự chọn giờ Spa qua UC11). Thiết kế cũ "generate tĩnh" từ template theo loại Package (Yoga, Detox) sẽ làm mất đi tính cá nhân hóa và sai lệch hoàn toàn với hệ thống.
 
-**Quyết định:** Generate itinerary on-the-fly dựa trên logic template theo `typePackage`:
-
-- `yoga` → Yoga sáng + Bữa ăn + Spa phục hồi
-- `stress` → Thiền định + Bữa trà + Spa Aromatherapy
-- `detox` / `weight` → Cardio + Bữa Detox + Spa thải độc
-- Default → Yoga sáng + Bữa dinh dưỡng + Spa massage
+**Quyết định:** 
+Không dùng template tĩnh. `ItineraryServiceImpl` sẽ tổng hợp Timeline Event bằng cách:
+1. Truy vấn `Booking` để tạo sự kiện Check-in, Check-out.
+2. Truy vấn `SpaBookingRepository` để tạo các sự kiện đi Spa theo đúng giờ khách đã chọn.
+3. Truy vấn `MealOrderRepository` để tạo các sự kiện bữa ăn theo đúng lịch khách chọn.
+4. Gộp tất cả các sự kiện trên thành 1 danh sách, sau đó sắp xếp tăng dần theo thời gian (ASC).
 
 **Hệ quả:**
-
-- Linh hoạt, không cần lưu itinerary vào DB
-- Dễ mở rộng thêm packageType mới
-- Trade-off: Nếu thay đổi logic template, tất cả booking cũ cũng thay đổi itinerary (không phản ánh đúng thời điểm book)
+- **Tích cực:** Phản ánh chính xác lịch trình cá nhân hóa của Guest (Code chuẩn động).
+- **Tiêu cực:** Tăng số lượng queries xuống DB (cần query bảng `Spa_Booking` và `Meal_Order`). Cần đánh index trên `booking_id` của các bảng này.
 
 ---
 
@@ -137,8 +136,9 @@ package "Service Layer" {
   class ItineraryServiceImpl {
     -bookingRepo: BookingRepository
     -userRepo: UserRepository
+    -spaBookingRepo: SpaBookingRepository
+    -mealOrderRepo: MealOrderRepository
     +getTimelineForGuest(guestId: Integer): ItineraryTimelineDTO
-    -generateDailyEvents(date: LocalDate, packageType: String, isStart: boolean, isEnd: boolean): List<TimelineEvent>
   }
 }
 
@@ -146,11 +146,17 @@ package "DTO" {
   class ItineraryTimelineDTO {
     +bookingId: Integer
     +guestName: String
+    +packageName: String
+    +villaName: String
+    +checkinDate: LocalDate
+    +checkoutDate: LocalDate
+    +bookingStatus: String
     +events: List<TimelineEvent>
   }
   class TimelineEvent {
     +eventName: String
     +time: LocalDateTime
+    +location: String
     +description: String
   }
 }
@@ -158,6 +164,12 @@ package "DTO" {
 package "Repository Layer" {
   interface BookingRepository <<JpaRepository>> {
     +findByGuestId(guestId: Integer): List<Booking>
+  }
+  interface SpaBookingRepository <<JpaRepository>> {
+    +findByBookingId(bookingId: Integer): List<SpaBooking>
+  }
+  interface MealOrderRepository <<JpaRepository>> {
+    +findByBookingId(bookingId: Integer): List<MealOrder>
   }
 }
 
@@ -176,12 +188,18 @@ ItineraryTimelineDTO *-- TimelineEvent
 public class ItineraryTimelineDTO {
     private Integer bookingId;
     private String guestName;
+    private String packageName;
+    private String villaName;
+    private LocalDate checkinDate;
+    private LocalDate checkoutDate;
+    private String bookingStatus;
     private List<TimelineEvent> events; // Sorted by time ASC
 
     @Data @Builder
     public static class TimelineEvent {
         private String eventName;           // Tên sự kiện
         private LocalDateTime time;         // Thời điểm (ngày + giờ)
+        private String location;            // Địa điểm diễn ra
         private String description;         // Mô tả chi tiết
     }
 }
@@ -200,6 +218,8 @@ participant "ItineraryController" as Ctrl
 participant "ItineraryServiceImpl" as Svc
 participant "UserRepository" as UserRepo
 participant "BookingRepository" as BookRepo
+participant "SpaBookingRepository" as SpaRepo
+participant "MealOrderRepository" as MealRepo
 database "PostgreSQL" as DB
 
 Guest -> Ctrl: GET /booking/itinerary\n[JWT: guestId=100]
@@ -211,29 +231,29 @@ Ctrl -> Svc: getTimelineForGuest(100)
 activate Svc
 
 Svc -> UserRepo: findById(100)
-UserRepo -> DB: SELECT * FROM USERS WHERE user_id=100
-DB --> UserRepo: User{fullName="Nguyễn Văn A"}
-UserRepo --> Svc: User
+UserRepo --> Svc: User{fullName="Nguyễn Văn A"}
 
 Svc -> BookRepo: findByGuestId(100)
-BookRepo -> DB: SELECT * FROM BOOKING WHERE guest_id=100
-DB --> BookRepo: [Booking{id=1001, status=CONFIRMED, checkinDate=2026-07-01, checkoutDate=2026-07-06}]
-BookRepo --> Svc: List<Booking>
+BookRepo --> Svc: List<Booking> (id=1001)
 
-Svc -> Svc: activeBooking = booking có status CONFIRMED hoặc CHECKED-IN
-Svc -> Svc: packageType = "Detox" → nhóm logic detox/weight
+Svc -> Svc: Lấy activeBooking (id=1001)
 
-loop Mỗi ngày từ checkinDate đến checkoutDate
-  Svc -> Svc: generateDailyEvents(date, packageType, isStart, isEnd)
-  note over Svc
-    Ngày đầu (isStart): Chỉ Check-in + Bữa tối
-    Ngày cuối (isEnd): Chỉ Checkout
-    Ngày giữa: Yoga/Thiền 06:30, Bữa trưa 12:00, Spa 15:30, Bữa tối 18:30
-  end note
-end
+Svc -> SpaRepo: findByBookingId(1001)
+SpaRepo -> DB: SELECT * FROM SPA_BOOKING WHERE booking_id=1001
+DB --> SpaRepo: List<SpaBooking>
+SpaRepo --> Svc: Lịch Spa thực tế
+
+Svc -> MealRepo: findByBookingId(1001)
+MealRepo -> DB: SELECT * FROM MEAL_ORDER WHERE booking_id=1001
+DB --> MealRepo: List<MealOrder>
+MealRepo --> Svc: Lịch Bữa ăn thực tế
+
+Svc -> Svc: Thêm Check-in, Check-out
+Svc -> Svc: Map SpaBooking -> TimelineEvent
+Svc -> Svc: Map MealOrder -> TimelineEvent
 
 Svc -> Svc: events.sort(Comparator.comparing(time))
-Svc --> Ctrl: ItineraryTimelineDTO{bookingId=1001, guestName="Nguyễn Văn A", events=[...28 events]}
+Svc --> Ctrl: ItineraryTimelineDTO{bookingId=1001, guestName="Nguyễn Văn A", events=[...]}
 deactivate Svc
 
 Ctrl -> Ctrl: model.addAttribute("itinerary", dto)
@@ -303,26 +323,18 @@ end note
 | 2            | Có booking status =`CONFIRMED`  | Lấy booking đó                   |
 | 3 (fallback) | Không có booking active          | Lấy booking cuối cùng trong list |
 
-## 6.4. Itinerary Template Logic
+## 6.4. Logic Tổng hợp Event
 
-```
-packageType matching (case-insensitive, contains):
-├── "stress" → Stress Relief template
-│   ├── 06:30 → "Thiền định & Thở chánh niệm"
-│   ├── 12:00 → "Bữa trưa thanh đạm giải tỏa căng thẳng"
-│   ├── 15:30 → "Trị liệu Spa giấc ngủ sâu (Aromatherapy)"
-│   └── 18:30 → "Thưởng trà trị liệu & Thư giãn"
-├── "detox" || "weight" || "béo" || "cân" → Detox/Weight template
-│   ├── 06:30 → "Vận động Cardio nhẹ nhàng"
-│   ├── 12:00 → "Bữa trưa Detox & Ít calorie"
-│   ├── 15:30 → "Trị liệu Spa thải độc chuyên sâu"
-│   └── 18:30 → "Nước ép thanh lọc & Soup nhẹ"
-└── default (Yoga, Ayurveda, ...) → Default template
-    ├── 06:30 → "Luyện tập Yoga sáng"
-    ├── 12:00 → "Bữa trưa dinh dưỡng"
-    ├── 15:30 → "Trị liệu Spa phục hồi"
-    └── 18:30 → "Bữa tối dinh dưỡng"
-```
+Quy trình gom sự kiện:
+1. **Check-in/Check-out**: Tạo 2 event tĩnh mặc định. 
+   - Check-in: `checkinDate` lúc 14:00.
+   - Check-out: `checkoutDate` lúc 12:00.
+2. **Spa Events**: Lấy từ `Spa_Booking` có `status` khác `CANCELLED`.
+   - Thời gian: `Spa_Booking.appointmentTime`
+   - Tiêu đề: Tên `Spa_Service`
+3. **Meal Events**: Lấy từ `Meal_Order` có `status` khác `CANCELLED`.
+   - Thời gian: `Meal_Order.deliveryTime` hoặc `mealDate` kết hợp với loại bữa (Sáng/Trưa/Tối).
+   - Tiêu đề: "Bữa ăn cá nhân hóa".
 
 ---
 
@@ -364,26 +376,22 @@ public interface ItineraryService {
 
 ```java
 // BookingRepository.java (mở rộng liên quan UC10)
-// @version 1.0
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
-
-    /**
-     * Tìm tất cả booking thuộc về một Guest.
-     * Dùng bởi: getTimelineForGuest() để lấy danh sách booking rồi chọn activeBooking.
-     * @param guestId  ID của Guest (từ JWT — IDOR-safe)
-     * @return Danh sách booking theo thứ tự tạo (mới nhất cuối)
-     */
     List<Booking> findByGuestId(Integer guestId);
 }
 
-// UserRepository.java (dùng bởi UC10 để lấy fullName)
-// @version 1.0
+// SpaBookingRepository.java
+public interface SpaBookingRepository extends JpaRepository<SpaBooking, Integer> {
+    List<SpaBooking> findByBookingId(Integer bookingId);
+}
+
+// MealOrderRepository.java
+public interface MealOrderRepository extends JpaRepository<MealOrder, Integer> {
+    List<MealOrder> findByBookingId(Integer bookingId);
+}
+
+// UserRepository.java
 public interface UserRepository extends JpaRepository<User, Integer> {
-    /**
-     * Tìm User theo ID.
-     * Dùng bởi: getTimelineForGuest() để lấy fullName hiển thị trên itinerary.
-     * @param id  User ID (= guestId từ JWT)
-     */
     Optional<User> findById(Integer id);
 }
 ```
@@ -410,26 +418,35 @@ public interface UserRepository extends JpaRepository<User, Integer> {
   "itinerary": {
     "bookingId": 1001,
     "guestName": "Nguyễn Văn A",
+    "packageName": "Detox Retreat 7 Days",
+    "villaName": "Lotus Suite 01",
+    "checkinDate": "2026-07-01",
+    "checkoutDate": "2026-07-06",
+    "bookingStatus": "CHECKED-IN",
     "events": [
       {
         "eventName": "Nhận phòng (Check-in)",
         "time": "2026-07-01T14:00:00",
+        "location": "Sảnh Lễ tân",
         "description": "Nhận Villa và bắt đầu kỳ nghỉ dưỡng."
       },
       {
         "eventName": "Vận động Cardio nhẹ nhàng",
         "time": "2026-07-02T06:30:00",
+        "location": "Bãi biển",
         "description": "Hoạt động đi bộ nhanh hoặc các bài tập vận động..."
       },
       {
         "eventName": "Bữa trưa Detox & Ít calorie",
         "time": "2026-07-02T12:00:00",
+        "location": "Nhà hàng Thực dưỡng",
         "description": "Bữa trưa dinh dưỡng chuyên biệt..."
       },
       "...",
       {
         "eventName": "Trả phòng (Check-out)",
         "time": "2026-07-06T12:00:00",
+        "location": "Sảnh Lễ tân",
         "description": "Hoàn tất thủ tục thanh toán Folio và check-out phòng."
       }
     ]
@@ -479,16 +496,14 @@ SELECT DISTINCT type_package FROM RETREAT_PACKAGE;
 -- Expected: các giá trị như 'Stress Relief', 'Detox', 'Yoga', ...
 ```
 
-## 11.2. Core Implementation (đã implement)
+## 11.2. Core Implementation (Cần sửa đổi)
 
 ```java
 // ItineraryServiceImpl.getTimelineForGuest()
 @Transactional(readOnly = true)
 public ItineraryTimelineDTO getTimelineForGuest(Integer guestId) {
-    // 1. Load user
+    // 1. Load user & booking active
     User guest = userRepository.findById(guestId).orElseThrow(...);
-
-    // 2. Load bookings — chọn booking active
     List<Booking> bookings = bookingRepository.findByGuestId(guestId);
     if (bookings.isEmpty()) throw new IllegalArgumentException("Chưa có đặt phòng");
 
@@ -497,33 +512,59 @@ public ItineraryTimelineDTO getTimelineForGuest(Integer guestId) {
         .findFirst()
         .orElse(bookings.get(bookings.size() - 1));
 
-    // 3. Generate events theo packageType
-    String packageType = activeBooking.getRetreatPackage().getTypePackage().toLowerCase();
     List<TimelineEvent> events = new ArrayList<>();
 
-    // 4. Check-in event (Day 1, 14:00)
+    // 2. Add Check-in / Check-out events
     events.add(TimelineEvent.builder()
         .eventName("Nhận phòng (Check-in)")
-        .time(start.atTime(14, 0))
+        .time(activeBooking.getCheckinDate().atStartOfDay().plusHours(14))
+        .location("Sảnh Lễ tân")
         .description("Nhận Villa và bắt đầu kỳ nghỉ dưỡng.")
         .build());
+    events.add(TimelineEvent.builder()
+        .eventName("Trả phòng (Check-out)")
+        .time(activeBooking.getCheckoutDate().atStartOfDay().plusHours(12))
+        .location("Sảnh Lễ tân")
+        .description("Thanh toán và kết thúc kỳ nghỉ.")
+        .build());
 
-    // 5. Loop daily events
-    for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
-        // Morning activity (06:30) — skip ngày đầu
-        // Lunch (12:00) — skip ngày cuối
-        // Spa (15:30) — skip ngày cuối
-        // Dinner (18:30) — skip ngày cuối
+    // 3. Lấy dữ liệu Spa thực tế
+    List<SpaBooking> spaBookings = spaBookingRepository.findByBookingId(activeBooking.getId());
+    for (SpaBooking spa : spaBookings) {
+        String roomName = (spa.getTreatmentRoom() != null) ? spa.getTreatmentRoom().getRoomName() : "Aura Spa";
+        events.add(TimelineEvent.builder()
+            .eventName("Spa: " + spa.getSpaService().getServiceName())
+            .time(spa.getAppointmentTime())
+            .location(roomName)
+            .description("Trị liệu Spa.")
+            .build());
     }
 
-    // 6. Check-out event (Last day, 12:00)
-    events.add(...checkout event...);
+    // 4. Lấy dữ liệu Bữa ăn thực tế
+    List<MealOrder> mealOrders = mealOrderRepository.findByBookingId(activeBooking.getId());
+    for (MealOrder meal : mealOrders) {
+        events.add(TimelineEvent.builder()
+            .eventName("Bữa ăn: " + meal.getMealType())
+            .time(meal.getDeliveryTime() != null ? meal.getDeliveryTime() : meal.getMealDate().atTime(12, 0))
+            .location("Nhà hàng Thực dưỡng")
+            .description("Bữa ăn cá nhân hóa theo Dietary Profile.")
+            .build());
+    }
 
-    // 7. Sort và return
+    // 5. Sort theo thời gian
     events.sort(Comparator.comparing(TimelineEvent::getTime));
+
+    String packageName = (activeBooking.getRetreatPackage() != null) ? activeBooking.getRetreatPackage().getPackageName() : "";
+    String villaName = (activeBooking.getVilla() != null) ? activeBooking.getVilla().getVillaName() : "Chưa xếp phòng";
+
     return ItineraryTimelineDTO.builder()
         .bookingId(activeBooking.getId())
         .guestName(guest.getFullName())
+        .packageName(packageName)
+        .villaName(villaName)
+        .checkinDate(activeBooking.getCheckinDate())
+        .checkoutDate(activeBooking.getCheckoutDate())
+        .bookingStatus(activeBooking.getBookingStatus())
         .events(events)
         .build();
 }
@@ -563,9 +604,21 @@ public String showItinerary(
 ---
 
 
+# 12. Rollback & Incident Runbook
 
-> UC10 là **read-only** — không có write operations, không cần rollback DB.
-> Nếu có lỗi, chỉ cần restart service.
+## 12.1. Điều kiện kích hoạt Rollback
+| Điều kiện                        | Ngưỡng            | Người quyết định   |
+| -------------------------------- | ----------------- | ------------------- |
+| Timeline query lỗi liên tục     | > 5 lần/phút      | On-call Engineer    |
+| Giao diện Crash do Null data     | Bất kỳ            | On-call Engineer    |
+
+## 12.2. Rollback Procedure
+- **Bước 1**: Giới hạn lại số lượng query nếu database bị quá tải (Rate limit qua API Gateway).
+- **Bước 2**: Revert Code về bản release trước nếu có exception nghiêm trọng do entity `SpaBooking` hoặc `MealOrder` bị thay đổi.
+- **Bước 3**: `kubectl rollout undo deployment/booking-service` (nếu deploy k8s).
+
+## 12.3. Notification Protocol
+- Nếu `Timeline` bị downtime quá 10 phút, tự động gửi cảnh báo lên kênh Slack `#incident-booking`.
 
 ---
 
@@ -573,30 +626,25 @@ public String showItinerary(
 
 ## 13.1. Unit Tests
 
-### TC-UC10-001 — getTimelineForGuest với Detox package
+### TC-UC10-001 — getTimelineForGuest lấy dữ liệu động thành công
 
 ```text
 Feature: View Itinerary Timeline
   Background:
     Given test data classification: SYNTHETIC
 
-  Scenario: Guest có booking Detox 5 ngày
+  Scenario: Guest có booking và các hoạt động thực tế
     Given Booking(guestId=100, status=CONFIRMED, checkinDate=2026-07-01, checkoutDate=2026-07-06)
-    And package.typePackage = "Detox"
+    And SpaBookingRepository trả về 1 SpaBooking lúc 2026-07-02T15:00
+    And MealOrderRepository trả về 1 MealOrder lúc 2026-07-02T12:00
     When getTimelineForGuest(100)
     Then kết quả có bookingId = 1001
     And guestName = "Nguyễn Văn A"
     And events có item đầu tiên là "Nhận phòng (Check-in)" lúc 14:00 ngày 2026-07-01
     And events có item cuối là "Trả phòng (Check-out)" lúc 12:00 ngày 2026-07-06
-    And events chứa "Vận động Cardio nhẹ nhàng" (không phải "Yoga")
-    And events chứa "Bữa trưa Detox & Ít calorie"
+    And events chứa item Spa vào lúc 2026-07-02T15:00
+    And events chứa item Bữa ăn vào lúc 2026-07-02T12:00
     And events được sắp xếp tăng dần theo time
-
-  Scenario: packageType = "Stress Relief"
-    Given package.typePackage = "Stress Relief"
-    When getTimelineForGuest(100)
-    Then events chứa "Thiền định & Thở chánh niệm"
-    And events KHÔNG chứa "Luyện tập Yoga sáng"
 ```
 
 ### TC-UC10-002 — IDOR Prevention

@@ -37,16 +37,16 @@ public class ReportServiceImpl implements ReportService {
         }
 
         ReportDataDTO dto = new ReportDataDTO();
-        
+
         List<OccupancyReportRow> occupancyRows = new ArrayList<>();
         List<TherapistUtilizationRow> utilizationRows = new ArrayList<>();
-        
+
         if ("OCCUPANCY".equalsIgnoreCase(reportType) || "ALL".equalsIgnoreCase(reportType)) {
             long totalVillas = villaRepository.countByIsDeleteFalse();
-            
+
             LocalDate currentMonthStart = startDate.withDayOfMonth(1);
             LocalDate absoluteEnd = endDate.withDayOfMonth(endDate.lengthOfMonth());
-            
+
             while (!currentMonthStart.isAfter(absoluteEnd)) {
                 OccupancyReportRow row = new OccupancyReportRow();
                 String monthLabel = "Tháng " + currentMonthStart.getMonthValue();
@@ -55,53 +55,55 @@ public class ReportServiceImpl implements ReportService {
                 }
                 row.setMonthLabel(monthLabel);
                 row.setTotalVillas((int) totalVillas);
-                
-                // For a real implementation, we would sum the occupied days for this month and average it.
+
+                // For a real implementation, we would sum the occupied days for this month and
+                // average it.
                 // Here we keep the demo logic but adapt it to the month.
                 long occupied = villaRepository.countByVillaStatusAndIsDeleteFalse("OCCUPIED");
                 row.setOccupiedVillas((int) occupied);
                 row.setOccupancyRate(totalVillas > 0 ? ((double) occupied / totalVillas) * 100 : 0.0);
                 occupancyRows.add(row);
-                
+
                 currentMonthStart = currentMonthStart.plusMonths(1);
             }
         }
-        
+
         if ("UTILIZATION".equalsIgnoreCase(reportType) || "ALL".equalsIgnoreCase(reportType)) {
             TherapistUtilizationRow row = new TherapistUtilizationRow();
             row.setTherapistName("Tất cả chuyên viên");
             LocalDateTime s = startDate.atStartOfDay();
             LocalDateTime e = endDate.atTime(LocalTime.MAX);
-            
+
             long total = scheduleRepository.countSchedules(s, e);
             long completed = scheduleRepository.countSchedulesByStatus("COMPLETED", s, e);
-            
+
             row.setTotalSessions((int) total);
             row.setCompletedSessions((int) completed);
             row.setNoShowSessions((int) (total - completed));
             row.setUtilizationRate(total > 0 ? ((double) completed / total) * 100 : 0.0);
-            
+
             utilizationRows.add(row);
         }
-        
+
         dto.setOccupancyRows(occupancyRows);
         dto.setUtilizationRows(utilizationRows);
-        
+
         double avgOcc = occupancyRows.stream().mapToDouble(OccupancyReportRow::getOccupancyRate).average().orElse(0.0);
-        double avgUtil = utilizationRows.stream().mapToDouble(TherapistUtilizationRow::getUtilizationRate).average().orElse(0.0);
-        
+        double avgUtil = utilizationRows.stream().mapToDouble(TherapistUtilizationRow::getUtilizationRate).average()
+                .orElse(0.0);
+
         dto.setAvgOccupancyRate(avgOcc);
         dto.setAvgUtilizationRate(avgUtil);
-        
+
         return dto;
     }
 
     @Override
     public byte[] exportToExcel(LocalDate startDate, LocalDate endDate, String reportType) {
         ReportDataDTO data = generateReportData(startDate, endDate, reportType);
-        
+
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            
+
             if ("OCCUPANCY".equalsIgnoreCase(reportType) || "ALL".equalsIgnoreCase(reportType)) {
                 Sheet sheet = workbook.createSheet("Tỷ lệ Lấp đầy");
                 Row headerRow = sheet.createRow(0);
@@ -109,7 +111,7 @@ public class ReportServiceImpl implements ReportService {
                 headerRow.createCell(1).setCellValue("Tổng số phòng");
                 headerRow.createCell(2).setCellValue("Phòng có khách");
                 headerRow.createCell(3).setCellValue("Tỷ lệ (%)");
-                
+
                 int rowIdx = 1;
                 for (OccupancyReportRow rowData : data.getOccupancyRows()) {
                     Row row = sheet.createRow(rowIdx++);
@@ -119,7 +121,7 @@ public class ReportServiceImpl implements ReportService {
                     row.createCell(3).setCellValue(rowData.getOccupancyRate());
                 }
             }
-            
+
             if ("UTILIZATION".equalsIgnoreCase(reportType) || "ALL".equalsIgnoreCase(reportType)) {
                 Sheet sheet = workbook.createSheet("Hiệu suất Chuyên viên");
                 Row headerRow = sheet.createRow(0);
@@ -128,7 +130,7 @@ public class ReportServiceImpl implements ReportService {
                 headerRow.createCell(2).setCellValue("Hoàn thành");
                 headerRow.createCell(3).setCellValue("Vắng mặt");
                 headerRow.createCell(4).setCellValue("Tỷ lệ (%)");
-                
+
                 int rowIdx = 1;
                 for (TherapistUtilizationRow rowData : data.getUtilizationRows()) {
                     Row row = sheet.createRow(rowIdx++);
@@ -139,7 +141,7 @@ public class ReportServiceImpl implements ReportService {
                     row.createCell(4).setCellValue(rowData.getUtilizationRate());
                 }
             }
-            
+
             workbook.write(out);
             return out.toByteArray();
         } catch (Exception e) {

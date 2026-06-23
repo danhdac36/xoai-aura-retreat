@@ -20,8 +20,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 1. Set minimum check-in date to today
     if (checkinInput) {
-        const today = new Date().toISOString().split("T")[0];
-        checkinInput.min = today;
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, "0");
+        const dd = String(today.getDate()).padStart(2, "0");
+        const hh = String(today.getHours()).padStart(2, "0");
+        const min = String(today.getMinutes()).padStart(2, "0");
+        checkinInput.min = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
 
         // Listen for check-in date changes
         checkinInput.addEventListener("change", updateCheckoutDate);
@@ -38,9 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const yyyy = checkin.getFullYear();
         const mm = String(checkin.getMonth() + 1).padStart(2, "0");
         const dd = String(checkin.getDate()).padStart(2, "0");
+        const hh = String(checkin.getHours()).padStart(2, "0");
+        const min = String(checkin.getMinutes()).padStart(2, "0");
 
         if (checkoutDisplay) {
-            checkoutDisplay.textContent = `${dd}/${mm}/${yyyy}`;
+            checkoutDisplay.textContent = `${hh}:${min} - ${dd}/${mm}/${yyyy}`;
         }
     }
 

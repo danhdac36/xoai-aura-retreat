@@ -125,6 +125,7 @@ public class BillingServiceImpl implements BillingService {
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
         booking.setBookingStatus("COMPLETED");
         booking.setPaymentStatus("PAID");
+        booking.setCheckoutDate(LocalDateTime.now());
         bookingRepository.save(booking);
 
         if (booking.getAssignedVilla() != null) {
@@ -152,6 +153,7 @@ public class BillingServiceImpl implements BillingService {
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
         booking.setBookingStatus("COMPLETED");
         booking.setPaymentStatus("PAID");
+        booking.setCheckoutDate(LocalDateTime.now());
         bookingRepository.save(booking);
 
         if (booking.getAssignedVilla() != null) {

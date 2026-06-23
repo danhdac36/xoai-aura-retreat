@@ -1,37 +1,46 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::div})}">
+
 <head>
     <title>Báo cáo Hiệu suất &amp; Xuất dữ liệu</title>
 </head>
+
 <body>
     <div class="w-full">
         <!-- Load specific report css -->
         <link rel="stylesheet" th:href="@{/css/billing/report.css}">
-        
+
         <div class="max-w-7xl mx-auto">
             <!-- Page Header Section -->
             <section class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-stack-lg">
                 <div>
-                    <h2 class="font-headline-lg text-headline-lg text-on-background mb-2">Báo cáo Hiệu suất &amp; Xuất dữ liệu</h2>
+                    <h2 class="font-headline-lg text-headline-lg text-on-background mb-2">Báo cáo Hiệu suất &amp; Xuất
+                        dữ liệu</h2>
                     <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
-                        Theo dõi và phân tích các chỉ số vận hành quan trọng của khu nghỉ dưỡng. Tạo báo cáo tùy chỉnh và xuất dữ liệu để phục vụ công tác quản lý chiến lược.
+                        Theo dõi và phân tích các chỉ số vận hành quan trọng của khu nghỉ dưỡng. Tạo báo cáo tùy chỉnh
+                        và xuất dữ liệu để phục vụ công tác quản lý chiến lược.
                     </p>
                 </div>
-                
+
                 <!-- Date Filter & Export -->
                 <form action="/manager/report" method="GET" class="flex flex-col sm:flex-row items-center gap-4">
-                    <div class="bg-surface-container-lowest border border-outline-variant px-6 py-2 rounded-full flex items-center gap-4 shadow-sm hover:bg-surface-container-low transition-colors">
+                    <div
+                        class="bg-surface-container-lowest border border-outline-variant px-6 py-2 rounded-full flex items-center gap-4 shadow-sm hover:bg-surface-container-low transition-colors">
                         <span class="material-symbols-outlined text-primary">calendar_today</span>
                         <div class="flex items-center gap-2">
-                            <input type="date" name="startDate" th:value="${startDate}" class="bg-transparent border-none text-body-md text-on-surface focus:ring-0 p-0 w-32 cursor-pointer">
+                            <input type="date" name="startDate" th:value="${startDate}"
+                                class="bg-transparent border-none text-body-md text-on-surface focus:ring-0 p-0 w-32 cursor-pointer">
                             <span>-</span>
-                            <input type="date" name="endDate" th:value="${endDate}" class="bg-transparent border-none text-body-md text-on-surface focus:ring-0 p-0 w-32 cursor-pointer">
+                            <input type="date" name="endDate" th:value="${endDate}"
+                                class="bg-transparent border-none text-body-md text-on-surface focus:ring-0 p-0 w-32 cursor-pointer">
                         </div>
                         <input type="hidden" name="type" th:value="${type}">
-                        <button type="submit" class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">refresh</button>
+                        <button type="submit"
+                            class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">refresh</button>
                     </div>
-                    
-                    <a th:href="@{/manager/report/export(startDate=${startDate},endDate=${endDate},type=${type})}" class="flex items-center gap-2 px-6 py-2.5 bg-primary text-on-primary rounded font-label-md text-label-md hover:brightness-110 transition-all shadow-sm">
+
+                    <a th:href="@{/manager/report/export(startDate=${startDate},endDate=${endDate},type=${type})}"
+                        class="flex items-center gap-2 px-6 py-2.5 bg-primary text-on-primary rounded font-label-md text-label-md hover:brightness-110 transition-all shadow-sm">
                         <span class="material-symbols-outlined text-[18px]">file_download</span>
                         Xuất báo cáo PDF/Excel
                     </a>
@@ -41,42 +50,56 @@
             <!-- KPI Section -->
             <section class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-stack-lg">
                 <!-- Card 1: Villa Occupancy -->
-                <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg flex items-center justify-between group shadow-sm transition-shadow hover:shadow-md">
+                <div
+                    class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg flex items-center justify-between group shadow-sm transition-shadow hover:shadow-md">
                     <div class="flex flex-col">
-                        <span class="font-label-md text-label-md text-on-surface-variant mb-2">Trung bình Tỷ lệ lấp đầy Villa</span>
+                        <span class="font-label-md text-label-md text-on-surface-variant mb-2">Trung bình Tỷ lệ lấp đầy
+                            Villa</span>
                         <div class="flex items-baseline gap-2">
-                            <span class="font-headline-md text-headline-md text-primary" th:text="${#numbers.formatDecimal(data.avgOccupancyRate, 1, 0)} + '%'">84%</span>
+                            <span class="font-headline-md text-headline-md text-primary"
+                                th:text="${#numbers.formatDecimal(data.avgOccupancyRate, 1, 0)} + '%'">84%</span>
                         </div>
-                        <p class="text-on-surface-variant text-[12px] mt-2 opacity-80">Dựa trên dữ liệu phòng đang sử dụng</p>
+                        <p class="text-on-surface-variant text-[12px] mt-2 opacity-80">Dựa trên dữ liệu phòng đang sử
+                            dụng</p>
                     </div>
                     <div class="relative h-20 w-20 flex items-center justify-center">
                         <svg class="h-full w-full transform -rotate-90" viewBox="0 0 112 112">
-                            <circle class="text-surface-variant" cx="56" cy="56" fill="transparent" r="48" stroke="currentColor" stroke-width="12"></circle>
-                            <circle class="text-primary transition-all duration-1000 ease-out" cx="56" cy="56" fill="transparent" r="48" stroke="currentColor" 
-                                    stroke-dasharray="301.59" 
-                                    th:attr="stroke-dashoffset=${301.59 - (301.59 * data.avgOccupancyRate / 100)}" stroke-width="12"></circle>
+                            <circle class="text-surface-variant" cx="56" cy="56" fill="transparent" r="48"
+                                stroke="currentColor" stroke-width="12"></circle>
+                            <circle class="text-primary transition-all duration-1000 ease-out" cx="56" cy="56"
+                                fill="transparent" r="48" stroke="currentColor" stroke-dasharray="301.59"
+                                th:attr="stroke-dashoffset=${301.59 - (301.59 * data.avgOccupancyRate / 100)}"
+                                stroke-width="12"></circle>
                         </svg>
-                        <span class="absolute font-headline-sm text-primary text-[14px]" th:text="${#numbers.formatDecimal(data.avgOccupancyRate, 1, 0)} + '%'">84%</span>
+                        <span class="absolute font-headline-sm text-primary text-[14px]"
+                            th:text="${#numbers.formatDecimal(data.avgOccupancyRate, 1, 0)} + '%'">84%</span>
                     </div>
                 </div>
 
                 <!-- Card 2: Spa Performance -->
-                <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg flex items-center justify-between group shadow-sm transition-shadow hover:shadow-md">
+                <div
+                    class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg flex items-center justify-between group shadow-sm transition-shadow hover:shadow-md">
                     <div class="flex flex-col">
-                        <span class="font-label-md text-label-md text-on-surface-variant mb-2">Trung bình Hiệu suất Chuyên viên</span>
+                        <span class="font-label-md text-label-md text-on-surface-variant mb-2">Trung bình Hiệu suất
+                            Chuyên viên</span>
                         <div class="flex items-baseline gap-2">
-                            <span class="font-headline-md text-headline-md text-[#92400e]" th:text="${#numbers.formatDecimal(data.avgUtilizationRate, 1, 0)} + '%'">64%</span>
+                            <span class="font-headline-md text-headline-md text-[#92400e]"
+                                th:text="${#numbers.formatDecimal(data.avgUtilizationRate, 1, 0)} + '%'">64%</span>
                         </div>
-                        <p class="text-on-surface-variant text-[12px] mt-2 opacity-80">Phân bổ phiên trị liệu đã hoàn thành</p>
+                        <p class="text-on-surface-variant text-[12px] mt-2 opacity-80">Phân bổ phiên trị liệu đã hoàn
+                            thành</p>
                     </div>
                     <div class="relative h-20 w-20 flex items-center justify-center">
                         <svg class="h-full w-full transform -rotate-90" viewBox="0 0 112 112">
-                            <circle class="text-surface-variant" cx="56" cy="56" fill="transparent" r="48" stroke="currentColor" stroke-width="12"></circle>
-                            <circle class="text-[#f59e0b] transition-all duration-1000 ease-out" cx="56" cy="56" fill="transparent" r="48" stroke="currentColor" 
-                                    stroke-dasharray="301.59" 
-                                    th:attr="stroke-dashoffset=${301.59 - (301.59 * data.avgUtilizationRate / 100)}" stroke-width="12"></circle>
+                            <circle class="text-surface-variant" cx="56" cy="56" fill="transparent" r="48"
+                                stroke="currentColor" stroke-width="12"></circle>
+                            <circle class="text-[#f59e0b] transition-all duration-1000 ease-out" cx="56" cy="56"
+                                fill="transparent" r="48" stroke="currentColor" stroke-dasharray="301.59"
+                                th:attr="stroke-dashoffset=${301.59 - (301.59 * data.avgUtilizationRate / 100)}"
+                                stroke-width="12"></circle>
                         </svg>
-                        <span class="absolute font-headline-sm text-[#92400e] text-[14px]" th:text="${#numbers.formatDecimal(data.avgUtilizationRate, 1, 0)} + '%'">64%</span>
+                        <span class="absolute font-headline-sm text-[#92400e] text-[14px]"
+                            th:text="${#numbers.formatDecimal(data.avgUtilizationRate, 1, 0)} + '%'">64%</span>
                     </div>
                 </div>
             </section>
@@ -87,21 +110,25 @@
                     <div class="flex items-center justify-between mb-8">
                         <div>
                             <h3 class="font-headline-sm text-headline-sm text-primary">Xu hướng Lấp đầy Hàng tháng</h3>
-                            <p class="text-on-surface-variant font-body-md text-[14px]">Biến động tỷ lệ thuê phòng định kỳ</p>
+                            <p class="text-on-surface-variant font-body-md text-[14px]">Biến động tỷ lệ thuê phòng định
+                                kỳ</p>
                         </div>
                         <div class="flex gap-4">
-                            <span class="flex items-center gap-2 font-label-md text-[12px] text-on-surface"><span class="w-3 h-3 rounded-full bg-primary"></span> Tỷ lệ (%)</span>
+                            <span class="flex items-center gap-2 font-label-md text-[12px] text-on-surface"><span
+                                    class="w-3 h-3 rounded-full bg-primary"></span> Tỷ lệ (%)</span>
                         </div>
                     </div>
                     <div class="h-64 flex items-end justify-between gap-4 px-4 overflow-x-auto pt-8">
                         <!-- Bar Chart Implementation dynamic via Thymeleaf -->
-                        <div th:each="row : ${data.occupancyRows}" class="flex-1 min-w-[40px] max-w-[80px] h-full flex flex-col justify-end items-center gap-2 group">
-                            <div class="w-full rounded-t-md transition-all duration-500 relative group-hover:brightness-110" 
-                                 th:style="'height: ' + ${row.occupancyRate} + '%; background-color: #4a5d4e; min-height: 4px;'">
-                                <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#2b3234] text-white text-[12px] font-label-md px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md z-10 pointer-events-none" 
-                                     th:text="${#numbers.formatDecimal(row.occupancyRate, 1, 0)} + '%'"></div>
+                        <div th:each="row : ${data.occupancyRows}"
+                            class="flex-1 min-w-[40px] max-w-[80px] h-full flex flex-col justify-end items-center gap-2 group">
+                            <div class="w-full rounded-t-md transition-all duration-500 relative group-hover:brightness-110"
+                                th:style="'height: ' + ${row.occupancyRate} + '%; background-color: #4a5d4e; min-height: 4px;'">
+                                <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#2b3234] text-white text-[12px] font-label-md px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md z-10 pointer-events-none"
+                                    th:text="${#numbers.formatDecimal(row.occupancyRate, 1, 0)} + '%'"></div>
                             </div>
-                            <span class="font-label-md text-[12px] text-on-surface-variant whitespace-nowrap" th:text="${row.monthLabel}">Tháng</span>
+                            <span class="font-label-md text-[12px] text-on-surface-variant whitespace-nowrap"
+                                th:text="${row.monthLabel}">Tháng</span>
                         </div>
                     </div>
                 </div>
@@ -109,59 +136,86 @@
 
             <!-- Detailed Data Table Section -->
             <section class="mb-stack-lg">
-                <div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm">
-                    <div class="px-8 py-6 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+                <div
+                    class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm">
+                    <div
+                        class="px-8 py-6 border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
                         <h3 class="font-headline-sm text-headline-sm text-primary">Bảng Chi tiết Vận hành</h3>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead class="bg-surface-container-low">
                                 <tr>
-                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider">Đối tượng</th>
-                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">Tỷ lệ Lấp đầy Villa / Hiệu suất (%)</th>
-                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-right">Chi tiết Thực tế</th>
-                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">Trạng thái</th>
+                                    <th
+                                        class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider">
+                                        Đối tượng</th>
+                                    <th
+                                        class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">
+                                        Tỷ lệ Lấp đầy Villa / Hiệu suất (%)</th>
+                                    <th
+                                        class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-right">
+                                        Chi tiết Thực tế</th>
+                                    <th
+                                        class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">
+                                        Trạng thái</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-outline-variant">
                                 <!-- Occupancy Rows -->
-                                <tr th:each="row : ${data.occupancyRows}" class="hover:bg-surface-bright transition-colors">
-                                    <td class="px-8 py-5 font-body-md text-body-md text-primary font-bold" th:text="${row.monthLabel}">Tháng 6</td>
+                                <tr th:each="row : ${data.occupancyRows}"
+                                    class="hover:bg-surface-bright transition-colors">
+                                    <td class="px-8 py-5 font-body-md text-body-md text-primary font-bold"
+                                        th:text="${row.monthLabel}">Tháng 6</td>
                                     <td class="px-8 py-5 text-center">
                                         <div class="flex items-center justify-center gap-3">
                                             <div class="w-32 bg-surface-variant rounded-full h-2 overflow-hidden">
-                                                <div class="bg-primary h-full rounded-full" th:style="'width: ' + ${row.occupancyRate} + '%'"></div>
+                                                <div class="bg-primary h-full rounded-full"
+                                                    th:style="'width: ' + ${row.occupancyRate} + '%'"></div>
                                             </div>
-                                            <span class="font-body-md text-body-md text-on-surface font-semibold" th:text="${#numbers.formatDecimal(row.occupancyRate, 1, 0)} + '%'">88%</span>
+                                            <span class="font-body-md text-body-md text-on-surface font-semibold"
+                                                th:text="${#numbers.formatDecimal(row.occupancyRate, 1, 0)} + '%'">88%</span>
                                         </div>
                                     </td>
-                                    <td class="px-8 py-5 text-right font-body-md text-body-md font-semibold text-primary" th:text="${row.occupiedVillas} + ' / ' + ${row.totalVillas} + ' Phòng'">10 / 12</td>
+                                    <td class="px-8 py-5 text-right font-body-md text-body-md font-semibold text-primary"
+                                        th:text="${row.occupiedVillas} + ' / ' + ${row.totalVillas} + ' Phòng'">10 / 12
+                                    </td>
                                     <td class="px-8 py-5 text-center">
-                                        <span th:classappend="${row.occupancyRate >= 80 ? 'bg-[#d1fae5] text-[#065f46] border border-[#34d399]' : (row.occupancyRate >= 50 ? 'bg-[#fef3c7] text-[#92400e] border border-[#fbbf24]' : 'bg-[#fee2e2] text-[#991b1b] border border-[#f87171]')}" 
-                                              class="px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tight" 
-                                              th:text="${row.occupancyRate >= 80 ? 'Tốt' : (row.occupancyRate >= 50 ? 'Bình thường' : 'Kém')}">Tốt</span>
+                                        <span
+                                            th:classappend="${row.occupancyRate >= 80 ? 'bg-[#d1fae5] text-[#065f46] border border-[#34d399]' : (row.occupancyRate >= 50 ? 'bg-[#fef3c7] text-[#92400e] border border-[#fbbf24]' : 'bg-[#fee2e2] text-[#991b1b] border border-[#f87171]')}"
+                                            class="px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tight"
+                                            th:text="${row.occupancyRate >= 80 ? 'Tốt' : (row.occupancyRate >= 50 ? 'Bình thường' : 'Kém')}">Tốt</span>
                                     </td>
                                 </tr>
                                 <!-- Utilization Rows -->
-                                <tr th:each="row : ${data.utilizationRows}" class="hover:bg-surface-bright transition-colors">
-                                    <td class="px-8 py-5 font-body-md text-body-md text-on-surface-variant font-bold" th:text="${row.therapistName}">Chuyên viên</td>
+                                <tr th:each="row : ${data.utilizationRows}"
+                                    class="hover:bg-surface-bright transition-colors">
+                                    <td class="px-8 py-5 font-body-md text-body-md text-on-surface-variant font-bold"
+                                        th:text="${row.therapistName}">Chuyên viên</td>
                                     <td class="px-8 py-5 text-center">
                                         <div class="flex items-center justify-center gap-3">
                                             <div class="w-32 bg-surface-variant rounded-full h-2 overflow-hidden">
-                                                <div class="bg-[#f59e0b] h-full rounded-full" th:style="'width: ' + ${row.utilizationRate} + '%'"></div>
+                                                <div class="bg-[#f59e0b] h-full rounded-full"
+                                                    th:style="'width: ' + ${row.utilizationRate} + '%'"></div>
                                             </div>
-                                            <span class="font-body-md text-body-md text-on-surface font-semibold" th:text="${#numbers.formatDecimal(row.utilizationRate, 1, 0)} + '%'">64%</span>
+                                            <span class="font-body-md text-body-md text-on-surface font-semibold"
+                                                th:text="${#numbers.formatDecimal(row.utilizationRate, 1, 0)} + '%'">64%</span>
                                         </div>
                                     </td>
-                                    <td class="px-8 py-5 text-right font-body-md text-body-md font-semibold text-primary" th:text="${row.completedSessions} + ' / ' + ${row.totalSessions} + ' Phiên'">8 / 12</td>
+                                    <td class="px-8 py-5 text-right font-body-md text-body-md font-semibold text-primary"
+                                        th:text="${row.completedSessions} + ' / ' + ${row.totalSessions} + ' Phiên'">8 /
+                                        12</td>
                                     <td class="px-8 py-5 text-center">
-                                        <span th:classappend="${row.utilizationRate >= 80 ? 'bg-[#d1fae5] text-[#065f46] border border-[#34d399]' : (row.utilizationRate >= 50 ? 'bg-[#fef3c7] text-[#92400e] border border-[#fbbf24]' : 'bg-[#fee2e2] text-[#991b1b] border border-[#f87171]')}" 
-                                              class="px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tight" 
-                                              th:text="${row.utilizationRate >= 80 ? 'Tốt' : (row.utilizationRate >= 50 ? 'Bình thường' : 'Kém')}">Tốt</span>
+                                        <span
+                                            th:classappend="${row.utilizationRate >= 80 ? 'bg-[#d1fae5] text-[#065f46] border border-[#34d399]' : (row.utilizationRate >= 50 ? 'bg-[#fef3c7] text-[#92400e] border border-[#fbbf24]' : 'bg-[#fee2e2] text-[#991b1b] border border-[#f87171]')}"
+                                            class="px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tight"
+                                            th:text="${row.utilizationRate >= 80 ? 'Tốt' : (row.utilizationRate >= 50 ? 'Bình thường' : 'Kém')}">Tốt</span>
                                     </td>
                                 </tr>
-                                <tr th:if="${#lists.isEmpty(data.occupancyRows) and #lists.isEmpty(data.utilizationRows)}">
-                                    <td colspan="4" class="px-8 py-6 text-center text-on-surface-variant font-body-md text-body-md">Không có dữ liệu trong khoảng thời gian này</td>
+                                <tr
+                                    th:if="${#lists.isEmpty(data.occupancyRows) and #lists.isEmpty(data.utilizationRows)}">
+                                    <td colspan="4"
+                                        class="px-8 py-6 text-center text-on-surface-variant font-body-md text-body-md">
+                                        Không có dữ liệu trong khoảng thời gian này</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -174,4 +228,7 @@
         <script th:src="@{/js/billing/report.js}"></script>
     </div>
 </body>
+
+</html>
+
 </html>

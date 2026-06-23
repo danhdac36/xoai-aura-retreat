@@ -4,7 +4,7 @@ import com.AuraMoon.auramoon.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "BOOKING")
@@ -37,10 +37,10 @@ public class Booking extends BaseEntity {
     private Villa assignedVilla;
 
     @Column(name = "checkin_date")
-    private LocalDate checkinDate;
+    private LocalDateTime checkinDate;
 
     @Column(name = "checkout_date")
-    private LocalDate checkoutDate;
+    private LocalDateTime checkoutDate;
 
     @Column(name = "total_guests")
     private Integer totalGuests;

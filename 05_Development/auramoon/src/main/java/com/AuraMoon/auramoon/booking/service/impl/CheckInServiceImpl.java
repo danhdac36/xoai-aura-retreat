@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -50,8 +51,7 @@ public class CheckInServiceImpl implements CheckInService {
                     "[BOOK-400] Đơn đặt phòng #" + booking.getId() + " không ở trạng thái CONFIRMED (hiện tại: " + booking.getBookingStatus() + ")");
         }
 
-        // 2.1 Kiểm tra ngày check-in thực tế — không được check-in trước ngày checkinDate
-        if (booking.getCheckinDate() != null && booking.getCheckinDate().isAfter(LocalDate.now())) {
+        if (booking.getCheckinDate() != null && booking.getCheckinDate().toLocalDate().isAfter(LocalDate.now())) {
             throw new IllegalStateException(
                     "[BOOK-400] Không thể check-in trước ngày nhận phòng thực tế (" + booking.getCheckinDate() + ")");
         }
@@ -115,6 +115,13 @@ public class CheckInServiceImpl implements CheckInService {
         // 8. Cập nhật trạng thái Booking và gán phòng (BR-02)
         booking.setBookingStatus(BookingStatus.CHECKED_IN.name());
         booking.setAssignedVilla(villa);
+        
+        // 8.1 Cập nhật thời gian thực tế theo Chu kỳ 24h
+        LocalDateTime now = LocalDateTime.now();
+        booking.setCheckinDate(now);
+        int durationDays = booking.getRetreatPackage() != null && booking.getRetreatPackage().getDurationDays() != null 
+                            ? booking.getRetreatPackage().getDurationDays() : 1;
+        booking.setCheckoutDate(now.plusDays(durationDays));
 
         // 9. Lưu thay đổi
         bookingRepository.save(booking);

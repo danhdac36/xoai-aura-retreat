@@ -1,9 +1,10 @@
 package com.AuraMoon.auramoon.booking.controller;
 
 import com.AuraMoon.auramoon.auth.entity.User;
+import com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse;
 import com.AuraMoon.auramoon.booking.dto.ItineraryTimelineDTO;
 import com.AuraMoon.auramoon.booking.service.ItineraryService;
-import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,19 +21,18 @@ public class ItineraryController {
     }
 
     @GetMapping("/booking/itinerary")
-    public String showItinerary(@RequestParam(value = "guestId", required = false) Integer guestId, Model model, HttpSession session) {
-        User currentUser = (User) session.getAttribute("currentUser");
-        
+    public String showItinerary(@RequestParam(value = "guestId", required = false) Integer guestId, Model model, @AuthenticationPrincipal UserDetailsResponse currentUser) {
         if (currentUser == null) {
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
 
         // Anti-IDOR: Chỉ Lễ tân/Admin mới được xem itinerary của khách khác. Khách chỉ xem của mình.
         if (guestId == null) {
             guestId = currentUser.getId();
         } else {
-            String roleName = (currentUser.getRole() != null) ? currentUser.getRole().getRoleName() : "";
-            if (!"RECEPTIONIST".equalsIgnoreCase(roleName) && !"ADMIN".equalsIgnoreCase(roleName)) {
+            String roleName = (currentUser.getAuthorities() != null && !currentUser.getAuthorities().isEmpty()) 
+                    ? currentUser.getAuthorities().iterator().next().getAuthority() : "";
+            if (!"ROLE_RECEPTIONIST".equalsIgnoreCase(roleName) && !"ROLE_ADMIN".equalsIgnoreCase(roleName)) {
                 // Phớt lờ guestId trên URL, ép buộc dùng ID của chính currentUser
                 guestId = currentUser.getId();
             }
