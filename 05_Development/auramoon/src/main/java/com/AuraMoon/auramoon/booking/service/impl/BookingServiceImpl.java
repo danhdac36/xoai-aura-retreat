@@ -18,12 +18,15 @@ import com.AuraMoon.auramoon.auth.entity.User;
 import com.AuraMoon.auramoon.auth.repository.UserRepository;
 import com.AuraMoon.auramoon.auth.entity.Consent;
 import com.AuraMoon.auramoon.auth.repository.ConsentRepository;
+import com.AuraMoon.auramoon.spa.entity.TreatmentBooking;
+import com.AuraMoon.auramoon.spa.repository.TreatmentBookingRepository;
+import com.AuraMoon.auramoon.spa.repository.TreatmentServiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +39,8 @@ public class BookingServiceImpl implements BookingService {
         private final VillaService villaService;
         private final UserRepository userRepository;
         private final ConsentRepository consentRepository;
+        private final TreatmentBookingRepository treatmentBookingRepository;
+        private final TreatmentServiceRepository treatmentServiceRepository;
 
         @Override
         @Transactional
@@ -47,6 +52,14 @@ public class BookingServiceImpl implements BookingService {
                         throw new IllegalArgumentException("Vui lòng chọn loại biệt thự lưu trú.");
                 }
 
+                if (guestId != null) {
+                        java.util.List<String> activeStatuses = java.util.Arrays.asList("PENDING", "CONFIRMED", "CHECKED_IN", "CHECKED-IN");
+                        boolean hasActive = bookingRepository.existsByGuestIdAndBookingStatusIn(guestId, activeStatuses);
+                        if (hasActive) {
+                                throw new IllegalStateException("Bạn đang có một kỳ nghỉ chưa hoàn tất. Không thể đặt thêm gói mới!");
+                        }
+                }
+
                 RetreatPackage retreatPackage = retreatPackageRepository
                                 .findByIdAndIsActiveTrueAndIsDeleteFalse(request.getRetreatPackageId())
                                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy gói trị liệu với ID: "
@@ -56,11 +69,11 @@ public class BookingServiceImpl implements BookingService {
                                 .orElseThrow(() -> new IllegalArgumentException(
                                                 "Không tìm thấy loại biệt thự với ID: " + request.getVillaTypeId()));
 
-                LocalDate checkinDate = request.getCheckinDate();
-                LocalDate checkoutDate = checkinDate.plusDays(retreatPackage.getDurationDays());
+                LocalDateTime checkinDate = request.getCheckinDate();
+                LocalDateTime expectedCheckoutDate = checkinDate.plusDays(retreatPackage.getDurationDays());
 
                 boolean isAvailable = villaService.checkVillaAvailability(request.getVillaTypeId(), checkinDate,
-                                checkoutDate);
+                                expectedCheckoutDate);
                 if (!isAvailable) {
                         throw new VillaNotAvailableException(
                                         "Loại biệt thự đã chọn không còn phòng trống trong thời gian này.");
@@ -70,7 +83,7 @@ public class BookingServiceImpl implements BookingService {
                                 .guestId(guestId)
                                 .retreatPackage(retreatPackage)
                                 .checkinDate(checkinDate)
-                                .checkoutDate(checkoutDate)
+                                .checkoutDate(null)
                                 .totalGuests(request.getTotalGuests())
                                 .bookingStatus("PENDING")
                                 .paymentStatus("UNPAID")
@@ -138,5 +151,30 @@ public class BookingServiceImpl implements BookingService {
                                                 "GuestFolio not found for bookingId: " + bookingId));
                 guestFolio.setStatus("OPEN");
                 guestFolioRepository.save(guestFolio);
+
+                // Auto create TreatmentBooking (Spa Ticket) for the guest with default active service
+                int durationDays = booking.getRetreatPackage().getDurationDays() != null 
+                        ? booking.getRetreatPackage().getDurationDays() : 1;
+                
+                treatmentServiceRepository.findAll().stream()
+                        .filter(s -> Boolean.TRUE.equals(s.getIsAvailable()) && Boolean.FALSE.equals(s.getIsDelete()))
+                        .findFirst()
+                        .ifPresent(service -> {
+                            for (int i = 0; i < durationDays; i++) {
+                                TreatmentBooking tb = new TreatmentBooking();
+                                tb.setBookingId(bookingId);
+                                tb.setTreatmentService(service);
+                                tb.setStatus("PENDING");
+                                tb.setIsDelete(false);
+                                treatmentBookingRepository.save(tb);
+                            }
+                        });
+        }
+
+        @Override
+        public boolean hasActiveBooking(Integer guestId) {
+                if (guestId == null) return false;
+                java.util.List<String> activeStatuses = java.util.Arrays.asList("PENDING", "CONFIRMED", "CHECKED_IN", "CHECKED-IN");
+                return bookingRepository.existsByGuestIdAndBookingStatusIn(guestId, activeStatuses);
         }
 }

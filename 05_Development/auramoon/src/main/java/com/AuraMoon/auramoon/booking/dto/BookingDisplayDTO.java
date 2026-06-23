@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -14,8 +15,8 @@ public class BookingDisplayDTO {
     private Integer id;
     private Integer guestId;
     private String packageName;      // Tên gói để tránh lazy load
-    private LocalDate checkinDate;
-    private LocalDate checkoutDate;
+    private LocalDateTime checkinDate;
+    private LocalDateTime checkoutDate;
     private String assignedVillaCode; // Mã phòng vật lý đã gán
     private String bookingStatus;
     private Boolean consentApproved;

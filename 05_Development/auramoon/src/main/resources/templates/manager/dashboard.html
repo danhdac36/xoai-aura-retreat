@@ -1,41 +1,51 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::div})}">
+
 <head>
     <title>Bảng điều khiển Doanh thu Quản lý</title>
 </head>
+
 <body>
     <div class="w-full">
         <!-- Load specific dashboard css -->
         <link rel="stylesheet" th:href="@{/css/billing/dashboard.css}">
-        
+
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-stack-lg">
             <div>
-                <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Bảng điều khiển Doanh thu Quản lý</h2>
-                <p class="font-body-md text-body-md text-on-surface-variant">Phân tích hiệu suất tài chính của Aura Retreat</p>
+                <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Bảng điều khiển Doanh thu Quản lý
+                </h2>
+                <p class="font-body-md text-body-md text-on-surface-variant">Phân tích hiệu suất tài chính của Aura
+                    Retreat</p>
             </div>
-            
+
             <form action="/manager/dashboard" method="GET" class="flex flex-wrap gap-4">
                 <!-- Time Filter -->
                 <div class="flex flex-col gap-1">
-                    <span class="font-label-md text-[10px] uppercase tracking-wider text-on-surface-variant ml-1">Thời gian</span>
+                    <span class="font-label-md text-[10px] uppercase tracking-wider text-on-surface-variant ml-1">Thời
+                        gian</span>
                     <div class="flex items-center gap-2">
-                        <input type="date" name="startDate" th:value="${startDate}" class="bg-surface-container-lowest border border-outline-variant rounded px-2 py-2 font-label-md text-on-surface focus:ring-2 focus:ring-tertiary focus:border-transparent outline-none">
+                        <input type="date" name="startDate" th:value="${startDate}"
+                            class="bg-surface-container-lowest border border-outline-variant rounded px-2 py-2 font-label-md text-on-surface focus:ring-2 focus:ring-tertiary focus:border-transparent outline-none">
                         <span>-</span>
-                        <input type="date" name="endDate" th:value="${endDate}" class="bg-surface-container-lowest border border-outline-variant rounded px-2 py-2 font-label-md text-on-surface focus:ring-2 focus:ring-tertiary focus:border-transparent outline-none">
+                        <input type="date" name="endDate" th:value="${endDate}"
+                            class="bg-surface-container-lowest border border-outline-variant rounded px-2 py-2 font-label-md text-on-surface focus:ring-2 focus:ring-tertiary focus:border-transparent outline-none">
                     </div>
                 </div>
                 <!-- Category Filter -->
                 <div class="flex flex-col gap-1">
-                    <span class="font-label-md text-[10px] uppercase tracking-wider text-on-surface-variant ml-1">Hạng mục</span>
-                    <select name="category" class="bg-surface-container-lowest border border-outline-variant rounded px-4 py-2 font-label-md text-on-surface min-w-[180px] focus:ring-2 focus:ring-tertiary focus:border-transparent outline-none">
+                    <span class="font-label-md text-[10px] uppercase tracking-wider text-on-surface-variant ml-1">Hạng
+                        mục</span>
+                    <select name="category"
+                        class="bg-surface-container-lowest border border-outline-variant rounded px-4 py-2 font-label-md text-on-surface min-w-[180px] focus:ring-2 focus:ring-tertiary focus:border-transparent outline-none">
                         <option value="ALL" th:selected="${category == 'ALL'}">Tất cả dịch vụ</option>
                         <option value="SPA" th:selected="${category == 'SPA'}">Spa &amp; Trị liệu</option>
                         <option value="FNB" th:selected="${category == 'FNB'}">Ẩm thực</option>
                         <option value="PACKAGE" th:selected="${category == 'PACKAGE'}">Phòng &amp; Gói Retreat</option>
                     </select>
                 </div>
-                <button type="submit" class="self-end bg-surface-container-highest text-on-surface-variant p-2.5 rounded-lg hover:bg-outline-variant transition-colors flex items-center">
+                <button type="submit"
+                    class="self-end bg-surface-container-highest text-on-surface-variant p-2.5 rounded-lg hover:bg-outline-variant transition-colors flex items-center">
                     <span class="material-symbols-outlined">filter_list</span>
                 </button>
             </form>
@@ -44,10 +54,13 @@
         <!-- Dashboard Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-stack-lg">
             <!-- Card 1: Tổng Doanh thu -->
-            <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex items-center justify-between">
+            <div
+                class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex items-center justify-between">
                 <div class="flex flex-col">
-                    <span class="font-label-md text-[12px] uppercase tracking-wider text-on-surface-variant mb-1">Tổng Doanh thu</span>
-                    <span class="font-headline-sm text-headline-sm text-primary" th:text="${#numbers.formatDecimal(data.totalRevenue, 0, 'COMMA', 0, 'POINT')} + '₫'">4.670.000.000₫</span>
+                    <span class="font-label-md text-[12px] uppercase tracking-wider text-on-surface-variant mb-1">Tổng
+                        Doanh thu</span>
+                    <span class="font-headline-sm text-headline-sm text-primary"
+                        th:text="${#numbers.formatDecimal(data.totalRevenue, 0, 'COMMA', 0, 'POINT')} + '₫'">4.670.000.000₫</span>
                     <span class="text-[12px] text-[#406840] font-bold mt-1">Cập nhật lúc này</span>
                 </div>
                 <div class="bg-secondary-container p-3 rounded-full">
@@ -56,10 +69,13 @@
             </div>
 
             <!-- Card 2: Tỷ lệ Lấp đầy phòng -->
-            <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex items-center justify-between">
+            <div
+                class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex items-center justify-between">
                 <div class="flex flex-col">
-                    <span class="font-label-md text-[12px] uppercase tracking-wider text-on-surface-variant mb-1">Tỷ lệ Lấp đầy phòng</span>
-                    <span class="font-headline-sm text-headline-sm text-primary" th:text="${#numbers.formatDecimal(data.occupancyRate, 1, 1)} + '%'">85%</span>
+                    <span class="font-label-md text-[12px] uppercase tracking-wider text-on-surface-variant mb-1">Tỷ lệ
+                        Lấp đầy phòng</span>
+                    <span class="font-headline-sm text-headline-sm text-primary"
+                        th:text="${#numbers.formatDecimal(data.occupancyRate, 1, 1)} + '%'">85%</span>
                     <span class="text-[12px] text-[#406840] font-bold mt-1">Phòng đang có khách</span>
                 </div>
                 <div class="bg-secondary-container p-3 rounded-full">
@@ -68,10 +84,13 @@
             </div>
 
             <!-- Card 3: Hiệu suất Chuyên viên -->
-            <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex items-center justify-between">
+            <div
+                class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex items-center justify-between">
                 <div class="flex flex-col">
-                    <span class="font-label-md text-[12px] uppercase tracking-wider text-on-surface-variant mb-1">Hiệu suất Chuyên viên</span>
-                    <span class="font-headline-sm text-headline-sm text-primary" th:text="${#numbers.formatDecimal(data.therapistUtilization, 1, 1)} + '%'">92%</span>
+                    <span class="font-label-md text-[12px] uppercase tracking-wider text-on-surface-variant mb-1">Hiệu
+                        suất Chuyên viên</span>
+                    <span class="font-headline-sm text-headline-sm text-primary"
+                        th:text="${#numbers.formatDecimal(data.therapistUtilization, 1, 1)} + '%'">92%</span>
                     <span class="text-[12px] text-[#406840] font-bold mt-1">Lịch đã hoàn thành</span>
                 </div>
                 <div class="bg-secondary-container p-3 rounded-full">
@@ -91,17 +110,20 @@
                     <!-- SVG Pie Chart Visualization -->
                     <div class="relative w-64 h-64">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                            <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#f0eded" stroke-width="3"></circle>
+                            <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#f0eded" stroke-width="3">
+                            </circle>
                             <!-- Retreat -->
                             <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#566342" stroke-width="3"
-                                    th:attr="stroke-dasharray=${data.packagePercentage} + ' ' + ${100 - data.packagePercentage}"
-                                    stroke-dashoffset="0"></circle>
+                                th:attr="stroke-dasharray=${data.packagePercentage} + ' ' + ${100 - data.packagePercentage}"
+                                stroke-dashoffset="0"></circle>
                             <!-- Spa -->
                             <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#8a9c72" stroke-width="3"
-                                    th:attr="stroke-dasharray=${data.spaPercentage} + ' ' + ${100 - data.spaPercentage}, stroke-dashoffset=${data.spaOffset}"></circle>
+                                th:attr="stroke-dasharray=${data.spaPercentage} + ' ' + ${100 - data.spaPercentage}, stroke-dashoffset=${data.spaOffset}">
+                            </circle>
                             <!-- F&B -->
                             <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#c9c6c2" stroke-width="3"
-                                    th:attr="stroke-dasharray=${data.fbPercentage} + ' ' + ${100 - data.fbPercentage}, stroke-dashoffset=${data.fbOffset}"></circle>
+                                th:attr="stroke-dasharray=${data.fbPercentage} + ' ' + ${100 - data.fbPercentage}, stroke-dashoffset=${data.fbOffset}">
+                            </circle>
                         </svg>
                         <div class="absolute inset-0 flex flex-col items-center justify-center">
                             <span class="font-headline-sm text-on-surface">100%</span>
@@ -114,21 +136,24 @@
                             <div class="w-3 h-3 rounded-full bg-[#566342]"></div>
                             <div class="flex flex-col">
                                 <span class="font-label-md text-on-surface">Gói Retreat</span>
-                                <span class="text-[12px] text-on-surface-variant" th:text="${#numbers.formatDecimal(data.packageRevenue, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                                <span class="text-[12px] text-on-surface-variant"
+                                    th:text="${#numbers.formatDecimal(data.packageRevenue, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
                             <div class="w-3 h-3 rounded-full bg-[#8a9c72]"></div>
                             <div class="flex flex-col">
                                 <span class="font-label-md text-on-surface">Spa &amp; Trị liệu</span>
-                                <span class="text-[12px] text-on-surface-variant" th:text="${#numbers.formatDecimal(data.spaRevenue, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                                <span class="text-[12px] text-on-surface-variant"
+                                    th:text="${#numbers.formatDecimal(data.spaRevenue, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
                             <div class="w-3 h-3 rounded-full bg-[#c9c6c2]"></div>
                             <div class="flex flex-col">
                                 <span class="font-label-md text-on-surface">Ẩm thực</span>
-                                <span class="text-[12px] text-on-surface-variant" th:text="${#numbers.formatDecimal(data.fbRevenue, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                                <span class="text-[12px] text-on-surface-variant"
+                                    th:text="${#numbers.formatDecimal(data.fbRevenue, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
                             </div>
                         </div>
                     </div>
@@ -136,16 +161,20 @@
             </div>
 
             <!-- Right Card: Revenue Trend (Bar Chart) -->
-            <div class="bg-surface-container-lowest border border-outline-variant p-stack-lg rounded-lg shadow-sm flex flex-col">
+            <div
+                class="bg-surface-container-lowest border border-outline-variant p-stack-lg rounded-lg shadow-sm flex flex-col">
                 <div class="flex justify-between items-center mb-8">
                     <h3 class="font-headline-sm text-headline-sm text-primary">Xu hướng Doanh thu (Mô phỏng)</h3>
-                    <div class="flex items-center gap-2 text-on-tertiary-container bg-tertiary-container px-3 py-1 rounded-full">
+                    <div
+                        class="flex items-center gap-2 text-on-tertiary-container bg-tertiary-container px-3 py-1 rounded-full">
                         <span class="material-symbols-outlined text-[18px]">trending_up</span>
                     </div>
                 </div>
-                <div class="flex-1 flex items-end justify-between gap-4 h-64 border-b border-outline-variant pb-2 relative mb-6">
+                <div
+                    class="flex-1 flex items-end justify-between gap-4 h-64 border-b border-outline-variant pb-2 relative mb-6">
                     <!-- Y-Axis labels -->
-                    <div class="absolute -left-10 h-full flex flex-col justify-between text-[10px] text-on-surface-variant py-2">
+                    <div
+                        class="absolute -left-10 h-full flex flex-col justify-between text-[10px] text-on-surface-variant py-2">
                         <span class="">100%</span>
                         <span class="">75%</span>
                         <span class="">50%</span>
@@ -153,22 +182,24 @@
                         <span class="">0</span>
                     </div>
                     <!-- Bar Month Loop -->
-                    <div th:each="trend, trendStat : ${data.monthlyTrend}" class="flex-1 flex flex-col items-center justify-end h-full group">
-                        <div class="chart-bar w-full max-w-[40px] rounded-t transition-colors relative rounded-t-lg" 
-                             th:classappend="${trendStat.last} ? 'bg-[#566342] hover:brightness-110' : 'bg-secondary-fixed-dim hover:bg-secondary-fixed'"
-                             th:style="'height: ' + ${trend.percentage} + '%;'"
-                             th:title="${trend.label} + ': ' + ${#numbers.formatDecimal(trend.revenue, 0, 'COMMA', 0, 'POINT')} + '₫'">
+                    <div th:each="trend, trendStat : ${data.monthlyTrend}"
+                        class="flex-1 flex flex-col items-center justify-end h-full group">
+                        <div class="chart-bar w-full max-w-[40px] rounded-t transition-colors relative rounded-t-lg"
+                            th:classappend="${trendStat.last} ? 'bg-[#566342] hover:brightness-110' : 'bg-secondary-fixed-dim hover:bg-secondary-fixed'"
+                            th:style="'height: ' + ${trend.percentage} + '%;'"
+                            th:title="${trend.label} + ': ' + ${#numbers.formatDecimal(trend.revenue, 0, 'COMMA', 0, 'POINT')} + '₫'">
                         </div>
-                        <span class="mt-2 text-[12px] font-label-md" 
-                              th:classappend="${trendStat.last} ? 'text-on-surface font-bold' : 'text-on-surface-variant'" 
-                              th:text="${trend.label}">Tháng</span>
+                        <span class="mt-2 text-[12px] font-label-md"
+                            th:classappend="${trendStat.last} ? 'text-on-surface font-bold' : 'text-on-surface-variant'"
+                            th:text="${trend.label}">Tháng</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Detailed Table Section -->
-        <div class="mt-stack-lg bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden mb-10">
+        <div
+            class="mt-stack-lg bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden mb-10">
             <div class="p-6 border-b border-outline-variant flex justify-between items-center">
                 <h3 class="font-headline-sm text-headline-sm text-primary">Giao dịch gần đây (Đã thanh toán)</h3>
             </div>
@@ -184,17 +215,23 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-outline-variant font-body-md text-on-surface">
-                        <tr th:each="tx : ${data.recentTransactions}" class="hover:bg-surface-container transition-colors">
+                        <tr th:each="tx : ${data.recentTransactions}"
+                            class="hover:bg-surface-container transition-colors">
                             <td class="px-6 py-4" th:text="${tx.guestName}">Nguyễn Văn A</td>
                             <td class="px-6 py-4" th:text="${tx.service}">Gói Zen Retreat</td>
                             <td class="px-6 py-4" th:text="${tx.date}">12/09/2023</td>
                             <td class="px-6 py-4">
-                                <span class="bg-tertiary-container text-on-tertiary-fixed-variant px-2 py-0.5 rounded-full text-[11px] font-bold" th:text="${tx.status}">Đã thanh toán</span>
+                                <span
+                                    class="bg-tertiary-container text-on-tertiary-fixed-variant px-2 py-0.5 rounded-full text-[11px] font-bold"
+                                    th:text="${tx.status}">Đã thanh toán</span>
                             </td>
-                            <td class="px-6 py-4 text-right font-bold" th:text="${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + '₫'">45.000.000đ</td>
+                            <td class="px-6 py-4 text-right font-bold"
+                                th:text="${#numbers.formatDecimal(tx.amount, 0, 'COMMA', 0, 'POINT')} + '₫'">45.000.000đ
+                            </td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(data.recentTransactions)}">
-                            <td colspan="5" class="px-6 py-4 text-center text-on-surface-variant">Không có giao dịch nào gần đây</td>
+                            <td colspan="5" class="px-6 py-4 text-center text-on-surface-variant">Không có giao dịch nào
+                                gần đây</td>
                         </tr>
                     </tbody>
                 </table>
@@ -205,4 +242,8 @@
         <script th:src="@{/js/billing/dashboard.js}"></script>
     </div>
 </body>
+
+</html>
+</body>
+
 </html>

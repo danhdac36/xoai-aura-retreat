@@ -10,6 +10,8 @@ Cách đặt thên method, class, tất cả phải tuân thủ theo phương ph
 
 Ưu tiên OOP.
 
+Mọi bước chuyển đổi dữ liệu cần được thực hiện ở bằng lớp DTO (request/response tương ứng) tránh việc code vào entity.
+
 ## Nguyên tắc 2: Định dạng File đầu ra
 
 Mọi file mà người dùng yêu cầu tạo ra đều phải được tạo dưới dạng **Markdown (.md)** (bao gồm cả việc viết code thì code cũng sẽ được bọc bên trong file Markdown thay vì tạo file mã nguồn trực tiếp).

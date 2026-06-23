@@ -1,4 +1,4 @@
-﻿# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
+# ENGINEERING DOCUMENTATION STANDARD (EDS) v2.0
 
 # Quy chuẩn Tài liệu Kỹ thuật và Đặc tả Hiện thực hóa
 

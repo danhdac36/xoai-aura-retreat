@@ -46,9 +46,24 @@ class CheckoutControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(checkoutController).build();
         mockUser = new com.AuraMoon.auramoon.auth.entity.User();
         mockUser.setId(1);
+        com.AuraMoon.auramoon.auth.entity.Role mockRole = new com.AuraMoon.auramoon.auth.entity.Role();
+        mockRole.setRoleName("ROLE_USER");
+        mockUser.setRole(mockRole);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(checkoutController)
+            .setCustomArgumentResolvers(new org.springframework.web.method.support.HandlerMethodArgumentResolver() {
+                @Override
+                public boolean supportsParameter(org.springframework.core.MethodParameter parameter) {
+                    return parameter.getParameterType().isAssignableFrom(com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse.class);
+                }
+                @Override
+                public Object resolveArgument(org.springframework.core.MethodParameter parameter, org.springframework.web.method.support.ModelAndViewContainer mavContainer, org.springframework.web.context.request.NativeWebRequest webRequest, org.springframework.web.bind.support.WebDataBinderFactory binderFactory) {
+                    return new com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse(mockUser);
+                }
+            })
+            .build();
     }
 
     @Test

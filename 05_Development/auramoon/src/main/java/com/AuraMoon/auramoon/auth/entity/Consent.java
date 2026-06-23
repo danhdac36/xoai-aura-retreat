@@ -11,9 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@AttributeOverrides({
-    @AttributeOverride(name = "updatedAt", column = @Column(name = "update_at"))
-})
 public class Consent extends BaseEntity {
 
     @Id

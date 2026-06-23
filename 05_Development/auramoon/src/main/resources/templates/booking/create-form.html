@@ -41,6 +41,20 @@
         </a>
 
         <!-- Split 2-Column Checkout Layout -->
+        <div th:if="${hasActiveBooking}" class="bg-red-50 border-l-4 border-red-500 p-4 mb-8 rounded-r-lg shadow-sm">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <span class="material-symbols-outlined text-red-500">warning</span>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Cảnh báo Đặt phòng</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <p>Bạn đang có một Kỳ nghỉ chưa hoàn tất (Đang chờ thanh toán, Đã xác nhận hoặc Đang lưu trú). Hệ thống chỉ cho phép mỗi khách hàng tham gia 1 gói Retreat tại một thời điểm. Vui lòng hoàn thành kỳ nghỉ hiện tại hoặc hủy gói cũ trước khi đặt mới.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
             <!-- Left Column: Form Fields (2/3 width) -->
@@ -72,8 +86,8 @@
                             <div class="relative">
                                 <span
                                     class="material-symbols-outlined absolute left-3 top-3 text-gray-400 text-xl pointer-events-none">calendar_today</span>
-                                <input type="date" id="checkinDate" name="checkinDate" required
-                                    th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
+                                <input type="datetime-local" id="checkinDate" name="checkinDate" required
+                                    th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd''T''HH:mm')}"
                                     class="w-full bg-white border border-gray-200 pl-11 pr-4 py-2.5 rounded-xl focus:ring-[#566342]/20 focus:border-[#566342] text-sm" />
                             </div>
                         </div>
@@ -184,8 +198,9 @@
                     </div>
 
                     <!-- Action Button -->
-                    <button type="submit" form="bookingForm"
-                        class="w-full py-3.5 bg-[#566342] text-white font-medium rounded-xl hover:bg-[#3f4b2c] transition-all duration-300 shadow-md shadow-[#566342]/10 hover:shadow-lg flex items-center justify-center gap-2 text-sm">
+                    <button type="submit" form="bookingForm" th:disabled="${hasActiveBooking}"
+                        th:classappend="${hasActiveBooking} ? 'opacity-50 cursor-not-allowed hover:bg-[#566342]' : 'hover:bg-[#3f4b2c] shadow-[#566342]/10 hover:shadow-lg'"
+                        class="w-full py-3.5 bg-[#566342] text-white font-medium rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2 text-sm">
                         Xác nhận & Thanh toán cọc <span class="material-symbols-outlined text-base">payments</span>
                     </button>
 

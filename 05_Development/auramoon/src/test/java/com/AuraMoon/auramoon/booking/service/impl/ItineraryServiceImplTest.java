@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -51,8 +51,8 @@ class ItineraryServiceImplTest {
                 .id(101)
                 .guestId(guestId)
                 .bookingStatus("CONFIRMED")
-                .checkinDate(LocalDate.of(2026, 6, 20))
-                .checkoutDate(LocalDate.of(2026, 6, 22))
+                .checkinDate(LocalDateTime.of(2026, 6, 20, 0, 0))
+                .checkoutDate(LocalDateTime.of(2026, 6, 22, 0, 0))
                 .retreatPackage(retreatPackage)
                 .build();
 
@@ -96,8 +96,8 @@ class ItineraryServiceImplTest {
                 .id(102)
                 .guestId(guestId)
                 .bookingStatus("CHECKED_IN")
-                .checkinDate(LocalDate.of(2026, 6, 20))
-                .checkoutDate(LocalDate.of(2026, 6, 22))
+                .checkinDate(LocalDateTime.of(2026, 6, 20, 0, 0))
+                .checkoutDate(LocalDateTime.of(2026, 6, 22, 0, 0))
                 .retreatPackage(retreatPackage)
                 .build();
 

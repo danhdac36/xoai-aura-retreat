@@ -16,7 +16,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse;
+
 import java.util.Map;
 
 @Controller
@@ -28,21 +30,12 @@ public class CheckoutController {
     private final VNPayService vnPayService;
     private final AuditLogService auditLogService;
 
-    private Integer getUserId(HttpSession session) {
-        if (session != null) {
-            com.AuraMoon.auramoon.auth.entity.User user = (com.AuraMoon.auramoon.auth.entity.User) session
-                    .getAttribute("currentUser");
-            if (user != null)
-                return user.getId();
-        }
-        throw new IllegalStateException("User is not authenticated or session expired.");
-    }
-
     @GetMapping("/checkout")
-    public String showCheckoutPage(@RequestParam Integer bookingId, Model model, HttpSession session) {
+    public String showCheckoutPage(@RequestParam Integer bookingId, Model model, @AuthenticationPrincipal UserDetailsResponse currentUser) {
         try {
             CheckoutViewDTO data = billingService.getCheckoutData(bookingId);
-            auditLogService.logActivity(AuditLogActionType.VIEW_INVOICE.name(), getUserId(session), bookingId);
+            Integer actorId = (currentUser != null) ? currentUser.getId() : 1;
+            auditLogService.logActivity(AuditLogActionType.VIEW_INVOICE.name(), actorId, bookingId);
             model.addAttribute("data", data);
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
@@ -57,12 +50,13 @@ public class CheckoutController {
             @RequestParam(required = false) String paymentMethod,
             HttpServletRequest request,
             RedirectAttributes redirectAttributes,
-            HttpSession session) {
+            @AuthenticationPrincipal UserDetailsResponse currentUser) {
         try {
             CheckoutViewDTO data = billingService.getCheckoutData(bookingId);
+            Integer actorId = (currentUser != null) ? currentUser.getId() : 1;
             if (data.getBalanceDue().compareTo(java.math.BigDecimal.ZERO) <= 0) {
                 billingService.completeCheckoutWithoutPayment(bookingId);
-                auditLogService.logActivity(AuditLogActionType.CHECKOUT_COMPLETE.name(), getUserId(session), bookingId);
+                auditLogService.logActivity(AuditLogActionType.CHECKOUT_COMPLETE.name(), actorId, bookingId);
                 redirectAttributes.addFlashAttribute("successMessage",
                         "Check-out thành công! Bạn không có khoản nợ nào cần thanh toán.");
                 return "redirect:/billing/checkout/success?bookingId=" + bookingId; // Or redirect to a general success
@@ -77,7 +71,7 @@ public class CheckoutController {
             String gateway = PaymentMethod.CASH.name().equals(paymentMethod) ? PaymentGateway.DIRECT.name()
                     : PaymentGateway.VNPAY.name();
             Payment payment = billingService.initiatePayment(bookingId, paymentMethod, gateway);
-            auditLogService.logActivity(AuditLogActionType.INITIATE_PAYMENT.name(), getUserId(session), bookingId);
+            auditLogService.logActivity(AuditLogActionType.INITIATE_PAYMENT.name(), actorId, bookingId);
 
             if (PaymentMethod.CASH.name().equals(paymentMethod)) {
                 billingService.completePaymentAndCheckout(payment.getId(), null);
@@ -112,20 +106,21 @@ public class CheckoutController {
     public String vnpayReturn(@RequestParam Map<String, String> params,
             @RequestParam(required = false) Integer bookingId,
             RedirectAttributes redirectAttributes,
-            HttpSession session) {
+            @AuthenticationPrincipal UserDetailsResponse currentUser) {
         if (vnPayService.verifySignature(params)) {
+            Integer actorId = (currentUser != null) ? currentUser.getId() : 1;
             Integer paymentId = Integer.parseInt(params.get("vnp_TxnRef"));
             if ("00".equals(params.get("vnp_ResponseCode"))) {
                 billingService.completePaymentAndCheckout(paymentId, params.get("vnp_TransactionNo"));
                 if (bookingId != null)
-                    auditLogService.logActivity(AuditLogActionType.COMPLETE_PAYMENT.name(), getUserId(session),
+                    auditLogService.logActivity(AuditLogActionType.COMPLETE_PAYMENT.name(), actorId,
                             bookingId);
                 redirectAttributes.addFlashAttribute("successMessage", "Thanh toán VNPay thành công!");
                 return "redirect:/billing/checkout/success?paymentId=" + paymentId;
             } else {
                 billingService.markPaymentAsFailed(paymentId);
                 if (bookingId != null)
-                    auditLogService.logActivity(AuditLogActionType.PAYMENT_FAILED.name(), getUserId(session),
+                    auditLogService.logActivity(AuditLogActionType.PAYMENT_FAILED.name(), actorId,
                             bookingId);
                 redirectAttributes.addFlashAttribute("errorMessage", "Khách hàng hủy giao dịch hoặc thẻ lỗi.");
             }
@@ -144,7 +139,7 @@ public class CheckoutController {
             @RequestParam(required = false) Integer paymentId,
             @RequestParam(required = false) Integer bookingId,
             Model model,
-            HttpSession session) {
+            @AuthenticationPrincipal UserDetailsResponse currentUser) {
 
         if (paymentId != null) {
             Payment payment = billingService.getPaymentById(paymentId);
@@ -155,7 +150,8 @@ public class CheckoutController {
             return "redirect:/billing/checkout";
         }
 
-        auditLogService.logActivity(AuditLogActionType.CHECKOUT_COMPLETE.name(), getUserId(session), bookingId);
+        Integer actorId = (currentUser != null) ? currentUser.getId() : 1;
+        auditLogService.logActivity(AuditLogActionType.CHECKOUT_COMPLETE.name(), actorId, bookingId);
         model.addAttribute("successMessage", "Thanh toán thành công. Check-out hoàn tất!");
         model.addAttribute("bookingId", bookingId);
         return "billing/checkout/checkout_success";

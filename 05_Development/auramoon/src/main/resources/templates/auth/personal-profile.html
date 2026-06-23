@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ Thông tin Cá nhân - AuraMoon Retreat</title>
+    <link rel="stylesheet" th:href="@{/css/auth/profile.css}">
+</head>
+<body>
+<div class="profile-container">
+    <a th:href="@{/packages}">&larr; Quay lại trang chủ</a>
+    <h2>Hồ Sơ Thông Tin Cá Nhân</h2>
+    <p class="subtitle">Vui lòng hoàn thiện thông tin cá nhân để chúng tôi phục vụ bạn tốt nhất trong kỳ nghỉ.</p>
+
+    <!-- Error Message -->
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <!-- Success Message -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+    <form th:action="@{/profile/me/update}" th:object="${personalProfileDto}" method="POST" class="profile-form">
+  
+        <fieldset>
+            <legend>Thông tin cơ bản</legend>
+            <div class="form-group">
+                <label for="fullName">Họ và tên (Readonly):</label>
+                <input type="text" id="fullName" th:field="*{fullName}" readonly class="readonly-input" style="background-color: #f0f0f0; cursor: not-allowed;"/>
+            </div>
+            <div class="form-group">
+                <label for="email">Email (Readonly):</label>
+                <input type="email" id="email" th:field="*{email}" readonly class="readonly-input" style="background-color: #f0f0f0; cursor: not-allowed;"/>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Thông tin cần cập nhật</legend>
+            <div class="form-group">
+                <label for="dateOfBirth">Ngày sinh:</label>
+                <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}" required/>
+                <div class="error-text" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></div>
+            </div>
+            <div class="form-group">
+                <label for="gender">Giới tính:</label>
+                <select id="gender" th:field="*{gender}" required>
+                    <option value="">-- Chọn giới tính --</option>
+                    <option value="MALE">Nam</option>
+                    <option value="FEMALE">Nữ</option>
+                    <option value="OTHER">Khác</option>
+                </select>
+                <div class="error-text" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+            </div>
+            <div class="form-group">
+                <label for="phone">Số điện thoại:</label>
+                <input type="tel" id="phone" th:field="*{phone}" placeholder="Ví dụ: 0912345678" required/>
+                <div class="error-text" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+            </div>
+            <div class="form-group">
+                <label for="identifyCode">Căn cước công dân / Passport:</label>
+                <input type="text" id="identifyCode" th:field="*{identifyCode}" placeholder="Ví dụ: 001200300400" required/>
+                <div class="error-text" th:if="${#fields.hasErrors('identifyCode')}" th:errors="*{identifyCode}"></div>
+            </div>
+        </fieldset>
+
+        <button type="submit" class="btn-submit">Cập Nhật Thông Tin</button>
+    </form>
+</div>
+</body>
+</html>

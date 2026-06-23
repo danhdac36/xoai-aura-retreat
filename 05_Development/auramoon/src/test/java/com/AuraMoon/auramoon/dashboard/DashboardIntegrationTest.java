@@ -11,6 +11,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse;
 import com.AuraMoon.auramoon.auth.entity.User;
 
 @SpringBootTest
@@ -33,23 +36,12 @@ class DashboardIntegrationTest {
         mockRole.setRoleName("MANAGER");
         mockUser.setRole(mockRole);
 
-        com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse userDetails = 
-            new com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse(mockUser);
-        org.springframework.security.authentication.UsernamePasswordAuthenticationToken auth =
-            new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities()
-            );
-        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
-
-        try {
-            mockMvc.perform(get("/manager/dashboard")
-                    .sessionAttr("currentUser", mockUser)
-                    .param("startDate", "2026-06-01")
-                    .param("endDate", "2026-06-30"))
-                   .andExpect(status().isOk())
-                   .andExpect(view().name("manager/dashboard"));
-        } finally {
-            org.springframework.security.core.context.SecurityContextHolder.clearContext();
-        }
+        // Expected to fail initially (RED)
+        mockMvc.perform(get("/manager/dashboard")
+                .with(user(new UserDetailsResponse(mockUser)))
+                .param("startDate", "2026-06-01")
+                .param("endDate", "2026-06-30"))
+               .andExpect(status().isOk())
+               .andExpect(view().name("manager/dashboard"));
     }
 }

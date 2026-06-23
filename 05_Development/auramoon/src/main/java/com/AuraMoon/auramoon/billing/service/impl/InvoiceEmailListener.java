@@ -23,8 +23,8 @@ public class InvoiceEmailListener {
     private final AuditLogRepository auditLogRepository;
 
     public InvoiceEmailListener(IPdfGeneratorService pdfGeneratorService,
-                                IEmailNotificationService emailNotificationService,
-                                AuditLogRepository auditLogRepository) {
+            IEmailNotificationService emailNotificationService,
+            AuditLogRepository auditLogRepository) {
         this.pdfGeneratorService = pdfGeneratorService;
         this.emailNotificationService = emailNotificationService;
         this.auditLogRepository = auditLogRepository;

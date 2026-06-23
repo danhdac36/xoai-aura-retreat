@@ -1,6 +1,6 @@
 package com.AuraMoon.auramoon.auth.service;
 
-import com.AuraMoon.auramoon.auth.dto.UserRegistrationDto;
+import com.AuraMoon.auramoon.auth.dto.request.UserRegistrationDto;
 import com.AuraMoon.auramoon.auth.entity.User;
 
 import java.util.List;

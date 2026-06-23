@@ -27,27 +27,31 @@ public class SecurityConfig {
                         "/auth/forgot-password",
                         "/auth/login-admin",
                         "/auth/verify-email",
+                        "/wellness",
+                        "/spa",
+                        "/culinary",
+                        "/villas",
                         "/css/**",
                         "/js/**",
                         "/images/**"
         };
 
         private static final String[] GUEST_ENDPOINTS = {
-                        "/user/**",
-                        "/orders/**",
-                        "/cart/**",
-                        "/profile/**"
+                        // "/user/**",
+                        // "/orders/**",
+                        // "/cart/**",
+                        // "/profile/**"
         };
 
         private static final String[] ADMIN_ENDPOINTS = {
                         "/admin/**",
                         "/dashboard/**",
-                        "/manage/**",
-                        "/manager/housekeeping/**"
+                        "/manage/**"
         };
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {
-                        "/receptionist/**"
+                        // "/receptionist/**"
+//                        "/receptionist/**"
         };
 
         private static final String[] THERAPIST_ENDPOINTS = {
@@ -58,7 +62,8 @@ public class SecurityConfig {
                         "/F&B/**" };
 
         private static final String[] MANAGER_ENDPOINTS = {
-                        "/management/**"
+                        "/management/**",
+                        "/manager/housekeeping/**"
         };
 
         @Bean
@@ -71,10 +76,11 @@ public class SecurityConfig {
                                                 .requestMatchers(RECEPTIONIST_ENDPOINTS).hasRole("RECEPTIONIST")
                                                 .requestMatchers(THERAPIST_ENDPOINTS).hasRole("THERAPIST")
                                                 .requestMatchers(CHEFF_ENDPOINTS).hasRole("CHEFF")
-                                                .requestMatchers(MANAGER_ENDPOINTS).hasRole("MANAGER")
+                                                .requestMatchers(MANAGER_ENDPOINTS).hasAnyRole("MANAGER", "ADMIN")
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
-                                                .loginPage("/auth/login")
+                                                .loginPage("/aut" +
+                                                        "h/login")
                                                 .loginProcessingUrl("/auth/login")
                                                 .usernameParameter("email")
                                                 .passwordParameter("password")

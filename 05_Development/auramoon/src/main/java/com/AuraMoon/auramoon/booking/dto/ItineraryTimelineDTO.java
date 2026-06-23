@@ -14,6 +14,11 @@ import java.util.List;
 public class ItineraryTimelineDTO {
     private Integer bookingId;
     private String guestName;
+    private String packageName;
+    private String villaName;
+    private LocalDateTime checkinDate;
+    private LocalDateTime checkoutDate;
+    private String bookingStatus;
     private List<TimelineEvent> events;
 
     @Data
@@ -23,6 +28,7 @@ public class ItineraryTimelineDTO {
     public static class TimelineEvent {
         private String eventName;
         private LocalDateTime time;
+        private String location;
         private String description;
     }
 }
