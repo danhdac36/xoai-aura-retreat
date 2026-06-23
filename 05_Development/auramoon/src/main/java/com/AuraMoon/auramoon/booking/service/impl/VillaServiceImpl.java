@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +28,7 @@ public class VillaServiceImpl implements VillaService {
     private static final Set<String> VALID_CLEANING_STATUSES = Set.of("CLEAN", "DIRTY", "CLEANING");
 
     @Override
-    public boolean checkVillaAvailability(Integer villaTypeId, LocalDate checkinDate, LocalDate checkoutDate) {
+    public boolean checkVillaAvailability(Integer villaTypeId, LocalDateTime checkinDate, LocalDateTime checkoutDate) {
         if (checkinDate == null || checkoutDate == null) {
             List<Villa> availableVillas = villaRepository.findByVillaType_IdAndVillaStatusAndIsDeleteFalse(villaTypeId, "AVAILABLE");
             return !availableVillas.isEmpty();

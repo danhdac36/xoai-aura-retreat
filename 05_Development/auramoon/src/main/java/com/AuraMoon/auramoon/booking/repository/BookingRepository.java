@@ -11,5 +11,6 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findByGuestId(Integer guestId);
     List<Booking> findByBookingStatusInAndCheckinDateBetween(List<String> statuses, LocalDate start, LocalDate end);
+    boolean existsByGuestIdAndBookingStatusIn(Integer guestId, List<String> statuses);
 }
 

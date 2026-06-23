@@ -48,13 +48,13 @@ public class ItineraryServiceImpl implements ItineraryService {
 
         List<ItineraryTimelineDTO.TimelineEvent> events = new ArrayList<>();
 
-        LocalDate start = activeBooking.getCheckinDate();
-        LocalDate end = activeBooking.getCheckoutDate();
+        LocalDateTime start = activeBooking.getCheckinDate();
+        LocalDateTime end = activeBooking.getCheckoutDate();
 
         // 1. Nhận phòng (Check-in)
         events.add(ItineraryTimelineDTO.TimelineEvent.builder()
-                .eventName("Nhận phòng (Check-in)")
-                .time(start.atTime(14, 0))
+                .eventName("Nhận phòng (Check-in dự kiến/thực tế)")
+                .time(start)
                 .location("Sảnh Lễ tân")
                 .description("Nhận Villa và bắt đầu kỳ nghỉ dưỡng.")
                 .build());
@@ -75,19 +75,21 @@ public class ItineraryServiceImpl implements ItineraryService {
         for (MealOrder meal : mealOrders) {
             events.add(ItineraryTimelineDTO.TimelineEvent.builder()
                 .eventName("Bữa ăn Cá nhân hóa")
-                .time(meal.getOrderedAt() != null ? meal.getOrderedAt() : start.atTime(12, 0))
+                .time(meal.getOrderedAt() != null ? meal.getOrderedAt() : start.plusHours(2))
                 .location("Nhà hàng Thực dưỡng")
                 .description("Bữa ăn theo Dietary Profile: " + (meal.getNote() != null ? meal.getNote() : "Thanh lọc cơ thể"))
                 .build());
         }
 
-        // 4. Trả phòng (Check-out)
-        events.add(ItineraryTimelineDTO.TimelineEvent.builder()
-                .eventName("Trả phòng (Check-out)")
-                .time(end.atTime(12, 0))
-                .location("Sảnh Lễ tân")
-                .description("Hoàn tất thủ tục thanh toán và check-out phòng.")
-                .build());
+        // 4. Trả phòng (Check-out) - Chỉ hiện nếu đã xác định được giờ checkout
+        if (end != null) {
+            events.add(ItineraryTimelineDTO.TimelineEvent.builder()
+                    .eventName("Trả phòng (Check-out)")
+                    .time(end)
+                    .location("Sảnh Lễ tân")
+                    .description("Hoàn tất thủ tục thanh toán và check-out phòng.")
+                    .build());
+        }
 
         events.sort(Comparator.comparing(ItineraryTimelineDTO.TimelineEvent::getTime));
 
@@ -96,8 +98,8 @@ public class ItineraryServiceImpl implements ItineraryService {
                 .guestName(guest.getFullName())
                 .packageName(activeBooking.getRetreatPackage() != null ? activeBooking.getRetreatPackage().getPackageName() : "Chưa đăng ký gói")
                 .villaName(activeBooking.getAssignedVilla() != null ? activeBooking.getAssignedVilla().getVillaCode() : "Chưa xếp phòng")
-                .checkinDate(start.atStartOfDay())
-                .checkoutDate(end.atStartOfDay())
+                .checkinDate(start)
+                .checkoutDate(end)
                 .bookingStatus(activeBooking.getBookingStatus())
                 .events(events)
                 .build();

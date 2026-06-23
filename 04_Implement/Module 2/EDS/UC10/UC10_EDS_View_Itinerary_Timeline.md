@@ -7,13 +7,13 @@
 | **Document ID**    | `AURAMOON-BOOKING-EDS-UC10`                                               |
 | **Version**        | 1.0                                                                         |
 | **Date**           | 2026-06-19                                                                  |
-| **Status**         | Approved                                                                    |
-| **Document Owner** | Lê Trà My — Module 2 Lead                                               |
-| **Author**         | Lê Trà My — Full-stack Developer                                        |
-| **Reviewed by**    | Phùng Giang Hải                                                           |
+| **Status**         | In Review                                                      |
+| **Document Owner** | Lê Trà My — Module 2 Lead                                  |
+| **Author**         | Phùng Giang Hải                                            |
+| **Reviewed by**    | Phùng Giang Hải                                              |
 | **DPO Sign-off**   | `[x] Approved` — Chỉ hiển thị dữ liệu của chính Guest (IDOR-safe) |
-| **Approved by**    | Phùng Giang Hải — Tech Lead                                              |
-| **Last Review**    | 2026-06-20                                                                  |
+| **Approved by**    | Phùng Giang Hải — Tech Lead                               |
+| **Last Review**    | 2026-06-23                                                  |
 | **Based on EDS**   | v2.0                                                                        |
 
 # CHANGELOG
@@ -21,6 +21,7 @@
 | Ngày      | Người thực hiện | Nội dung thay đổi                                                         |
 | ---------- | ------------------- | ---------------------------------------------------------------------------- |
 | 2026-06-19 | Student 2           | Tạo tài liệu lần đầu — UC10 View Booking Details & Itinerary Timeline |
+| 2026-06-23 | Phùng Giang Hải     | Cập nhật chỉ hiển thị Check-out nếu checkoutDate không null |
 
 ---
 
