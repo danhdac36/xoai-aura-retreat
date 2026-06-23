@@ -47,6 +47,7 @@ CREATE TABLE CONSENT (
     update_at DATETIME DEFAULT GETDATE(),
     consent_version VARCHAR(8),
     is_delete BIT DEFAULT 0,
+    create_at DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_CONSENT_USER FOREIGN KEY (user_id) REFERENCES [USER](user_id)
 );
 
@@ -133,8 +134,8 @@ CREATE TABLE BOOKING (
     guest_id INT NOT NULL,
     package_id INT,
     assigned_villa_id INT,
-    checkin_date DATE,
-    checkout_date DATE,
+    checkin_date DATETIME,
+    checkout_date DATETIME,
     total_guests INT,
     create_at DATETIME DEFAULT GETDATE(),
     update_at DATETIME DEFAULT GETDATE(),
