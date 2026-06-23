@@ -21,22 +21,7 @@
         <p>Thưởng thức các món ngon ẩm thực cao cấp, chi phí sẽ được tự động ghi nhận vào hóa đơn phòng của bạn.</p>
     </header>
 
-    <!-- Filter Form -->
-    <section class="header-container">
-        <div class="filter-form">
-            <div class="form-group">
-                <label for="input-guest-id">Mã khách hàng (Guest ID)</label>
-                <input type="number" id="input-guest-id" th:value="${guestId != null ? guestId : 2}" min="1">
-            </div>
-            <div class="form-group">
-                <label for="input-booking-id">Mã đặt phòng (Booking ID)</label>
-                <input type="number" id="input-booking-id" th:value="${bookingId != null ? bookingId : 1}" min="1">
-            </div>
-            <div>
-                <button type="button" class="btn-search">Tải thực đơn</button>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Main Container -->
     <main class="main-content">
@@ -53,19 +38,22 @@
                             th:data-item-name="${item.itemName}" class="card-img">
                     </div>
                     <div class="card-body">
-                        <h3 class="card-title" th:text="${item.itemName}">Tên món</h3>
-                        <div class="card-price"
-                            th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
-                            0đ
+                        <div class="card-header-row" style="justify-content: center; text-align: center;">
+                            <h3 class="card-title" th:text="${item.itemName}" style="margin: 0;">Tên món</h3>
                         </div>
+
                         <p class="card-ingredients"
                             th:text="${item.ingredient != null ? item.ingredient : 'Thành phần tự nhiên từ vườn Aura'}">
                             Thành phần
                         </p>
-                        <button type="button" class="btn-select" th:data-id="${item.id}" th:data-name="${item.itemName}"
-                            th:data-price="${item.price}">
-                            CHỌN MÓN
-                        </button>
+
+                        <div class="card-footer-row">
+                            <div class="card-price" th:text="${'$ ' + item.price}">$2.00</div>
+                            <button type="button" class="btn-select" th:data-id="${item.id}" th:data-name="${item.itemName}"
+                                th:data-price="${item.price}">
+                                add to cart +
+                            </button>
+                        </div>
                     </div>
                 </article>
             </div>
@@ -74,8 +62,8 @@
         <!-- Right Column: Sidebar / Cart Panel -->
         <aside class="sidebar-panel" aria-label="Giỏ hàng">
             <h2 class="sidebar-title">
-                <span>Giỏ hàng</span>
-                <span class="qty-badge" id="cart-badge">0</span>
+                <span style="font-family: var(--font-serif); font-size: 1.6rem;">Giỏ hàng</span>
+                <span class="qty-badge" id="selected-badge">0</span>
             </h2>
 
             <div class="cart-items" id="cart-items-list">
@@ -99,7 +87,7 @@
             </div>
 
             <!-- Order Fields and Submit Form -->
-            <form th:action="@{/fnb/uc19-alacarte-order}" th:object="${orderForm}" method="post"
+            <form th:action="@{/fnb/alacarte-order}" th:object="${orderForm}" method="post"
                 id="alacarte-order-form">
 
                 <input type="hidden" th:field="*{guestId}" id="form-guest-id">
@@ -131,7 +119,7 @@
 
     <!-- Scripts -->
     <script src="/js/fnb/menu-image-map.js"></script>
-    <script src="/js/fnb/uc19.js"></script>
+    <script src="/js/fnb/alacarte-order.js"></script>
 </body>
 
 </html>

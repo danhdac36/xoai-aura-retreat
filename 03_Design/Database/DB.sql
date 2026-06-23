@@ -47,6 +47,7 @@ CREATE TABLE CONSENT (
     update_at DATETIME DEFAULT GETDATE(),
     consent_version VARCHAR(8),
     is_delete BIT DEFAULT 0,
+    create_at DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_CONSENT_USER FOREIGN KEY (user_id) REFERENCES [USER](user_id)
 );
 

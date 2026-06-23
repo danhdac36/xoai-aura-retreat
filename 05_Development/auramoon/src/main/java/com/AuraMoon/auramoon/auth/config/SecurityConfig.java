@@ -27,16 +27,20 @@ public class SecurityConfig {
                         "/auth/forgot-password",
                         "/auth/login-admin",
                         "/auth/verify-email",
+                        "/wellness",
+                        "/spa",
+                        "/culinary",
+                        "/villas",
                         "/css/**",
                         "/js/**",
                         "/images/**"
         };
 
         private static final String[] GUEST_ENDPOINTS = {
-                        "/user/**",
-                        "/orders/**",
-                        "/cart/**",
-                        "/profile/**"
+                        // "/user/**",
+                        // "/orders/**",
+                        // "/cart/**",
+                        // "/profile/**"
         };
 
         private static final String[] ADMIN_ENDPOINTS = {
@@ -46,7 +50,7 @@ public class SecurityConfig {
         };
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {
-                        "/receptionist/**"
+                        // "/receptionist/**"
         };
 
         private static final String[] THERAPIST_ENDPOINTS = {
@@ -74,7 +78,8 @@ public class SecurityConfig {
                                                 .requestMatchers(MANAGER_ENDPOINTS).hasAnyRole("MANAGER", "ADMIN")
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
-                                                .loginPage("/auth/login")
+                                                .loginPage("/aut" +
+                                                        "h/login")
                                                 .loginProcessingUrl("/auth/login")
                                                 .usernameParameter("email")
                                                 .passwordParameter("password")
