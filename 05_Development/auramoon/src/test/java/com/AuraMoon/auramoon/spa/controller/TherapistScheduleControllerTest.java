@@ -135,7 +135,7 @@ public class TherapistScheduleControllerTest {
                                 .param("date", "2026-06-15")
                                 .session(session))
                                 .andExpect(status().is3xxRedirection())
-                                .andExpect(redirectedUrl("/login"));
+                                .andExpect(redirectedUrl("/auth/login"));
         }
 
         @Test
