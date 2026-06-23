@@ -1,6 +1,8 @@
 <!DOCTYPE html><html class="light" lang="vi"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <title>Đặt lịch Trị liệu Spa | Aura Wellness</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
@@ -227,7 +229,7 @@
 <!-- Calendar (Interactive Placeholder) -->
 <div class="bg-white/80 rounded-xl p-6 border border-white/50 shadow-sm backdrop-blur-sm">
 <div class="flex justify-between items-center mb-8 px-2">
-<span id="calendar-month-year" class="font-headline-sm text-headline-sm">Tháng 6, 2024</span>
+<span id="calendar-month-year" class="font-headline-sm text-headline-sm">Đang tải...</span>
 <div class="flex gap-4">
 <button id="prev-month-btn" class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2 rounded hover:bg-surface-container-low">chevron_left</button>
 <button id="next-month-btn" class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2 rounded hover:bg-surface-container-low">chevron_right</button>
@@ -268,7 +270,7 @@
 <div class="space-y-4 mb-6">
 <div class="flex justify-between items-center">
 <span class="font-body-md text-on-surface-variant">Ngày:</span>
-<span class="font-label-md text-label-md" id="summary-date">20 Tháng 6, 2024</span>
+<span class="font-label-md text-label-md" id="summary-date">Đang tải...</span>
 </div>
 <div class="flex justify-between items-center">
 <span class="font-body-md text-on-surface-variant">Thời gian:</span>
@@ -311,10 +313,12 @@
         let currentServiceId = null;
         let serviceDuration = 60;
 
+        document.getElementById('summary-date').innerText = `${todayReal.getDate()} Tháng ${todayReal.getMonth() + 1}, ${todayReal.getFullYear()}`;
+
         // Fetch Package Data from Backend on Load
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                const res = await fetch('/booking-spa/active-package');
+                const res = await fetch('/guest/booking-spa/active-package');
                 const data = await res.json();
                 
                 if (res.ok) {
@@ -440,7 +444,7 @@
             document.getElementById('time-slots-evening').innerHTML = '';
             
             try {
-                const response = await fetch(`/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}`);
+                const response = await fetch(`/guest/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}`);
                 if (!response.ok) throw new Error('Network response was not ok');
                 const availableTimes = await response.json();
                 
@@ -568,9 +572,15 @@
             loadingSpinner.classList.remove('hidden');
 
             try {
-                const response = await fetch('/booking-spa', {
+                const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+                const response = await fetch('/guest/booking-spa', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
                     body: JSON.stringify(payload)
                 });
 

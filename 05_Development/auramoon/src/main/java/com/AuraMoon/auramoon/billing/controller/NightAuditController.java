@@ -23,8 +23,8 @@ public class NightAuditController {
     @GetMapping
     public String showDashboard(Model model) {
         model.addAttribute("businessDate", LocalDate.now());
-        // For UI purposes, we could query actual historical data here
-        // Currently leaving simple placeholders for MVC binding
+        model.addAttribute("hasRunToday", nightAuditService.hasRunToday());
+        model.addAttribute("data", nightAuditService.getDashboardData());
         return "billing/night-audit-dashboard";
     }
 

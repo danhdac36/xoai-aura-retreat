@@ -59,7 +59,7 @@
             <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex items-center justify-between">
                 <div class="flex flex-col">
                     <span class="font-label-md text-[12px] uppercase tracking-wider text-on-surface-variant mb-1">Tỷ lệ Lấp đầy phòng</span>
-                    <span class="font-headline-sm text-headline-sm text-primary" th:text="${#numbers.formatDecimal(data.occupancyRate, 0, 1)} + '%'">85%</span>
+                    <span class="font-headline-sm text-headline-sm text-primary" th:text="${#numbers.formatDecimal(data.occupancyRate, 1, 1)} + '%'">85%</span>
                     <span class="text-[12px] text-[#406840] font-bold mt-1">Phòng đang có khách</span>
                 </div>
                 <div class="bg-secondary-container p-3 rounded-full">
@@ -71,7 +71,7 @@
             <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex items-center justify-between">
                 <div class="flex flex-col">
                     <span class="font-label-md text-[12px] uppercase tracking-wider text-on-surface-variant mb-1">Hiệu suất Chuyên viên</span>
-                    <span class="font-headline-sm text-headline-sm text-primary" th:text="${#numbers.formatDecimal(data.therapistUtilization, 0, 1)} + '%'">92%</span>
+                    <span class="font-headline-sm text-headline-sm text-primary" th:text="${#numbers.formatDecimal(data.therapistUtilization, 1, 1)} + '%'">92%</span>
                     <span class="text-[12px] text-[#406840] font-bold mt-1">Lịch đã hoàn thành</span>
                 </div>
                 <div class="bg-secondary-container p-3 rounded-full">
@@ -92,12 +92,16 @@
                     <div class="relative w-64 h-64">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                             <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#f0eded" stroke-width="3"></circle>
-                            <!-- Retreat (approx) -->
-                            <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#566342" stroke-dasharray="45 55" stroke-dashoffset="0" stroke-width="3"></circle>
-                            <!-- Spa (approx) -->
-                            <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#8a9c72" stroke-dasharray="30 70" stroke-dashoffset="-45" stroke-width="3"></circle>
-                            <!-- F&B (approx) -->
-                            <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#c9c6c2" stroke-dasharray="20 80" stroke-dashoffset="-75" stroke-width="3"></circle>
+                            <!-- Retreat -->
+                            <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#566342" stroke-width="3"
+                                    th:attr="stroke-dasharray=${data.packagePercentage} + ' ' + ${100 - data.packagePercentage}"
+                                    stroke-dashoffset="0"></circle>
+                            <!-- Spa -->
+                            <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#8a9c72" stroke-width="3"
+                                    th:attr="stroke-dasharray=${data.spaPercentage} + ' ' + ${100 - data.spaPercentage}, stroke-dashoffset=${data.spaOffset}"></circle>
+                            <!-- F&B -->
+                            <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#c9c6c2" stroke-width="3"
+                                    th:attr="stroke-dasharray=${data.fbPercentage} + ' ' + ${100 - data.fbPercentage}, stroke-dashoffset=${data.fbOffset}"></circle>
                         </svg>
                         <div class="absolute inset-0 flex flex-col items-center justify-center">
                             <span class="font-headline-sm text-on-surface">100%</span>

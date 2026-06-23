@@ -193,7 +193,7 @@ CREATE TABLE SCHEDULE (
 -- 16. Table MENU_ITEM
 CREATE TABLE MENU_ITEM (
     menu_item_id INT IDENTITY(1,1) PRIMARY KEY,
-    item_name NVARCHAR(20) NOT NULL,
+    item_name NVARCHAR(100) NOT NULL,
     price DECIMAL(18, 2),
     ingredient NVARCHAR(MAX),
     is_available BIT DEFAULT 1,

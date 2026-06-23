@@ -35,7 +35,9 @@ public class ItineraryServiceImpl implements ItineraryService {
 
         // Chọn Booking mới nhất hoặc đang hoạt động (Checked-in / Confirmed)
         Booking activeBooking = bookings.stream()
-                .filter(b -> "CHECKED-IN".equals(b.getBookingStatus()) || "CONFIRMED".equals(b.getBookingStatus()))
+                .filter(b -> "CHECKED_IN".equalsIgnoreCase(b.getBookingStatus()) 
+                        || "CHECKED-IN".equalsIgnoreCase(b.getBookingStatus()) 
+                        || "CONFIRMED".equalsIgnoreCase(b.getBookingStatus()))
                 .findFirst()
                 .orElse(bookings.get(bookings.size() - 1));
 

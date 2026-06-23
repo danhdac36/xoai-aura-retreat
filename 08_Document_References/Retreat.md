@@ -45,6 +45,7 @@ Dự án này được thiết kế thành 5 module độc lập nhưng liên k�
 - **UC11**: Với tư cách là Khách hàng (người đã đặt gói), tôi muốn lên lịch các phiên Spa/Trị liệu đi kèm bằng cách chọn ngày và khung giờ.
 - **UC12**: Với tư cách là Hệ thống, tôi phải tự động tìm một khung giờ trống bằng cách khớp đồng thời MỘT Chuyên viên trị liệu rảnh VÀ MỘT Phòng điều trị trống.
 - **UC13**: Với tư cách là Chuyên viên Spa, tôi muốn xem lịch trình hàng ngày của mình và truy cập các ghi chú y tế cụ thể (ví dụ: đau lưng) của các khách hàng được giao.
+- **UC13.1**: Với tư cách là Quản lý, tôi muốn xem danh sách nhân viên Spa, lịch làm việc của họ, và cập nhật trạng thái (Nghỉ/Bận). Nếu cập nhật thành "Nghỉ", hệ thống sẽ tự động chuyển ca cho các lịch đã đặt sang chuyên viên khác.
 - **UC14**: Với tư cách là Chuyên viên Spa, tôi muốn đánh dấu một phiên là "Đã hoàn thành" hoặc "Vắng mặt (No-Show)".
 - **UC15**: Với tư cách là Lễ tân, tôi muốn đặt thủ công các dịch vụ Spa bổ sung cho khách và tính phí vào tài khoản (folio) Villa của họ.
 
@@ -56,7 +57,7 @@ Dự án này được thiết kế thành 5 module độc lập nhưng liên k�
 - **UC19**: Với tư cách là Khách hàng, tôi muốn gọi thêm đồ uống/thức ăn a-la-carte ngoài gói của mình và tính phí vào Villa.
 - **UC20**: Với tư cách là Hệ thống, tôi phải che giấu toàn bộ tiền sử bệnh án của Khách hàng đối với Đầu bếp, chỉ hiển thị "Dị ứng thực phẩm" có liên quan (Nguyên tắc Hạn chế dữ liệu).
 
-## Module 5: Thanh toán Gộp & Phân tích Thống kê (Giao cho Sinh viên 5)
+## Module 5: Thanh toán Gộp, Phân tích Thống kê & Nhân sự - Buồng phòng (Giao cho Sinh viên 5)
 
 - **UC21**: Với tư cách là Lễ tân, trong quá trình Check-Out, tôi muốn tạo một Hóa đơn Gộp tổng hợp lại Chi phí Gói còn lại, Dịch vụ Spa gọi thêm và Đơn đặt món F&B gọi thêm.
 - **UC22**: Với tư cách là Lễ tân, tôi muốn xử lý thanh toán cuối cùng và chuyển trạng thái Villa thành Trống/Cần dọn dẹp.
@@ -64,6 +65,10 @@ Dự án này được thiết kế thành 5 module độc lập nhưng liên k�
 - **UC24**: Với tư cách là Quản lý, tôi muốn xem Bảng điều khiển Doanh thu (Biểu đồ tròn/cột) phân tách thu nhập theo Gói retreat, Spa và F&B.
 - **UC25**: Với tư cách là Quản lý, tôi muốn xuất báo cáo "Tỷ lệ Lấp đầy phòng & Mức độ sử dụng Chuyên viên trị liệu" hàng tháng ra file Excel.
 - **UC26**: Với tư cách là Quản lý/Hệ thống, tôi muốn thực thi quy trình "Night Audit" (thủ công hoặc tự động lúc 12h đêm) để hệ thống tự động rà soát, chốt doanh thu các điểm bán hàng (POS) trong ngày và tự động cộng phí tiền phòng (Room Charge) vào Guest Folio Item cho ngày hôm đó
+- **UC27**: Với tư cách là Hệ thống, tôi muốn tự động kết xuất Hóa đơn gộp (Consolidated Invoice) dưới định dạng file PDF và gửi tự động vào email của khách hàng ngay sau khi Lễ tân hoàn tất Check-out.
+- **UC28 (Housekeeping Management)**: Với tư cách là Quản lý Buồng phòng (Housekeeping Manager), tôi muốn xem danh sách các Villa đang ở trạng thái "Cần dọn dẹp" (DIRTY) để phân công dọn dẹp, đồng thời thực hiện nghiệm thu và cập nhật trạng thái về "Sạch sẽ / Sẵn sàng" (CLEAN / AVAILABLE) ngay trên cùng một màn hình để Lễ tân có thể gán phòng cho khách mới.
+- **UC29 (Time Attendance)**: Với tư cách là Nhân viên (Lễ tân, Chuyên viên Spa, Đầu bếp), tôi muốn truy cập hệ thống để bấm nút "Check-in (Vào ca)" và "Check-out (Tan ca)". Hệ thống sẽ ghi nhận vào bảng `timesheet` (gồm `id`, `user_id`, `check_in_time`, `check_out_time`, `work_date`).
+- **UC30 (Commission Payroll)**: Với tư cách là Quản lý, tôi muốn hệ thống tự động tính Bảng lương cuối tháng cho Chuyên viên Spa. Công thức: Lương cứng (tính theo ngày công từ bảng `timesheet`) + Tiền Hoa hồng (Commission nhân với tổng số ca Spa đã hoàn thành được trích xuất từ báo cáo của Module 3).
 
 # 5. Quy tắc Nghiệp vụ - Ràng buộc Nghiêm ngặt (Strict Constraints)
 

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xoai Aura Retreat – Thực đơn Gọi Món Ngoài (UC19)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/fnb/fnb.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header-container">
+        <h1>Thực đơn gọi món ngoài (A-La-Carte)</h1>
+        <p>Thưởng thức các món ngon ẩm thực cao cấp, chi phí sẽ được tự động ghi nhận vào hóa đơn phòng của bạn.</p>
+    </header>
+
+
+
+    <!-- Main Container -->
+    <main class="main-content">
+        <!-- Left Column: Menu Items -->
+        <section aria-label="Danh sách món gọi ngoài">
+            <div class="menu-grid" id="menu-grid">
+                <p th:if="${#lists.isEmpty(menuItems)}" class="menu-empty-message">
+                    Không có món ăn nào khả dụng.
+                </p>
+                <article th:each="item : ${menuItems}" class="menu-card" th:data-id="${item.id}"
+                    th:data-name="${item.itemName}" th:data-price="${item.price}">
+                    <div class="card-img-wrap">
+                        <img th:src="@{/images/fnb/menu/default-food.jpg}" th:alt="${item.itemName}"
+                            th:data-item-name="${item.itemName}" class="card-img">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-header-row" style="justify-content: center; text-align: center;">
+                            <h3 class="card-title" th:text="${item.itemName}" style="margin: 0;">Tên món</h3>
+                        </div>
+
+                        <p class="card-ingredients"
+                            th:text="${item.ingredient != null ? item.ingredient : 'Thành phần tự nhiên từ vườn Aura'}">
+                            Thành phần
+                        </p>
+
+                        <div class="card-footer-row">
+                            <div class="card-price" th:text="${'$ ' + item.price}">$2.00</div>
+                            <button type="button" class="btn-select" th:data-id="${item.id}" th:data-name="${item.itemName}"
+                                th:data-price="${item.price}">
+                                add to cart +
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Right Column: Sidebar / Cart Panel -->
+        <aside class="sidebar-panel" aria-label="Giỏ hàng">
+            <h2 class="sidebar-title">
+                <span style="font-family: var(--font-serif); font-size: 1.6rem;">Giỏ hàng</span>
+                <span class="qty-badge" id="selected-badge">0</span>
+            </h2>
+
+            <div class="cart-items" id="cart-items-list">
+                <p class="cart-empty" id="empty-cart-msg">Chưa chọn món nào</p>
+            </div>
+
+            <!-- Cost Summary -->
+            <div class="pricing-summary">
+                <div class="price-row">
+                    <span>Tạm tính:</span>
+                    <span id="price-subtotal">0đ</span>
+                </div>
+                <div class="price-row">
+                    <span>Phí phục vụ (5%):</span>
+                    <span id="price-service-charge">0đ</span>
+                </div>
+                <div class="price-row total">
+                    <span>Tổng cộng:</span>
+                    <span id="price-total">0đ</span>
+                </div>
+            </div>
+
+            <!-- Order Fields and Submit Form -->
+            <form th:action="@{/fnb/alacarte-order}" th:object="${orderForm}" method="post"
+                id="alacarte-order-form">
+
+                <input type="hidden" th:field="*{guestId}" id="form-guest-id">
+                <input type="hidden" th:field="*{bookingId}" id="form-booking-id">
+                <input type="hidden" th:field="*{placeOrder}" id="form-place-order">
+                <input type="hidden" th:field="*{note}" id="form-note">
+
+                <div id="hidden-items-container"></div>
+
+                <div class="checkout-note-group">
+                    <label for="order-place">Địa điểm giao món</label>
+                    <input type="text" id="order-place" value="Villa V101">
+                </div>
+                <div class="checkout-note-group">
+                    <label for="order-note">Ghi chú cho nhà bếp</label>
+                    <textarea id="order-note" placeholder="Ví dụ: Ít dầu mỡ, không cay..."></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-checkout" id="btn-submit-order">XÁC NHẬN ĐẶT MÓN</button>
+            </form>
+        </aside>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification"
+        th:class="${successMessage != null or errorMessage != null} ? 'toast show ' + (${successMessage != null} ? 'success' : 'error') : 'toast'"
+        th:text="${successMessage != null ? successMessage : (errorMessage != null ? errorMessage : '')}"></div>
+
+    <!-- Scripts -->
+    <script src="/js/fnb/menu-image-map.js"></script>
+    <script src="/js/fnb/alacarte-order.js"></script>
+</body>
+
+</html>

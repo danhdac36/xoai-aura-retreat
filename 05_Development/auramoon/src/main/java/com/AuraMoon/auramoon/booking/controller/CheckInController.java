@@ -9,11 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
 @Controller
-@RequestMapping("/reception")
+@RequestMapping("/receptionist")
 @RequiredArgsConstructor
 public class CheckInController {
 
@@ -23,7 +24,7 @@ public class CheckInController {
 
     @GetMapping("/bookings")
     public String listBookings(Model model) {
-        List<Booking> bookings = bookingRepository.findAll();
+        List<com.AuraMoon.auramoon.booking.dto.BookingDisplayDTO> bookings = checkInService.getAllBookingsForDisplay();
         // Lấy danh sách các Villa đang trống (AVAILABLE) để lễ tân gán khi check-in
         model.addAttribute("bookings", bookings);
         model.addAttribute("villas", villaRepository.findByVillaType_IdAndVillaStatusAndIsDeleteFalse(1, "AVAILABLE")); // default type 1 or list all
@@ -32,13 +33,21 @@ public class CheckInController {
         return "reception/bookings";
     }
 
-    @PostMapping("/checkin")
-    public String performCheckIn(@ModelAttribute("checkInRequest") CheckInRequestDTO request, Model model) {
+    @PostMapping("/check-in")
+    public String performCheckIn(@ModelAttribute("checkInRequest") CheckInRequestDTO request,
+                                 org.springframework.validation.BindingResult bindingResult,
+                                 RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addAttribute("error", "Ngày sinh hoặc thông tin nhập vào không đúng định dạng!");
+            return "redirect:/receptionist/bookings";
+        }
         try {
             checkInService.performCheckIn(request);
-            return "redirect:/reception/bookings?success=Check-in thành công!";
+            redirectAttributes.addAttribute("success", "Check-in thành công!");
+            return "redirect:/receptionist/bookings";
         } catch (Exception e) {
-            return "redirect:/reception/bookings?error=" + e.getMessage();
+            redirectAttributes.addAttribute("error", e.getMessage());
+            return "redirect:/receptionist/bookings";
         }
     }
 }

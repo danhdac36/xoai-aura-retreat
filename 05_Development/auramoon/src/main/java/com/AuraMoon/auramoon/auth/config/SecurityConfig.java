@@ -37,20 +37,21 @@ public class SecurityConfig {
         };
 
         private static final String[] GUEST_ENDPOINTS = {
-                        "/user/**",
-                        "/orders/**",
-                        "/cart/**",
-                        "/profile/**"
+                        // "/user/**",
+                        // "/orders/**",
+                        // "/cart/**",
+                        // "/profile/**"
         };
 
         private static final String[] ADMIN_ENDPOINTS = {
-                        "/admin/**",
-                        "/dashboard/**",
-                        "/manage/**"
+                        // "/admin/**",
+                        // "/dashboard/**",
+                        // "/manage/**",
+                        // "/manager/housekeeping/**"
         };
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {
-                        "/receptionist/**"
+                        // "/receptionist/**"
         };
 
         private static final String[] THERAPIST_ENDPOINTS = {
@@ -61,7 +62,8 @@ public class SecurityConfig {
                         "/F&B/**" };
 
         private static final String[] MANAGER_ENDPOINTS = {
-                        "/management/**" };
+                        // "/management/**"
+        };
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

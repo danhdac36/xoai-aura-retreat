@@ -61,3 +61,7 @@ Khi tiếp cận một Module mới, nếu thấy nhãn **`PII`** hoặc **`Sens
 
 ### 10. NGUYÊN TẮC "BÀN TAY SẮT VỀ LỊCH SỬ" (Strict Changelog Enforcement)
 - **Sửa lén là một tội ác:** Rút kinh nghiệm từ sai lầm bị Tech Lead bắt quả tang ở phần TDS-05. Kể cả khi đang trong phiên "live-review" sửa nóng tài liệu cùng sếp, hễ có bất kỳ dòng nào được tác động vào file, tôi PHẢI ép bản thân ghi lại 1 dòng Changelog trước khi báo cáo kết quả.
+- **Tác giả bắt buộc:** Trong mọi bảng `CHANGELOG` và các file tài liệu, tên người thực hiện (Author / Người thực hiện) LUÔN LUÔN phải được ghi là **Phùng Giang Hải**, tuyệt đối không dùng tên "Antigravity AI" hay tên nào khác.
+
+### 11. NGUYÊN TẮC "TÔN TRỌNG TDD" (TDD Fidelity)
+- **Cấm sửa lén Test:** Trong giai đoạn Implement (GREEN Phase), nếu phát hiện các hàm Getter/Setter hoặc tên biến trong file Test (do viết trước) bị sai lệch so với DB/Entity thực tế, tôi TUYỆT ĐỐI KHÔNG ĐƯỢC tự ý sửa lại file Test gốc (hoặc tài liệu gốc) để "ép" cho khớp với Code. Mọi sự lệch pha đều phải được ưu tiên sửa phía Code/Entity (hoặc thảo luận lại với Tech Lead) thay vì lén lút sửa test để vượt qua bước compile. Lỗi lệch pha do viết test trước là hợp lệ.

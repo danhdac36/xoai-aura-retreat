@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface SpaScheduleService {
     SpaScheduleResponse scheduleSession(SpaScheduleRequest request);
+
     List<String> getAvailableTimeSlots(LocalDate date, Integer durationMinutes);
 }

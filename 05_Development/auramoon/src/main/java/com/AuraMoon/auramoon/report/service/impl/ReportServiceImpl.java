@@ -44,16 +44,26 @@ public class ReportServiceImpl implements ReportService {
         if ("OCCUPANCY".equalsIgnoreCase(reportType) || "ALL".equalsIgnoreCase(reportType)) {
             long totalVillas = villaRepository.countByIsDeleteFalse();
             
-            for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            LocalDate currentMonthStart = startDate.withDayOfMonth(1);
+            LocalDate absoluteEnd = endDate.withDayOfMonth(endDate.lengthOfMonth());
+            
+            while (!currentMonthStart.isAfter(absoluteEnd)) {
                 OccupancyReportRow row = new OccupancyReportRow();
-                row.setDate(date);
+                String monthLabel = "Tháng " + currentMonthStart.getMonthValue();
+                if (currentMonthStart.getYear() != LocalDate.now().getYear()) {
+                    monthLabel += "/" + currentMonthStart.getYear();
+                }
+                row.setMonthLabel(monthLabel);
                 row.setTotalVillas((int) totalVillas);
                 
-                // Demo logic: count current occupied
+                // For a real implementation, we would sum the occupied days for this month and average it.
+                // Here we keep the demo logic but adapt it to the month.
                 long occupied = villaRepository.countByVillaStatusAndIsDeleteFalse("OCCUPIED");
                 row.setOccupiedVillas((int) occupied);
                 row.setOccupancyRate(totalVillas > 0 ? ((double) occupied / totalVillas) * 100 : 0.0);
                 occupancyRows.add(row);
+                
+                currentMonthStart = currentMonthStart.plusMonths(1);
             }
         }
         
@@ -95,7 +105,7 @@ public class ReportServiceImpl implements ReportService {
             if ("OCCUPANCY".equalsIgnoreCase(reportType) || "ALL".equalsIgnoreCase(reportType)) {
                 Sheet sheet = workbook.createSheet("Tỷ lệ Lấp đầy");
                 Row headerRow = sheet.createRow(0);
-                headerRow.createCell(0).setCellValue("Ngày");
+                headerRow.createCell(0).setCellValue("Tháng");
                 headerRow.createCell(1).setCellValue("Tổng số phòng");
                 headerRow.createCell(2).setCellValue("Phòng có khách");
                 headerRow.createCell(3).setCellValue("Tỷ lệ (%)");
@@ -103,7 +113,7 @@ public class ReportServiceImpl implements ReportService {
                 int rowIdx = 1;
                 for (OccupancyReportRow rowData : data.getOccupancyRows()) {
                     Row row = sheet.createRow(rowIdx++);
-                    row.createCell(0).setCellValue(rowData.getDate().toString());
+                    row.createCell(0).setCellValue(rowData.getMonthLabel());
                     row.createCell(1).setCellValue(rowData.getTotalVillas());
                     row.createCell(2).setCellValue(rowData.getOccupiedVillas());
                     row.createCell(3).setCellValue(rowData.getOccupancyRate());

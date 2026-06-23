@@ -12,32 +12,60 @@ import java.util.List;
 
 @Repository
 public interface FolioItemRepository extends JpaRepository<FolioItem, Integer> {
-    List<FolioItem> findByGuestFolioId(Integer folioId);
+        List<FolioItem> findByGuestFolioId(Integer folioId);
 
-    List<FolioItem> findByGuestFolioIdIn(List<Integer> folioIds);
+        List<FolioItem> findByGuestFolioIdIn(List<Integer> folioIds);
 
-    boolean existsByGuestFolioIdAndStatusIn(Integer folioId, List<String> statuses);
+        boolean existsByGuestFolioIdAndStatusIn(Integer folioId, List<String> statuses);
 
-    @Modifying
-    @Query(value = "INSERT INTO FOLIO_ITEM (folio_id, service_category, reference_id, description, amount, status, create_at, create_by) " +
-            "SELECT :folioId, 'F_AND_B', mo.meal_order_id, 'Phát sinh dịch vụ F&B (Order #' + CAST(mo.meal_order_id AS VARCHAR) + ')', " +
-            "       (SELECT ISNULL(SUM(moi.quantity * moi.price), 0) FROM MEAL_ORDER_ITEM moi WHERE moi.meal_order_id = mo.meal_order_id), " +
-            "       'UNPAID', GETDATE(), :actorId " +
-            "FROM MEAL_ORDER mo " +
-            "WHERE mo.booking_id = :bookingId AND mo.order_status = 'DELIVERED' " +
-            "AND NOT EXISTS (SELECT 1 FROM FOLIO_ITEM fi WHERE fi.reference_id = mo.meal_order_id AND fi.service_category = 'F_AND_B')", nativeQuery = true)
-    int consolidateFnbCharges(@Param("bookingId") Integer bookingId, @Param("folioId") Integer folioId, @Param("actorId") Integer actorId);
+        @Modifying
+        @Query(value = "INSERT INTO FOLIO_ITEM (folio_id, service_category, reference_id, description, amount, status, create_at, create_by) "
+                        +
+                        "SELECT :folioId, 'F_AND_B', mo.meal_order_id, 'Phát sinh dịch vụ F&B (Order #' + CAST(mo.meal_order_id AS VARCHAR) + ')', "
+                        +
+                        "       (SELECT ISNULL(SUM(moi.quantity * moi.price), 0) FROM MEAL_ORDER_ITEM moi WHERE moi.meal_order_id = mo.meal_order_id), "
+                        +
+                        "       'UNPAID', GETDATE(), :actorId " +
+                        "FROM MEAL_ORDER mo " +
+                        "WHERE mo.booking_id = :bookingId AND mo.order_status = 'DELIVERED' " +
+                        "AND NOT EXISTS (SELECT 1 FROM FOLIO_ITEM fi WHERE fi.reference_id = mo.meal_order_id AND fi.service_category = 'F_AND_B')", nativeQuery = true)
+        int consolidateFnbCharges(@Param("bookingId") Integer bookingId, @Param("folioId") Integer folioId,
+                        @Param("actorId") Integer actorId);
 
-    @Modifying
-    @Query(value = "INSERT INTO FOLIO_ITEM (folio_id, service_category, reference_id, description, amount, status, create_at, create_by) " +
-            "SELECT :folioId, 'SPA', tb.treatment_id, 'Phát sinh dịch vụ Spa (Booking #' + CAST(tb.treatment_id AS VARCHAR) + ')', " +
-            "       ISNULL((SELECT ts.price FROM TREATMENT_SERVICE ts WHERE ts.service_id = tb.service_id), 0), " +
-            "       'UNPAID', GETDATE(), :actorId " +
-            "FROM TREATMENT_BOOKING tb " +
-            "WHERE tb.booking_id = :bookingId AND tb.status = 'COMPLETED' " +
-            "AND NOT EXISTS (SELECT 1 FROM FOLIO_ITEM fi WHERE fi.reference_id = tb.treatment_id AND fi.service_category = 'SPA')", nativeQuery = true)
-    int consolidateSpaCharges(@Param("bookingId") Integer bookingId, @Param("folioId") Integer folioId, @Param("actorId") Integer actorId);
+        @Modifying
+        @Query(value = "INSERT INTO FOLIO_ITEM (folio_id, service_category, reference_id, description, amount, status, create_at, create_by) "
+                        +
+                        "SELECT :folioId, 'SPA', tb.treatment_id, 'Phát sinh dịch vụ Spa (Booking #' + CAST(tb.treatment_id AS VARCHAR) + ')', "
+                        +
+                        "       ISNULL((SELECT ts.price FROM TREATMENT_SERVICE ts WHERE ts.service_id = tb.service_id), 0), "
+                        +
+                        "       'UNPAID', GETDATE(), :actorId " +
+                        "FROM TREATMENT_BOOKING tb " +
+                        "WHERE tb.booking_id = :bookingId AND tb.status = 'COMPLETED' " +
+                        "AND NOT EXISTS (SELECT 1 FROM FOLIO_ITEM fi WHERE fi.reference_id = tb.treatment_id AND fi.service_category = 'SPA')", nativeQuery = true)
+        int consolidateSpaCharges(@Param("bookingId") Integer bookingId, @Param("folioId") Integer folioId,
+                        @Param("actorId") Integer actorId);
 
-    @Query("SELECT COALESCE(SUM(f.amount), 0) FROM FolioItem f WHERE f.guestFolio.id = :folioId AND f.serviceCategory = :category AND CAST(f.createAt AS date) = CURRENT_DATE")
-    BigDecimal sumChargesByFolioAndCategoryToday(@Param("folioId") Integer folioId, @Param("category") String category);
+        @Query("SELECT COALESCE(SUM(f.amount), 0) FROM FolioItem f WHERE f.guestFolio.id = :folioId AND f.serviceCategory = :category AND CAST(f.createAt AS date) = CURRENT_DATE")
+        BigDecimal sumChargesByFolioAndCategoryToday(@Param("folioId") Integer folioId,
+                        @Param("category") String category);
+
+        @Query("SELECT COALESCE(SUM(f.amount), 0) FROM FolioItem f WHERE f.serviceCategory = :category AND CAST(f.createAt AS date) = :date")
+        BigDecimal sumChargesByCategoryAndDate(@Param("category") String category,
+                        @Param("date") java.time.LocalDate date);
+
+        @Query(value = "SELECT ISNULL(SUM(moi.quantity * moi.price), 0) FROM MEAL_ORDER mo JOIN MEAL_ORDER_ITEM moi ON mo.meal_order_id = moi.meal_order_id WHERE mo.order_status = 'DELIVERED' AND NOT EXISTS (SELECT 1 FROM FOLIO_ITEM fi WHERE fi.reference_id = mo.meal_order_id AND fi.service_category = 'F_AND_B')", nativeQuery = true)
+        BigDecimal sumPendingFnbCharges();
+
+        @Query(value = "SELECT ISNULL(SUM(ts.price), 0) FROM TREATMENT_BOOKING tb JOIN TREATMENT_SERVICE ts ON tb.service_id = ts.service_id WHERE tb.status = 'COMPLETED' AND NOT EXISTS (SELECT 1 FROM FOLIO_ITEM fi WHERE fi.reference_id = tb.treatment_id AND fi.service_category = 'SPA')", nativeQuery = true)
+        BigDecimal sumPendingSpaCharges();
+
+        @Query(value = "SELECT TOP 10 u.full_name, b.booking_id, fi.service_category, fi.amount " +
+                        "FROM FOLIO_ITEM fi " +
+                        "JOIN GUEST_FOLIO gf ON fi.folio_id = gf.folio_id " +
+                        "JOIN BOOKING b ON gf.booking_id = b.booking_id " +
+                        "JOIN [USER] u ON b.guest_id = u.user_id " +
+                        "WHERE CAST(fi.create_at AS DATE) = :date " +
+                        "ORDER BY fi.create_at DESC", nativeQuery = true)
+        List<Object[]> getRecentFolioTransactions(@Param("date") java.time.LocalDate date);
 }

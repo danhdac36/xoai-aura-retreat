@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/booking-spa")
+@RequestMapping("/receptionist/booking-spa")
 public class SpaReceptionistController {
 
     private final SpaManualBookingService spaManualBookingService;
@@ -77,6 +77,6 @@ public class SpaReceptionistController {
             redirectAttributes.addFlashAttribute("errorMessage", "Đã xảy ra lỗi hệ thống. Vui lòng thử lại.");
         }
 
-        return "redirect:/booking-spa/manual";
+        return "redirect:/receptionist/booking-spa/manual";
     }
 }
