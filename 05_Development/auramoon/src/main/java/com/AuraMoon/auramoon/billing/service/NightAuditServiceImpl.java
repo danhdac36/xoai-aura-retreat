@@ -34,7 +34,8 @@ public class NightAuditServiceImpl implements INightAuditService {
         if (result.getTotalActiveFolios() == 0 && result.getGrandTotalRevenue().compareTo(BigDecimal.ZERO) == 0) {
             details = "No new charges";
         } else {
-            details = String.format("totalActiveFolios: %d, spaChargesPosted: %s, fnbChargesPosted: %s, grandTotalRevenue: %s",
+            details = String.format(
+                    "totalActiveFolios: %d, spaChargesPosted: %s, fnbChargesPosted: %s, grandTotalRevenue: %s",
                     result.getTotalActiveFolios(),
                     result.getSpaChargesPosted(),
                     result.getFnbChargesPosted(),
@@ -55,7 +56,7 @@ public class NightAuditServiceImpl implements INightAuditService {
 
     @Autowired
     private com.AuraMoon.auramoon.billing.repository.GuestFolioRepository guestFolioRepository;
-    
+
     @Autowired
     private com.AuraMoon.auramoon.billing.repository.FolioItemRepository folioItemRepository;
 
@@ -63,10 +64,10 @@ public class NightAuditServiceImpl implements INightAuditService {
     public com.AuraMoon.auramoon.billing.dto.NightAuditDashboardDTO getDashboardData() {
         com.AuraMoon.auramoon.billing.dto.NightAuditDashboardDTO dashboardDTO = new com.AuraMoon.auramoon.billing.dto.NightAuditDashboardDTO();
         NightAuditResultDTO kpiCards = new NightAuditResultDTO();
-        
+
         // Kpi Cards: Total active folios
         kpiCards.setTotalActiveFolios((int) guestFolioRepository.countByStatus("OPEN"));
-        
+
         LocalDate today = LocalDate.now();
         if (hasRunToday()) {
             // Already run: get consolidated amounts from FolioItem
@@ -77,10 +78,10 @@ public class NightAuditServiceImpl implements INightAuditService {
             kpiCards.setFnbChargesPosted(folioItemRepository.sumPendingFnbCharges());
             kpiCards.setSpaChargesPosted(folioItemRepository.sumPendingSpaCharges());
         }
-        
+
         kpiCards.setGrandTotalRevenue(kpiCards.getFnbChargesPosted().add(kpiCards.getSpaChargesPosted()));
         dashboardDTO.setKpiCards(kpiCards);
-        
+
         // Folio Items List
         java.util.List<Object[]> rawTransactions = folioItemRepository.getRecentFolioTransactions(today);
         java.util.List<com.AuraMoon.auramoon.billing.dto.FolioTransactionDTO> transactions = new java.util.ArrayList<>();
@@ -94,9 +95,10 @@ public class NightAuditServiceImpl implements INightAuditService {
             transactions.add(dto);
         }
         dashboardDTO.setFolioItemsList(transactions);
-        
+
         // Audit History
-        java.util.List<com.AuraMoon.auramoon.billing.entity.AuditLog> logs = auditLogRepository.findTop5ByActionTypeStartingWithOrderByTimestampDesc("NIGHT_AUDIT");
+        java.util.List<com.AuraMoon.auramoon.billing.entity.AuditLog> logs = auditLogRepository
+                .findTop5ByActionTypeStartingWithOrderByTimestampDesc("NIGHT_AUDIT");
         java.util.List<com.AuraMoon.auramoon.billing.dto.AuditHistoryDTO> history = new java.util.ArrayList<>();
         for (com.AuraMoon.auramoon.billing.entity.AuditLog log : logs) {
             com.AuraMoon.auramoon.billing.dto.AuditHistoryDTO h = new com.AuraMoon.auramoon.billing.dto.AuditHistoryDTO();
@@ -109,7 +111,7 @@ public class NightAuditServiceImpl implements INightAuditService {
             history.add(h);
         }
         dashboardDTO.setAuditHistory(history);
-        
+
         return dashboardDTO;
     }
 }

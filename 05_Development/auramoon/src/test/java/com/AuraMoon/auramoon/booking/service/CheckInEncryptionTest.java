@@ -17,7 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,7 +58,7 @@ public class CheckInEncryptionTest {
                 .id(bookingId)
                 .guestId(guestId)
                 .bookingStatus("CONFIRMED")
-                .checkinDate(LocalDate.now())
+                .checkinDate(LocalDateTime.now())
                 .build();
 
         Villa villa = Villa.builder()

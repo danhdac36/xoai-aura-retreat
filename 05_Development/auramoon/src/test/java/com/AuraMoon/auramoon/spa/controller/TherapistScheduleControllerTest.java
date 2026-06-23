@@ -128,10 +128,12 @@ public class TherapistScheduleControllerTest {
                 String therapistCode = "TH01";
                 session.setAttribute("therapistCode", therapistCode);
 
-                doNothing().when(therapistScheduleService).updateSessionStatus(eq(scheduleId), eq(therapistCode), eq(status));
+                doNothing().when(therapistScheduleService).updateSessionStatus(eq(scheduleId), eq(therapistCode),
+                                eq(status));
 
                 // Act & Assert
-                mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/therapist/schedules/update-status")
+                mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                                .post("/therapist/schedules/update-status")
                                 .param("scheduleId", scheduleId.toString())
                                 .param("status", status)
                                 .param("date", dateStr)
@@ -150,11 +152,14 @@ public class TherapistScheduleControllerTest {
                 String therapistCode = "TH01";
                 session.setAttribute("therapistCode", therapistCode);
 
-                doThrow(new com.AuraMoon.auramoon.spa.exception.SpaBusinessException("SPA-012", "Trạng thái không hợp lệ"))
-                                .when(therapistScheduleService).updateSessionStatus(eq(scheduleId), eq(therapistCode), eq(status));
+                doThrow(new com.AuraMoon.auramoon.spa.exception.SpaBusinessException("SPA-012",
+                                "Trạng thái không hợp lệ"))
+                                .when(therapistScheduleService)
+                                .updateSessionStatus(eq(scheduleId), eq(therapistCode), eq(status));
 
                 // Act & Assert
-                mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/therapist/schedules/update-status")
+                mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                                .post("/therapist/schedules/update-status")
                                 .param("scheduleId", scheduleId.toString())
                                 .param("status", status)
                                 .param("date", dateStr)

@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -69,7 +69,7 @@ public class BookingServiceTest {
         public void createBooking_villasAvailable_savesSuccessfully() {
                 // Arrange
                 Integer guestId = 1;
-                LocalDate checkinDate = LocalDate.now().plusDays(2);
+                LocalDateTime checkinDate = LocalDateTime.now().plusDays(2);
                 BookingRequestDTO request = BookingRequestDTO.builder()
                                 .retreatPackageId(1)
                                 .villaTypeId(2)
@@ -128,7 +128,7 @@ public class BookingServiceTest {
         public void createBooking_noVillasAvailable_throwsBook002() {
                 // Arrange
                 Integer guestId = 1;
-                LocalDate checkinDate = LocalDate.now().plusDays(2);
+                LocalDateTime checkinDate = LocalDateTime.now().plusDays(2);
                 BookingRequestDTO request = BookingRequestDTO.builder()
                                 .retreatPackageId(1)
                                 .villaTypeId(2)
@@ -202,7 +202,7 @@ public class BookingServiceTest {
         public void createBooking_withPrivacyConsent_savesConsent() {
                 // Arrange
                 Integer guestId = 1;
-                LocalDate checkinDate = LocalDate.now().plusDays(2);
+                LocalDateTime checkinDate = LocalDateTime.now().plusDays(2);
                 BookingRequestDTO request = BookingRequestDTO.builder()
                                 .retreatPackageId(1)
                                 .villaTypeId(2)

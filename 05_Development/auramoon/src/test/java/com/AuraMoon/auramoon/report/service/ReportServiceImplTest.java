@@ -35,7 +35,7 @@ class ReportServiceImplTest {
     void testGenerateOccupancyReportData() {
         when(villaRepository.countByIsDeleteFalse()).thenReturn(10L);
         when(villaRepository.countByVillaStatusAndIsDeleteFalse("OCCUPIED")).thenReturn(5L);
-        
+
         LocalDate startDate = LocalDate.of(2026, 4, 15);
         LocalDate endDate = LocalDate.of(2026, 6, 15);
         ReportDataDTO result = reportService.generateReportData(startDate, endDate, "OCCUPANCY");
@@ -43,7 +43,8 @@ class ReportServiceImplTest {
         assertFalse(result.getOccupancyRows().isEmpty());
         // For monthly logic, 4/15 to 6/15 covers April, May, June = 3 rows
         assertEquals(3, result.getOccupancyRows().size(), "RPT-TC-001: Should generate exactly 3 monthly rows");
-        assertEquals("Tháng 4", result.getOccupancyRows().get(0).getMonthLabel(), "RPT-TC-001: First row should be Tháng 4");
+        assertEquals("Tháng 4", result.getOccupancyRows().get(0).getMonthLabel(),
+                "RPT-TC-001: First row should be Tháng 4");
     }
 
     // RPT-TC-002
@@ -52,16 +53,17 @@ class ReportServiceImplTest {
     void testGenerateTherapistUtilizationData() {
         when(scheduleRepository.countSchedules(any(), any())).thenReturn(20L);
         when(scheduleRepository.countSchedulesByStatus(eq("COMPLETED"), any(), any())).thenReturn(15L);
-        
+
         LocalDate startDate = LocalDate.of(2026, 4, 15);
         LocalDate endDate = LocalDate.of(2026, 6, 15);
         ReportDataDTO result = reportService.generateReportData(startDate, endDate, "UTILIZATION");
         assertNotNull(result, "RPT-TC-002 TDD: Expected result to not be null");
         assertFalse(result.getUtilizationRows().isEmpty());
-        // Currently the mockup says "Tất cả chuyên viên" for the whole period, 
+        // Currently the mockup says "Tất cả chuyên viên" for the whole period,
         // but if we group by therapist AND month, or just therapist.
         // Let's assume the test just checks it generates something for now.
-        // If it's grouped by therapist, it should have rows equal to number of therapists.
+        // If it's grouped by therapist, it should have rows equal to number of
+        // therapists.
     }
 
     // RPT-TC-003

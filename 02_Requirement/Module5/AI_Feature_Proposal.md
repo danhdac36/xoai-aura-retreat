@@ -1,61 +1,49 @@
-# ĐỀ XUẤT TÍNH NĂNG AI CHO HỆ THỐNG QUẢN LÝ (MANAGER DASHBOARD)
+# ĐỀ XUẤT TÍCH HỢP AI VÀO 5 PHÂN HỆ QUẢN LÝ CỐT LÕI (AURA MOON MANAGER PORTAL)
 
 **Mục tiêu:** 
-Nâng cấp bảng điều khiển (Dashboard) của Manager từ dạng báo cáo thống kê dữ liệu quá khứ (Descriptive Analytics) lên mức độ phân tích chuyên sâu, dự báo tương lai và đưa ra khuyến nghị hành động (Predictive & Prescriptive Analytics) bằng công nghệ Trí tuệ Nhân tạo (AI). Điều này giúp hệ thống tiệm cận với các chuẩn mực PMS cao cấp trên thế giới, đồng thời đáp ứng xuất sắc yêu cầu đổi mới từ giảng viên hướng dẫn.
+Đảm bảo hệ thống đạt chuẩn "tối thiểu 5 màn hình nghiệp vụ cho Quản lý" theo yêu cầu đồ án. Thay vì tạo ra các màn hình AI gượng ép, hệ thống sẽ chèn sức mạnh của Trí tuệ Nhân tạo (AI) vào đúng các "nỗi đau" (Pain-points) trên 5 màn hình quản lý truyền thống, biến chúng thành các phân hệ thông minh, mang tính thực tiễn cao nhất.
 
 ---
 
-## 5 CẤP ĐỘ (LEVEL) TÍCH HỢP AI CHO HỆ THỐNG
+## Màn hình 1: Tổng quan Doanh thu (Dashboard - UC24)
+*   **Mô tả Nghiệp vụ:** Màn hình đầu tiên Quản lý xem mỗi sáng để nắm bắt tình hình tổng thể.
+*   **Nỗi đau thực tế:** Dữ liệu quá nhiều, khó nhận biết nhanh hôm qua làm ăn tốt hay xấu, có lỗi gì không.
+*   **Tích hợp AI (Level 1 + Level 5):**
+    *   **Trợ lý Insight:** Một thẻ tóm tắt tự động xuất hiện: *"Chào sếp, hôm nay mọi thứ ổn, doanh thu tăng 5% so với tuần trước"*.
+    *   **Phát hiện Bất thường:** Nếu có lỗi, AI khoanh đỏ ngay lập tức: *"Cảnh báo: Tỷ lệ hủy phòng hôm qua đột ngột tăng 30%. Cần kiểm tra lại báo cáo lễ tân"*.
+*   **Giá trị mang lại:** Tiết kiệm thời gian đọc báo cáo, quản trị rủi ro ngay lập tức.
 
-### Level 1: AI Data Insight (Trợ lý Phân tích Dữ liệu tự động)
-Hỗ trợ Manager đọc hiểu số liệu nhanh chóng thông qua việc AI tự động tổng hợp và đưa ra nhận xét bằng ngôn ngữ tự nhiên.
-*   **Mô tả:** AI đọc dữ liệu doanh thu, công suất phòng của chu kỳ hiện tại và đưa ra báo cáo tóm tắt "Executive Summary" kèm theo khuyến nghị hành động.
-*   **Ví dụ hiển thị:** *"Doanh thu Spa tuần này tăng 15% nhưng công suất phòng lưu trú chỉ đạt 60%. Đề xuất: Triển khai chiến dịch gửi email tặng voucher Spa 30% cho khách hàng book phòng cuối tuần để kích cầu lưu trú."*
-*   **Độ khó:** Dễ - Gọi API LLM truyền thống.
+## Màn hình 2: Báo cáo Hiệu suất Dịch vụ (Performance Analytics - UC25)
+*   **Mô tả Nghiệp vụ:** Phân tích sâu về hiệu quả của từng loại phòng và dịch vụ Spa/Nhà hàng.
+*   **Nỗi đau thực tế:** Chỉ nhìn thấy quá khứ, không biết tuần sau có cần thuê thêm nhân viên thời vụ (part-time) không.
+*   **Tích hợp AI (Level 2 - Dự báo tương lai):**
+    *   Trên biểu đồ doanh thu, AI vẽ thêm một đường nét đứt (dashed line) dự báo công suất phòng và lượng khách sử dụng Spa trong 14 ngày tới.
+*   **Giá trị mang lại:** Tối ưu hóa việc sắp xếp nhân sự, chuẩn bị vật tư/thực phẩm, tránh tình trạng dư thừa (tốn chi phí) hoặc thiếu hụt (giảm chất lượng phục vụ).
 
-### Level 2: Predictive Forecasting (Dự báo Doanh thu / Công suất tương lai)
-Dự báo tương lai để có kế hoạch chuẩn bị nguồn lực thay vì chỉ nhìn vào dữ liệu quá khứ.
-*   **Mô tả:** Dựa vào dữ liệu lịch sử và tính chu kỳ (Seasonality), hệ thống vẽ tiếp đường dự báo (Trend Line) trên biểu đồ doanh thu/công suất cho 7 - 14 ngày tiếp theo.
-*   **Ví dụ hiển thị:** Một đường nét đứt (dashed line) trên biểu đồ Chart.js nối tiếp chuỗi dữ liệu thực tế, kèm theo vùng đổ bóng (confidence interval) biểu thị rủi ro/sai số.
-*   **Độ khó:** Trung bình - Có thể dùng thuật toán Linear Regression hoặc dùng AI API để nội suy dữ liệu.
+## Màn hình 3: Quản lý Phòng & Giá (Room & Pricing Management)
+*   **Mô tả Nghiệp vụ:** Nơi cấu hình thông tin phòng, đóng/mở phòng và cài đặt giá phòng.
+*   **Nỗi đau thực tế:** Để giá cố định quanh năm sẽ mất khách lúc vắng, không tối ưu lợi nhuận lúc đông.
+*   **Tích hợp AI (Level 4 - Giá Động / Yield Management):**
+    *   Ngay cạnh cột "Giá bán", AI hiện mũi tên đề xuất: *"Đợt này đang có xu hướng khách Hàn Quốc đặt phòng nhiều, tốc độ lấp đầy nhanh. Đề xuất tăng giá phòng Villa lên 15% trong tuần sau"*.
+    *   Quản lý chỉ cần ấn nút **[Approve]** để áp dụng giá mới.
+*   **Giá trị mang lại:** Tối đa hóa doanh thu (Revenue Maximization) - vũ khí sắc bén của mọi hệ thống khách sạn 5 sao.
 
-### Level 3: Sentiment & Quality Trend (Phân tích Xu hướng Cảm xúc Khách hàng)
-Lượng hóa chất lượng dịch vụ dựa trên phản hồi của khách hàng.
-*   **Mô tả:** Hệ thống sử dụng NLP (Natural Language Processing) phân tích tất cả đánh giá của khách hàng (Feedback/Review), phân loại thành Tiêu cực (Negative), Tích cực (Positive), Trung tính (Neutral).
-*   **Ví dụ hiển thị:** Đồ thị dạng cột xếp chồng (Stacked Bar Chart). Nếu AI phát hiện cột "Phàn nàn" tăng đột biến, hệ thống sẽ chắt lọc từ khóa: *"Có 15 phàn nàn về 'nước hồ bơi lạnh' vào sáng thứ 4. Đề xuất: Rà soát lại bộ gia nhiệt hồ bơi."*
-*   **Độ khó:** Khá.
+## Màn hình 4: Quản lý Đánh giá Khách hàng (Customer Feedback & Review)
+*   **Mô tả Nghiệp vụ:** Quản trị chất lượng dịch vụ dựa trên nhận xét của khách sau khi checkout.
+*   **Nỗi đau thực tế:** Đọc hàng trăm review mỗi tuần rất mất thời gian, khó tổng hợp được hệ thống đang hỏng ở đâu.
+*   **Tích hợp AI (Level 3 - Phân tích Cảm xúc):**
+    *   Thay vì chỉ list review, AI tự động phân tích ngôn ngữ (NLP) và gom nhóm thành các "Điểm nóng" (Pain-points).
+    *   Ví dụ: AI báo hiệu *"Có 18 khách phàn nàn về 'Wifi yếu ở khu B'"* hoặc *"Nhân viên Spa A được khen ngợi nhiều nhất"*.
+*   **Giá trị mang lại:** Xác định nhanh vấn đề cơ sở hạ tầng hoặc chất lượng nhân sự để khắc phục kịp thời.
 
-### Level 4: AI Dynamic Pricing (Gợi ý Chiến lược Giá Động - Yield Management)
-Tối ưu hóa lợi nhuận kinh doanh bằng cách áp dụng giá linh hoạt tùy theo cung-cầu.
-*   **Mô tả:** AI theo dõi Tốc độ đặt phòng (Booking Velocity). Khi một ngày trong tương lai (ví dụ dịp Lễ 2/9) có tỷ lệ cháy phòng nhanh hơn bình thường, AI sẽ ra cảnh báo.
-*   **Ví dụ hiển thị:** *"Cảnh báo: Dịp lễ 2/9 còn 1 tháng nữa nhưng số phòng trống chỉ còn 10%. Tốc độ đặt phòng đang nhanh gấp 3 lần bình thường. Đề xuất AI: Đóng các kênh bán qua OTA (như Booking, Agoda) để tránh mất phí hoa hồng, và TĂNG GIÁ phòng bán trực tiếp lên 25%."*
-*   **Độ khó:** Nâng cao.
-
-### Level 5: Anomaly Detection (Phát hiện Bất thường Vận hành)
-Công cụ quản trị rủi ro tự động, chống thất thoát.
-*   **Mô tả:** AI phân tích các điểm dữ liệu và tự động khoanh đỏ (Highlight) các Outliers (Điểm bất thường) phá vỡ quy luật thống kê bình thường.
-*   **Ví dụ hiển thị:** *"Cảnh báo Anomaly: Công suất phòng ngày 15/06 đạt 90% nhưng Doanh thu Nhà hàng (F&B) lại giảm 50% so với định mức trung bình. Có dấu hiệu thất thoát hoặc sự cố vận hành F&B. Yêu cầu kiểm tra."*
-*   **Độ khó:** Khó.
+## Màn hình 5: Quản lý Nhân sự & Phân ca (Staff / Therapist Management)
+*   **Mô tả Nghiệp vụ:** Xếp lịch làm việc cho Kỹ thuật viên Spa (Therapist) và nhân viên nội bộ.
+*   **Nỗi đau thực tế:** Phân bổ ca làm việc không đồng đều, không dựa trên năng lực và yêu cầu thực tế của khách hàng.
+*   **Tích hợp AI (Tối ưu hóa Vận hành):**
+    *   AI dựa trên lịch sử đặt chỗ và đánh giá khách hàng để đề xuất: *"Nhân viên A có tỷ lệ khách yêu cầu (request) rất cao. Nên ưu tiên xếp A vào các khung giờ vàng cuối tuần để tối đa hóa doanh thu dịch vụ."*
+*   **Giá trị mang lại:** Tối ưu hóa chất lượng phục vụ, tăng động lực cho nhân viên xuất sắc.
 
 ---
 
-## KIẾN TRÚC VÀ GIẢI PHÁP KỸ THUẬT (DÀNH CHO ĐỒ ÁN SWP391)
-
-Để đảm bảo tính khả thi trong khuôn khổ thời gian của đồ án môn học, nhóm đề xuất tập trung triển khai **Level 1, Level 2 và Level 4**.
-
-**1. Kiến trúc Backend (Spring Boot):**
-*   Tạo ra một service chuyên biệt: `AIAnalyticsService.java`.
-*   Sử dụng Spring Data JPA để tổng hợp số liệu thực tế (VD: Doanh thu 30 ngày qua, tỷ lệ lấp đầy).
-*   Đóng gói số liệu thành định dạng JSON.
-
-**2. Tích hợp AI (LLM API):**
-*   Hệ thống không cần tự xây dựng model (tốn kém thời gian và tài nguyên máy chủ).
-*   Sử dụng **Open Feign** hoặc **RestTemplate** trong Spring Boot để gọi REST API sang các mô hình ngôn ngữ lớn (LLM) như **Google Gemini API** hoặc **OpenAI API**.
-*   **Prompt Engineering:** Xây dựng câu lệnh (Prompt) chuẩn hóa để LLM hiểu được nó đang đóng vai trò là "Chuyên gia phân tích dữ liệu Resort", truyền kèm mảng JSON chứa data.
-
-**3. Frontend (Giao diện hiển thị):**
-*   Nhận JSON Data do AI trả về.
-*   Sử dụng thư viện **Chart.js** để vẽ biểu đồ đường (Line Chart) dự báo và biểu đồ cột.
-*   Dùng HTML/CSS theo chuẩn bảng màu của hệ thống thiết kế "Aura Moon" để render box văn bản "AI Insights" ngay bên cạnh các biểu đồ lớn.
-
-> **Kết luận:** Việc ứng dụng AI dưới dạng "Cố vấn dữ liệu" qua API LLM không chỉ giải quyết triệt để yêu cầu đổi mới của Giảng viên mà còn mang lại tính hiện đại, thực tiễn và dễ dàng áp dụng ngay trên kiến trúc Spring Boot hiện có của đồ án.
+**KẾT LUẬN VỀ MẶT KIẾN TRÚC KỸ THUẬT:**
+Việc tích hợp AI vào 5 phân hệ này hoàn toàn khả thi trên kiến trúc Spring Boot. Chỉ cần viết một `AI_Integration_Service` gọi API tới LLM (Google Gemini / OpenAI), truyền dữ liệu tương ứng của từng phân hệ (dưới dạng JSON) và hiển thị kết quả phân tích trực tiếp lên giao diện của phân hệ đó. Hướng đi này đảm bảo tính "thực dụng", chuyên nghiệp, đúng yêu cầu môn học và thể hiện tư duy thiết kế phần mềm sắc bén.

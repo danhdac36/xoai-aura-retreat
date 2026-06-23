@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -48,8 +48,8 @@ public class ItineraryTimelineServiceTest {
                 .id(1001)
                 .guestId(guestId)
                 .bookingStatus("CONFIRMED")
-                .checkinDate(LocalDate.now())
-                .checkoutDate(LocalDate.now().plusDays(2))
+                .checkinDate(LocalDateTime.now())
+                .checkoutDate(LocalDateTime.now().plusDays(2))
                 .build();
 
         when(userRepository.findById(guestId)).thenReturn(Optional.of(guest));

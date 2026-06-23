@@ -42,9 +42,10 @@ public class HousekeepingController {
             RedirectAttributes redirectAttributes) {
         try {
             // Because User implements UserDetails, we can cast/use it directly.
-            // Assuming User has getId() method. If it's a CustomUserDetails, we might need a cast.
+            // Assuming User has getId() method. If it's a CustomUserDetails, we might need
+            // a cast.
             // But let's assume actor.getId() works, or we use a fallback if actor is null.
-            Integer actorId = (actor != null && actor.getId() != null) ? actor.getId() : 1; 
+            Integer actorId = (actor != null && actor.getId() != null) ? actor.getId() : 1;
             housekeepingService.assignHousekeeper(villaId, keeperName, actorId);
             redirectAttributes.addFlashAttribute("successMessage", "Đã phân công dọn dẹp thành công.");
         } catch (Exception e) {
