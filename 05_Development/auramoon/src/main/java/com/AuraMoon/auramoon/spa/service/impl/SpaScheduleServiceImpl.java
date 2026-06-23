@@ -13,6 +13,8 @@ import com.AuraMoon.auramoon.spa.repository.TherapistRepository;
 import com.AuraMoon.auramoon.spa.repository.TreatmentBookingRepository;
 import com.AuraMoon.auramoon.spa.repository.TreatmentRoomRepository;
 import com.AuraMoon.auramoon.spa.repository.TreatmentServiceRepository;
+import com.AuraMoon.auramoon.booking.repository.BookingRepository;
+import com.AuraMoon.auramoon.booking.entity.Booking;
 import com.AuraMoon.auramoon.spa.service.SpaScheduleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,17 +33,20 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
     private final TherapistRepository therapistRepository;
     private final TreatmentBookingRepository treatmentBookingRepository;
     private final TreatmentServiceRepository treatmentServiceRepository;
+    private final BookingRepository bookingRepository;
 
     public SpaScheduleServiceImpl(ScheduleRepository scheduleRepository,
             TreatmentRoomRepository roomRepository,
             TherapistRepository therapistRepository,
             TreatmentBookingRepository treatmentBookingRepository,
-            TreatmentServiceRepository treatmentServiceRepository) {
+            TreatmentServiceRepository treatmentServiceRepository,
+            BookingRepository bookingRepository) {
         this.scheduleRepository = scheduleRepository;
         this.roomRepository = roomRepository;
         this.therapistRepository = therapistRepository;
         this.treatmentBookingRepository = treatmentBookingRepository;
         this.treatmentServiceRepository = treatmentServiceRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     @Override
@@ -60,8 +65,24 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
         TreatmentService service = treatmentServiceRepository.findById(request.getServiceId())
                 .orElseThrow(() -> new SpaBusinessException("SPA-001", "Treatment Service not found"));
 
-        // 2. Tính thời gian kết thúc
+        // 1.5. Kiểm tra lịch hẹn Spa có nằm trong khoảng lưu trú không
+        Booking guestBooking = bookingRepository.findById(request.getBookingId())
+                .orElseThrow(() -> new SpaBusinessException("SPA-001", "Booking not found"));
+
         LocalDateTime startTime = request.getStartTime();
+        LocalDate bookingCheckin = guestBooking.getCheckinDate();
+        LocalDate bookingCheckout = guestBooking.getCheckoutDate();
+
+        if (bookingCheckin != null && bookingCheckout != null) {
+            LocalDate spaDate = startTime.toLocalDate();
+            if (spaDate.isBefore(bookingCheckin) || spaDate.isAfter(bookingCheckout)) {
+                throw new SpaBusinessException("SPA-011",
+                        "Lịch hẹn Spa phải nằm trong thời gian lưu trú (từ " +
+                                bookingCheckin + " đến " + bookingCheckout + ").");
+            }
+        }
+
+        // 2. Tính thời gian kết thúc
         LocalDateTime endTime = startTime
                 .plusMinutes(service.getDurationMinutes() != null ? service.getDurationMinutes() : 60);
 

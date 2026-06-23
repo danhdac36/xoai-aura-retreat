@@ -12,5 +12,6 @@ public class MealOrderRequest {
     private Integer guestId;
     private String placeOrder;
     private String note;
+    private Boolean isExtraCharge;
     private List<OrderItemDto> items;
 }

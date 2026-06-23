@@ -82,6 +82,24 @@
                 <span class="font-label-md text-label-md">Spa Staff Management</span>
             </a>
 
+            <!-- F&B Guest -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('GUEST', 'ADMIN')" th:href="@{/fnb/meal-selection}">
+                <span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
+                <span class="font-label-md text-label-md">Meal Selection</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('GUEST', 'ADMIN')" th:href="@{/fnb/alacarte-order}">
+                <span class="material-symbols-outlined" data-icon="room_service">room_service</span>
+                <span class="font-label-md text-label-md">A-La-Carte Order</span>
+            </a>
+            <!-- F&B Chef -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('CHEFF', 'ADMIN')" th:href="@{/fnb/chef/dashboard}">
+                <span class="material-symbols-outlined" data-icon="kitchen">kitchen</span>
+                <span class="font-label-md text-label-md">Chef Dashboard</span>
+            </a>
+
             <!-- Logout -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200">
                 <form th:action="@{/auth/logout}" method="post" class="w-full">
