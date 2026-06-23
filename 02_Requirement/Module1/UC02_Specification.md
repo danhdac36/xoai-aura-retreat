@@ -23,6 +23,7 @@
 * Tài khoản Guest đã được đăng ký và xác thực thành công (đang trong trạng thái đăng nhập).
 * Trạng thái tài khoản của Guest là Active (Hoạt động).
 * Guest đã chấp nhận Chính sách Quyền riêng tư chung của hệ thống.
+* Guest đã cập nhật toàn bộ thông tin cá nhân (căn cước công dân, số điện thoại, giới tính, ngày tháng năm sinh)cho hệ thống
 
 #### 2.2 Điều kiện sau (Postconditions)
 
@@ -37,7 +38,7 @@
 #### 3.1 Luồng cơ bản (Normal Flow)
 
 1. Guest chọn menu/chức năng **"Health & Dietary Profile"** trên hệ thống.
-2. hệ thống hiển thị biểu mẫu (Form) điền thông tin hồ sơ.
+2. hệ thống hiển thị biểu mẫu (Form) điền thông tin hồ sơ sức khỏe .
 3. Hệ thống hiển thị **Tuyên bố đồng ý (Consent statement)** với hộp kiểm (checkbox) ở trạng thái **không được chọn sẵn (unchecked mặc định)** (Quy tắc BR-08).
 4. Guest nhập các thông tin về **Chế độ ăn uống** (Dietary preferences).
 5. Guest nhập thông tin về **Dị ứng thực phẩm** (Food allergies).
@@ -47,7 +48,7 @@
 9. Hệ thống kiểm tra tính hợp lệ của dữ liệu (Validation).
 10. Hệ thống thực hiện **Mã hóa (Encryption)** các trường dữ liệu nhạy cảm (Quy tắc BR-09).
 11. Hệ thống lưu hồ sơ xuống Database (vào bảng `PHYSICAL_HEALTH_PROFILE`, `DIETARY_PROFILE` và lưu trạng thái vào bảng `CONSENT`).
-12. Hệ thống ghi lại ngày, giờ cập nhật vào cột update_at
+12. Hệ thống ghi lại ngày, giờ cập nhật vào Audit_Log
 13. Hệ thống hiển thị thông báo cập nhật hồ sơ thành công.
 
 #### 3.2 Luồng thay thế (Alternative Flows)

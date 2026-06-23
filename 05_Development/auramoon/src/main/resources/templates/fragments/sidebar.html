@@ -82,6 +82,20 @@
                 <span class="font-label-md text-label-md">Spa Staff Management</span>
             </a>
 
+            <!-- USER - SENSITIVE PROFILE -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/profile/health}">
+                <span class="material-symbols-outlined" data-icon="person">person</span>
+                <span class="font-label-md text-label-md">Sensitive profile</span>
+            </a>
+
+            <!-- USER - PROFILE -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+               th:href="@{/profile/me}">
+                <span class="material-symbols-outlined" data-icon="person">person</span>
+                <span class="font-label-md text-label-md">My profile</span>
+            </a>
+
             <!-- Logout -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200">
                 <form th:action="@{/auth/logout}" method="post" class="w-full">

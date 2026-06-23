@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ Sức khỏe & Dinh dưỡng - AuraMoon Retreat</title>
+    <link rel="stylesheet" th:href="@{/css/auth/profile.css}">
+</head>
+<body>
+<div class="profile-container">
+    <a th:href="@{/packages}">&larr; Quay lại trang chủ</a>
+    <h2>Hồ Sơ Sức Khỏe & Dinh Dưỡng</h2>
+    <p class="subtitle">Thông tin y tế và chế độ ăn uống của bạn được mã hóa an toàn và chỉ cung cấp cho chuyên gia trị liệu, đầu bếp để chăm sóc bạn tốt nhất.</p>
+
+    <!-- MSG-15 Hoặc MSG-03 -->
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <!-- Success Message -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+    <form th:action="@{/profile/update}" th:object="${profileDto}" method="POST" class="profile-form">
+  
+        <!-- Khu vực 1: Sức khỏe Vật lý -->
+        <fieldset>
+            <legend>Tình trạng Sức khỏe (Physical Health)</legend>
+            <div class="form-group">
+                <label for="medicalConditions">Tình trạng Y tế hiện tại:</label>
+                <textarea id="medicalConditions" th:field="*{medicalConditions}" rows="3" placeholder="Ví dụ: Tiểu đường, Cao huyết áp, bệnh tim mạch..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="injuries">Chấn thương / Lưu ý Vật lý:</label>
+                <textarea id="injuries" th:field="*{injuries}" rows="3" placeholder="Ví dụ: Đau mỏi thắt lưng, chấn thương khớp gối cũ..."></textarea>
+            </div>
+        </fieldset>
+
+        <!-- Khu vực 2: Dinh dưỡng & Dị ứng -->
+        <fieldset>
+            <legend>Chế độ Dinh dưỡng (Diet & Allergies)</legend>
+            <div class="form-group">
+                <label for="foodAllergies">Dị ứng thực phẩm:</label>
+                <textarea id="foodAllergies" th:field="*{foodAllergies}" rows="2" placeholder="Ví dụ: Dị ứng hải sản vỏ cứng, dị ứng đậu phộng..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="dietaryPreference">Sở thích Ăn kiêng:</label>
+                <textarea id="dietaryPreference" th:field="*{dietaryPreference}" rows="2" placeholder="Ví dụ: Ăn thuần chay, chế độ ăn ít đường (Keto)..."></textarea>
+            </div>
+        </fieldset>
+
+        <!-- Khu vực 3: Đồng ý thu thập dữ liệu (BR-08) -->
+        <div class="consent-group">
+            <input type="checkbox" id="hasConsent" th:field="*{hasConsent}" class="consent-checkbox">
+            <label for="hasConsent" class="consent-label">
+                Tôi đồng ý cho phép Xoài Aura Retreat thu thập và xử lý các thông tin y tế trên nhằm mục đích cải thiện dịch vụ chăm sóc sức khỏe cá nhân. Tôi hiểu rằng dữ liệu này được mã hóa và bảo mật nghiêm ngặt theo quy định.
+            </label>
+        </div>
+
+        <button type="submit" class="btn-submit">Lưu Hồ Sơ Sức Khỏe</button>
+    </form>
+</div>
+</body>
+</html>

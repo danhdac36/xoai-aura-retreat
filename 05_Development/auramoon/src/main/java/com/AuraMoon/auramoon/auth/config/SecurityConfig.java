@@ -39,8 +39,8 @@ public class SecurityConfig {
         private static final String[] GUEST_ENDPOINTS = {
                         "/user/**",
                         "/orders/**",
-                        "/cart/**",
-                        "/profile/**"
+                        "/cart/**"
+
         };
 
         private static final String[] ADMIN_ENDPOINTS = {
@@ -51,7 +51,7 @@ public class SecurityConfig {
         };
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {
-                        "/receptionist/**"
+//                        "/receptionist/**"
         };
 
         private static final String[] THERAPIST_ENDPOINTS = {

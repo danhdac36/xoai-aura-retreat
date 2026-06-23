@@ -23,7 +23,7 @@ public class Villa {
     @Column(name = "villa_code", nullable = false, unique = true, length = 10)
     private String villaCode;
 
-    @Column(name = "max_number")
+    @Column(name = "limit_person")
     private Integer limitPerson;
 
     @Column(name = "villa_status", length = 10)
