@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Aman Wellness | Khai báo Sức khỏe &amp; Ăn kiêng</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+          rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1b1c1c",
+                        "surface-container": "#f0eded",
+                        "primary-container": "#f5f2ed",
+                        "tertiary": "#406840",
+                        "outline-variant": "#c8c7be",
+                        "outline": "#787770",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#5f5e5b",
+                        "on-background": "#1b1c1c",
+                        "on-tertiary-fixed-variant": "#284f2a",
+                        "secondary": "#566342",
+                        "on-secondary-container": "#5a6745",
+                        "on-primary-fixed-variant": "#474743",
+                        "background": "#fbf9f8",
+                        "tertiary-fixed-dim": "#a5d2a2",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#e5e2dd",
+                        "on-secondary-fixed": "#141f05",
+                        "secondary-fixed": "#dae8be",
+                        "secondary-container": "#d7e5bb",
+                        "surface-variant": "#e4e2e1",
+                        "on-tertiary-container": "#4f784f",
+                        "on-primary-fixed": "#1c1c19",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#303030",
+                        "tertiary-fixed": "#c1eebc",
+                        "surface-dim": "#dcd9d9",
+                        "secondary-fixed-dim": "#becca3",
+                        "on-surface-variant": "#474741",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f3f0f0",
+                        "primary-fixed-dim": "#c9c6c2",
+                        "surface-tint": "#5f5e5b",
+                        "surface": "#fbf9f8",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#6f6e6a",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-secondary-fixed-variant": "#3f4b2c",
+                        "on-tertiary-fixed": "#002106",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fbf9f8",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#d1ffcb",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-high": "#eae8e7",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#c9c6c2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "margin-desktop": "80px",
+                        "stack-md": "16px",
+                        "section-gap": "120px",
+                        "stack-lg": "32px",
+                        "gutter": "24px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "headline-sm": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
+                        "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .form-input-minimal {
+            border: none;
+            border-bottom: 2px solid #e4e2e1;
+            background-color: transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input-minimal:focus {
+            outline: none;
+            border-color: #406840; /* tertiary as sage-green substitute */
+            ring: 0;
+        }
+
+        .custom-checkbox:checked {
+            background-color: #406840;
+            border-color: #406840;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="w-full top-0 sticky z-50 bg-background dark:bg-on-background">
+    <div class="flex justify-between items-center h-20 max-w-[1280px] mx-auto px-margin-desktop">
+        <span class="font-headline-sm text-headline-sm text-on-surface dark:text-on-surface-variant font-bold tracking-tight">Aman Wellness</span>
+        <div class="hidden md:flex items-center space-x-stack-lg">
+            <a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-tertiary-fixed-dim transition-colors duration-300 ease-in-out"
+               href="#">Retreats</a>
+            <a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-tertiary-fixed-dim transition-colors duration-300 ease-in-out"
+               href="#">Spa</a>
+            <a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-tertiary-fixed-dim transition-colors duration-300 ease-in-out"
+               href="#">Dining</a>
+            <a class="font-body-md text-body-md text-primary dark:text-primary-fixed font-semibold border-b border-primary transition-colors duration-300 ease-in-out"
+               href="#">My Journey</a>
+        </div>
+        <button class="bg-secondary text-on-tertiary px-6 py-2 rounded-lg font-label-md text-label-md hover:bg-tertiary transition-colors duration-300">
+            Book Stay
+        </button>
+    </div>
+</nav>
+<main class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg">
+    <!-- Hero Section -->
+    <section class="mb-stack-lg animate-fade-in">
+        <div class="relative w-full h-[200px] overflow-hidden rounded-xl mb-stack-md">
+            <img alt="Wellness Profile Header"
+                 class="w-full h-full object-cover opacity-80 scale-105 hover:scale-100 transition-transform duration-1000"
+                 data-alt="A serene wide-angle shot of a high-end luxury spa treatment room in a Vietnamese retreat. Soft morning sunlight filters through bamboo screens, casting gentle shadows on a minimalist massage bed draped in organic white linen. The room features warm cedar wood panels and a small indoor zen garden with smooth river stones. The atmosphere is quiet, sophisticated, and deeply calming, with soft sage green accents."
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAHmuVzbXtMKzMFjgpN-arjMO0R5lNsoyE1JqUGU_XVcwGNjqZjh2BCNIuli4OOVikni6H7a4B7Xd4X9Q8N-f7pzY4Gr78WW29ss-FJJ74IlQ3H1zfsD4jVGO310YWs6DK91NIMjPMqT39O49gUWAtLLHGf-eu0YWE47RCmmR6FwvfNMZE2DB3Sd-3g-v1nQPqCfOh0zMM0nDM6_VR6Rmz9w9KQH-xrFXSk_FnU86VZMl0KR508viHwVM-_2vKstqn5TAWgFdcvnU">
+            <div class="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+        </div>
+        <div class="max-w-2xl">
+            <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Khai báo Sức khỏe &amp; Ăn kiêng</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant opacity-80">
+                Hồ sơ sức khỏe cá nhân của bạn giúp chúng tôi thiết kế hành trình chữa lành tối ưu. Mọi thông tin được
+                bảo mật và chỉ sử dụng cho mục đích cá nhân hóa trải nghiệm.
+            </p>
+        </div>
+    </section>
+    <!-- Form Section -->
+    <form class="grid grid-cols-1 md:grid-cols-2 gap-section-gap" id="wellness-form">
+        <!-- Left Column: Dietary Preferences -->
+        <div class="space-y-stack-lg">
+            <div class="border-b border-outline-variant pb-stack-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary" data-icon="restaurant">restaurant</span>
+                <h2 class="font-headline-sm text-headline-sm text-secondary">Chế độ Ăn uống &amp; Dị ứng</h2>
+            </div>
+            <!-- Allergies -->
+            <div class="space-y-stack-md">
+                <label class="font-label-md text-label-md text-on-surface-variant">Dị ứng Thực phẩm</label>
+                <div class="grid grid-cols-2 gap-stack-md">
+                    <label class="flex items-center space-x-3 cursor-pointer group">
+                        <input class="form-checkbox h-5 w-5 text-tertiary border-outline rounded-sm focus:ring-tertiary transition-all"
+                               type="checkbox">
+                        <span class="font-body-md group-hover:text-tertiary transition-colors">Đậu phộng / Nuts</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer group">
+                        <input class="form-checkbox h-5 w-5 text-tertiary border-outline rounded-sm focus:ring-tertiary transition-all"
+                               type="checkbox">
+                        <span class="font-body-md group-hover:text-tertiary transition-colors">Hải sản / Shellfish</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer group">
+                        <input class="form-checkbox h-5 w-5 text-tertiary border-outline rounded-sm focus:ring-tertiary transition-all"
+                               type="checkbox">
+                        <span class="font-body-md group-hover:text-tertiary transition-colors">Sữa / Dairy</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer group">
+                        <input class="form-checkbox h-5 w-5 text-tertiary border-outline rounded-sm focus:ring-tertiary transition-all"
+                               type="checkbox">
+                        <span class="font-body-md group-hover:text-tertiary transition-colors">Gluten</span>
+                    </label>
+                </div>
+                <input class="w-full form-input-minimal py-2 font-body-md italic text-on-surface-variant"
+                       placeholder="Loại dị ứng khác..." type="text">
+            </div>
+            <!-- Dietary Regimen -->
+            <div class="space-y-stack-md">
+                <label class="font-label-md text-label-md text-on-surface-variant">Chế độ Ăn kiêng</label>
+                <div class="flex flex-wrap gap-stack-md">
+                    <label class="relative flex items-center px-4 py-2 border border-outline-variant rounded-full cursor-pointer hover:bg-surface-container transition-colors group">
+                        <input class="sr-only peer" name="diet" type="radio">
+                        <span class="font-body-md peer-checked:text-tertiary">Thuần chay (Vegan)</span>
+                        <div class="absolute inset-0 border-2 border-transparent peer-checked:border-tertiary rounded-full transition-all"></div>
+                    </label>
+                    <label class="relative flex items-center px-4 py-2 border border-outline-variant rounded-full cursor-pointer hover:bg-surface-container transition-colors group">
+                        <input class="sr-only peer" name="diet" type="radio">
+                        <span class="font-body-md peer-checked:text-tertiary">Ăn chay (Vegetarian)</span>
+                        <div class="absolute inset-0 border-2 border-transparent peer-checked:border-tertiary rounded-full transition-all"></div>
+                    </label>
+                    <label class="relative flex items-center px-4 py-2 border border-outline-variant rounded-full cursor-pointer hover:bg-surface-container transition-colors group bg-primary-container">
+                        <input class="sr-only peer" name="diet" type="radio">
+                        <span class="font-body-md peer-checked:text-tertiary">Keto</span>
+                        <div class="absolute inset-0 border-2 border-transparent peer-checked:border-tertiary rounded-full transition-all"></div>
+                    </label>
+                    <label class="relative flex items-center px-4 py-2 border border-outline-variant rounded-full cursor-pointer hover:bg-surface-container transition-colors group">
+                        <input class="sr-only peer" name="diet" type="radio">
+                        <span class="font-body-md peer-checked:text-tertiary">Halal</span>
+                        <div class="absolute inset-0 border-2 border-transparent peer-checked:border-tertiary rounded-full transition-all"></div>
+                    </label>
+                </div>
+            </div>
+            <!-- Notes -->
+            <div class="space-y-stack-sm">
+                <label class="font-label-md text-label-md text-on-surface-variant">Ghi chú bổ sung</label>
+                <textarea class="w-full form-input-minimal py-2 font-body-md resize-none"
+                          placeholder="Sở thích riêng hoặc yêu cầu đặc biệt về khẩu vị..." rows="3"></textarea>
+            </div>
+        </div>
+        <!-- Right Column: Physical Health -->
+        <div class="space-y-stack-lg">
+            <div class="border-b border-outline-variant pb-stack-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary"
+                      data-icon="health_and_safety">health_and_safety</span>
+                <h2 class="font-headline-sm text-headline-sm text-secondary">Tình trạng Sức khỏe Vật lý</h2>
+            </div>
+            <!-- Medical Conditions -->
+            <div class="space-y-stack-sm">
+                <label class="font-label-md text-label-md text-on-surface-variant">Tình trạng Y tế Hiện tại</label>
+                <textarea class="w-full form-input-minimal py-2 font-body-md"
+                          placeholder="Ví dụ: Cao huyết áp, tiểu đường, hen suyễn..." rows="2"></textarea>
+            </div>
+            <!-- Medications -->
+            <div class="space-y-stack-sm">
+                <label class="font-label-md text-label-md text-on-surface-variant">Thuốc đang sử dụng</label>
+                <textarea class="w-full form-input-minimal py-2 font-body-md"
+                          placeholder="Liệt kê các loại thuốc định kỳ nếu có..." rows="2"></textarea>
+            </div>
+            <!-- Injuries -->
+            <div class="space-y-stack-sm">
+                <label class="font-label-md text-label-md text-on-surface-variant">Chấn thương hoặc Vấn đề gần
+                    đây</label>
+                <textarea class="w-full form-input-minimal py-2 font-body-md"
+                          placeholder="Đau lưng, khớp, hoặc các vùng nhạy cảm cần lưu ý khi massage..."
+                          rows="2"></textarea>
+            </div>
+            <!-- Atmospheric Detail: Subtle Decor -->
+            <div class="pt-stack-lg opacity-40">
+                <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-outline to-transparent"></div>
+                <p class="text-center font-label-md mt-4 italic">Sức khỏe của bạn là ưu tiên hàng đầu của Aman
+                    Wellness.</p>
+            </div>
+        </div>
+        <!-- Form Bottom / Action Area -->
+        <div class="col-span-1 md:col-span-2 pt-stack-lg">
+            <div class="bg-surface-container rounded-xl p-stack-lg flex flex-col items-center space-y-stack-lg border border-outline-variant/30">
+                <label class="flex items-start space-x-4 max-w-2xl cursor-pointer group">
+                    <input class="mt-1 form-checkbox h-5 w-5 text-tertiary border-outline rounded-sm focus:ring-tertiary"
+                           required="" type="checkbox">
+                    <span class="font-body-md text-on-surface-variant leading-relaxed">
+                            Tôi xác nhận rằng thông tin cung cấp là chính xác và đồng ý để Aman Wellness sử dụng thông tin này nhằm mục đích cá nhân hóa trải nghiệm nghỉ dưỡng của tôi.
+                        </span>
+                </label>
+                <div class="flex flex-col md:flex-row gap-stack-md w-full md:w-auto">
+                    <button class="bg-tertiary text-on-tertiary px-12 py-4 rounded font-label-md text-label-md tracking-widest hover:brightness-110 transition-all shadow-lg shadow-tertiary/20"
+                            type="submit">
+                        LƯU &amp; TIẾP TỤC
+                    </button>
+                    <button class="border border-tertiary text-tertiary px-12 py-4 rounded font-label-md text-label-md tracking-widest hover:bg-tertiary/5 transition-all"
+                            type="button">&nbsp; &nbsp;QUAY LẠI&nbsp; &nbsp; &nbsp;
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-section-gap bg-surface-container dark:bg-surface-container-high border-t border-outline-variant/20">
+    <div class="flex flex-col md:flex-row justify-between items-center py-stack-lg max-w-[1280px] mx-auto px-margin-desktop">
+        <div class="mb-stack-md md:mb-0">
+            <span class="font-headline-sm text-headline-sm text-primary font-bold">Aman Wellness</span>
+            <p class="font-label-md text-label-md text-on-surface-variant mt-2 opacity-80">© 2024 Aman Wellness
+                Retreats. Tranquility in every breath.</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-6">
+            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all underline underline-offset-4"
+               href="#">Privacy Policy</a>
+            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all"
+               href="#">Health &amp; Safety</a>
+            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all"
+               href="#">Terms of Service</a>
+            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all"
+               href="#">Contact Us</a>
+        </div>
+    </div>
+</footer>
+<script>
+    document.getElementById('wellness-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.innerText;
+        btn.innerText = 'ĐANG XỬ LÝ...';
+        btn.disabled = true;
+
+        setTimeout(() => {
+            alert('Thông tin của bạn đã được ghi nhận. Cảm ơn bạn!');
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }, 1500);
+    });
+
+    // Simple tag interaction for diet buttons
+    const radioLabels = document.querySelectorAll('input[name="diet"]');
+    radioLabels.forEach(radio => {
+        radio.addEventListener('change', () => {
+            // Clear others
+            document.querySelectorAll('input[name="diet"]').forEach(r => {
+                r.parentElement.classList.remove('bg-primary-container');
+            });
+            if (radio.checked) {
+                radio.parentElement.classList.add('bg-primary-container');
+            }
+        });
+    });
+</script>
+
+
+</body>
+</html>

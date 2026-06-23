@@ -78,7 +78,8 @@ public class SecurityConfig {
                                                 .requestMatchers(MANAGER_ENDPOINTS).hasRole("MANAGER")
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
-                                                .loginPage("/auth/login")
+                                                .loginPage("/aut" +
+                                                        "h/login")
                                                 .loginProcessingUrl("/auth/login")
                                                 .usernameParameter("email")
                                                 .passwordParameter("password")
