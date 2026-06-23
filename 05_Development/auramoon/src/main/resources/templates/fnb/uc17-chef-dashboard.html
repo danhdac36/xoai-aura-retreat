@@ -11,6 +11,11 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
         rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN & standard config -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script th:src="@{/js/public/tailwind-config.js}"></script>
 
     <link rel="stylesheet" th:href="@{/css/fnb/fnb.css}" href="/css/fnb/fnb.css">
     <link rel="stylesheet" th:href="@{/css/fnb/uc17-chef-dashboard.css}" href="/css/fnb/uc17-chef-dashboard.css">
@@ -19,42 +24,11 @@
 <body>
 
     <div class="dashboard-wrapper">
-        <!-- Sidebar Navigation (Aura Kitchen Left Panel) -->
-        <aside class="sidebar-nav" aria-label="Menu quản lý bếp">
-            <div class="brand-logo">
-                <h2>Aura Kitchen</h2>
-                <p>Main Kitchen</p>
-            </div>
-            
-            <nav class="nav-links">
-                <a href="/fnb/chef/dashboard" class="nav-item active">
-                    <span class="icon">📋</span> Orders
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="icon">🍳</span> Prep List
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="icon">📅</span> Menu Planning
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="icon">⚠️</span> Dietary Alerts
-                </a>
-                <a href="#" class="nav-item">
-                    <span class="icon">📊</span> Reports
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <button type="button" class="btn-custom-order">New Custom Order</button>
-                <div class="footer-links">
-                    <a href="#" class="help-link">Help</a>
-                    <a href="#" class="signout-link">Sign Out</a>
-                </div>
-            </div>
-        </aside>
+        <!-- Sidebar Navigation (App-wide Sidebar Fragment) -->
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
         <!-- Main Workspace -->
-        <main class="dashboard-main">
+        <main class="dashboard-main" style="margin-left: 260px;">
             <!-- Top Bar -->
             <div class="top-bar">
                 <div class="top-bar-nav">

@@ -502,7 +502,7 @@
         document.getElementById('time-slots-evening').innerHTML = '';
 
         try {
-            const res = await fetch(`/receptionist/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}`);
+            const res = await fetch(`/guest/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}`);
             if (!res.ok) throw new Error("Connection failed");
             
             const availableTimes = await res.json();

@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
 
@@ -19,33 +18,18 @@
 <body>
 
     <!-- Header -->
-    <header class="header-container">
-        <h1>Thực đơn dinh dưỡng cá nhân</h1>
-        <p>Lựa chọn món ăn lành mạnh được thiết kế tối ưu dựa trên sở thích và hồ sơ dị ứng của bạn.</p>
-    </header>
-
-    <!-- Filter Form -->
-    <section class="header-container filter-container">
-        <div class="filter-form">
-            <div class="form-group">
-                <label for="input-user-id">Mã khách hàng (User ID)</label>
-                <input type="number" id="input-user-id" th:value="${guestId != null ? guestId : 1}" min="1">
-            </div>
-
-            <div class="form-group">
-                <label for="input-booking-id">Mã đặt phòng (Booking ID)</label>
-                <input type="number" id="input-booking-id" th:value="${bookingId != null ? bookingId : 1}" min="1">
-            </div>
-
-            <div class="form-actions">
-                <button type="button" class="btn-search">Tải thực đơn</button>
-
-                <a class="alacarte-link-btn" href="/fnb/uc19-alacarte-order">
-                    Thực đơn gọi món ngoài (A-La-Carte)
-                </a>
-            </div>
+    <header class="header-container"
+        style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 24px;">
+        <div>
+            <h1>Thực đơn dinh dưỡng cá nhân</h1>
+            <p>Lựa chọn món ăn lành mạnh được thiết kế tối ưu dựa trên sở thích và hồ sơ dị ứng của bạn.</p>
         </div>
-    </section>
+        <div>
+            <a class="alacarte-link-btn" href="/fnb/alacarte-order" style="display: inline-block;">
+                Thực đơn gọi món ngoài (A-La-Carte)
+            </a>
+        </div>
+    </header>
 
     <!-- Main Container -->
     <main class="main-content">
@@ -67,11 +51,8 @@
                     </div>
 
                     <div class="card-body">
-                        <h3 class="card-title" th:text="${item.itemName}">Tên món</h3>
-
-                        <div class="card-price"
-                            th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
-                            0đ
+                        <div class="card-header-row" style="justify-content: center; text-align: center;">
+                            <h3 class="card-title" th:text="${item.itemName}" style="margin: 0;">Tên món</h3>
                         </div>
 
                         <p class="card-ingredients"
@@ -79,10 +60,12 @@
                             Thành phần
                         </p>
 
-                        <button type="button" class="btn-select" th:data-id="${item.id}" th:data-name="${item.itemName}"
-                            th:data-price="${item.price}">
-                            CHỌN MÓN
-                        </button>
+                        <div class="card-footer-row" style="justify-content: center;">
+                            <button type="button" class="btn-select" th:data-id="${item.id}"
+                                th:data-name="${item.itemName}" th:data-price="0">
+                                Add to cart +
+                            </button>
+                        </div>
                     </div>
                 </article>
             </div>
@@ -98,7 +81,7 @@
         <!-- Right Column: Sidebar / Selected Items Panel -->
         <aside class="sidebar-panel" aria-label="Thực đơn đã chọn">
             <h2 class="sidebar-title">
-                <span>Thực đơn đã chọn</span>
+                <span style="font-family: var(--font-serif); font-size: 1.6rem;">Giỏ hàng</span>
                 <span class="qty-badge" id="selected-badge">0</span>
             </h2>
 
@@ -109,29 +92,20 @@
             <!-- Cost Summary -->
             <div class="pricing-summary">
                 <div class="price-row">
-                    <span>Tạm tính:</span>
-                    <span id="price-subtotal">0đ</span>
-                </div>
-
-                <div class="price-row">
-                    <span>Phí phục vụ (5%):</span>
-                    <span id="price-service-charge">0đ</span>
-                </div>
-
-                <div class="price-row total">
-                    <span>Tổng cộng:</span>
-                    <span id="price-total">0đ</span>
+                    <span class="price-label">Chi phí:</span>
+                    <span class="price-value free">Miễn phí (Thuộc Gói Retreat)</span>
                 </div>
             </div>
 
             <!-- MVC Submit Form -->
-            <form th:action="@{/fnb/uc16-meal-selection}" th:object="${orderForm}" method="post" id="order-submit-form">
+            <form th:action="@{/fnb/meal-selection}" th:object="${orderForm}" method="post" id="order-submit-form">
 
                 <!-- Hidden fields for Spring MVC Binding -->
                 <input type="hidden" th:field="*{guestId}" id="form-guest-id">
                 <input type="hidden" th:field="*{bookingId}" id="form-booking-id">
                 <input type="hidden" th:field="*{placeOrder}" id="form-place-order">
                 <input type="hidden" th:field="*{note}" id="form-note">
+                <input type="hidden" id="max-meals-limit" th:value="${maxMeals != null ? maxMeals : 3}">
 
                 <!-- JS will generate items[index].menuItemId and items[index].quantity here -->
                 <div id="hidden-items-container"></div>
@@ -161,7 +135,7 @@
 
     <!-- Scripts -->
     <script src="/js/fnb/menu-image-map.js"></script>
-    <script src="/js/fnb/uc16.js"></script>
+    <script src="/js/fnb/meal-selection.js"></script>
 </body>
 
 </html>

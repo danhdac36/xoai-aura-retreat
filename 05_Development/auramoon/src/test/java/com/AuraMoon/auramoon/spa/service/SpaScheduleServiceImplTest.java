@@ -102,8 +102,9 @@ class SpaScheduleServiceImplTest {
         request.setServiceId(10);
         request.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
 
-        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10)).thenReturn(List.of(new TreatmentBooking()));
-        
+        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10))
+                .thenReturn(List.of(new TreatmentBooking()));
+
         TreatmentService service = new TreatmentService();
         service.setDurationMinutes(60);
         when(treatmentServiceRepository.findById(10)).thenReturn(Optional.of(service));
@@ -129,8 +130,9 @@ class SpaScheduleServiceImplTest {
         request.setServiceId(10);
         request.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
 
-        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10)).thenReturn(List.of(new TreatmentBooking()));
-        
+        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10))
+                .thenReturn(List.of(new TreatmentBooking()));
+
         TreatmentService service = new TreatmentService();
         service.setDurationMinutes(60);
         when(treatmentServiceRepository.findById(10)).thenReturn(Optional.of(service));
@@ -157,7 +159,8 @@ class SpaScheduleServiceImplTest {
         request.setServiceId(10);
         request.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
 
-        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10)).thenReturn(Collections.emptyList());
+        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10))
+                .thenReturn(Collections.emptyList());
 
         // Act & Assert
         SpaBusinessException exception = assertThrows(SpaBusinessException.class, () -> {

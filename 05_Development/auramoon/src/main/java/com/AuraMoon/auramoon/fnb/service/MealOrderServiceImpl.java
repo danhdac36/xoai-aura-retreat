@@ -18,6 +18,8 @@ import com.AuraMoon.auramoon.billing.repository.FolioItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -50,6 +52,9 @@ public class MealOrderServiceImpl implements IMealOrderService {
 
     @Autowired
     private FolioItemRepository folioItemRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     @Transactional(readOnly = true)
@@ -124,7 +129,7 @@ public class MealOrderServiceImpl implements IMealOrderService {
                 .orElseThrow(() -> new FnbException("FNB-002", "Booking not found with ID: " + request.getBookingId()));
 
         String bStatus = booking.getBookingStatus();
-        if (bStatus == null || (!bStatus.equalsIgnoreCase("Checked-In") && !bStatus.equalsIgnoreCase("Checked-in")
+        if (bStatus == null || (!bStatus.equalsIgnoreCase(com.AuraMoon.auramoon.common.enums.BookingStatus.CHECKED_IN.name()) && !bStatus.equalsIgnoreCase("Checked-in")
                 && !bStatus.equalsIgnoreCase("ACTIVE"))) {
             throw new FnbException("FNB-002", "Lượt đặt phòng không ở trạng thái ACTIVE tại thời điểm gọi món.");
         }
@@ -181,6 +186,25 @@ public class MealOrderServiceImpl implements IMealOrderService {
                     allergenConflicts);
         }
 
+        if (!Boolean.TRUE.equals(request.getIsExtraCharge())) {
+            int totalGuests = booking.getTotalGuests() != null ? booking.getTotalGuests() : 1;
+            int maxAllowedQuantity = totalGuests * 3;
+
+            LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+            LocalDateTime endOfDay = LocalDate.now().plusDays(1).atStartOfDay();
+            int alreadyOrderedToday = mealOrderRepository.sumQuantityOfFreeMealOrdersToday(booking.getId(), startOfDay, endOfDay);
+            int totalRequestedQuantity = request.getItems().stream().mapToInt(OrderItemDto::getQuantity).sum();
+
+            if (alreadyOrderedToday + totalRequestedQuantity > maxAllowedQuantity) {
+                int remainingFreeMeals = maxAllowedQuantity - alreadyOrderedToday;
+                if (remainingFreeMeals <= 0) {
+                    throw new FnbException("FNB-005", "Quý khách đã sử dụng hết " + maxAllowedQuantity + " phần ăn miễn phí của ngày hôm nay. Vui lòng đặt qua Thực đơn A-La-Carte nếu có nhu cầu phát sinh.");
+                } else {
+                    throw new FnbException("FNB-005", "Quý khách chỉ còn lại " + remainingFreeMeals + " phần ăn miễn phí trong ngày hôm nay. Đơn hàng yêu cầu " + totalRequestedQuantity + " phần. Vui lòng giảm số lượng hoặc đặt qua Thực đơn A-La-Carte.");
+                }
+            }
+        }
+
         GuestFolio folio = guestFolioRepository.findByBookingId(booking.getId())
                 .orElseThrow(() -> new FnbException("FNB-002",
                         "Resort Guest Folio not found for booking: " + booking.getId()));
@@ -212,25 +236,27 @@ public class MealOrderServiceImpl implements IMealOrderService {
         mealOrderItemRepository.saveAll(orderItems);
         mealOrderItemRepository.saveAll(orderItems);
 
-        // Update Folio charges
-        BigDecimal currentExtra = folio.getTotalExtraFb() == null ? BigDecimal.ZERO : folio.getTotalExtraFb();
-        folio.setTotalExtraFb(currentExtra.add(totalAmount));
-        BigDecimal packageAmt = folio.getTotalPackageAmount() == null ? BigDecimal.ZERO : folio.getTotalPackageAmount();
-        folio.setFinalAmount(packageAmt.add(folio.getTotalExtraFb()));
-        guestFolioRepository.save(folio);
+        // Update Folio charges if this is an A-la-carte order
+        if (Boolean.TRUE.equals(request.getIsExtraCharge())) {
+            BigDecimal currentExtra = folio.getTotalExtraFb() == null ? BigDecimal.ZERO : folio.getTotalExtraFb();
+            folio.setTotalExtraFb(currentExtra.add(totalAmount));
+            BigDecimal packageAmt = folio.getTotalPackageAmount() == null ? BigDecimal.ZERO : folio.getTotalPackageAmount();
+            folio.setFinalAmount(packageAmt.add(folio.getTotalExtraFb()));
+            guestFolioRepository.save(folio);
 
-        // Create Folio Item record
-        FolioItem folioItem = FolioItem.builder()
-                .guestFolio(folio)
-                .serviceCategory("Extra F&B")
-                .referenceId(order.getId())
-                .description("Extra F&B Order #" + order.getId())
-                .amount(totalAmount)
-                .createAt(LocalDateTime.now())
-                .createBy(request.getGuestId())
-                .status("PENDING")
-                .build();
-        folioItemRepository.save(folioItem);
+            // Create Folio Item record
+            FolioItem folioItem = FolioItem.builder()
+                    .guestFolio(folio)
+                    .serviceCategory("Extra F&B")
+                    .referenceId(order.getId())
+                    .description("Extra F&B Order #" + order.getId())
+                    .amount(totalAmount)
+                    .createAt(LocalDateTime.now())
+                    .createBy(request.getGuestId())
+                    .status("UNPAID")
+                    .build();
+            folioItemRepository.save(folioItem);
+        }
 
         return MealOrderResponse.builder()
                 .mealOrderId(order.getId())
@@ -279,6 +305,35 @@ public class MealOrderServiceImpl implements IMealOrderService {
 
         order.setOrderStatus(status);
         mealOrderRepository.save(order);
+
+        // If status is CANCELLED, void the corresponding FolioItem and deduct the charge
+        if (status.equalsIgnoreCase("CANCELLED")) {
+            String queryStr = "SELECT fi FROM FolioItem fi WHERE fi.serviceCategory = :category AND fi.referenceId = :refId";
+            List<FolioItem> folioItems = entityManager.createQuery(queryStr, FolioItem.class)
+                    .setParameter("category", "Extra F&B")
+                    .setParameter("refId", orderId)
+                    .getResultList();
+            for (FolioItem folioItem : folioItems) {
+                if (!"VOIDED".equalsIgnoreCase(folioItem.getStatus())) {
+                    folioItem.setStatus("VOIDED");
+                    entityManager.merge(folioItem);
+
+                    GuestFolio folio = folioItem.getGuestFolio();
+                    if (folio != null) {
+                        BigDecimal currentExtra = folio.getTotalExtraFb() == null ? BigDecimal.ZERO : folio.getTotalExtraFb();
+                        BigDecimal newExtra = currentExtra.subtract(folioItem.getAmount());
+                        if (newExtra.compareTo(BigDecimal.ZERO) < 0) {
+                            newExtra = BigDecimal.ZERO;
+                        }
+                        folio.setTotalExtraFb(newExtra);
+
+                        BigDecimal packageAmt = folio.getTotalPackageAmount() == null ? BigDecimal.ZERO : folio.getTotalPackageAmount();
+                        folio.setFinalAmount(packageAmt.add(folio.getTotalExtraFb()));
+                        entityManager.merge(folio);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -419,5 +474,14 @@ public class MealOrderServiceImpl implements IMealOrderService {
                 && (ing.contains("tôm") || ing.contains("cua") || ing.contains("hải sản") || ing.contains("seafood")))
             return true;
         return false;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int getSumQuantityOfFreeMealOrdersToday(Integer bookingId, LocalDateTime start, LocalDateTime end) {
+        if (bookingId == null || start == null || end == null) {
+            return 0;
+        }
+        return mealOrderRepository.sumQuantityOfFreeMealOrdersToday(bookingId, start, end);
     }
 }

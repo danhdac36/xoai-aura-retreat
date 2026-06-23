@@ -18,5 +18,7 @@ public interface IMealOrderService {
     List<MenuItemResponse> getAllMenu();
 
     List<ChefDashboardOrderResponse> getChefDashboardOrders(LocalDate date);
+
+    int getSumQuantityOfFreeMealOrdersToday(Integer bookingId, java.time.LocalDateTime start, java.time.LocalDateTime end);
 }
 

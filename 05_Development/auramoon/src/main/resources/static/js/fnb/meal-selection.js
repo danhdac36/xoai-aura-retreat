@@ -32,7 +32,7 @@ function bindLoadMenuButton() {
             return;
         }
 
-        window.location.href = "/fnb/uc16-meal-selection?guestId="
+        window.location.href = "/fnb/meal-selection?guestId="
             + encodeURIComponent(guestId)
             + "&bookingId="
             + encodeURIComponent(bookingId);
@@ -152,6 +152,17 @@ function toggleItemSelection(buttonEl) {
         buttonEl.classList.remove("selected");
         buttonEl.textContent = "CHỌN MÓN";
     } else {
+        const limitInput = document.getElementById("max-meals-limit");
+        const maxMeals = limitInput ? parseInt(limitInput.value, 10) : 3;
+        const totalQuantity = selectedItems.reduce(function (total, selItem) {
+            return total + selItem.quantity;
+        }, 0);
+
+        if (totalQuantity >= maxMeals) {
+            showToast("Quý khách chỉ được chọn tối đa " + maxMeals + " phần ăn miễn phí.", "error");
+            return;
+        }
+
         selectedItems.push({
             id: itemId,
             itemName: itemName,
@@ -174,6 +185,19 @@ function updateItemQuantity(itemId, delta) {
 
     if (!item) {
         return;
+    }
+
+    if (delta > 0) {
+        const limitInput = document.getElementById("max-meals-limit");
+        const maxMeals = limitInput ? parseInt(limitInput.value, 10) : 3;
+        const totalQuantity = selectedItems.reduce(function (total, selItem) {
+            return total + selItem.quantity;
+        }, 0);
+
+        if (totalQuantity >= maxMeals) {
+            showToast("Quý khách chỉ được chọn tối đa " + maxMeals + " phần ăn miễn phí.", "error");
+            return;
+        }
     }
 
     item.quantity += delta;
@@ -299,10 +323,6 @@ function createSelectedItemRow(item) {
     name.className = "cart-item-name";
     name.textContent = item.itemName;
 
-    const price = document.createElement("div");
-    price.className = "cart-item-price";
-    price.textContent = formatVND(item.price);
-
     const qtyRow = document.createElement("div");
     qtyRow.className = "cart-item-qty-row";
 
@@ -330,7 +350,6 @@ function createSelectedItemRow(item) {
     qtyRow.appendChild(plusBtn);
 
     details.appendChild(name);
-    details.appendChild(price);
     details.appendChild(qtyRow);
 
     const removeBtn = document.createElement("button");
