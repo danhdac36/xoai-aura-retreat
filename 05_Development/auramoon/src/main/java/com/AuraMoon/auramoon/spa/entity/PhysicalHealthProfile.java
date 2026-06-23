@@ -33,7 +33,4 @@ public class PhysicalHealthProfile {
 
     @Column(name = "update_at")
     private LocalDateTime updatedAt;
-
-    @Column(name = "update_at")
-    private String updateAt;
 }

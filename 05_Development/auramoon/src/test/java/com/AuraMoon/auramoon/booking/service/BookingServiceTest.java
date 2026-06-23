@@ -61,6 +61,9 @@ public class BookingServiceTest {
         @Mock
         private ConsentRepository consentRepository;
 
+        @Mock
+        private com.AuraMoon.auramoon.spa.repository.TreatmentServiceRepository treatmentServiceRepository;
+
         @InjectMocks
         private BookingServiceImpl bookingService;
 

@@ -50,6 +50,11 @@
 // createInitialUser("therapist@xoai-aura.com", "Therapist User", "THERAPIST");
 // createInitialUser("cheff@xoai-aura.com", "Cheff User", "CHEFF");
 // createInitialUser("manager@xoai-aura.com", "Manager User", "MANAGER");
+
+// // 3. Them 3 tai khoan Guest theo yeu cau
+// createInitialUser("guest2@xoai-aura.com", "Guest User 2", "GUEST");
+// createInitialUser("guest3@xoai-aura.com", "Guest User 3", "GUEST");
+// createInitialUser("guest4@xoai-aura.com", "Guest User 4", "GUEST");
 // }
 
 // private void createInitialUser(String email, String fullName, String
@@ -59,6 +64,7 @@
 // Role role = roleRepository.findByRoleName(roleName)
 // .orElseThrow(() -> new IllegalStateException("Role " + roleName + " not
 // found"));
+
 // user = new User();
 // user.setEmail(email);
 // user.setPasswordHash(passwordEncoder.encode("password123")); // Default test
