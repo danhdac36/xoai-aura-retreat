@@ -13,4 +13,6 @@ public class MenuItemResponse {
     private BigDecimal price;
     private String ingredient;
     private Boolean isAvailable;
+    private String imageUrl;
+    private String category;
 }

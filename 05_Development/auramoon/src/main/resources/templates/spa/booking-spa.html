@@ -444,7 +444,7 @@
             document.getElementById('time-slots-evening').innerHTML = '';
             
             try {
-                const response = await fetch(`/guest/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}`);
+                const response = await fetch(`/guest/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}&bookingId=${currentBookingId}`);
                 if (!response.ok) throw new Error('Network response was not ok');
                 const availableTimes = await response.json();
                 

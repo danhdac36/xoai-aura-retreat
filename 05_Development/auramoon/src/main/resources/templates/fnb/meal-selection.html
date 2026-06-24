@@ -23,6 +23,10 @@
         <div>
             <h1>Thực đơn dinh dưỡng cá nhân</h1>
             <p>Lựa chọn món ăn lành mạnh được thiết kế tối ưu dựa trên sở thích và hồ sơ dị ứng của bạn.</p>
+            <div class="buffet-hours-banner" style="margin-top: 12px; font-size: 0.95rem; color: var(--olive-green); font-weight: 500;">
+                <span style="font-weight: bold; color: var(--accent-gold);">Khung giờ Buffet miễn phí:</span> 
+                Sáng: 06:00 - 10:00 | Trưa: 11:30 - 14:00 | Tối: 18:00 - 21:00
+            </div>
         </div>
         <div>
             <a class="alacarte-link-btn" href="/fnb/alacarte-order" style="display: inline-block;">
@@ -36,6 +40,15 @@
 
         <!-- Left Column: Menu Items -->
         <section aria-label="Danh sách thực đơn">
+            <!-- Category Tabs -->
+            <div class="category-tabs">
+                <button type="button" class="tab-btn active" data-category="ALL">Tất cả</button>
+                <button type="button" class="tab-btn" data-category="BREAKFAST">Đồ ăn sáng</button>
+                <button type="button" class="tab-btn" data-category="MAIN">Món chính</button>
+                <button type="button" class="tab-btn" data-category="DESSERT">Tráng miệng</button>
+                <button type="button" class="tab-btn" data-category="DRINK">Đồ uống</button>
+            </div>
+
             <div class="menu-grid" id="menu-grid">
 
                 <p th:if="${#lists.isEmpty(menuItems)}" class="menu-empty-message">
@@ -43,10 +56,11 @@
                 </p>
 
                 <article th:each="item : ${menuItems}" class="menu-card" th:data-id="${item.id}"
-                    th:data-name="${item.itemName}" th:data-price="${item.price}">
+                    th:data-name="${item.itemName}" th:data-price="${item.price}" th:data-image-url="${item.imageUrl}"
+                    th:data-category="${item.category}">
 
                     <div class="card-img-wrap">
-                        <img th:src="@{/images/fnb/menu/default-food.jpg}" th:alt="${item.itemName}"
+                        <img th:src="${(item.imageUrl != null && !item.imageUrl.isEmpty()) ? item.imageUrl : '/images/fnb/menu/default-food.jpg'}" th:alt="${item.itemName}"
                             th:data-item-name="${item.itemName}" class="card-img">
                     </div>
 
@@ -62,7 +76,7 @@
 
                         <div class="card-footer-row" style="justify-content: center;">
                             <button type="button" class="btn-select" th:data-id="${item.id}"
-                                th:data-name="${item.itemName}" th:data-price="0">
+                                th:data-name="${item.itemName}" th:data-price="0" th:data-image-url="${item.imageUrl}">
                                 Add to cart +
                             </button>
                         </div>
@@ -105,7 +119,7 @@
                 <input type="hidden" th:field="*{bookingId}" id="form-booking-id">
                 <input type="hidden" th:field="*{placeOrder}" id="form-place-order">
                 <input type="hidden" th:field="*{note}" id="form-note">
-                <input type="hidden" id="max-meals-limit" th:value="${maxMeals != null ? maxMeals : 3}">
+                <input type="hidden" th:field="*{servingTime}" id="form-serving-time">
 
                 <!-- JS will generate items[index].menuItemId and items[index].quantity here -->
                 <div id="hidden-items-container"></div>
@@ -113,6 +127,17 @@
                 <div class="checkout-note-group">
                     <label for="order-place">Địa điểm phục vụ</label>
                     <input type="text" id="order-place" value="Villa V101">
+                </div>
+
+                <div class="checkout-note-group">
+                    <label for="order-time">Thời gian phục vụ</label>
+                    <input type="time" id="order-time" required>
+                    <small style="color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; line-height: 1.4; display: block;">
+                        Buffet miễn phí áp dụng trong các khung giờ: 
+                        <br>• Sáng: 06:00 - 10:00
+                        <br>• Trưa: 11:30 - 14:00
+                        <br>• Tối: 18:00 - 21:00
+                    </small>
                 </div>
 
                 <div class="checkout-note-group">
@@ -133,8 +158,23 @@
         th:text="${successMessage != null ? successMessage : (errorMessage != null ? errorMessage : '')}">
     </div>
 
+    <!-- Error Modal Dialog -->
+    <div id="error-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-icon">⚠️</span>
+                <h3>Thông báo lỗi</h3>
+            </div>
+            <div class="modal-body">
+                <p id="modal-error-message">Đã xảy ra lỗi không xác định.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-close" onclick="closeErrorModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
-    <script src="/js/fnb/menu-image-map.js"></script>
     <script src="/js/fnb/meal-selection.js"></script>
 </body>
 

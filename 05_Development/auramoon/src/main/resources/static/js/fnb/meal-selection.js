@@ -1,16 +1,26 @@
 let selectedItems = [];
 let currentPage = 1;
 const itemsPerPage = 12;
+let currentCategory = "ALL";
 
 document.addEventListener("DOMContentLoaded", function () {
     bindLoadMenuButton();
     bindSelectButtons();
     bindOrderForm();
     bindPaginationButtons();
+    bindCategoryTabs();
     applyMenuImages();
     renderPagination();
     renderSelectedPanel();
     updateHiddenFormInputs();
+
+    // Check if there is an error message rendered on page load
+    const toastEl = document.getElementById("toast-notification");
+    if (toastEl && toastEl.classList.contains("error") && toastEl.textContent.trim()) {
+        showErrorModal(toastEl.textContent.trim());
+        toastEl.classList.remove("show", "error");
+        toastEl.textContent = "";
+    }
 });
 
 function bindLoadMenuButton() {
@@ -67,11 +77,13 @@ function bindOrderForm() {
         const bookingInput = document.getElementById("input-booking-id");
         const placeOrderInput = document.getElementById("order-place");
         const noteInput = document.getElementById("order-note");
+        const timeInput = document.getElementById("order-time");
 
         const formGuestId = document.getElementById("form-guest-id");
         const formBookingId = document.getElementById("form-booking-id");
         const formPlaceOrder = document.getElementById("form-place-order");
         const formNote = document.getElementById("form-note");
+        const formServingTime = document.getElementById("form-serving-time");
 
         if (formGuestId && guestInput) {
             formGuestId.value = guestInput.value;
@@ -85,6 +97,12 @@ function bindOrderForm() {
             formPlaceOrder.value = placeOrderInput && placeOrderInput.value
                 ? placeOrderInput.value
                 : "Villa V101";
+        }
+
+        if (formServingTime) {
+            formServingTime.value = timeInput && timeInput.value
+                ? timeInput.value
+                : "";
         }
 
         if (formNote) {
@@ -118,12 +136,6 @@ function applyMenuImages() {
     const images = document.querySelectorAll(".card-img");
 
     images.forEach(function (img) {
-        const itemName = img.getAttribute("data-item-name");
-
-        if (typeof getMenuImageUrl === "function" && itemName) {
-            img.src = getMenuImageUrl({ itemName: itemName });
-        }
-
         img.addEventListener("error", function () {
             if (!img.dataset.fallbackApplied) {
                 img.dataset.fallbackApplied = "true";
@@ -152,22 +164,13 @@ function toggleItemSelection(buttonEl) {
         buttonEl.classList.remove("selected");
         buttonEl.textContent = "CHỌN MÓN";
     } else {
-        const limitInput = document.getElementById("max-meals-limit");
-        const maxMeals = limitInput ? parseInt(limitInput.value, 10) : 3;
-        const totalQuantity = selectedItems.reduce(function (total, selItem) {
-            return total + selItem.quantity;
-        }, 0);
-
-        if (totalQuantity >= maxMeals) {
-            showToast("Quý khách chỉ được chọn tối đa " + maxMeals + " phần ăn miễn phí.", "error");
-            return;
-        }
-
+        const imageUrl = buttonEl.getAttribute("data-image-url") || "/images/fnb/menu/default-food.jpg";
         selectedItems.push({
             id: itemId,
             itemName: itemName,
             price: price,
-            quantity: 1
+            quantity: 1,
+            imageUrl: imageUrl
         });
 
         buttonEl.classList.add("selected");
@@ -187,18 +190,7 @@ function updateItemQuantity(itemId, delta) {
         return;
     }
 
-    if (delta > 0) {
-        const limitInput = document.getElementById("max-meals-limit");
-        const maxMeals = limitInput ? parseInt(limitInput.value, 10) : 3;
-        const totalQuantity = selectedItems.reduce(function (total, selItem) {
-            return total + selItem.quantity;
-        }, 0);
 
-        if (totalQuantity >= maxMeals) {
-            showToast("Quý khách chỉ được chọn tối đa " + maxMeals + " phần ăn miễn phí.", "error");
-            return;
-        }
-    }
 
     item.quantity += delta;
 
@@ -302,12 +294,7 @@ function createSelectedItemRow(item) {
     const image = document.createElement("img");
     image.className = "cart-item-img";
     image.alt = item.itemName;
-
-    if (typeof getMenuImageUrl === "function") {
-        image.src = getMenuImageUrl({ itemName: item.itemName });
-    } else {
-        image.src = "/images/fnb/menu/default-food.jpg";
-    }
+    image.src = item.imageUrl || "/images/fnb/menu/default-food.jpg";
 
     image.addEventListener("error", function () {
         if (!image.dataset.fallbackApplied) {
@@ -389,13 +376,34 @@ function updateCostSummary(subtotal) {
 }
 
 function renderPagination() {
-    const cards = Array.from(document.querySelectorAll(".menu-card"));
+    const allCards = Array.from(document.querySelectorAll(".menu-card"));
     const paginationContainer = document.getElementById("pagination-controls");
     const pageInfo = document.getElementById("page-info");
     const prevBtn = document.getElementById("btn-prev");
     const nextBtn = document.getElementById("btn-next");
 
     if (!paginationContainer) {
+        return;
+    }
+
+    // Filter cards based on current category
+    const cards = allCards.filter(function (card) {
+        if (currentCategory === "ALL" || !currentCategory) {
+            return true;
+        }
+        return card.getAttribute("data-category") === currentCategory;
+    });
+
+    // Hide all cards first
+    allCards.forEach(function (card) {
+        card.classList.add("hidden");
+    });
+
+    if (cards.length === 0) {
+        paginationContainer.classList.add("hidden");
+        if (pageInfo) {
+            pageInfo.textContent = "Trang 0 / 0";
+        }
         return;
     }
 
@@ -425,8 +433,6 @@ function renderPagination() {
     cards.forEach(function (card, index) {
         if (index >= startIndex && index < endIndex) {
             card.classList.remove("hidden");
-        } else {
-            card.classList.add("hidden");
         }
     });
 
@@ -470,6 +476,11 @@ function formatVND(value) {
 }
 
 function showToast(message, type) {
+    if (type === "error") {
+        showErrorModal(message);
+        return;
+    }
+
     const toast = document.getElementById("toast-notification");
 
     if (!toast) {
@@ -483,4 +494,35 @@ function showToast(message, type) {
         toast.className = "toast";
         toast.textContent = "";
     }, 3000);
+}
+
+function showErrorModal(message) {
+    const modal = document.getElementById("error-modal");
+    const msgEl = document.getElementById("modal-error-message");
+    if (modal && msgEl) {
+        msgEl.textContent = message;
+        modal.classList.add("show");
+    }
+}
+
+function closeErrorModal() {
+    const modal = document.getElementById("error-modal");
+    if (modal) {
+        modal.classList.remove("show");
+    }
+}
+
+function bindCategoryTabs() {
+    const tabs = document.querySelectorAll(".tab-btn");
+    tabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+            tabs.forEach(function (t) {
+                t.classList.remove("active");
+            });
+            tab.classList.add("active");
+            currentCategory = tab.getAttribute("data-category");
+            currentPage = 1;
+            renderPagination();
+        });
+    });
 }

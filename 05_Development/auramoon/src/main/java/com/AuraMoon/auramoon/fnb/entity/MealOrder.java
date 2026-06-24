@@ -46,4 +46,7 @@ public class MealOrder {
 
     @Column(name = "order_status", length = 10)
     private String orderStatus;
+
+    @Column(name = "serving_time", length = 20)
+    private String servingTime;
 }

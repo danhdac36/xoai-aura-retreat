@@ -13,5 +13,6 @@ public class MealOrderRequest {
     private String placeOrder;
     private String note;
     private Boolean isExtraCharge;
+    private String servingTime;
     private List<OrderItemDto> items;
 }

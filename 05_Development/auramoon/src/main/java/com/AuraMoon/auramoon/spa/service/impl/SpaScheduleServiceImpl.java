@@ -69,22 +69,28 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
         Booking guestBooking = bookingRepository.findById(request.getBookingId())
                 .orElseThrow(() -> new SpaBusinessException("SPA-001", "Booking not found"));
 
+        if (guestBooking.getBookingStatus() == null ||
+                (!"Checked-In".equalsIgnoreCase(guestBooking.getBookingStatus())
+                        && !"CHECKED_IN".equalsIgnoreCase(guestBooking.getBookingStatus()))) {
+            throw new SpaBusinessException("SPA-012",
+                    "Chỉ cho phép đặt lịch Spa đối với đơn đặt phòng có trạng thái Checked-In.");
+        }
+
         LocalDateTime startTime = request.getStartTime();
         LocalDateTime bookingCheckin = guestBooking.getCheckinDate();
         LocalDateTime bookingCheckout = guestBooking.getCheckoutDate();
 
-        if (bookingCheckin != null && bookingCheckout != null) {
-            LocalDate spaDate = startTime.toLocalDate();
-            if (spaDate.isBefore(bookingCheckin.toLocalDate()) || spaDate.isAfter(bookingCheckout.toLocalDate())) {
-                throw new SpaBusinessException("SPA-011",
-                        "Lịch hẹn Spa phải nằm trong thời gian lưu trú (từ " +
-                                bookingCheckin.toLocalDate() + " đến " + bookingCheckout.toLocalDate() + ").");
-            }
-        }
-
         // 2. Tính thời gian kết thúc
         LocalDateTime endTime = startTime
                 .plusMinutes(service.getDurationMinutes() != null ? service.getDurationMinutes() : 60);
+
+        if (bookingCheckin != null && bookingCheckout != null) {
+            if (startTime.isBefore(bookingCheckin) || endTime.isAfter(bookingCheckout)) {
+                throw new SpaBusinessException("SPA-011",
+                        "Lịch hẹn Spa phải nằm trong thời gian lưu trú (từ " +
+                                bookingCheckin + " đến " + bookingCheckout + ").");
+            }
+        }
 
         // 3. Tìm Phòng và Chuyên viên rảnh bằng Pessimistic Lock (BR-04)
         List<TreatmentRoom> availableRooms = roomRepository.findAvailableRoomsWithLock(startTime, endTime);
@@ -129,12 +135,22 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
     }
 
     @Override
-    public List<String> getAvailableTimeSlots(LocalDate date, Integer durationMinutes) {
+    public List<String> getAvailableTimeSlots(LocalDate date, Integer durationMinutes, Integer bookingId) {
         long totalRooms = roomRepository.countByStatusAndIsDeleteFalse("AVAILABLE");
         long totalTherapists = therapistRepository.countByStatus("AVAILABLE");
 
         if (totalRooms == 0 || totalTherapists == 0) {
             return new ArrayList<>(); // No resources available at all
+        }
+
+        LocalDateTime checkinDate = null;
+        LocalDateTime checkoutDate = null;
+        if (bookingId != null) {
+            Booking booking = bookingRepository.findById(bookingId).orElse(null);
+            if (booking != null) {
+                checkinDate = booking.getCheckinDate();
+                checkoutDate = booking.getCheckoutDate();
+            }
         }
 
         LocalDateTime startOfDay = date.atStartOfDay();
@@ -146,10 +162,28 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
         LocalTime currentTime = LocalTime.of(9, 0); // Open at 09:00
         LocalTime closeTime = LocalTime.of(22, 0); // Spa closes at 22:00 (last booking finishes at 22:00)
 
+        LocalDateTime now = LocalDateTime.now();
+
         while (currentTime.plusMinutes(durationMinutes).isBefore(closeTime)
                 || currentTime.plusMinutes(durationMinutes).equals(closeTime)) {
             LocalDateTime slotStart = date.atTime(currentTime);
             LocalDateTime slotEnd = slotStart.plusMinutes(durationMinutes);
+
+            // Filter out slots in the past relative to now
+            if (slotStart.isBefore(now)) {
+                currentTime = currentTime.plusMinutes(30);
+                continue;
+            }
+
+            // Filter out slots strictly outside checkin/checkout LocalDateTime boundaries
+            if (checkinDate != null && slotStart.isBefore(checkinDate)) {
+                currentTime = currentTime.plusMinutes(30);
+                continue;
+            }
+            if (checkoutDate != null && slotEnd.isAfter(checkoutDate)) {
+                currentTime = currentTime.plusMinutes(30);
+                continue;
+            }
 
             // Find overlapping schedules
             List<Schedule> overlapping = daySchedules.stream()

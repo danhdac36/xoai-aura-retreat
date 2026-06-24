@@ -87,6 +87,7 @@
                                     <span class="order-room" th:text="${'Phòng ' + order.placeOrder}">Phòng 402</span>
                                     <span class="order-guest-id" th:text="${' — Khách #' + order.guestId}"> — Khách #1</span>
                                     <span class="order-time" th:text="${#temporals.format(order.orderedAt, 'HH:mm')}">10:45</span>
+                                    <span class="order-serving-time" th:if="${order.servingTime != null and !order.servingTime.isEmpty()}" th:text="${' | Giờ phục vụ: ' + order.servingTime}" style="font-weight: bold; color: #d97706;"> | Giờ phục vụ: 12:00</span>
                                 </div>
                             </div>
 
@@ -151,6 +152,7 @@
                                     <span class="order-room" th:text="${'Phòng ' + order.placeOrder}">Phòng 108</span>
                                     <span class="order-guest-id" th:text="${' — Khách #' + order.guestId}"> — Khách #1</span>
                                     <span class="order-time" th:text="${#temporals.format(order.orderedAt, 'HH:mm')}">11:15</span>
+                                    <span class="order-serving-time" th:if="${order.servingTime != null and !order.servingTime.isEmpty()}" th:text="${' | Giờ phục vụ: ' + order.servingTime}" style="font-weight: bold; color: #d97706;"> | Giờ phục vụ: 12:00</span>
                                 </div>
                             </div>
 
@@ -210,6 +212,7 @@
                                     <span class="order-room" th:text="${'Phòng ' + order.placeOrder}">Phòng 301</span>
                                     <span class="order-guest-id" th:text="${' — Khách #' + order.guestId}"> — Khách #1</span>
                                     <span class="order-time" th:text="${#temporals.format(order.orderedAt, 'HH:mm')}">11:30</span>
+                                    <span class="order-serving-time" th:if="${order.servingTime != null and !order.servingTime.isEmpty()}" th:text="${' | Giờ phục vụ: ' + order.servingTime}" style="font-weight: bold; color: #d97706; margin-right: 8px;"> | Giờ phục vụ: 12:00</span>
                                     <span class="order-status-tag" th:classappend="${order.orderStatus.toLowerCase()}" th:text="${order.orderStatus}">READY</span>
                                 </div>
                             </div>
