@@ -1,12 +1,22 @@
 let cartItems = [];
+let currentCategory = "ALL";
 
 document.addEventListener("DOMContentLoaded", () => {
     bindLoadMenuButton();
     bindSelectButtons();
     bindOrderForm();
+    bindCategoryTabs();
     applyMenuImages();
     renderCartPanel();
     updateHiddenFormInputs();
+
+    // Check if there is an error message rendered on page load
+    const toastEl = document.getElementById("toast-notification");
+    if (toastEl && toastEl.classList.contains("error") && toastEl.textContent.trim()) {
+        showErrorModal(toastEl.textContent.trim());
+        toastEl.classList.remove("show", "error");
+        toastEl.textContent = "";
+    }
 });
 
 function bindLoadMenuButton() {
@@ -51,11 +61,13 @@ function toggleCartItem(buttonEl) {
         buttonEl.classList.remove("selected");
         buttonEl.textContent = "CHỌN MÓN";
     } else {
+        const imageUrl = buttonEl.getAttribute("data-image-url") || "/images/fnb/menu/default-food.jpg";
         cartItems.push({
             id: itemId,
             itemName: itemName,
             price: price,
-            quantity: 1
+            quantity: 1,
+            imageUrl: imageUrl
         });
         buttonEl.classList.add("selected");
         buttonEl.textContent = "ĐÃ CHỌN (1)";
@@ -124,10 +136,7 @@ function renderCartPanel() {
     }
 
     cartItems.forEach(item => {
-        let imageUrl = "/images/fnb/menu/default-food.jpg";
-        if (typeof getMenuImageUrl === "function") {
-            imageUrl = getMenuImageUrl({ itemName: item.itemName });
-        }
+        let imageUrl = item.imageUrl || "/images/fnb/menu/default-food.jpg";
 
         const row = document.createElement("div");
         row.className = "cart-item";
@@ -209,16 +218,19 @@ function bindOrderForm() {
         const guestEl = document.getElementById("input-guest-id");
         const bookingEl = document.getElementById("input-booking-id");
         const placeEl = document.getElementById("order-place");
+        const timeEl = document.getElementById("order-time");
         const noteEl = document.getElementById("order-note");
 
         const formGuestId = document.getElementById("form-guest-id");
         const formBookingId = document.getElementById("form-booking-id");
         const formPlaceOrder = document.getElementById("form-place-order");
+        const formServingTime = document.getElementById("form-serving-time");
         const formNote = document.getElementById("form-note");
 
         if (formGuestId && guestEl) formGuestId.value = guestEl.value;
         if (formBookingId && bookingEl) formBookingId.value = bookingEl.value;
         if (formPlaceOrder) formPlaceOrder.value = placeEl ? placeEl.value : "Villa V101";
+        if (formServingTime) formServingTime.value = timeEl ? timeEl.value : "";
         if (formNote) formNote.value = noteEl ? noteEl.value : "";
 
         updateHiddenFormInputs();
@@ -228,11 +240,6 @@ function bindOrderForm() {
 function applyMenuImages() {
     const images = document.querySelectorAll(".card-img");
     images.forEach(img => {
-        const itemName = img.getAttribute("data-item-name");
-        if (typeof getMenuImageUrl === "function" && itemName) {
-            img.src = getMenuImageUrl({ itemName: itemName });
-        }
-
         img.addEventListener("error", function onError() {
             if (!img.dataset.fallbackApplied) {
                 img.dataset.fallbackApplied = "true";
@@ -250,6 +257,10 @@ function formatVND(value) {
 }
 
 function showToast(message, type) {
+    if (type === "error") {
+        showErrorModal(message);
+        return;
+    }
     const toast = document.getElementById("toast-notification");
     if (!toast) return;
     toast.textContent = message;
@@ -259,4 +270,44 @@ function showToast(message, type) {
         toast.className = "toast";
         toast.textContent = "";
     }, 3000);
+}
+
+function showErrorModal(message) {
+    const modal = document.getElementById("error-modal");
+    const msgEl = document.getElementById("modal-error-message");
+    if (modal && msgEl) {
+        msgEl.textContent = message;
+        modal.classList.add("show");
+    }
+}
+
+function closeErrorModal() {
+    const modal = document.getElementById("error-modal");
+    if (modal) {
+        modal.classList.remove("show");
+    }
+}
+
+function bindCategoryTabs() {
+    const tabs = document.querySelectorAll(".tab-btn");
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            tabs.forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+            currentCategory = tab.getAttribute("data-category");
+            filterMenuItems();
+        });
+    });
+}
+
+function filterMenuItems() {
+    const cards = document.querySelectorAll(".menu-card");
+    cards.forEach(card => {
+        const cat = card.getAttribute("data-category");
+        if (currentCategory === "ALL" || cat === currentCategory) {
+            card.classList.remove("hidden");
+        } else {
+            card.classList.add("hidden");
+        }
+    });
 }

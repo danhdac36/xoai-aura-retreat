@@ -1,5 +1,6 @@
 package com.AuraMoon.auramoon.fnb.service;
 
+import com.AuraMoon.auramoon.auth.config.AesDataEncryptor;
 import com.AuraMoon.auramoon.fnb.dto.ChefDashboardOrderResponse;
 import com.AuraMoon.auramoon.fnb.dto.OrderItemDto;
 import com.AuraMoon.auramoon.fnb.entity.DietaryProfile;
@@ -38,6 +39,9 @@ public class UC17ChefDashboardTest {
     @Mock
     private DietaryProfileRepository dietaryProfileRepository;
 
+    @Mock
+    private AesDataEncryptor aesDataEncryptor;
+
     @InjectMocks
     private MealOrderServiceImpl mealOrderService;
 
@@ -49,9 +53,10 @@ public class UC17ChefDashboardTest {
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
 
-        Object[] row1 = new Object[]{1, 100, 10, "VILLA_01", "Ghi chú 1", "PENDING", startOfDay.plusHours(10)};
+        Object[] row1 = new Object[]{1, 100, 10, "VILLA_01", "Ghi chú 1", "PENDING", startOfDay.plusHours(10), "12:00"};
         List<Object[]> rows = Collections.singletonList(row1);
 
+        when(aesDataEncryptor.convertToEntityAttribute(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(mealOrderRepository.findChefDashboardOrdersByDateRange(any(), any())).thenReturn(rows);
         
         DietaryProfile profile = DietaryProfile.builder()
@@ -71,6 +76,7 @@ public class UC17ChefDashboardTest {
         assertEquals(1, results.get(0).getOrderId());
         assertEquals("Peanuts", results.get(0).getFoodAllergies());
         assertEquals("VILLA_01", results.get(0).getPlaceOrder());
+        assertEquals("12:00", results.get(0).getServingTime());
         assertEquals(1, results.get(0).getItems().size());
         assertEquals("Món A", results.get(0).getItems().get(0).getItemName());
     }
@@ -83,17 +89,15 @@ public class UC17ChefDashboardTest {
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
 
-        Object[] row1 = new Object[]{2, 101, 11, "VILLA_02", "None", "PREPARING", startOfDay.plusHours(12)};
+        Object[] row1 = new Object[]{2, 101, 11, "VILLA_02", "None", "PREPARING", startOfDay.plusHours(12), "13:00"};
         List<Object[]> rows = Collections.singletonList(row1);
 
+        when(aesDataEncryptor.convertToEntityAttribute(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(mealOrderRepository.findChefDashboardOrdersByDateRange(any(), any())).thenReturn(rows);
         
-        // Giả lập DietaryProfile chỉ chứa thông tin thức ăn. Các thông tin MedicalHistory nằm ở bảng khác 
-        // và KHÔNG ĐƯỢC query/join vào Service này.
         DietaryProfile profile = DietaryProfile.builder()
                 .userId(11)
                 .foodAllergies("Shellfish")
-                // medicalHistory = "Heart disease" -> Lớp Service hoàn toàn không chứa trường này
                 .build();
         when(dietaryProfileRepository.findByUserId(anyInt())).thenReturn(Optional.of(profile));
         when(mealOrderItemRepository.findChefDashboardItemsByOrderId(anyInt())).thenReturn(List.of());
@@ -104,12 +108,10 @@ public class UC17ChefDashboardTest {
         // Assert
         assertEquals(1, results.size());
         
-        // Đảm bảo đối tượng trả về (ChefDashboardOrderResponse) chỉ chứa trường foodAllergies
-        // và KHÔNG có bất kỳ thuộc tính nào chứa thông tin y tế nhạy cảm.
         ChefDashboardOrderResponse response = results.get(0);
         assertEquals("Shellfish", response.getFoodAllergies());
+        assertEquals("13:00", response.getServingTime());
         
-        // Assert Object type doesn't have medicalHistory
         assertThrows(NoSuchMethodException.class, () -> {
             ChefDashboardOrderResponse.class.getMethod("getMedicalHistory");
         });

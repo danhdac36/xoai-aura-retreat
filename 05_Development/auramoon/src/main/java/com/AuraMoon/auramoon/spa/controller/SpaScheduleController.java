@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.AuraMoon.auramoon.booking.entity.Booking;
+import com.AuraMoon.auramoon.booking.repository.BookingRepository;
 import com.AuraMoon.auramoon.spa.dto.SpaScheduleRequest;
 import com.AuraMoon.auramoon.spa.dto.SpaScheduleResponse;
 import com.AuraMoon.auramoon.spa.entity.TreatmentBooking;
@@ -32,11 +34,14 @@ public class SpaScheduleController {
 
     private final SpaScheduleService spaScheduleService;
     private final TreatmentBookingRepository treatmentBookingRepository;
+    private final BookingRepository bookingRepository;
 
     public SpaScheduleController(SpaScheduleService spaScheduleService,
-            TreatmentBookingRepository treatmentBookingRepository) {
+            TreatmentBookingRepository treatmentBookingRepository,
+            BookingRepository bookingRepository) {
         this.spaScheduleService = spaScheduleService;
         this.treatmentBookingRepository = treatmentBookingRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     @GetMapping
@@ -49,32 +54,56 @@ public class SpaScheduleController {
     public ResponseEntity<?> getActivePackage(@AuthenticationPrincipal UserDetailsResponse userDetails) {
         Integer userId = userDetails.getId();
 
-        Optional<TreatmentBooking> firstBooking = treatmentBookingRepository.findUnscheduledBookingsByGuestId(userId)
-                .stream().findFirst();
+        List<TreatmentBooking> unscheduledBookings = treatmentBookingRepository.findUnscheduledBookingsByGuestId(userId);
 
-        if (firstBooking.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "Bạn chưa thực hiện đặt trước"));
+        // 1. Tìm TreatmentBooking thuộc các Booking đang Checked-In
+        Optional<TreatmentBooking> checkedInBooking = unscheduledBookings.stream()
+                .filter(tb -> {
+                    Booking b = bookingRepository.findById(tb.getBookingId()).orElse(null);
+                    return b != null && ("CHECKED_IN".equalsIgnoreCase(b.getBookingStatus())
+                            || "Checked-In".equalsIgnoreCase(b.getBookingStatus())
+                            || "CHECKED-IN".equalsIgnoreCase(b.getBookingStatus()));
+                })
+                .findFirst();
+
+        if (checkedInBooking.isPresent()) {
+            TreatmentBooking booking = checkedInBooking.get();
+            Map<String, Object> activePackage = new HashMap<>();
+            activePackage.put("bookingId", booking.getBookingId());
+            activePackage.put("serviceId", booking.getTreatmentService().getId());
+            activePackage.put("serviceName", booking.getTreatmentService().getServiceName());
+            activePackage.put("durationMinutes", booking.getTreatmentService().getDurationMinutes());
+            activePackage.put("priceInfo", "Đã bao gồm trong Gói Retreat");
+            return ResponseEntity.ok(activePackage);
         }
 
-        TreatmentBooking booking = firstBooking.get();
-        Map<String, Object> activePackage = new HashMap<>();
-        activePackage.put("bookingId", booking.getBookingId());
-        activePackage.put("serviceId", booking.getTreatmentService().getId());
-        activePackage.put("serviceName", booking.getTreatmentService().getServiceName());
-        activePackage.put("durationMinutes", booking.getTreatmentService().getDurationMinutes());
-        activePackage.put("priceInfo", "Đã bao gồm trong Gói Retreat");
+        // 2. Nếu không có booking Checked-In, kiểm tra xem có booking sắp tới nào (CONFIRMED hoặc PENDING)
+        boolean hasUpcomingBooking = unscheduledBookings.stream()
+                .anyMatch(tb -> {
+                    Booking b = bookingRepository.findById(tb.getBookingId()).orElse(null);
+                    return b != null && ("CONFIRMED".equalsIgnoreCase(b.getBookingStatus())
+                            || "PENDING".equalsIgnoreCase(b.getBookingStatus()));
+                });
 
-        return ResponseEntity.ok(activePackage);
+        if (hasUpcomingBooking) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error",
+                            "Bạn chỉ được phép đặt lịch Spa sau khi đã thực hiện Check-In tại quầy lễ tân."));
+        }
+
+        // 3. Không tìm thấy bất kỳ gói booking nào khả dụng
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", "Bạn chưa thực hiện đặt trước"));
     }
 
     @GetMapping("/available-slots")
     @ResponseBody
     public ResponseEntity<List<String>> getAvailableSlots(
             @RequestParam("date") String dateStr,
-            @RequestParam(value = "duration", defaultValue = "60") Integer duration) {
+            @RequestParam(value = "duration", defaultValue = "60") Integer duration,
+            @RequestParam(value = "bookingId", required = false) Integer bookingId) {
         LocalDate date = LocalDate.parse(dateStr);
-        List<String> availableSlots = spaScheduleService.getAvailableTimeSlots(date, duration);
+        List<String> availableSlots = spaScheduleService.getAvailableTimeSlots(date, duration, bookingId);
         return ResponseEntity.ok(availableSlots);
     }
 
