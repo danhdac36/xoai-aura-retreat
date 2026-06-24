@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -12,14 +13,14 @@
     <h2>Hồ Sơ Sức Khỏe & Dinh Dưỡng</h2>
     <p class="subtitle">Thông tin y tế và chế độ ăn uống của bạn được mã hóa an toàn và chỉ cung cấp cho chuyên gia trị liệu, đầu bếp để chăm sóc bạn tốt nhất.</p>
 
-    <!-- MSG-15 Hoặc MSG-03 -->
+    [MSG-15 Hoặc MSG-03]
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-    <!-- Success Message -->
+    [Success Message]
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
 
     <form th:action="@{/profile/update}" th:object="${profileDto}" method="POST" class="profile-form">
   
-        <!-- Khu vực 1: Sức khỏe Vật lý -->
+        [Khu vực 1: Sức khỏe Vật lý]
         <fieldset>
             <legend>Tình trạng Sức khỏe (Physical Health)</legend>
             <div class="form-group">
@@ -32,7 +33,7 @@
             </div>
         </fieldset>
 
-        <!-- Khu vực 2: Dinh dưỡng & Dị ứng -->
+        [Khu vực 2: Dinh dưỡng & Dị ứng]
         <fieldset>
             <legend>Chế độ Dinh dưỡng (Diet & Allergies)</legend>
             <div class="form-group">
@@ -45,7 +46,7 @@
             </div>
         </fieldset>
 
-        <!-- Khu vực 3: Đồng ý thu thập dữ liệu (BR-08) -->
+        [Khu vực 3: Đồng ý thu thập dữ liệu (BR-08)]
         <div class="consent-group">
             <input type="checkbox" id="hasConsent" th:field="*{hasConsent}" class="consent-checkbox">
             <label for="hasConsent" class="consent-label">
@@ -58,3 +59,4 @@
 </div>
 </body>
 </html>
+-->
