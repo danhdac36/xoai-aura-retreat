@@ -33,7 +33,7 @@ public class ProfileController {
             model.addAttribute("successMessage", "Hồ sơ sức khỏe & dinh dưỡng đã được lưu thành công!");
         }
 
-        return "auth/health-profile";
+        return "auth/update-health-profile";
     }
 
     @PostMapping("/update")
@@ -42,12 +42,12 @@ public class ProfileController {
         // Exception E1
         if (!dto.isHasConsent()) {
             model.addAttribute("error", "MSG-03: Bạn phải đồng ý với các điều khoản bảo mật dữ liệu y tế để tiếp tục");
-            return "auth/health-profile";
+            return "auth/update-health-profile";
 
         }
       
         if (result.hasErrors()) {
-            return "auth/health-profile";
+            return "auth/update-health-profile";
         }
 
         try {
@@ -55,11 +55,11 @@ public class ProfileController {
             if (userId == null) return "redirect:/auth/login";
 
             profileService.saveSensitiveProfile(dto, userId);
-            return "redirect:/profile/me?success=true";
+            return "redirect:/profile/health?success=true";
         } catch (Exception e) {
             // Exception E2
             model.addAttribute("error", "MSG-15: Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
-            return "auth/health-profile";
+            return "auth/update-health-profile";
         }
     }
 
@@ -90,6 +90,10 @@ public class ProfileController {
     @PostMapping("/me/update")
     public String updatePersonalProfile(@Valid @ModelAttribute("personalProfileDto") PersonalProfileDto dto,
                                 BindingResult result, Model model, Authentication authentication) {
+        if (dto.getDateOfBirth() != null && dto.getDateOfBirth().isAfter(java.time.LocalDate.now().minusYears(18))) {
+            result.rejectValue("dateOfBirth", "error.dateOfBirth", "Bạn phải đủ 18 tuổi trở lên");
+        }
+
         if (result.hasErrors()) {
             return "auth/personal-profile";
         }
