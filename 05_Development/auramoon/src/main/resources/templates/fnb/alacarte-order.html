@@ -27,14 +27,24 @@
     <main class="main-content">
         <!-- Left Column: Menu Items -->
         <section aria-label="Danh sách món gọi ngoài">
+            <!-- Category Tabs -->
+            <div class="category-tabs">
+                <button type="button" class="tab-btn active" data-category="ALL">Tất cả</button>
+                <button type="button" class="tab-btn" data-category="BREAKFAST">Đồ ăn sáng</button>
+                <button type="button" class="tab-btn" data-category="MAIN">Món chính</button>
+                <button type="button" class="tab-btn" data-category="DESSERT">Tráng miệng</button>
+                <button type="button" class="tab-btn" data-category="DRINK">Đồ uống</button>
+            </div>
+
             <div class="menu-grid" id="menu-grid">
                 <p th:if="${#lists.isEmpty(menuItems)}" class="menu-empty-message">
                     Không có món ăn nào khả dụng.
                 </p>
                 <article th:each="item : ${menuItems}" class="menu-card" th:data-id="${item.id}"
-                    th:data-name="${item.itemName}" th:data-price="${item.price}">
+                    th:data-name="${item.itemName}" th:data-price="${item.price}" th:data-image-url="${item.imageUrl}"
+                    th:data-category="${item.category}">
                     <div class="card-img-wrap">
-                        <img th:src="@{/images/fnb/menu/default-food.jpg}" th:alt="${item.itemName}"
+                        <img th:src="${(item.imageUrl != null && !item.imageUrl.isEmpty()) ? item.imageUrl : '/images/fnb/menu/default-food.jpg'}" th:alt="${item.itemName}"
                             th:data-item-name="${item.itemName}" class="card-img">
                     </div>
                     <div class="card-body">
@@ -50,7 +60,7 @@
                         <div class="card-footer-row">
                             <div class="card-price" th:text="${'$ ' + item.price}">$2.00</div>
                             <button type="button" class="btn-select" th:data-id="${item.id}" th:data-name="${item.itemName}"
-                                th:data-price="${item.price}">
+                                th:data-price="${item.price}" th:data-image-url="${item.imageUrl}">
                                 add to cart +
                             </button>
                         </div>
@@ -94,12 +104,17 @@
                 <input type="hidden" th:field="*{bookingId}" id="form-booking-id">
                 <input type="hidden" th:field="*{placeOrder}" id="form-place-order">
                 <input type="hidden" th:field="*{note}" id="form-note">
+                <input type="hidden" th:field="*{servingTime}" id="form-serving-time">
 
                 <div id="hidden-items-container"></div>
 
                 <div class="checkout-note-group">
                     <label for="order-place">Địa điểm giao món</label>
                     <input type="text" id="order-place" value="Villa V101">
+                </div>
+                <div class="checkout-note-group">
+                    <label for="order-time">Thời gian phục vụ</label>
+                    <input type="time" id="order-time" required>
                 </div>
                 <div class="checkout-note-group">
                     <label for="order-note">Ghi chú cho nhà bếp</label>
@@ -117,8 +132,23 @@
         th:class="${successMessage != null or errorMessage != null} ? 'toast show ' + (${successMessage != null} ? 'success' : 'error') : 'toast'"
         th:text="${successMessage != null ? successMessage : (errorMessage != null ? errorMessage : '')}"></div>
 
+    <!-- Error Modal Dialog -->
+    <div id="error-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-icon">⚠️</span>
+                <h3>Thông báo lỗi</h3>
+            </div>
+            <div class="modal-body">
+                <p id="modal-error-message">Đã xảy ra lỗi không xác định.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-close" onclick="closeErrorModal()">Đóng</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
-    <script src="/js/fnb/menu-image-map.js"></script>
     <script src="/js/fnb/alacarte-order.js"></script>
 </body>
 

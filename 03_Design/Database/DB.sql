@@ -197,6 +197,8 @@ CREATE TABLE MENU_ITEM (
     price DECIMAL(18, 2),
     ingredient NVARCHAR(MAX),
     is_available BIT DEFAULT 1,
+    image_url VARCHAR(255),
+    category VARCHAR(50),
     create_at DATETIME DEFAULT GETDATE(),
     update_at DATETIME DEFAULT GETDATE()
 );
