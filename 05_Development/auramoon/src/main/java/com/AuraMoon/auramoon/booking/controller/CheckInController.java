@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -34,11 +35,15 @@ public class CheckInController {
     }
 
     @PostMapping("/check-in")
-    public String performCheckIn(@ModelAttribute("checkInRequest") CheckInRequestDTO request,
+    public String performCheckIn(@Valid @ModelAttribute("checkInRequest") CheckInRequestDTO request,
                                  org.springframework.validation.BindingResult bindingResult,
                                  RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addAttribute("error", "Ngày sinh hoặc thông tin nhập vào không đúng định dạng!");
+            String errorMsg = bindingResult.getFieldErrors().stream()
+                    .map(org.springframework.validation.FieldError::getDefaultMessage)
+                    .findFirst()
+                    .orElse("Thông tin nhập vào không hợp lệ!");
+            redirectAttributes.addAttribute("error", errorMsg);
             return "redirect:/receptionist/bookings";
         }
         try {

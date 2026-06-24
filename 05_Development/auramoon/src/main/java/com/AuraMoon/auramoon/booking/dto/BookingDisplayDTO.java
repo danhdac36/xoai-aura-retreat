@@ -24,4 +24,6 @@ public class BookingDisplayDTO {
     private String guestPhone;
     private String guestGender;
     private LocalDate guestDateOfBirth;
+    private String medicalConditions;
+    private String injuries;
 }
