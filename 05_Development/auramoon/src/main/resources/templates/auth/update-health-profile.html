@@ -129,22 +129,7 @@
 <body class="bg-background text-on-surface font-body-md overflow-x-hidden">
 <!-- TopNavBar -->
 <nav class="w-full top-0 sticky z-50 bg-background dark:bg-on-background">
-    <div class="flex justify-between items-center h-20 max-w-[1280px] mx-auto px-margin-desktop">
-        <span class="font-headline-sm text-headline-sm text-on-surface dark:text-on-surface-variant font-bold tracking-tight">Aman Wellness</span>
-        <div class="hidden md:flex items-center space-x-stack-lg">
-            <a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-tertiary-fixed-dim transition-colors duration-300 ease-in-out"
-               href="#">Retreats</a>
-            <a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-tertiary-fixed-dim transition-colors duration-300 ease-in-out"
-               href="#">Spa</a>
-            <a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-tertiary-fixed-dim transition-colors duration-300 ease-in-out"
-               href="#">Dining</a>
-            <a class="font-body-md text-body-md text-primary dark:text-primary-fixed font-semibold border-b border-primary transition-colors duration-300 ease-in-out"
-               href="#">My Journey</a>
-        </div>
-        <button class="bg-secondary text-on-tertiary px-6 py-2 rounded-lg font-label-md text-label-md hover:bg-tertiary transition-colors duration-300">
-            Book Stay
-        </button>
-    </div>
+    
 </nav>
 <main class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg">
     <!-- Hero Section -->
@@ -164,73 +149,90 @@
             </p>
         </div>
     </section>
+
+    <!-- Error/Success Alerts -->
+    <div th:if="${error}" class="mb-6 p-4 bg-error-container text-on-error-container rounded-xl border border-error/20 flex items-center gap-3">
+        <span class="material-symbols-outlined text-error">error</span>
+        <span class="font-body-md" th:text="${error}"></span>
+    </div>
+    <div th:if="${successMessage}" class="mb-6 p-4 bg-tertiary-container text-on-tertiary-container rounded-xl border border-tertiary/20 flex items-center gap-3">
+        <span class="material-symbols-outlined text-tertiary">check_circle</span>
+        <span class="font-body-md" th:text="${successMessage}"></span>
+    </div>
+
     <!-- Form Section -->
-    <form class="grid grid-cols-1 md:grid-cols-2 gap-section-gap" id="wellness-form">
+    <form class="grid grid-cols-1 md:grid-cols-2 gap-section-gap" id="wellness-form" th:action="@{/profile/update}" th:object="${profileDto}" method="POST">
         <!-- Left Column: Dietary Preferences -->
         <div class="space-y-stack-lg">
             <div class="border-b border-outline-variant pb-stack-sm flex items-center gap-2">
                 <span class="material-symbols-outlined text-secondary" data-icon="restaurant">restaurant</span>
                 <h2 class="font-headline-sm text-headline-sm text-secondary">Chế độ Ăn uống &amp; Dị ứng</h2>
             </div>
+            <!-- Hidden inputs bound to DTO -->
+            <input type="hidden" id="foodAllergies" th:field="*{foodAllergies}">
+            <input type="hidden" id="dietaryPreference" th:field="*{dietaryPreference}">
+
             <!-- Allergies -->
             <div class="space-y-stack-md">
                 <label class="font-label-md text-label-md text-on-surface-variant">Dị ứng Thực phẩm</label>
                 <div class="grid grid-cols-2 gap-stack-md">
                     <label class="flex items-center space-x-3 cursor-pointer group">
                         <input class="form-checkbox h-5 w-5 text-tertiary border-outline rounded-sm focus:ring-tertiary transition-all"
-                               type="checkbox">
+                               id="allergy_nuts" type="checkbox">
                         <span class="font-body-md group-hover:text-tertiary transition-colors">Đậu phộng / Nuts</span>
                     </label>
                     <label class="flex items-center space-x-3 cursor-pointer group">
                         <input class="form-checkbox h-5 w-5 text-tertiary border-outline rounded-sm focus:ring-tertiary transition-all"
-                               type="checkbox">
+                               id="allergy_shellfish" type="checkbox">
                         <span class="font-body-md group-hover:text-tertiary transition-colors">Hải sản / Shellfish</span>
                     </label>
                     <label class="flex items-center space-x-3 cursor-pointer group">
                         <input class="form-checkbox h-5 w-5 text-tertiary border-outline rounded-sm focus:ring-tertiary transition-all"
-                               type="checkbox">
+                               id="allergy_dairy" type="checkbox">
                         <span class="font-body-md group-hover:text-tertiary transition-colors">Sữa / Dairy</span>
                     </label>
                     <label class="flex items-center space-x-3 cursor-pointer group">
                         <input class="form-checkbox h-5 w-5 text-tertiary border-outline rounded-sm focus:ring-tertiary transition-all"
-                               type="checkbox">
+                               id="allergy_gluten" type="checkbox">
                         <span class="font-body-md group-hover:text-tertiary transition-colors">Gluten</span>
                     </label>
                 </div>
                 <input class="w-full form-input-minimal py-2 font-body-md italic text-on-surface-variant"
-                       placeholder="Loại dị ứng khác..." type="text">
+                       id="allergy_other" placeholder="Loại dị ứng khác..." type="text">
             </div>
+
             <!-- Dietary Regimen -->
             <div class="space-y-stack-md">
                 <label class="font-label-md text-label-md text-on-surface-variant">Chế độ Ăn kiêng</label>
                 <div class="flex flex-wrap gap-stack-md">
                     <label class="relative flex items-center px-4 py-2 border border-outline-variant rounded-full cursor-pointer hover:bg-surface-container transition-colors group">
-                        <input class="sr-only peer" name="diet" type="radio">
+                        <input class="sr-only peer" name="diet_preset" type="radio" value="Thuần chay (Vegan)">
                         <span class="font-body-md peer-checked:text-tertiary">Thuần chay (Vegan)</span>
                         <div class="absolute inset-0 border-2 border-transparent peer-checked:border-tertiary rounded-full transition-all"></div>
                     </label>
                     <label class="relative flex items-center px-4 py-2 border border-outline-variant rounded-full cursor-pointer hover:bg-surface-container transition-colors group">
-                        <input class="sr-only peer" name="diet" type="radio">
+                        <input class="sr-only peer" name="diet_preset" type="radio" value="Ăn chay (Vegetarian)">
                         <span class="font-body-md peer-checked:text-tertiary">Ăn chay (Vegetarian)</span>
                         <div class="absolute inset-0 border-2 border-transparent peer-checked:border-tertiary rounded-full transition-all"></div>
                     </label>
-                    <label class="relative flex items-center px-4 py-2 border border-outline-variant rounded-full cursor-pointer hover:bg-surface-container transition-colors group bg-primary-container">
-                        <input class="sr-only peer" name="diet" type="radio">
+                    <label class="relative flex items-center px-4 py-2 border border-outline-variant rounded-full cursor-pointer hover:bg-surface-container transition-colors group">
+                        <input class="sr-only peer" name="diet_preset" type="radio" value="Keto">
                         <span class="font-body-md peer-checked:text-tertiary">Keto</span>
                         <div class="absolute inset-0 border-2 border-transparent peer-checked:border-tertiary rounded-full transition-all"></div>
                     </label>
                     <label class="relative flex items-center px-4 py-2 border border-outline-variant rounded-full cursor-pointer hover:bg-surface-container transition-colors group">
-                        <input class="sr-only peer" name="diet" type="radio">
+                        <input class="sr-only peer" name="diet_preset" type="radio" value="Halal">
                         <span class="font-body-md peer-checked:text-tertiary">Halal</span>
                         <div class="absolute inset-0 border-2 border-transparent peer-checked:border-tertiary rounded-full transition-all"></div>
                     </label>
                 </div>
             </div>
+
             <!-- Notes -->
             <div class="space-y-stack-sm">
                 <label class="font-label-md text-label-md text-on-surface-variant">Ghi chú bổ sung</label>
                 <textarea class="w-full form-input-minimal py-2 font-body-md resize-none"
-                          placeholder="Sở thích riêng hoặc yêu cầu đặc biệt về khẩu vị..." rows="3"></textarea>
+                          id="diet_notes" placeholder="Sở thích riêng hoặc yêu cầu đặc biệt về khẩu vị..." rows="3"></textarea>
             </div>
         </div>
         <!-- Right Column: Physical Health -->
@@ -242,49 +244,41 @@
             </div>
             <!-- Medical Conditions -->
             <div class="space-y-stack-sm">
-                <label class="font-label-md text-label-md text-on-surface-variant">Tình trạng Y tế Hiện tại</label>
-                <textarea class="w-full form-input-minimal py-2 font-body-md"
+                <label class="font-label-md text-label-md text-on-surface-variant" for="medicalConditions">Tình trạng Y tế Hiện tại</label>
+                <textarea class="w-full form-input-minimal py-2 font-body-md" id="medicalConditions" th:field="*{medicalConditions}"
                           placeholder="Ví dụ: Cao huyết áp, tiểu đường, hen suyễn..." rows="2"></textarea>
-            </div>
-            <!-- Medications -->
-            <div class="space-y-stack-sm">
-                <label class="font-label-md text-label-md text-on-surface-variant">Thuốc đang sử dụng</label>
-                <textarea class="w-full form-input-minimal py-2 font-body-md"
-                          placeholder="Liệt kê các loại thuốc định kỳ nếu có..." rows="2"></textarea>
             </div>
             <!-- Injuries -->
             <div class="space-y-stack-sm">
-                <label class="font-label-md text-label-md text-on-surface-variant">Chấn thương hoặc Vấn đề gần
-                    đây</label>
-                <textarea class="w-full form-input-minimal py-2 font-body-md"
+                <label class="font-label-md text-label-md text-on-surface-variant" for="injuries">Chấn thương hoặc Vấn đề gần đây</label>
+                <textarea class="w-full form-input-minimal py-2 font-body-md" id="injuries" th:field="*{injuries}"
                           placeholder="Đau lưng, khớp, hoặc các vùng nhạy cảm cần lưu ý khi massage..."
                           rows="2"></textarea>
             </div>
             <!-- Atmospheric Detail: Subtle Decor -->
             <div class="pt-stack-lg opacity-40">
                 <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-outline to-transparent"></div>
-                <p class="text-center font-label-md mt-4 italic">Sức khỏe của bạn là ưu tiên hàng đầu của Aman
-                    Wellness.</p>
+                <p class="text-center font-label-md mt-4 italic">Sức khỏe của bạn là ưu tiên hàng đầu của AuraMoon Wellness.</p>
             </div>
         </div>
         <!-- Form Bottom / Action Area -->
         <div class="col-span-1 md:col-span-2 pt-stack-lg">
             <div class="bg-surface-container rounded-xl p-stack-lg flex flex-col items-center space-y-stack-lg border border-outline-variant/30">
-                <label class="flex items-start space-x-4 max-w-2xl cursor-pointer group">
+                <label class="flex items-start space-x-4 max-w-2xl cursor-pointer group" for="hasConsent">
                     <input class="mt-1 form-checkbox h-5 w-5 text-tertiary border-outline rounded-sm focus:ring-tertiary"
-                           required="" type="checkbox">
+                           id="hasConsent" th:field="*{hasConsent}" type="checkbox">
                     <span class="font-body-md text-on-surface-variant leading-relaxed">
-                            Tôi xác nhận rằng thông tin cung cấp là chính xác và đồng ý để Aman Wellness sử dụng thông tin này nhằm mục đích cá nhân hóa trải nghiệm nghỉ dưỡng của tôi.
-                        </span>
+                        Tôi đồng ý cho phép AuraMoon Retreat thu thập và xử lý các thông tin y tế trên nhằm mục đích cải thiện dịch vụ chăm sóc sức khỏe cá nhân. Tôi hiểu rằng dữ liệu này được mã hóa và bảo mật nghiêm ngặt theo quy định.
+                    </span>
                 </label>
                 <div class="flex flex-col md:flex-row gap-stack-md w-full md:w-auto">
                     <button class="bg-tertiary text-on-tertiary px-12 py-4 rounded font-label-md text-label-md tracking-widest hover:brightness-110 transition-all shadow-lg shadow-tertiary/20"
                             type="submit">
-                        LƯU &amp; TIẾP TỤC
+                        LƯU HỒ SƠ SỨC KHỎE
                     </button>
-                    <button class="border border-tertiary text-tertiary px-12 py-4 rounded font-label-md text-label-md tracking-widest hover:bg-tertiary/5 transition-all"
-                            type="button">&nbsp; &nbsp;QUAY LẠI&nbsp; &nbsp; &nbsp;
-                    </button>
+                    <a th:href="@{/packages}" class="border border-tertiary text-tertiary px-12 py-4 rounded font-label-md text-label-md tracking-widest hover:bg-tertiary/5 transition-all text-center flex items-center justify-center">
+                        QUAY LẠI
+                    </a>
                 </div>
             </div>
         </div>
@@ -294,9 +288,8 @@
 <footer class="w-full mt-section-gap bg-surface-container dark:bg-surface-container-high border-t border-outline-variant/20">
     <div class="flex flex-col md:flex-row justify-between items-center py-stack-lg max-w-[1280px] mx-auto px-margin-desktop">
         <div class="mb-stack-md md:mb-0">
-            <span class="font-headline-sm text-headline-sm text-primary font-bold">Aman Wellness</span>
-            <p class="font-label-md text-label-md text-on-surface-variant mt-2 opacity-80">© 2024 Aman Wellness
-                Retreats. Tranquility in every breath.</p>
+            <span class="font-headline-sm text-headline-sm text-primary font-bold">AuraMoon Retreat</span>
+            <p class="font-label-md text-label-md text-on-surface-variant mt-2 opacity-80">© 2024 AuraMoon Retreats. Tranquility in every breath.</p>
         </div>
         <div class="flex flex-wrap justify-center gap-6">
             <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all underline underline-offset-4"
@@ -311,32 +304,95 @@
     </div>
 </footer>
 <script>
-    document.getElementById('wellness-form').addEventListener('submit', function (e) {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        const originalText = btn.innerText;
-        btn.innerText = 'ĐANG XỬ LÝ...';
-        btn.disabled = true;
+    document.addEventListener("DOMContentLoaded", function() {
+        // --- 1. FOOD ALLERGIES SYNC ---
+        const hiddenAllergies = document.getElementById('foodAllergies');
+        const checkNuts = document.getElementById('allergy_nuts');
+        const checkShellfish = document.getElementById('allergy_shellfish');
+        const checkDairy = document.getElementById('allergy_dairy');
+        const checkGluten = document.getElementById('allergy_gluten');
+        const inputOther = document.getElementById('allergy_other');
 
-        setTimeout(() => {
-            alert('Thông tin của bạn đã được ghi nhận. Cảm ơn bạn!');
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }, 1500);
-    });
-
-    // Simple tag interaction for diet buttons
-    const radioLabels = document.querySelectorAll('input[name="diet"]');
-    radioLabels.forEach(radio => {
-        radio.addEventListener('change', () => {
-            // Clear others
-            document.querySelectorAll('input[name="diet"]').forEach(r => {
-                r.parentElement.classList.remove('bg-primary-container');
+        if (hiddenAllergies && hiddenAllergies.value) {
+            const values = hiddenAllergies.value.split(',').map(s => s.trim());
+            let otherValues = [];
+            values.forEach(val => {
+                if (val === 'Đậu phộng / Nuts') checkNuts.checked = true;
+                else if (val === 'Hải sản / Shellfish') checkShellfish.checked = true;
+                else if (val === 'Sữa / Dairy') checkDairy.checked = true;
+                else if (val === 'Gluten') checkGluten.checked = true;
+                else if (val) otherValues.push(val);
             });
-            if (radio.checked) {
-                radio.parentElement.classList.add('bg-primary-container');
+            inputOther.value = otherValues.join(', ');
+        }
+
+        function updateAllergies() {
+            let list = [];
+            if (checkNuts.checked) list.push('Đậu phộng / Nuts');
+            if (checkShellfish.checked) list.push('Hải sản / Shellfish');
+            if (checkDairy.checked) list.push('Sữa / Dairy');
+            if (checkGluten.checked) list.push('Gluten');
+            if (inputOther.value.trim()) list.push(inputOther.value.trim());
+            hiddenAllergies.value = list.join(', ');
+        }
+
+        [checkNuts, checkShellfish, checkDairy, checkGluten].forEach(cb => cb.addEventListener('change', updateAllergies));
+        inputOther.addEventListener('input', updateAllergies);
+
+        // --- 2. DIETARY PREFERENCES SYNC ---
+        const hiddenDiet = document.getElementById('dietaryPreference');
+        const diets = ['Thuần chay (Vegan)', 'Ăn chay (Vegetarian)', 'Keto', 'Halal'];
+        const radioInputs = document.querySelectorAll('input[name="diet_preset"]');
+        const textareaNotes = document.getElementById('diet_notes');
+
+        if (hiddenDiet && hiddenDiet.value) {
+            const val = hiddenDiet.value.trim();
+            let found = false;
+            diets.forEach(d => {
+                if (val === d || val.startsWith(d + ' - ') || val.startsWith(d + ' | ') || val.startsWith(d + ':')) {
+                    radioInputs.forEach(r => {
+                        if (r.value === d) {
+                            r.checked = true;
+                            r.parentElement.classList.add('bg-primary-container');
+                            found = true;
+                            const suffix = val.substring(d.length).replace(/^(\s*[-|:]\s*)/, '');
+                            textareaNotes.value = suffix;
+                        }
+                    });
+                }
+            });
+            if (!found) {
+                textareaNotes.value = val;
             }
+        }
+
+        function updateDiet() {
+            let selectedDiet = '';
+            radioInputs.forEach(r => {
+                if (r.checked) selectedDiet = r.value;
+            });
+            const notes = textareaNotes.value.trim();
+            if (selectedDiet && notes) {
+                hiddenDiet.value = selectedDiet + ' - ' + notes;
+            } else if (selectedDiet) {
+                hiddenDiet.value = selectedDiet;
+            } else {
+                hiddenDiet.value = notes;
+            }
+        }
+
+        radioInputs.forEach(radio => {
+            radio.addEventListener('change', () => {
+                radioInputs.forEach(r => {
+                    r.parentElement.classList.remove('bg-primary-container');
+                });
+                if (radio.checked) {
+                    radio.parentElement.classList.add('bg-primary-container');
+                }
+                updateDiet();
+            });
         });
+        textareaNotes.addEventListener('input', updateDiet);
     });
 </script>
 
