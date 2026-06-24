@@ -123,7 +123,7 @@ public class BillingServiceImpl implements BillingService {
 
         Booking booking = bookingRepository.findById(folio.getBookingId())
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
-        booking.setBookingStatus("COMPLETED");
+        booking.setBookingStatus("CHECKED_OUT");
         booking.setPaymentStatus("PAID");
         booking.setCheckoutDate(LocalDateTime.now());
         bookingRepository.save(booking);
@@ -151,7 +151,7 @@ public class BillingServiceImpl implements BillingService {
 
         Booking booking = bookingRepository.findById(folio.getBookingId())
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
-        booking.setBookingStatus("COMPLETED");
+        booking.setBookingStatus("CHECKED_OUT");
         booking.setPaymentStatus("PAID");
         booking.setCheckoutDate(LocalDateTime.now());
         bookingRepository.save(booking);

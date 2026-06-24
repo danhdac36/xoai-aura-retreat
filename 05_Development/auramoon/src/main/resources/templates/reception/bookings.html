@@ -65,7 +65,18 @@
                     <tbody class="divide-y divide-gray-200 text-sm">
                         <tr th:each="b : ${bookings}" class="hover:bg-gray-50 transition-colors">
                             <td class="py-4 px-6 font-semibold text-gray-900" th:text="'#' + ${b.id}">#100</td>
-                            <td class="py-4 px-6 text-gray-600" th:text="${b.guestId}">Guest 1</td>
+                            <td class="py-4 px-6 text-gray-600">
+                                <div class="flex items-center gap-2">
+                                    <span th:text="${b.guestName != null ? b.guestName : 'Khách hàng'} + ' (#' + ${b.guestId} + ')'">Guest 1</span>
+                                    <div th:if="${b.medicalConditions != null or b.injuries != null}" class="group relative cursor-pointer text-red-500 flex items-center">
+                                        <span class="material-symbols-outlined text-sm">medical_information</span>
+                                        <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 bg-red-50 text-red-700 text-xs rounded shadow-lg border border-red-200 z-10 whitespace-normal break-words">
+                                            <p th:if="${b.medicalConditions != null}"><strong>Bệnh lý:</strong> <span th:text="${b.medicalConditions}"></span></p>
+                                            <p th:if="${b.injuries != null}"><strong>Chấn thương:</strong> <span th:text="${b.injuries}"></span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
                             <td class="py-4 px-6 text-gray-900 font-medium" th:text="${b.packageName}">Mindfulness</td>
                             <td class="py-4 px-6 text-gray-600">
                                 <span th:text="${#temporals.format(b.checkinDate, 'HH:mm dd/MM/yyyy')}">2026-06-11</span> đến 
@@ -90,11 +101,11 @@
                                 <span th:if="${b.bookingStatus == 'CONFIRMED'}"
                                     class="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-600">CONFIRMED</span>
                                 <span th:if="${b.bookingStatus == 'CHECKED_IN'}"
-                                    class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-600">CHECKED-IN</span>
+                                    class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-600">CHECKED_IN</span>
                                 <span th:if="${b.bookingStatus == 'PENDING'}"
                                     class="px-2.5 py-1 text-xs font-semibold rounded-full bg-yellow-50 text-yellow-600">PENDING</span>
-                                <span th:if="${b.bookingStatus == 'CHECKED-OUT'}"
-                                    class="px-2.5 py-1 text-xs font-semibold rounded-full bg-gray-50 text-gray-600">CHECKED-OUT</span>
+                                <span th:if="${b.bookingStatus == 'CHECKED_OUT'}"
+                                    class="px-2.5 py-1 text-xs font-semibold rounded-full bg-gray-50 text-gray-600">CHECKED_OUT</span>
                                 <span th:if="${b.bookingStatus == 'CANCELLED'}"
                                     class="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-600">CANCELLED</span>
                             </td>
