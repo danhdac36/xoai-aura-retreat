@@ -3,39 +3,51 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Xoai Aura - Đăng ký</title>
+    <title>Xoài Aura - Đăng ký</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@400;500;700&amp;display=swap"
           rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
           rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/auth/registration.css}">
+    <link rel="stylesheet" th:href="@{/css/auth/login.css}">
     <script th:src="@{/js/auth/registration.js}" defer></script>
+    <div th:replace="~{fragments/tailwind-config :: tailwind-config}"></div>
 </head>
-<body class="bg-background text-on-background font-body-md overflow-hidden">
-<main class="split-screen-container">
-    <!-- Left Side: Brand Imagery -->
-    <section class="brand-panel">
-        <div class="absolute inset-0 z-10 bg-on-background/10"></div>
-        <img alt="Luxury wellness retreat scene" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEOZN_X4oRbPTtTYWiC6c3X9b9FlfssRtrtZbV8pVNGc2rWtO0QuYxSsn3j1grqaKM0-sEkrA344VzH_owDxvp4LkHIor8VpwIXiLj7WY1tDCwz31g2HejNCdZ2-yG0oz6_id87vEAJ1tqolKYkEZpzSbbmCgs2E4n0pMb3DzalwKjBNdpDErbgkiigfGgYbP5N4Y31qUpN8zZ3DBhhyfVNZfeWDfIiGJ5TXSdBZKRhXP73EMruxzrbrF0IDQNsU5Uff0wDY_aJv0">
-        <div class="absolute top-10 left-10 z-20">
-            <span class="font-headline-sm text-headline-sm text-surface-lowest tracking-tight">Xoai Aura</span>
+<body class="bg-surface font-body-md text-on-surface antialiased overflow-hidden">
+<main class="flex min-h-screen">
+    <!-- Left Section: Visual Brand Identity -->
+    <section class="hidden lg:block lg:w-3/5 relative overflow-hidden">
+        <div class="absolute inset-0 z-10 bg-black/20"></div>
+        <div class="absolute inset-0 w-full h-full transform scale-105 transition-transform duration-[10000ms] ease-out brand-bg-container">
+            <img alt="Xoài Aura Retreat Villa & Pool" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 brand-bg-img opacity-100" th:src="@{/images/auth/login-bg3.jpg}">
+            <img alt="Xoài Aura Retreat lake bungalows" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 brand-bg-img opacity-0" th:src="@{/images/auth/login-bg1.jpg}">
+            <img alt="Xoài Aura Retreat Yoga sunset" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 brand-bg-img opacity-0" th:src="@{/images/auth/login-bg2.png}">
+            <img alt="Xoài Aura Retreat terrace sunset" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 brand-bg-img opacity-0" th:src="@{/images/auth/login-bg4.jpg}">
+            <img alt="Xoài Aura Retreat aerial pool view" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 brand-bg-img opacity-0" th:src="@{/images/auth/login-bg5.jpg}">
         </div>
-        <div class="absolute bottom-20 left-10 z-20 max-w-md">
-            <p class="font-headline-sm text-headline-sm text-surface-lowest mb-4 leading-relaxed">
-                "Sự tĩnh lặng là khởi đầu của mọi trí tuệ."
-            </p>
-            <div class="h-1 w-12 bg-secondary-fixed"></div>
+        <div class="absolute inset-0 z-20 flex flex-col justify-between p-margin-desktop">
+            <div class="flex items-center gap-stack-sm">
+                <span class="font-display-lg text-headline-sm text-surface-container-lowest tracking-[0.2em] uppercase font-semibold">Aura Moon</span>
+            </div>
+            <div class="max-w-xl">
+                <p class="font-display-lg text-headline-lg text-surface-container-lowest leading-snug">
+                    Sự tĩnh lặng là khởi đầu <br><span class="italic font-normal">của mọi trí tuệ.</span>
+                </p>
+                <div class="w-24 h-[1px] bg-surface-container-lowest/40 mt-stack-lg"></div>
+            </div>
         </div>
     </section>
 
-    <!-- Right Side: Registration Form -->
-    <section class="form-panel bg-surface-bright">
-        <div class="w-full max-w-[440px]">
+    <!-- Right Section: Registration Form -->
+    <section class="w-full lg:w-2/5 flex flex-col justify-center items-center px-margin-mobile md:px-margin-desktop bg-surface relative">
+        <div class="lg:hidden absolute top-8 left-8">
+            <span class="font-display-lg text-headline-sm text-primary tracking-tight">Xoài Aura</span>
+        </div>
+        <div class="w-full max-w-md relative z-10">
             <!-- Header -->
-            <div class="mb-6 text-center md:text-left">
-                <h1 class="font-headline-lg text-headline-lg text-primary mb-2 text-center">Đăng ký</h1>
-                <p class="font-body-md text-on-surface-variant text-center">
+            <div class="mb-8">
+                <h1 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight mb-2 text-center lg:text-left">Đăng ký</h1>
+                <p class="font-body-md text-body-md text-on-surface-variant text-center lg:text-left">
                     Tham gia cộng đồng Xoai Aura để trải nghiệm sự cân bằng tuyệt đối.
                 </p>
             </div>
@@ -46,54 +58,58 @@
             <!-- Registration Form -->
             <form class="space-y-4" th:action="@{/auth/register}" method="post" th:object="${registerDto}">
                 <!-- Full Name -->
-                <div class="flex flex-col gap-1">
-                    <label class="font-label-md text-xs text-on-surface-variant uppercase tracking-widest" for="fullName">Họ và tên</label>
-                    <input class="luxury-input py-2 px-1 text-body-md text-on-surface" id="fullName" placeholder="Nguyễn Văn A" type="text" th:field="*{fullName}">
-                    <span class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></span>
+                <div class="space-y-2">
+                    <label class="font-label-md text-xs text-on-surface-variant uppercase tracking-[0.15em]" for="fullName">Họ và tên</label>
+                    <input class="w-full bg-surface-container-low border-t-0 border-l-0 border-r-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-colors px-2 py-3 input-minimal font-body-md text-sm text-on-surface placeholder-outline-variant/60"
+                           id="fullName" placeholder="Nguyễn Văn A" type="text" th:field="*{fullName}">
+                    <span class="text-red-500 text-xs mt-1 block" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></span>
                 </div>
                 <!-- Email -->
-                <div class="flex flex-col gap-1">
-                    <label class="font-label-md text-xs text-on-surface-variant uppercase tracking-widest" for="email">Email</label>
-                    <input class="luxury-input py-2 px-1 text-body-md text-on-surface" id="email" placeholder="example@xoai-aura.com" type="email" th:field="*{email}">
-                    <span class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                <div class="space-y-2">
+                    <label class="font-label-md text-xs text-on-surface-variant uppercase tracking-[0.15em]" for="email">Email</label>
+                    <input class="w-full bg-surface-container-low border-t-0 border-l-0 border-r-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-colors px-2 py-3 input-minimal font-body-md text-sm text-on-surface placeholder-outline-variant/60"
+                           id="email" placeholder="example@xoai-aura.com" type="email" th:field="*{email}">
+                    <span class="text-red-500 text-xs mt-1 block" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
                 </div>
                 <!-- Password -->
-                <div class="flex flex-col gap-1 relative">
-                    <label class="font-label-md text-xs text-on-surface-variant uppercase tracking-widest" for="password">Mật khẩu</label>
+                <div class="space-y-2 relative">
+                    <label class="font-label-md text-xs text-on-surface-variant uppercase tracking-[0.15em]" for="password">Mật khẩu</label>
                     <div class="relative">
-                        <input class="luxury-input w-full py-2 px-1 text-body-md text-on-surface pr-10" id="password" placeholder="••••••••" type="password" th:field="*{password}">
-                        <button class="absolute right-1 bottom-3 text-on-surface-variant" type="button" id="togglePassword">
+                        <input class="w-full bg-surface-container-low border-t-0 border-l-0 border-r-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-colors px-2 py-3 input-minimal font-body-md text-sm text-on-surface pr-10 placeholder-outline-variant/60"
+                               id="password" placeholder="••••••••" type="password" th:field="*{password}">
+                        <button class="absolute right-2 bottom-3 text-on-surface-variant/80 hover:text-secondary transition-colors" type="button" id="togglePassword">
                             <span class="material-symbols-outlined text-[20px]">visibility_off</span>
                         </button>
                     </div>
-                    <span class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                    <span class="text-red-500 text-xs mt-1 block" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
                 </div>
                 <!-- Confirm Password -->
-                <div class="flex flex-col gap-1 relative">
-                    <label class="font-label-md text-xs text-on-surface-variant uppercase tracking-widest" for="confirmPassword">Xác nhận mật khẩu</label>
-                    <input class="luxury-input w-full py-2 px-1 text-body-md text-on-surface" id="confirmPassword" placeholder="••••••••" type="password" th:field="*{confirmPassword}">
-                    <span class="text-red-500 text-xs mt-1" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></span>
+                <div class="space-y-2">
+                    <label class="font-label-md text-xs text-on-surface-variant uppercase tracking-[0.15em]" for="confirmPassword">Xác nhận mật khẩu</label>
+                    <input class="w-full bg-surface-container-low border-t-0 border-l-0 border-r-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-colors px-2 py-3 input-minimal font-body-md text-sm text-on-surface placeholder-outline-variant/60"
+                           id="confirmPassword" placeholder="••••••••" type="password" th:field="*{confirmPassword}">
+                    <span class="text-red-500 text-xs mt-1 block" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></span>
                 </div>
                 <!-- Submit Button -->
-                <div class="pt-2">
-                    <button class="w-full bg-secondary text-white font-label-md text-sm uppercase tracking-[0.2em] py-4 rounded-lg hover:opacity-90 transition-all shadow-sm active:scale-[0.98]" type="submit">
+                <div class="pt-4">
+                    <button class="w-full bg-secondary text-on-secondary py-4 font-label-md text-sm uppercase tracking-[0.15em] rounded-lg shadow-sm hover:bg-secondary/95 active:scale-[0.98] transition-all duration-300 flex justify-center items-center gap-2" type="submit">
                         Đăng ký
                     </button>
                 </div>
             </form>
             <!-- Navigation Back to Login -->
-            <div class="mt-6 text-center">
-                <p class="font-body-md text-on-surface-variant">
+            <div class="mt-8 text-center">
+                <p class="font-body-md text-sm text-on-surface-variant">
                     Đã có tài khoản?
-                    <a class="text-secondary font-semibold underline underline-offset-4 ml-1 hover:text-on-secondary-container transition-colors" th:href="@{/auth/login}">
-                        Đăng nhập ngay
-                    </a>
+                    <a class="text-secondary font-label-md text-sm hover:underline underline-offset-4 ml-1" th:href="@{/auth/login}">Đăng nhập ngay</a>
                 </p>
             </div>
-            <!-- Footer Links -->
-            <div class="mt-4 pt-6 border-t border-outline-variant/30 flex justify-center gap-6">
-                <a class="font-label-md text-[10px] text-on-surface-variant/60 uppercase tracking-widest hover:text-on-surface transition-colors" href="#">Điều khoản</a>
-                <a class="font-label-md text-[10px] text-on-surface-variant/60 uppercase tracking-widest hover:text-on-surface transition-colors" href="#">Bảo mật</a>
+        </div>
+        <!-- Footer Links & Rights -->
+        <div class="absolute bottom-8 w-full text-center pointer-events-none">
+            <div class="flex justify-center gap-6">
+                <a class="font-label-md text-[10px] text-on-surface-variant/40 uppercase tracking-[0.15em] hover:text-secondary transition-colors pointer-events-auto" href="#">Điều khoản</a>
+                <a class="font-label-md text-[10px] text-on-surface-variant/40 uppercase tracking-[0.15em] hover:text-secondary transition-colors pointer-events-auto" href="#">Bảo mật</a>
             </div>
         </div>
     </section>
