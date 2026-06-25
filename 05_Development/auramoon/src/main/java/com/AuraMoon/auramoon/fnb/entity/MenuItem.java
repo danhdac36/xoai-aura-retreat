@@ -33,7 +33,14 @@ public class MenuItem {
     @Builder.Default
     private Boolean isAvailable = true;
 
+    @Column(name = "image_url", length = 255)
+    private String imageUrl;
+
+    @Column(name = "category", length = 50)
+    private String category;
+
     @Column(name = "create_at", insertable = false, updatable = false)
+
     private LocalDateTime createAt;
 
     @Column(name = "update_at")

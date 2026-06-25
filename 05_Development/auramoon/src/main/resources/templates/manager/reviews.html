@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::div})}">
+
+<head>
+    <title>Quản lý Đánh giá Khách hàng</title>
+</head>
+
+<body>
+    <div class="w-full">
+        <div class="max-w-7xl mx-auto">
+            <!-- Page Header Section -->
+            <section class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-stack-lg">
+                <div>
+                    <h2 class="font-headline-lg text-headline-lg text-on-background mb-2">Đánh giá của khách hàng</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+                        Xem và lắng nghe ý kiến phản hồi từ các khách hàng sau khi hoàn tất kỳ nghỉ dưỡng. Trải nghiệm dịch vụ xuất sắc luôn là ưu tiên hàng đầu tại Xoai Aura Retreat.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Summary Statistics (Optional but looks highly premium!) -->
+            <section class="grid grid-cols-1 sm:grid-cols-3 gap-gutter mb-stack-lg">
+                <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex flex-col">
+                    <span class="font-label-md text-label-md text-on-surface-variant mb-2">Tổng số lượt đánh giá</span>
+                    <span class="font-headline-md text-headline-md text-primary font-bold" th:text="${#lists.size(reviews)}">0</span>
+                </div>
+                <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex flex-col">
+                    <span class="font-label-md text-label-md text-on-surface-variant mb-2">Điểm đánh giá trung bình</span>
+                    <span class="font-headline-md text-headline-md text-[#92400e] font-bold" 
+                          th:text="${reviews.isEmpty() ? '0.0' : #numbers.formatDecimal(reviews.stream().mapToDouble(r -> r.rating).average().orElse(0.0), 1, 1)} + ' / 5.0'">
+                        4.5 / 5.0
+                    </span>
+                </div>
+                <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex flex-col justify-center">
+                    <span class="font-label-md text-label-md text-on-surface-variant mb-1">Mức độ hài lòng</span>
+                    <div class="flex items-center gap-2">
+                        <span class="font-headline-sm text-headline-sm text-green-700 font-bold">100%</span>
+                        <span class="text-on-surface-variant text-[12px] opacity-80">(Điểm 4-5 sao)</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Detailed Data Table Section -->
+            <section class="mb-stack-lg">
+                <div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm">
+                    <div class="px-8 py-6 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+                        <h3 class="font-headline-sm text-headline-sm text-primary">Danh sách nhận xét phản hồi</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-surface-container-low">
+                                <tr>
+                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider">Khách hàng</th>
+                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">Villa</th>
+                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">Thời gian ở</th>
+                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">Điểm số</th>
+                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider">Nhận xét chi tiết</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-outline-variant">
+                                <tr th:each="review : ${reviews}" class="hover:bg-surface-bright transition-colors">
+                                    <!-- Guest Name -->
+                                    <td class="px-8 py-5 font-body-md text-body-md text-primary font-bold" 
+                                        th:text="${guestNames.get(review.booking.guestId) != null ? guestNames.get(review.booking.guestId) : 'Khách hàng ẩn danh'}">
+                                        Nguyễn Văn A
+                                    </td>
+                                    <!-- Villa -->
+                                    <td class="px-8 py-5 text-center font-body-md text-body-md font-semibold text-primary" 
+                                        th:text="${review.booking.assignedVilla != null ? review.booking.assignedVilla.villaCode : 'N/A'}">
+                                        V101
+                                    </td>
+                                    <!-- Time Period -->
+                                    <td class="px-8 py-5 text-center font-body-md text-body-md text-on-surface-variant" 
+                                        th:text="${#temporals.format(review.booking.checkinDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(review.booking.checkoutDate, 'dd/MM/yyyy')}">
+                                        01/06/2026 - 05/06/2026
+                                    </td>
+                                    <!-- Star Rating -->
+                                    <td class="px-8 py-5 text-center font-body-md text-body-md">
+                                        <div class="flex items-center justify-center gap-1 text-[#f59e0b]">
+                                            <span th:each="star : ${#numbers.sequence(1, 5)}" 
+                                                  th:text="${star <= review.rating ? '★' : '☆'}"
+                                                  class="text-lg">
+                                                ★
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <!-- Comment -->
+                                    <td class="px-8 py-5 font-body-md text-body-md text-on-surface-variant" 
+                                        th:text="${review.comment != null and !review.comment.isEmpty() ? review.comment : 'Không có bình luận.'}">
+                                        Dịch vụ chăm sóc sức khỏe tuyệt vời!
+                                    </td>
+                                </tr>
+                                <tr th:if="${reviews.isEmpty()}">
+                                    <td colspan="5" class="px-8 py-6 text-center text-on-surface-variant font-body-md text-body-md">
+                                        Chưa có lượt đánh giá nào được ghi nhận.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -22,5 +22,6 @@ public class ChefDashboardOrderResponse {
     private LocalDateTime orderedAt;
     private String foodAllergies;
     private Boolean hasAllergyWarning;
+    private String servingTime;
     private List<ChefDashboardItemResponse> items;
 }

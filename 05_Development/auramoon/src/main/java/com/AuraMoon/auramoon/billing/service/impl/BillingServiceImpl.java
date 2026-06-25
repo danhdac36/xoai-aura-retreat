@@ -33,160 +33,168 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BillingServiceImpl implements BillingService {
 
-    private final GuestFolioRepository guestFolioRepository;
-    private final FolioItemRepository folioItemRepository;
-    private final PaymentRepository paymentRepository;
-    private final BookingRepository bookingRepository;
-    private final VillaRepository villaRepository;
-    private final IUserRepository userRepository;
-    private final ApplicationEventPublisher eventPublisher;
+        private final GuestFolioRepository guestFolioRepository;
+        private final FolioItemRepository folioItemRepository;
+        private final PaymentRepository paymentRepository;
+        private final BookingRepository bookingRepository;
+        private final VillaRepository villaRepository;
+        private final IUserRepository userRepository;
+        private final ApplicationEventPublisher eventPublisher;
 
-    @Override
-    public CheckoutViewDTO getCheckoutData(Integer bookingId) {
-        GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
-                .orElseThrow(() -> new RuntimeException("GuestFolio not found for bookingId: " + bookingId));
+        @Override
+        public CheckoutViewDTO getCheckoutData(Integer bookingId) {
+                GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
+                                .orElseThrow(() -> new RuntimeException(
+                                                "GuestFolio not found for bookingId: " + bookingId));
 
-        List<FolioItem> items = folioItemRepository.findByGuestFolioId(folio.getId());
-        Map<String, List<FolioItem>> groupedServices = items.stream()
-                .collect(Collectors
-                        .groupingBy(item -> item.getServiceCategory() != null ? item.getServiceCategory() : "Khác"));
+                List<FolioItem> items = folioItemRepository.findByGuestFolioId(folio.getId());
+                Map<String, List<FolioItem>> groupedServices = items.stream()
+                                .collect(Collectors
+                                                .groupingBy(item -> item.getServiceCategory() != null
+                                                                ? item.getServiceCategory()
+                                                                : "Khác"));
 
-        BigDecimal totalExtra = items.stream()
-                .map(item -> item.getAmount() != null ? item.getAmount() : BigDecimal.ZERO)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal totalExtra = items.stream()
+                                .map(item -> item.getAmount() != null ? item.getAmount() : BigDecimal.ZERO)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        List<Payment> payments = paymentRepository.findByGuestFolioIdAndStatus(folio.getId(), PaymentTransactionStatus.SUCCESS.name());
-        BigDecimal totalPaid = payments.stream()
-                .map(payment -> payment.getAmount() != null ? payment.getAmount() : BigDecimal.ZERO)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                List<Payment> payments = paymentRepository.findByGuestFolioIdAndStatus(folio.getId(),
+                                PaymentTransactionStatus.SUCCESS.name());
+                BigDecimal totalPaid = payments.stream()
+                                .map(payment -> payment.getAmount() != null ? payment.getAmount() : BigDecimal.ZERO)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal packageAmount = folio.getTotalPackageAmount() != null ? folio.getTotalPackageAmount()
-                : BigDecimal.ZERO;
-        BigDecimal totalCost = packageAmount.add(totalExtra);
-        BigDecimal balanceDue = totalCost.subtract(totalPaid);
+                BigDecimal packageAmount = folio.getTotalPackageAmount() != null ? folio.getTotalPackageAmount()
+                                : BigDecimal.ZERO;
+                BigDecimal totalCost = packageAmount.add(totalExtra);
+                BigDecimal balanceDue = totalCost.subtract(totalPaid);
 
-        return CheckoutViewDTO.builder()
-                .folio(folio)
-                .payments(payments)
-                .groupedExtraServices(groupedServices)
-                .totalCost(totalCost)
-                .totalPaid(totalPaid)
-                .balanceDue(balanceDue)
-                .build();
-    }
-
-    @Override
-    @Transactional
-    public Payment initiatePayment(Integer bookingId, String method, String gateway) {
-        GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
-                .orElseThrow(() -> new RuntimeException("Folio not found"));
-
-        List<FolioItem> items = folioItemRepository.findByGuestFolioId(folio.getId());
-        boolean hasPendingOrders = items.stream().anyMatch(item -> "PENDING".equalsIgnoreCase(item.getStatus()));
-        if (hasPendingOrders) {
-            throw new PendingOrdersExistException("Khách không thể check-out vì còn đơn Spa/F&B đang chờ xử lý.");
+                return CheckoutViewDTO.builder()
+                                .folio(folio)
+                                .payments(payments)
+                                .groupedExtraServices(groupedServices)
+                                .totalCost(totalCost)
+                                .totalPaid(totalPaid)
+                                .balanceDue(balanceDue)
+                                .build();
         }
 
-        CheckoutViewDTO data = getCheckoutData(bookingId);
-        BigDecimal amountToPay = data.getBalanceDue();
+        @Override
+        @Transactional
+        public Payment initiatePayment(Integer bookingId, String method, String gateway) {
+                GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
+                                .orElseThrow(() -> new RuntimeException("Folio not found"));
 
-        if (amountToPay.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("No balance due");
+                List<FolioItem> items = folioItemRepository.findByGuestFolioId(folio.getId());
+                boolean hasPendingOrders = items.stream()
+                                .anyMatch(item -> "PENDING".equalsIgnoreCase(item.getStatus()));
+                if (hasPendingOrders) {
+                        throw new PendingOrdersExistException(
+                                        "Khách không thể check-out vì còn đơn Spa/F&B đang chờ xử lý.");
+                }
+
+                CheckoutViewDTO data = getCheckoutData(bookingId);
+                BigDecimal amountToPay = data.getBalanceDue();
+
+                if (amountToPay.compareTo(BigDecimal.ZERO) <= 0) {
+                        throw new RuntimeException("No balance due");
+                }
+
+                Payment payment = Payment.builder()
+                                .guestFolio(folio)
+                                .amount(amountToPay)
+                                .paymentMethod(method)
+                                .paymentGateway(gateway)
+                                .paymentDate(LocalDateTime.now())
+                                .status(PaymentTransactionStatus.PENDING.name())
+                                .build();
+
+                return paymentRepository.save(payment);
         }
 
-        Payment payment = Payment.builder()
-                .guestFolio(folio)
-                .amount(amountToPay)
-                .paymentMethod(method)
-                .paymentGateway(gateway)
-                .paymentDate(LocalDateTime.now())
-                .status(PaymentTransactionStatus.PENDING.name())
-                .build();
+        @Override
+        @Transactional
+        public void completePaymentAndCheckout(Integer paymentId, String transactionCode) {
+                Payment payment = paymentRepository.findById(paymentId)
+                                .orElseThrow(() -> new RuntimeException("Payment not found"));
 
-        return paymentRepository.save(payment);
-    }
+                payment.setStatus(PaymentTransactionStatus.SUCCESS.name());
+                payment.setTransactionCode(transactionCode);
+                payment.setPaymentDate(LocalDateTime.now());
+                paymentRepository.save(payment);
 
-    @Override
-    @Transactional
-    public void completePaymentAndCheckout(Integer paymentId, String transactionCode) {
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                GuestFolio folio = payment.getGuestFolio();
+                folio.setStatus(GuestFolioStatus.CLOSED.name());
+                guestFolioRepository.save(folio);
 
-        payment.setStatus(PaymentTransactionStatus.SUCCESS.name());
-        payment.setTransactionCode(transactionCode);
-        payment.setPaymentDate(LocalDateTime.now());
-        paymentRepository.save(payment);
+                Booking booking = bookingRepository.findById(folio.getBookingId())
+                                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                booking.setBookingStatus("CHECKED_OUT");
+                booking.setPaymentStatus("PAID");
+                booking.setCheckoutDate(LocalDateTime.now());
+                bookingRepository.save(booking);
 
-        GuestFolio folio = payment.getGuestFolio();
-        folio.setStatus(GuestFolioStatus.CLOSED.name());
-        guestFolioRepository.save(folio);
+                if (booking.getAssignedVilla() != null) {
+                        Villa villa = booking.getAssignedVilla();
+                        villa.setVillaStatus("AVAILABLE");
+                        villa.setCleaningStatus("DIRTY");
+                        villaRepository.save(villa);
+                }
 
-        Booking booking = bookingRepository.findById(folio.getBookingId())
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
-        booking.setBookingStatus("COMPLETED");
-        booking.setPaymentStatus("PAID");
-        booking.setCheckoutDate(LocalDateTime.now());
-        bookingRepository.save(booking);
-
-        if (booking.getAssignedVilla() != null) {
-            Villa villa = booking.getAssignedVilla();
-            villa.setVillaStatus("AVAILABLE");
-            villa.setCleaningStatus("DIRTY");
-            villaRepository.save(villa);
+                User guest = userRepository.findById(booking.getGuestId()).orElse(null);
+                String guestEmail = (guest != null) ? guest.getEmail() : null;
+                eventPublisher.publishEvent(
+                                new CheckoutCompletedEvent(this, booking.getId(), guestEmail, folio.getId()));
         }
 
-        User guest = userRepository.findById(booking.getGuestId()).orElse(null);
-        String guestEmail = (guest != null) ? guest.getEmail() : null;
-        eventPublisher.publishEvent(new CheckoutCompletedEvent(this, booking.getId(), guestEmail, folio.getId()));
-    }
+        @Override
+        @Transactional
+        public void completeCheckoutWithoutPayment(Integer bookingId) {
+                GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
+                                .orElseThrow(() -> new RuntimeException("Folio not found"));
 
-    @Override
-    @Transactional
-    public void completeCheckoutWithoutPayment(Integer bookingId) {
-        GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
-                .orElseThrow(() -> new RuntimeException("Folio not found"));
+                folio.setStatus(GuestFolioStatus.CLOSED.name());
+                guestFolioRepository.save(folio);
 
-        folio.setStatus(GuestFolioStatus.CLOSED.name());
-        guestFolioRepository.save(folio);
+                Booking booking = bookingRepository.findById(folio.getBookingId())
+                                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                booking.setBookingStatus("CHECKED_OUT");
+                booking.setPaymentStatus("PAID");
+                booking.setCheckoutDate(LocalDateTime.now());
+                bookingRepository.save(booking);
 
-        Booking booking = bookingRepository.findById(folio.getBookingId())
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
-        booking.setBookingStatus("COMPLETED");
-        booking.setPaymentStatus("PAID");
-        booking.setCheckoutDate(LocalDateTime.now());
-        bookingRepository.save(booking);
+                if (booking.getAssignedVilla() != null) {
+                        Villa villa = booking.getAssignedVilla();
+                        villa.setVillaStatus("AVAILABLE");
+                        villa.setCleaningStatus("DIRTY");
+                        villaRepository.save(villa);
+                }
 
-        if (booking.getAssignedVilla() != null) {
-            Villa villa = booking.getAssignedVilla();
-            villa.setVillaStatus("AVAILABLE");
-            villa.setCleaningStatus("DIRTY");
-            villaRepository.save(villa);
+                User guest = userRepository.findById(booking.getGuestId()).orElse(null);
+                String guestEmail = (guest != null) ? guest.getEmail() : null;
+                eventPublisher.publishEvent(
+                                new CheckoutCompletedEvent(this, booking.getId(), guestEmail, folio.getId()));
         }
 
-        User guest = userRepository.findById(booking.getGuestId()).orElse(null);
-        String guestEmail = (guest != null) ? guest.getEmail() : null;
-        eventPublisher.publishEvent(new CheckoutCompletedEvent(this, booking.getId(), guestEmail, folio.getId()));
-    }
-
-    @Override
-    @Transactional
-    public void markPaymentAsFailed(Integer paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
-        payment.setStatus(PaymentTransactionStatus.FAILED.name());
-        payment.setPaymentDate(LocalDateTime.now());
-        paymentRepository.save(payment);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Payment getPaymentById(Integer paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new RuntimeException("Payment not found with id: " + paymentId));
-        // Initialize lazy association
-        if (payment.getGuestFolio() != null) {
-            payment.getGuestFolio().getBookingId();
+        @Override
+        @Transactional
+        public void markPaymentAsFailed(Integer paymentId) {
+                Payment payment = paymentRepository.findById(paymentId)
+                                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                payment.setStatus(PaymentTransactionStatus.FAILED.name());
+                payment.setPaymentDate(LocalDateTime.now());
+                paymentRepository.save(payment);
         }
-        return payment;
-    }
+
+        @Override
+        @Transactional(readOnly = true)
+        public Payment getPaymentById(Integer paymentId) {
+                Payment payment = paymentRepository.findById(paymentId)
+                                .orElseThrow(() -> new RuntimeException("Payment not found with id: " + paymentId));
+                // Initialize lazy association
+                if (payment.getGuestFolio() != null) {
+                        payment.getGuestFolio().getBookingId();
+                }
+                return payment;
+        }
 }

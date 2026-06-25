@@ -76,10 +76,10 @@ INSERT INTO RETREAT_PACKAGE (package_id, type_package, package_name, duration_da
 SET IDENTITY_INSERT RETREAT_PACKAGE OFF;
 
 SET IDENTITY_INSERT MENU_ITEM ON;
-INSERT INTO MENU_ITEM (menu_item_id, item_name, price, ingredient, is_available) VALUES
-(1, N'Salad Cá Hồi', 250000, N'Cá hồi, rau xà lách, sốt', 1),
-(2, N'Ức Gà Nướng Mật Ong', 180000, N'Ức gà, mật ong, gia vị', 1),
-(3, N'Nước Ép Cần Tây', 80000, N'Cần tây, táo', 1);
+INSERT INTO MENU_ITEM (menu_item_id, item_name, price, ingredient, is_available, image_url) VALUES
+(1, N'Salad Cá Hồi', 250000, N'Cá hồi, rau xà lách, sốt', 1, '/images/fnb/menu/default-food.jpg'),
+(2, N'Ức Gà Nướng Mật Ong', 180000, N'Ức gà, mật ong, gia vị', 1, '/images/fnb/menu/default-food.jpg'),
+(3, N'Nước Ép Cần Tây', 80000, N'Cần tây, táo', 1, '/images/fnb/menu/default-food.jpg');
 SET IDENTITY_INSERT MENU_ITEM OFF;
 
 -- =========================================================================
