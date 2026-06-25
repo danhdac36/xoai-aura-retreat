@@ -145,6 +145,10 @@
         <span th:if="${timeline.checkoutDate == null}" th:text="${#temporals.format(timeline.checkinDate, 'dd/MM/yyyy')} + ' - (Chưa xác định)'">Thứ Hai, 24 Tháng 5</span>
     </div>
     <div class="text-base text-on-surface-variant font-body-md" th:text="'Phòng: ' + ${timeline.villaName} + ' | Gói: ' + ${timeline.packageName}">Phòng: Xoai 01 | Gói: Detox</div>
+    
+    <a th:if="${timeline.bookingStatus == 'PENDING'}" th:href="@{/billing/deposit/pay(bookingId=${timeline.bookingId})}" class="mt-2 px-6 py-2 bg-yellow-600 text-white font-body-md font-semibold text-sm rounded-lg hover:bg-yellow-700 transition-colors shadow flex items-center gap-2">
+        <span class="material-symbols-outlined text-[20px]">account_balance_wallet</span> Thanh toán Đặt cọc
+    </a>
 </div>
 </div>
 </section>

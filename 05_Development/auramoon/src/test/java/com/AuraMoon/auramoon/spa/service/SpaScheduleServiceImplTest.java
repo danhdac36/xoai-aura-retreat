@@ -72,6 +72,7 @@ class SpaScheduleServiceImplTest {
         Booking guestBooking = new Booking();
         guestBooking.setCheckinDate(LocalDateTime.of(2024, 6, 19, 14, 0));
         guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
+        guestBooking.setBookingStatus("Checked-In");
         when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
 
         TreatmentRoom room = new TreatmentRoom();
@@ -122,6 +123,7 @@ class SpaScheduleServiceImplTest {
         Booking guestBooking = new Booking();
         guestBooking.setCheckinDate(LocalDateTime.of(2024, 6, 19, 14, 0));
         guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
+        guestBooking.setBookingStatus("Checked-In");
         when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
 
         when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(Collections.emptyList());
@@ -155,6 +157,7 @@ class SpaScheduleServiceImplTest {
         Booking guestBooking = new Booking();
         guestBooking.setCheckinDate(LocalDateTime.of(2024, 6, 19, 14, 0));
         guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
+        guestBooking.setBookingStatus("Checked-In");
         when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
 
         when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(new TreatmentRoom()));

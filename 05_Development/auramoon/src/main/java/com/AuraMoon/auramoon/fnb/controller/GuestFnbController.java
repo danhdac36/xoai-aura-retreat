@@ -59,18 +59,6 @@ public class GuestFnbController {
             model.addAttribute("errorMessage", "Không tìm thấy thông tin Booking hợp lệ.");
         }
 
-        int maxMeals = 3; // Default
-        if (bookingId != null) {
-            Booking b = bookingRepository.findById(bookingId).orElse(null);
-            if (b != null && b.getTotalGuests() != null) {
-                int totalMax = b.getTotalGuests() * 3;
-                java.time.LocalDateTime start = java.time.LocalDate.now().atStartOfDay();
-                java.time.LocalDateTime end = java.time.LocalDate.now().plusDays(1).atStartOfDay();
-                int alreadyOrdered = mealOrderService.getSumQuantityOfFreeMealOrdersToday(bookingId, start, end);
-                maxMeals = Math.max(0, totalMax - alreadyOrdered);
-            }
-        }
-        model.addAttribute("maxMeals", maxMeals);
         model.addAttribute("menuItems", menuItems);
         model.addAttribute("guestId", guestId);
         model.addAttribute("bookingId", bookingId);

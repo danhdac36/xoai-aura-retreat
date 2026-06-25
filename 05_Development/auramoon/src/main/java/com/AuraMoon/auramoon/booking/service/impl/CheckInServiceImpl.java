@@ -13,6 +13,8 @@ import com.AuraMoon.auramoon.booking.service.VillaService;
 import com.AuraMoon.auramoon.common.enums.BookingStatus;
 import com.AuraMoon.auramoon.auth.entity.Consent;
 import com.AuraMoon.auramoon.auth.repository.ConsentRepository;
+import com.AuraMoon.auramoon.spa.entity.PhysicalHealthProfile;
+import com.AuraMoon.auramoon.spa.repository.PhysicalHealthProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +34,7 @@ public class CheckInServiceImpl implements CheckInService {
     private final UserRepository userRepository;
     private final VillaService villaService;
     private final ConsentRepository consentRepository;
+    private final PhysicalHealthProfileRepository healthProfileRepository;
 
     private static final java.util.logging.Logger auditLogger =
             java.util.logging.Logger.getLogger(CheckInServiceImpl.class.getName());
@@ -157,6 +160,16 @@ public class CheckInServiceImpl implements CheckInService {
             String guestGender = guest != null ? guest.getGender() : null;
             LocalDate guestDateOfBirth = guest != null ? guest.getDateOfBirth() : null;
 
+            String medicalConditions = null;
+            String injuries = null;
+            if (guest != null) {
+                PhysicalHealthProfile hp = healthProfileRepository.findByUserId(guest.getId()).orElse(null);
+                if (hp != null) {
+                    medicalConditions = hp.getMedicalConditions();
+                    injuries = hp.getInjuries();
+                }
+            }
+
             dtos.add(com.AuraMoon.auramoon.booking.dto.BookingDisplayDTO.builder()
                     .id(b.getId())
                     .guestId(b.getGuestId())
@@ -170,6 +183,8 @@ public class CheckInServiceImpl implements CheckInService {
                     .guestPhone(guestPhone)
                     .guestGender(guestGender)
                     .guestDateOfBirth(guestDateOfBirth)
+                    .medicalConditions(medicalConditions)
+                    .injuries(injuries)
                     .build());
         }
         return dtos;

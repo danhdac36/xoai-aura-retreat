@@ -16,6 +16,7 @@ import com.AuraMoon.auramoon.fnb.repository.MenuItemRepository;
 import com.AuraMoon.auramoon.billing.repository.GuestFolioRepository;
 import com.AuraMoon.auramoon.billing.repository.FolioItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.AuraMoon.auramoon.auth.config.AesDataEncryptor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
@@ -53,6 +54,9 @@ public class MealOrderServiceImpl implements IMealOrderService {
     @Autowired
     private FolioItemRepository folioItemRepository;
 
+    @Autowired
+    private AesDataEncryptor aesDataEncryptor;
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -69,6 +73,8 @@ public class MealOrderServiceImpl implements IMealOrderService {
                     .price(item.getPrice())
                     .ingredient(item.getIngredient())
                     .isAvailable(item.getIsAvailable())
+                    .imageUrl(item.getImageUrl())
+                    .category(item.getCategory())
                     .build());
         }
 
@@ -93,7 +99,8 @@ public class MealOrderServiceImpl implements IMealOrderService {
         }
 
         Optional<DietaryProfile> profileOpt = dietaryProfileRepository.findByUserId(userId);
-        String foodAllergies = profileOpt.map(DietaryProfile::getFoodAllergies).orElse("");
+        String rawAllergies = profileOpt.map(DietaryProfile::getFoodAllergies).orElse("");
+        String foodAllergies = aesDataEncryptor.convertToEntityAttribute(rawAllergies);
 
         List<MenuItem> allItems = menuItemRepository.findByIsAvailableTrue();
         List<MenuItemResponse> filtered = new ArrayList<>();
@@ -106,6 +113,8 @@ public class MealOrderServiceImpl implements IMealOrderService {
                         .price(item.getPrice())
                         .ingredient(item.getIngredient())
                         .isAvailable(item.getIsAvailable())
+                        .imageUrl(item.getImageUrl())
+                        .category(item.getCategory())
                         .build());
             }
         }
@@ -139,7 +148,8 @@ public class MealOrderServiceImpl implements IMealOrderService {
         }
 
         Optional<DietaryProfile> profileOpt = dietaryProfileRepository.findByUserId(request.getGuestId());
-        String allergies = profileOpt.map(DietaryProfile::getFoodAllergies).orElse("");
+        String rawAllergies = profileOpt.map(DietaryProfile::getFoodAllergies).orElse("");
+        String allergies = aesDataEncryptor.convertToEntityAttribute(rawAllergies);
 
         List<ErrorDetail> allergenConflicts = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -186,28 +196,47 @@ public class MealOrderServiceImpl implements IMealOrderService {
                     allergenConflicts);
         }
 
-        if (!Boolean.TRUE.equals(request.getIsExtraCharge())) {
-            int totalGuests = booking.getTotalGuests() != null ? booking.getTotalGuests() : 1;
-            int maxAllowedQuantity = totalGuests * 3;
-
-            LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-            LocalDateTime endOfDay = LocalDate.now().plusDays(1).atStartOfDay();
-            int alreadyOrderedToday = mealOrderRepository.sumQuantityOfFreeMealOrdersToday(booking.getId(), startOfDay, endOfDay);
-            int totalRequestedQuantity = request.getItems().stream().mapToInt(OrderItemDto::getQuantity).sum();
-
-            if (alreadyOrderedToday + totalRequestedQuantity > maxAllowedQuantity) {
-                int remainingFreeMeals = maxAllowedQuantity - alreadyOrderedToday;
-                if (remainingFreeMeals <= 0) {
-                    throw new FnbException("FNB-005", "Quý khách đã sử dụng hết " + maxAllowedQuantity + " phần ăn miễn phí của ngày hôm nay. Vui lòng đặt qua Thực đơn A-La-Carte nếu có nhu cầu phát sinh.");
-                } else {
-                    throw new FnbException("FNB-005", "Quý khách chỉ còn lại " + remainingFreeMeals + " phần ăn miễn phí trong ngày hôm nay. Đơn hàng yêu cầu " + totalRequestedQuantity + " phần. Vui lòng giảm số lượng hoặc đặt qua Thực đơn A-La-Carte.");
-                }
-            }
-        }
-
         GuestFolio folio = guestFolioRepository.findByBookingId(booking.getId())
                 .orElseThrow(() -> new FnbException("FNB-002",
                         "Resort Guest Folio not found for booking: " + booking.getId()));
+
+        if (!Boolean.TRUE.equals(request.getIsExtraCharge())) {
+            if (request.getServingTime() == null || request.getServingTime().trim().isEmpty()) {
+                throw new FnbException("FNB-002", "Vui lòng chọn thời gian phục vụ cho bữa ăn buffet miễn phí.");
+            }
+
+            String requestedPeriod = getMealPeriod(request.getServingTime());
+            if (requestedPeriod == null) {
+                throw new FnbException("FNB-005", "Giờ phục vụ mong muốn (" + request.getServingTime() + ") ngoài khung giờ buffet miễn phí (Sáng: 06:00-10:00, Trưa: 11:30-14:00, Tối: 18:00-21:00). Vui lòng chuyển sang đặt Thực đơn A-La-Carte.");
+            }
+
+            List<MealOrder> allOrders = mealOrderRepository.findByBookingId(booking.getId());
+            List<FolioItem> folioItems = folioItemRepository.findByGuestFolioId(folio.getId());
+            java.util.Set<Integer> extraFbOrderIds = new java.util.HashSet<>();
+            for (FolioItem fi : folioItems) {
+                if ("Extra F&B".equalsIgnoreCase(fi.getServiceCategory()) && !"VOIDED".equalsIgnoreCase(fi.getStatus())) {
+                    extraFbOrderIds.add(fi.getReferenceId());
+                }
+            }
+
+            LocalDate today = LocalDate.now();
+            for (MealOrder mo : allOrders) {
+                if (!"CANCELLED".equalsIgnoreCase(mo.getOrderStatus())
+                        && mo.getOrderedAt().toLocalDate().equals(today)
+                        && mo.getGuestId().equals(request.getGuestId())) {
+                    
+                    if (!extraFbOrderIds.contains(mo.getId())) {
+                        String existingPeriod = getMealPeriod(mo.getServingTime());
+                        if (requestedPeriod.equals(existingPeriod)) {
+                            String periodName = requestedPeriod.equals("BREAKFAST") ? "Bữa sáng" : requestedPeriod.equals("LUNCH") ? "Bữa trưa" : "Bữa tối";
+                            throw new FnbException("FNB-005", "Khách hàng đã đặt 1 suất buffet miễn phí cho " + periodName + " ngày hôm nay. Vui lòng chuyển sang đặt thực đơn A-la-carte.");
+                        }
+                    }
+                }
+            }
+
+            // No limits on quantities of dishes/items ordered under new unlimited buffet policy
+        }
 
         MealOrder order = MealOrder.builder()
                 .bookingId(booking.getId())
@@ -218,6 +247,7 @@ public class MealOrderServiceImpl implements IMealOrderService {
                 .placeOrder(request.getPlaceOrder())
                 .note(request.getNote())
                 .orderStatus("PENDING")
+                .servingTime(request.getServingTime())
                 .build();
 
         order = mealOrderRepository.save(order);
@@ -266,6 +296,7 @@ public class MealOrderServiceImpl implements IMealOrderService {
                 .totalAmount(totalAmount)
                 .orderStatus(order.getOrderStatus())
                 .orderedAt(order.getOrderedAt())
+                .servingTime(order.getServingTime())
                 .build();
     }
 
@@ -367,10 +398,13 @@ public class MealOrderServiceImpl implements IMealOrderService {
                 }
             }
 
+            String servingTime = row[7] != null ? row[7].toString() : null;
+
             String foodAllergies = null;
             if (guestId != null) {
                 Optional<DietaryProfile> profileOpt = dietaryProfileRepository.findByUserId(guestId);
-                foodAllergies = profileOpt.map(DietaryProfile::getFoodAllergies).orElse(null);
+                String rawAllergies = profileOpt.map(DietaryProfile::getFoodAllergies).orElse(null);
+                foodAllergies = aesDataEncryptor.convertToEntityAttribute(rawAllergies);
             }
 
             List<Object[]> itemRows = orderId != null ?
@@ -432,6 +466,7 @@ public class MealOrderServiceImpl implements IMealOrderService {
                     .orderedAt(orderedAt)
                     .foodAllergies(foodAllergies)
                     .hasAllergyWarning(orderHasAllergy)
+                    .servingTime(servingTime)
                     .items(itemResponses)
                     .build());
         }
@@ -474,6 +509,35 @@ public class MealOrderServiceImpl implements IMealOrderService {
                 && (ing.contains("tôm") || ing.contains("cua") || ing.contains("hải sản") || ing.contains("seafood")))
             return true;
         return false;
+    }
+
+    private String getMealPeriod(String servingTimeStr) {
+        if (servingTimeStr == null || servingTimeStr.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            String timePart = servingTimeStr.trim();
+            if (timePart.length() > 5) {
+                timePart = timePart.substring(0, 5);
+            }
+            String[] parts = timePart.split(":");
+            int hour = Integer.parseInt(parts[0]);
+            int minute = Integer.parseInt(parts[1]);
+            java.time.LocalTime time = java.time.LocalTime.of(hour, minute);
+
+            if (!time.isBefore(java.time.LocalTime.of(6, 0)) && !time.isAfter(java.time.LocalTime.of(10, 0))) {
+                return "BREAKFAST";
+            }
+            if (!time.isBefore(java.time.LocalTime.of(11, 30)) && !time.isAfter(java.time.LocalTime.of(14, 0))) {
+                return "LUNCH";
+            }
+            if (!time.isBefore(java.time.LocalTime.of(18, 0)) && !time.isAfter(java.time.LocalTime.of(21, 0))) {
+                return "DINNER";
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return null;
     }
 
     @Override

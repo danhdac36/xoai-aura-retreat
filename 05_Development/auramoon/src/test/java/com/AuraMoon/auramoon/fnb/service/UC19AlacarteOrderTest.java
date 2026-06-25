@@ -1,5 +1,6 @@
 package com.AuraMoon.auramoon.fnb.service;
 
+import com.AuraMoon.auramoon.auth.config.AesDataEncryptor;
 import com.AuraMoon.auramoon.billing.entity.FolioItem;
 import com.AuraMoon.auramoon.billing.entity.GuestFolio;
 import com.AuraMoon.auramoon.billing.repository.FolioItemRepository;
@@ -57,6 +58,9 @@ public class UC19AlacarteOrderTest {
     @Mock
     private FolioItemRepository folioItemRepository;
 
+    @Mock
+    private AesDataEncryptor aesDataEncryptor;
+
     @InjectMocks
     private MealOrderServiceImpl mealOrderService;
 
@@ -99,6 +103,7 @@ public class UC19AlacarteOrderTest {
                 .build();
         savedOrder.setId(55);
 
+        when(aesDataEncryptor.convertToEntityAttribute(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(dietaryProfileRepository.findByUserId(guestId)).thenReturn(Optional.empty());
         when(menuItemRepository.findById(1)).thenReturn(Optional.of(menuItem));
@@ -163,6 +168,7 @@ public class UC19AlacarteOrderTest {
                 .build();
         booking.setId(bookingId);
 
+        when(aesDataEncryptor.convertToEntityAttribute(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(menuItemRepository.findById(999)).thenReturn(Optional.empty());
 
@@ -206,6 +212,7 @@ public class UC19AlacarteOrderTest {
                 .build();
         menuItem.setId(10);
 
+        when(aesDataEncryptor.convertToEntityAttribute(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(dietaryProfileRepository.findByUserId(guestId)).thenReturn(Optional.of(profile));
         when(menuItemRepository.findById(10)).thenReturn(Optional.of(menuItem));

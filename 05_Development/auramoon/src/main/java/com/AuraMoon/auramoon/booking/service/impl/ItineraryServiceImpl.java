@@ -48,7 +48,7 @@ public class ItineraryServiceImpl implements ItineraryService {
 
         List<ItineraryTimelineDTO.TimelineEvent> events = new ArrayList<>();
 
-        LocalDateTime start = activeBooking.getCheckinDate();
+        LocalDateTime start = activeBooking.getCheckinDate() != null ? activeBooking.getCheckinDate() : LocalDateTime.now();
         LocalDateTime end = activeBooking.getCheckoutDate();
 
         // 1. Nhận phòng (Check-in)
@@ -62,9 +62,13 @@ public class ItineraryServiceImpl implements ItineraryService {
         // 2. Lấy dữ liệu Spa Scheduled thực tế
         List<Schedule> spaSchedules = scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(activeBooking.getId());
         for (Schedule schedule : spaSchedules) {
+            String serviceName = "Dịch vụ Spa";
+            if (schedule.getTreatmentBooking() != null && schedule.getTreatmentBooking().getTreatmentService() != null) {
+                serviceName = schedule.getTreatmentBooking().getTreatmentService().getServiceName();
+            }
             events.add(ItineraryTimelineDTO.TimelineEvent.builder()
-                .eventName("Trị liệu: " + schedule.getTreatmentBooking().getTreatmentService().getServiceName())
-                .time(schedule.getStartTime())
+                .eventName("Trị liệu: " + serviceName)
+                .time(schedule.getStartTime() != null ? schedule.getStartTime() : start)
                 .location(schedule.getRoom() != null ? schedule.getRoom().getRoomName() : "Aura Spa")
                 .description("Liệu trình Spa thư giãn cơ thể.")
                 .build());
@@ -91,7 +95,7 @@ public class ItineraryServiceImpl implements ItineraryService {
                     .build());
         }
 
-        events.sort(Comparator.comparing(ItineraryTimelineDTO.TimelineEvent::getTime));
+        events.sort(Comparator.comparing(ItineraryTimelineDTO.TimelineEvent::getTime, Comparator.nullsLast(Comparator.naturalOrder())));
 
         return ItineraryTimelineDTO.builder()
                 .bookingId(activeBooking.getId())

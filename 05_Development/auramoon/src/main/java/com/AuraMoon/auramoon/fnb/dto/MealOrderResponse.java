@@ -16,4 +16,5 @@ public class MealOrderResponse {
     private BigDecimal totalAmount;
     private String orderStatus;
     private LocalDateTime orderedAt;
+    private String servingTime;
 }
