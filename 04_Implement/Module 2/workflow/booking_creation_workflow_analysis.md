@@ -71,7 +71,7 @@ sequenceDiagram
 
 ---
 
-## 2. Chi Tiết Từng Hoạt Động Cụ Thể (Step-by-step Actions)
+## 2. Chi Tiết Từng Action và Thành Phần Tham Gia
 
 ### 2.1 Tầng Giao Diện (Frontend - HTML/JS)
 
@@ -151,3 +151,14 @@ Khi hoàn thành giao dịch (Transaction Commit), JPA/Hibernate sẽ sinh ra c�
   1. **Bảng `BOOKING`:** Ghi mới bản ghi đặt phòng ở trạng thái `'PENDING'`, trường `assigned_villa_id` có giá trị `NULL` (vì phòng cụ thể chỉ được gán lúc check-in thực tế).
   2. **Bảng `CONSENT`:** Ghi mới bản ghi chấp thuận chính sách quyền riêng tư dữ liệu cá nhân của khách hàng.
   3. **Bảng `GUEST_FOLIO`:** Ghi mới bản ghi hóa đơn chi tiết của đơn đặt phòng phục vụ cho việc đối chiếu thanh toán tiền đặt cọc VNPay tiếp theo.
+
+---
+
+## 3. Tổng Kết Các Điểm Nổi Bật Về Bảo Mật & Ràng Buộc (Key Takeaways)
+
+| Ràng buộc/Quy tắc bảo mật | Cách thức triển khai chi tiết | Lợi ích mang lại |
+| :--- | :--- | :--- |
+| **Kiểm duyệt phòng trống** | Gọi `villaService.checkVillaAvailability` đếm số phòng vật lý trống thực tế | Tránh overbooking (nhận quá số lượng phòng thực tế có thể cung cấp). |
+| **Bảo vệ kỳ nghỉ trùng lặp** | Kiểm tra trạng thái Booking đang Active của khách hàng | Ngăn khách hàng spam đặt nhiều gói trị liệu cùng lúc làm kẹt hệ thống. |
+| **Privacy Consent** | Lưu bảng `CONSENT` với version `v1.0` nếu khách tick chọn đồng ý | Tuân thủ tiêu chuẩn thu thập dữ liệu cá nhân ngay từ khâu đầu tiên. |
+| **Khởi tạo Folio tức thì** | Lưu `GuestFolio` ngay lúc tạo Booking (ADR-002) | Tạo mỏ neo (anchor) chuẩn bị sẵn sàng cho giao dịch đặt cọc VNPay kế tiếp. |
