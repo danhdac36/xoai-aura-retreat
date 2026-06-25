@@ -16,6 +16,9 @@ import com.AuraMoon.auramoon.spa.repository.TreatmentServiceRepository;
 import com.AuraMoon.auramoon.spa.service.impl.SpaScheduleServiceImpl;
 import com.AuraMoon.auramoon.booking.repository.BookingRepository;
 import com.AuraMoon.auramoon.booking.entity.Booking;
+import com.AuraMoon.auramoon.auth.repository.UserRepository;
+import com.AuraMoon.auramoon.auth.entity.User;
+import com.AuraMoon.auramoon.billing.service.IEmailNotificationService;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,13 +51,17 @@ class SpaScheduleServiceImplTest {
     private TreatmentServiceRepository treatmentServiceRepository;
     @Mock
     private BookingRepository bookingRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private IEmailNotificationService emailNotificationService;
 
     @InjectMocks
     private SpaScheduleServiceImpl spaScheduleService;
 
     @Test
     @DisplayName("SPA-TC-001: Book lịch Spa thành công khi có đủ phòng và nhân viên")
-    void scheduleSession_hasAvailableResources_shouldCreateScheduleSuccessfully() {
+    void scheduleSession_hasAvailableResources_shouldCreateScheduleSuccessfully() throws Exception {
         // Arrange
         SpaScheduleRequest request = new SpaScheduleRequest();
         request.setBookingId(1);
@@ -67,21 +74,30 @@ class SpaScheduleServiceImplTest {
 
         TreatmentService service = new TreatmentService();
         service.setDurationMinutes(60);
+        service.setServiceName("Body Massage");
         when(treatmentServiceRepository.findById(10)).thenReturn(Optional.of(service));
 
         Booking guestBooking = new Booking();
         guestBooking.setCheckinDate(LocalDateTime.of(2024, 6, 19, 14, 0));
         guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
         guestBooking.setBookingStatus("Checked-In");
+        guestBooking.setGuestId(5);
         when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
 
         TreatmentRoom room = new TreatmentRoom();
         room.setId(5);
+        room.setRoomName("VIP Room 1");
         when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(room));
 
         Therapist therapist = new Therapist();
         therapist.setTherapistCode("TH01");
         when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(List.of(therapist));
+
+        User guest = new User();
+        guest.setId(5);
+        guest.setEmail("guest@example.com");
+        guest.setFullName("Nguyen Van A");
+        when(userRepository.findById(5)).thenReturn(Optional.of(guest));
 
         Schedule savedSchedule = new Schedule();
         savedSchedule.setId(999);
@@ -102,6 +118,13 @@ class SpaScheduleServiceImplTest {
         assertEquals("Scheduled", booking.getStatus());
         verify(scheduleRepository, times(1)).save(any(Schedule.class));
         verify(treatmentBookingRepository, times(1)).save(booking);
+        verify(emailNotificationService, times(1)).sendSpaBookingReminderEmail(
+                eq("guest@example.com"),
+                eq("Nguyen Van A"),
+                eq("Body Massage"),
+                eq("VIP Room 1"),
+                any()
+        );
     }
 
     @Test
@@ -193,5 +216,80 @@ class SpaScheduleServiceImplTest {
         assertEquals("SPA-001", exception.getErrorCode());
         assertEquals("Service not found, not in package, or all sessions already scheduled", exception.getMessage());
         verify(roomRepository, never()).findAvailableRoomsWithLock(any(), any());
+    }
+
+    @Test
+    @DisplayName("SPA-TC-005: Lựa chọn kỹ thuật viên có số ca làm việc ít nhất trong ngày")
+    void scheduleSession_shouldSelectTherapistWithLeastWorkload() throws Exception {
+        // Arrange
+        SpaScheduleRequest request = new SpaScheduleRequest();
+        request.setBookingId(1);
+        request.setServiceId(10);
+        request.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
+
+        TreatmentBooking booking = new TreatmentBooking();
+        booking.setId(100);
+        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10)).thenReturn(List.of(booking));
+
+        TreatmentService service = new TreatmentService();
+        service.setDurationMinutes(60);
+        service.setServiceName("Body Massage");
+        when(treatmentServiceRepository.findById(10)).thenReturn(Optional.of(service));
+
+        Booking guestBooking = new Booking();
+        guestBooking.setCheckinDate(LocalDateTime.of(2024, 6, 19, 14, 0));
+        guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
+        guestBooking.setBookingStatus("Checked-In");
+        guestBooking.setGuestId(5);
+        when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
+
+        TreatmentRoom room = new TreatmentRoom();
+        room.setId(5);
+        room.setRoomName("VIP Room 1");
+        when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(room));
+
+        // Two therapists available
+        Therapist t1 = new Therapist();
+        t1.setId(101);
+        t1.setTherapistCode("TH01");
+
+        Therapist t2 = new Therapist();
+        t2.setId(102);
+        t2.setTherapistCode("TH02");
+
+        when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(List.of(t1, t2));
+
+        // t1 has workload = 3, t2 has workload = 1. The system should pick t2!
+        when(scheduleRepository.countDailySchedulesForTherapist(eq(101), any(), any())).thenReturn(3L);
+        when(scheduleRepository.countDailySchedulesForTherapist(eq(102), any(), any())).thenReturn(1L);
+
+        User guest = new User();
+        guest.setId(5);
+        guest.setEmail("guest@example.com");
+        guest.setFullName("Nguyen Van A");
+        when(userRepository.findById(5)).thenReturn(Optional.of(guest));
+
+        Schedule savedSchedule = new Schedule();
+        savedSchedule.setId(999);
+        savedSchedule.setRoom(room);
+        savedSchedule.setTherapist(t2); // expected selected therapist
+        savedSchedule.setStartTime(request.getStartTime());
+        savedSchedule.setEndTime(request.getStartTime().plusMinutes(60));
+        when(scheduleRepository.save(any(Schedule.class))).thenReturn(savedSchedule);
+
+        // Act
+        SpaScheduleResponse response = spaScheduleService.scheduleSession(request);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals("TH02", response.getTherapistCode()); // Verify that t2 was chosen
+        verify(scheduleRepository).save(org.mockito.ArgumentMatchers.argThat(s -> s.getTherapist().getId().equals(102)));
+        verify(emailNotificationService, times(1)).sendSpaBookingReminderEmail(
+                eq("guest@example.com"),
+                eq("Nguyen Van A"),
+                eq("Body Massage"),
+                eq("VIP Room 1"),
+                any()
+        );
     }
 }

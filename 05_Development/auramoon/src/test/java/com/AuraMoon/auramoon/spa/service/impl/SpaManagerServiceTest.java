@@ -66,21 +66,19 @@ public class SpaManagerServiceTest {
 
     @Test
     void TC003_updateTherapistStatus_InvalidStatus_ThrowsException() {
-        assertThrows(SpaBusinessException.class, () -> 
-            spaManagerService.updateTherapistStatus("TH001", "INVALID", 1)
-        );
+        assertThrows(SpaBusinessException.class, () -> spaManagerService.updateTherapistStatus("TH001", "INVALID", 1));
     }
 
     @Test
     void updateTherapistStatus_OffDuty_AutoReassign_Success() {
         when(therapistRepository.findByTherapistCode("TH001")).thenReturn(therapist);
-        
+
         Schedule schedule = new Schedule();
         schedule.setStartTime(LocalDateTime.now().plusHours(1));
         schedule.setEndTime(LocalDateTime.now().plusHours(2));
-        
+
         when(scheduleRepository.findFutureSchedules(eq("TH001"), any())).thenReturn(Arrays.asList(schedule));
-        
+
         Therapist replacement = new Therapist();
         replacement.setTherapistCode("TH002");
         when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(Arrays.asList(replacement));
@@ -95,18 +93,17 @@ public class SpaManagerServiceTest {
     @Test
     void updateTherapistStatus_OffDuty_NoReplacement_ThrowsException() {
         when(therapistRepository.findByTherapistCode("TH001")).thenReturn(therapist);
-        
+
         Schedule schedule = new Schedule();
         schedule.setStartTime(LocalDateTime.now().plusHours(1));
-        
+
         when(scheduleRepository.findFutureSchedules(eq("TH001"), any())).thenReturn(Arrays.asList(schedule));
-        
+
         // Return only the current therapist, so no replacement found
         when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(Arrays.asList(therapist));
 
-        SpaBusinessException ex = assertThrows(SpaBusinessException.class, () -> 
-            spaManagerService.updateTherapistStatus("TH001", "OFF_DUTY", 1)
-        );
+        SpaBusinessException ex = assertThrows(SpaBusinessException.class,
+                () -> spaManagerService.updateTherapistStatus("TH001", "OFF_DUTY", 1));
         assertTrue(ex.getMessage().contains("Không thể chuyển ca tự động"));
     }
 }

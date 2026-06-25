@@ -90,7 +90,19 @@ public class SpaManualBookingServiceImpl implements SpaManualBookingService {
             throw new SpaBusinessException("SPA-010",
                     "Không tìm thấy Therapist hoặc Phòng điều trị khả dụng. Vui lòng chọn thời gian khác.");
         }
+        
+        // Cân bằng công việc: Lựa chọn Therapist có số ca làm việc ít nhất trong ngày
         Therapist selectedTherapist = availableTherapists.get(0);
+        long minWorkload = Long.MAX_VALUE;
+        LocalDateTime startOfDay = startTime.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startTime.toLocalDate().atTime(java.time.LocalTime.MAX);
+        for (Therapist t : availableTherapists) {
+            long workload = scheduleRepository.countDailySchedulesForTherapist(t.getId(), startOfDay, endOfDay);
+            if (workload < minWorkload) {
+                minWorkload = workload;
+                selectedTherapist = t;
+            }
+        }
 
         // 5. Lưu TreatmentBooking (với status = 'Scheduled' và folio_id liên kết)
         TreatmentBooking treatmentBooking = TreatmentBooking.builder()

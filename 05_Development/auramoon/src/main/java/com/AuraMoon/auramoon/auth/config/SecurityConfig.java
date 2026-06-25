@@ -92,7 +92,7 @@ public class SecurityConfig {
                                                 .successHandler(oAuth2LoginSuccessHandler))
                                 .logout(logout -> logout
                                                 .logoutUrl("/auth/logout")
-                                                .logoutSuccessUrl("/auth/login?logout=true")
+                                                .logoutSuccessUrl("/")
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID")
                                                 .permitAll())
