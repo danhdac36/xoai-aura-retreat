@@ -1,0 +1,652 @@
+<!DOCTYPE html><html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Lịch Dạy Yoga | Aura Wellness</title>
+<meta name="description" content="Trang quản lý lịch dạy Yoga dành cho Huấn luyện viên tại Aura Wellness Resort">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "on-background": "#1b1c1c",
+                    "primary-fixed-dim": "#c9c6c2",
+                    "surface-dim": "#dcd9d9",
+                    "outline-variant": "#c8c7be",
+                    "secondary-container": "#d7e5bb",
+                    "secondary-fixed-dim": "#becca3",
+                    "on-surface-variant": "#474741",
+                    "on-tertiary": "#ffffff",
+                    "surface-container": "#f0eded",
+                    "on-tertiary-fixed-variant": "#284f2a",
+                    "on-primary-fixed": "#1c1c19",
+                    "primary-fixed": "#e5e2dd",
+                    "inverse-primary": "#c9c6c2",
+                    "tertiary": "#406840",
+                    "surface": "#fbf9f8",
+                    "secondary": "#566342",
+                    "on-primary-container": "#6f6e6a",
+                    "surface-container-high": "#eae8e7",
+                    "on-secondary-fixed-variant": "#3f4b2c",
+                    "surface-tint": "#5f5e5b",
+                    "surface-container-low": "#f6f3f2",
+                    "on-secondary-container": "#5a6745",
+                    "background": "#fbf9f8",
+                    "surface-bright": "#fbf9f8",
+                    "surface-container-highest": "#e4e2e1",
+                    "outline": "#787770",
+                    "on-secondary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#d1ffcb",
+                    "on-primary": "#ffffff",
+                    "primary-container": "#f5f2ed",
+                    "surface-variant": "#e4e2e1",
+                    "secondary-fixed": "#dae8be",
+                    "on-tertiary-fixed": "#002106",
+                    "on-secondary-fixed": "#141f05",
+                    "on-tertiary-container": "#4f784f",
+                    "on-surface": "#1b1c1c",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#474743",
+                    "inverse-on-surface": "#f3f0f0",
+                    "primary": "#5f5e5b",
+                    "tertiary-fixed-dim": "#a5d2a2",
+                    "inverse-surface": "#303030",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#c1eebc"
+                },
+                "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+                },
+                "spacing": {
+                    "gutter": "24px",
+                    "section-gap": "120px",
+                    "margin-mobile": "20px",
+                    "stack-md": "16px",
+                    "margin-desktop": "80px",
+                    "stack-sm": "8px",
+                    "stack-lg": "32px"
+                },
+                "fontFamily": {
+                    "headline-sm": ["Playfair Display"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "display-lg": ["Playfair Display"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Playfair Display"],
+                    "body-md": ["Inter"]
+                },
+                "fontSize": {
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
+                    "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                }
+            },
+        },
+    }
+</script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes kenBurns {
+        0% { transform: scale(1.0); }
+        100% { transform: scale(1.05); }
+    }
+    .bg-animated-image {
+        position: fixed;
+        top: -5%;
+        left: -5%;
+        width: 110%;
+        height: 110%;
+        background-image: url('https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=2070&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        z-index: -2;
+        animation: kenBurns 30s ease-in-out infinite alternate;
+        pointer-events: none;
+    }
+    .bg-overlay {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(252, 251, 249, 0.82), rgba(252, 251, 249, 0.95));
+        z-index: -1;
+        pointer-events: none;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+
+    @keyframes blob {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+    }
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .animate-blob {
+        animation: blob 15s infinite alternate;
+    }
+    .animation-delay-2000 { animation-delay: 2s; }
+    .animation-delay-4000 { animation-delay: 4s; }
+    .delay-100 { animation-delay: 100ms; }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.6;
+        transition: 0.3s;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    /* Drawer Overlay */
+    #participantDrawerOverlay {
+        transition: opacity 0.3s ease;
+    }
+    #participantDrawer {
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #participantDrawer.translate-x-full {
+        transform: translateX(100%);
+    }
+    #participantDrawer.translate-x-0 {
+        transform: translateX(0);
+    }
+</style>
+</head>
+<body class="text-on-surface relative overflow-x-hidden min-h-screen">
+<!-- Animated Photo Background -->
+<div class="bg-animated-image"></div>
+<div class="bg-overlay"></div>
+
+<!-- Decorative blobs -->
+<div class="fixed top-0 left-0 w-96 h-96 bg-[#869273]/20 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob pointer-events-none z-[-1]"></div>
+<div class="fixed top-0 right-0 w-96 h-96 bg-[#c5c1b6]/40 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-2000 pointer-events-none z-[-1]"></div>
+<div class="fixed -bottom-32 left-20 w-96 h-96 bg-[#869273]/30 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-4000 pointer-events-none z-[-1]"></div>
+
+<main class="max-w-[1440px] mx-auto px-margin-desktop py-12 relative">
+
+    <!-- Back Button -->
+    <div class="mb-8 animate-fade-in-up opacity-0 relative z-10">
+        <a href="#" onclick="history.back(); return false;" class="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md group">
+            <span class="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
+            Quay lại
+        </a>
+    </div>
+
+    <!-- Header Section -->
+    <section class="mb-8 flex flex-col lg:flex-row justify-between items-center gap-6 animate-fade-in-up opacity-0 relative z-10">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-primary mb-2">Lịch Dạy Yoga</h1>
+            <p class="font-body-md text-body-md text-on-surface-variant">Xem lịch dạy và danh sách học viên các lớp Yoga hôm nay.</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- Previous Day -->
+            <button type="button" onclick="navigateDay(-1)" class="glass-panel p-2.5 rounded-full flex items-center justify-center text-outline hover:text-primary hover:bg-surface-container-low transition-all active:scale-95 cursor-pointer" title="Ngày trước">
+                <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+            </button>
+
+            <!-- Date Picker -->
+            <div class="glass-panel px-6 py-3 rounded-full flex items-center gap-4">
+                <span class="material-symbols-outlined text-outline">calendar_month</span>
+                <form id="dateForm" action="/instructor/yoga/schedule" method="get" class="m-0">
+                    <input type="date" id="date" name="date"
+                           th:value="${selectedDate}"
+                           onchange="document.getElementById('dateForm').submit();"
+                           class="bg-transparent border-none text-on-surface font-body-md focus:ring-0 p-0 cursor-pointer outline-none">
+                </form>
+            </div>
+
+            <!-- Next Day -->
+            <button type="button" onclick="navigateDay(1)" class="glass-panel p-2.5 rounded-full flex items-center justify-center text-outline hover:text-primary hover:bg-surface-container-low transition-all active:scale-95 cursor-pointer" title="Ngày sau">
+                <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Quick Day Tabs Navigation -->
+    <section class="mb-8 animate-fade-in-up opacity-0 relative z-10 flex justify-center">
+        <div class="glass-panel p-2 rounded-2xl flex items-center gap-2 overflow-x-auto max-w-full no-scrollbar" id="dayTabsContainer">
+            <!-- Rendered dynamically by JS -->
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 animate-fade-in-up opacity-0 relative z-10">
+        <!-- Total Classes Card -->
+        <div class="glass-panel p-4 rounded-2xl flex items-center gap-4 transition-all duration-300 hover:shadow-md">
+            <div class="w-12 h-12 rounded-xl bg-surface-container-high/60 text-primary flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[24px]">self_improvement</span>
+            </div>
+            <div>
+                <div class="text-[11px] text-on-surface-variant font-bold uppercase tracking-wider">Tổng Lớp</div>
+                <div class="text-2xl font-bold text-primary mt-0.5" th:text="${schedules != null ? schedules.size() : 0}">0</div>
+            </div>
+        </div>
+        <!-- Upcoming Card -->
+        <div class="glass-panel p-4 rounded-2xl flex items-center gap-4 transition-all duration-300 hover:shadow-md">
+            <div class="w-12 h-12 rounded-xl bg-[#d7e5bb]/45 text-[#3f4b2c] flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[24px]">upcoming</span>
+            </div>
+            <div>
+                <div class="text-[11px] text-on-surface-variant font-bold uppercase tracking-wider">Sắp Diễn Ra</div>
+                <div class="text-2xl font-bold text-[#3f4b2c] mt-0.5" id="upcomingCount">0</div>
+            </div>
+        </div>
+        <!-- Total Students Card -->
+        <div class="glass-panel p-4 rounded-2xl flex items-center gap-4 transition-all duration-300 hover:shadow-md">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[24px]">groups</span>
+            </div>
+            <div>
+                <div class="text-[11px] text-on-surface-variant font-bold uppercase tracking-wider">Tổng Học Viên</div>
+                <div class="text-2xl font-bold text-amber-600 mt-0.5" id="totalStudents">0</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <div class="glass-panel p-stack-lg rounded-2xl animate-fade-in-up delay-100 opacity-0 relative z-10 transition-transform duration-500 hover:-translate-y-1">
+
+        <!-- Render Schedules (Happy Path) -->
+        <div class="overflow-x-auto w-full" th:if="${schedules != null and !schedules.isEmpty()}">
+            <table class="w-full border-separate" style="border-spacing: 0 12px;">
+                <thead>
+                    <tr class="text-on-surface-variant font-label-md text-label-md">
+                        <th class="pb-3 px-6 font-semibold uppercase tracking-wider whitespace-nowrap text-center">Thời gian</th>
+                        <th class="pb-3 px-6 font-semibold uppercase tracking-wider text-center">Lớp Yoga</th>
+                        <th class="pb-3 px-6 font-semibold uppercase tracking-wider text-center">Địa điểm</th>
+                        <th class="pb-3 px-6 font-semibold uppercase tracking-wider text-center whitespace-nowrap">Sĩ số</th>
+                        <th class="pb-3 px-6 font-semibold uppercase tracking-wider text-center whitespace-nowrap">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y-0">
+                    <tr th:each="schedule : ${schedules}" class="hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group" th:id="'row-' + ${schedule.id}">
+                        <!-- Time Column -->
+                        <td class="py-5 px-6 align-middle text-center whitespace-nowrap rounded-l-2xl border-y border-l border-outline-variant/30 bg-surface-container-lowest group-hover:bg-surface-container-low transition-colors duration-300 relative">
+                            <!-- Left accent bar (green gradient) -->
+                            <div class="absolute left-0 top-0 bottom-0 w-[4px] rounded-l-2xl bg-tertiary/60 transition-all duration-300 group-hover:w-[6px] group-hover:bg-tertiary"></div>
+                            <div class="flex justify-center">
+                                <div class="bg-secondary-container/85 text-on-secondary-container px-3.5 py-2 rounded-xl font-bold text-sm inline-block shadow-sm">
+                                    <span th:text="${#temporals.format(schedule.startTime, 'HH:mm')}">07:00</span>
+                                    -
+                                    <span th:text="${#temporals.format(schedule.endTime, 'HH:mm')}">08:00</span>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Class Name Column -->
+                        <td class="py-5 px-6 align-middle text-center border-y border-outline-variant/30 bg-surface-container-lowest group-hover:bg-surface-container-low transition-colors duration-300">
+                            <h3 class="font-headline-sm text-lg text-primary font-bold mb-1" th:text="${schedule.yogaClass.className}">Yoga Class</h3>
+                            <p class="text-on-surface-variant text-xs" th:text="${schedule.yogaClass.description != null ? schedule.yogaClass.description : '--'}">Description</p>
+                        </td>
+                        <!-- Location Column -->
+                        <td class="py-5 px-6 align-middle text-center border-y border-outline-variant/30 bg-surface-container-lowest group-hover:bg-surface-container-low transition-colors duration-300">
+                            <div class="flex items-center justify-center gap-1.5 text-on-surface-variant text-sm font-medium">
+                                <span class="material-symbols-outlined text-[18px] text-outline group-hover:text-secondary transition-colors">location_on</span>
+                                <span th:text="${schedule.location}">Garden Pavilion</span>
+                            </div>
+                        </td>
+                        <!-- Capacity Column -->
+                        <td class="py-5 px-6 align-middle text-center border-y border-outline-variant/30 bg-surface-container-lowest group-hover:bg-surface-container-low transition-colors duration-300">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <span class="material-symbols-outlined text-[18px] text-outline">person</span>
+                                <span class="font-bold text-primary schedule-registered" th:attr="data-count=${registeredCounts[schedule.id]}" th:text="${registeredCounts[schedule.id]}">0</span>
+                                <span class="text-on-surface-variant">/</span>
+                                <span class="text-on-surface-variant" th:text="${schedule.maxCapacity}">15</span>
+                            </div>
+                        </td>
+                        <!-- Actions Column -->
+                        <td class="py-5 px-6 align-middle text-center rounded-r-2xl border-y border-r border-outline-variant/30 bg-surface-container-lowest group-hover:bg-surface-container-low transition-colors duration-300">
+                            <button type="button"
+                                    th:attr="data-schedule-id=${schedule.id}, data-class-name=${schedule.yogaClass.className}, data-time=${#temporals.format(schedule.startTime, 'HH:mm') + ' - ' + #temporals.format(schedule.endTime, 'HH:mm')}"
+                                    onclick="openParticipantDrawer(this)"
+                                    class="bg-[#5f5e5b] text-white px-4 py-2 rounded-full font-label-md text-xs hover:bg-[#474743] transition-all duration-300 shadow-sm hover:shadow flex items-center gap-1.5 active:scale-95 hover:scale-[1.03] mx-auto">
+                                <span class="material-symbols-outlined text-[16px]">groups</span>
+                                Xem Học Viên
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div class="text-center py-20" th:if="${schedules == null or schedules.isEmpty()}">
+            <div class="inline-flex flex-col items-center gap-4">
+                <div class="w-20 h-20 rounded-full bg-surface-container-high/60 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[40px] text-outline">self_improvement</span>
+                </div>
+                <div>
+                    <h3 class="font-headline-sm text-headline-sm text-primary mb-2">Không có lớp nào</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+                        Bạn không có lịch dạy Yoga nào vào ngày này. Hãy chọn ngày khác để kiểm tra.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- Participant Drawer Overlay -->
+<div id="participantDrawerOverlay" class="fixed inset-0 bg-black/30 z-40 hidden opacity-0" onclick="closeParticipantDrawer()"></div>
+
+<!-- Participant Drawer -->
+<div id="participantDrawer" class="fixed top-0 right-0 h-full w-full max-w-lg bg-surface-container-lowest shadow-2xl z-50 translate-x-full flex flex-col">
+    <!-- Drawer Header -->
+    <div class="px-6 py-5 border-b border-outline-variant/30 flex items-center justify-between bg-surface-container-low/50 flex-shrink-0">
+        <div>
+            <h2 class="font-headline-sm text-headline-sm text-primary" id="drawerClassName">Danh sách Học viên</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-1" id="drawerTimeSlot">--:-- - --:--</p>
+        </div>
+        <button onclick="closeParticipantDrawer()" class="w-10 h-10 rounded-full bg-surface-container-high/60 flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-all active:scale-95">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+
+    <!-- Drawer Content (scrollable) -->
+    <div class="flex-1 overflow-y-auto px-6 py-5" id="drawerContent">
+        <!-- Loading State -->
+        <div id="drawerLoading" class="flex flex-col items-center justify-center py-16 gap-4">
+            <div class="w-10 h-10 border-3 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+            <p class="text-on-surface-variant font-body-md">Đang tải danh sách...</p>
+        </div>
+
+        <!-- Participant List -->
+        <div id="drawerList" class="space-y-3 hidden"></div>
+
+        <!-- Empty Participant State -->
+        <div id="drawerEmpty" class="text-center py-16 hidden">
+            <div class="w-16 h-16 rounded-full bg-surface-container-high/60 flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-[32px] text-outline">person_off</span>
+            </div>
+            <p class="text-on-surface-variant font-body-md">Chưa có học viên đăng ký lớp này.</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="drawerError" class="text-center py-16 hidden">
+            <div class="w-16 h-16 rounded-full bg-error-container/30 flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-[32px] text-error">error</span>
+            </div>
+            <p class="text-error font-body-md" id="drawerErrorMessage">Đã xảy ra lỗi.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================================
+    // Date Navigation
+    // ==========================================================
+    function navigateDay(offset) {
+        const dateInput = document.getElementById('date');
+        const currentDate = new Date(dateInput.value);
+        currentDate.setDate(currentDate.getDate() + offset);
+        const yyyy = currentDate.getFullYear();
+        const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(currentDate.getDate()).padStart(2, '0');
+        dateInput.value = `${yyyy}-${mm}-${dd}`;
+        document.getElementById('dateForm').submit();
+    }
+
+    // ==========================================================
+    // Quick Day Tabs
+    // ==========================================================
+    function renderDayTabs() {
+        const container = document.getElementById('dayTabsContainer');
+        const selectedDateStr = document.getElementById('date').value;
+        const selectedDate = new Date(selectedDateStr);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+        let html = '';
+
+        for (let i = -3; i <= 3; i++) {
+            const d = new Date(selectedDate);
+            d.setDate(d.getDate() + i);
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const dateStr = `${yyyy}-${mm}-${dd}`;
+
+            const isSelected = i === 0;
+            const isToday = d.getTime() === today.getTime();
+
+            let cls = 'flex flex-col items-center px-4 py-2 rounded-xl cursor-pointer transition-all duration-200 min-w-[56px] ';
+            if (isSelected) {
+                cls += 'bg-primary text-on-primary shadow-md scale-105 ';
+            } else {
+                cls += 'hover:bg-surface-container-high text-on-surface-variant ';
+            }
+
+            html += `<a href="/instructor/yoga/schedule?date=${dateStr}" class="${cls}">
+                <span class="text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-on-primary' : 'text-on-surface-variant'}">${dayNames[d.getDay()]}</span>
+                <span class="text-lg font-bold ${isSelected ? '' : ''}">${d.getDate()}</span>
+                ${isToday ? `<div class="w-1.5 h-1.5 rounded-full mt-0.5 ${isSelected ? 'bg-on-primary' : 'bg-primary'}"></div>` : ''}
+            </a>`;
+        }
+
+        container.innerHTML = html;
+    }
+
+    // ==========================================================
+    // Calculate Stats
+    // ==========================================================
+    function calculateStats() {
+        const now = new Date();
+        const dateStr = document.getElementById('date').value;
+        const selectedDate = new Date(dateStr);
+
+        // Upcoming count: count rows where start time is after now (only if same day)
+        let upcomingCount = 0;
+        const rows = document.querySelectorAll('tbody tr[id^="row-"]');
+        let totalStudents = 0;
+
+        rows.forEach(row => {
+            const timeCell = row.querySelector('.bg-secondary-container\\/85');
+            if (timeCell) {
+                const timeText = timeCell.textContent.trim();
+                const startStr = timeText.split('-')[0].trim();
+                const [hh, mi] = startStr.split(':').map(Number);
+                const startDate = new Date(selectedDate);
+                startDate.setHours(hh, mi, 0, 0);
+                if (startDate > now) {
+                    upcomingCount++;
+                }
+            }
+
+            const regSpan = row.querySelector('.schedule-registered');
+            if (regSpan) {
+                totalStudents += parseInt(regSpan.dataset.count || '0', 10);
+            }
+        });
+
+        const upcomingEl = document.getElementById('upcomingCount');
+        if (upcomingEl) upcomingEl.textContent = upcomingCount;
+
+        const totalEl = document.getElementById('totalStudents');
+        if (totalEl) totalEl.textContent = totalStudents;
+    }
+
+    // ==========================================================
+    // Participant Drawer
+    // ==========================================================
+    function openParticipantDrawer(btn) {
+        const scheduleId = btn.dataset.scheduleId;
+        const className = btn.dataset.className;
+        const timeSlot = btn.dataset.time;
+
+        document.getElementById('drawerClassName').textContent = className;
+        document.getElementById('drawerTimeSlot').textContent = timeSlot;
+
+        // Show overlay + drawer
+        const overlay = document.getElementById('participantDrawerOverlay');
+        const drawer = document.getElementById('participantDrawer');
+
+        overlay.classList.remove('hidden');
+        setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+        setTimeout(() => {
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.add('translate-x-0');
+        }, 50);
+
+        // Show loading, hide others
+        document.getElementById('drawerLoading').classList.remove('hidden');
+        document.getElementById('drawerList').classList.add('hidden');
+        document.getElementById('drawerEmpty').classList.add('hidden');
+        document.getElementById('drawerError').classList.add('hidden');
+
+        // Fetch participants
+        fetch(`/instructor/yoga/schedules/${scheduleId}/participants`, {
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('drawerLoading').classList.add('hidden');
+
+            if (!data || data.length === 0) {
+                document.getElementById('drawerEmpty').classList.remove('hidden');
+                return;
+            }
+
+            const listEl = document.getElementById('drawerList');
+            listEl.innerHTML = '';
+
+            data.forEach((p, idx) => {
+                const hasInjury = p.injuriesNote && p.injuriesNote !== 'Không';
+                const hasMedical = p.medicalConditionsNote && p.medicalConditionsNote !== 'Không';
+                const hasHealthNote = hasInjury || hasMedical;
+
+                const card = document.createElement('div');
+                card.className = 'glass-panel rounded-2xl p-4 transition-all duration-300 hover:shadow-md';
+                card.style.animationDelay = `${idx * 80}ms`;
+                card.classList.add('animate-fade-in-up', 'opacity-0');
+
+                let healthHtml = '';
+                if (hasHealthNote) {
+                    healthHtml = `<div class="mt-3 pt-3 border-t border-outline-variant/20 space-y-2">`;
+                    if (hasInjury) {
+                        healthHtml += `
+                            <div class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-[16px] text-amber-600 mt-0.5">warning</span>
+                                <div>
+                                    <span class="text-[11px] font-bold text-amber-700 uppercase tracking-wider">Chấn thương</span>
+                                    <p class="text-sm text-on-surface-variant">${escapeHtml(p.injuriesNote)}</p>
+                                </div>
+                            </div>`;
+                    }
+                    if (hasMedical) {
+                        healthHtml += `
+                            <div class="flex items-start gap-2">
+                                <span class="material-symbols-outlined text-[16px] text-error mt-0.5">medical_information</span>
+                                <div>
+                                    <span class="text-[11px] font-bold text-error uppercase tracking-wider">Bệnh lý</span>
+                                    <p class="text-sm text-on-surface-variant">${escapeHtml(p.medicalConditionsNote)}</p>
+                                </div>
+                            </div>`;
+                    }
+                    healthHtml += `</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-tertiary-container/40 flex items-center justify-center flex-shrink-0">
+                            <span class="text-on-tertiary-fixed-variant font-bold text-sm">${(idx + 1)}</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-primary text-sm truncate">${escapeHtml(p.guestName)}</h4>
+                            <div class="flex items-center gap-3 mt-0.5">
+                                <span class="text-xs text-on-surface-variant flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">villa</span>
+                                    ${escapeHtml(p.villaName)}
+                                </span>
+                                <span class="text-xs text-on-surface-variant flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">confirmation_number</span>
+                                    #${p.bookingId}
+                                </span>
+                            </div>
+                        </div>
+                        ${hasHealthNote ? '<span class="material-symbols-outlined text-amber-500 text-[20px]">health_and_safety</span>' : '<span class="material-symbols-outlined text-tertiary text-[20px]">check_circle</span>'}
+                    </div>
+                    ${healthHtml}
+                `;
+
+                listEl.appendChild(card);
+            });
+
+            listEl.classList.remove('hidden');
+        })
+        .catch(err => {
+            document.getElementById('drawerLoading').classList.add('hidden');
+            document.getElementById('drawerError').classList.remove('hidden');
+            const msg = err && err.error ? err.error.message : 'Không thể tải danh sách học viên.';
+            document.getElementById('drawerErrorMessage').textContent = msg;
+        });
+    }
+
+    function closeParticipantDrawer() {
+        const overlay = document.getElementById('participantDrawerOverlay');
+        const drawer = document.getElementById('participantDrawer');
+
+        drawer.classList.add('translate-x-full');
+        drawer.classList.remove('translate-x-0');
+        overlay.classList.add('opacity-0');
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+        }, 300);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ==========================================================
+    // Init
+    // ==========================================================
+    document.addEventListener('DOMContentLoaded', function () {
+        renderDayTabs();
+        calculateStats();
+    });
+</script>
+</body>
+</html>

@@ -10,6 +10,8 @@ import com.AuraMoon.auramoon.spa.entity.Schedule;
 import com.AuraMoon.auramoon.spa.repository.ScheduleRepository;
 import com.AuraMoon.auramoon.fnb.entity.MealOrder;
 import com.AuraMoon.auramoon.fnb.repository.MealOrderRepository;
+import com.AuraMoon.auramoon.yoga.entity.YogaRegistration;
+import com.AuraMoon.auramoon.yoga.repository.YogaRegistrationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,7 @@ public class ItineraryServiceImpl implements ItineraryService {
     private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
     private final MealOrderRepository mealOrderRepository;
+    private final YogaRegistrationRepository yogaRegistrationRepository;
 
     @Override
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
@@ -83,6 +86,22 @@ public class ItineraryServiceImpl implements ItineraryService {
                 .location("Nhà hàng Thực dưỡng")
                 .description("Bữa ăn theo Dietary Profile: " + (meal.getNote() != null ? meal.getNote() : "Thanh lọc cơ thể"))
                 .build());
+        }
+
+        // 3.5 Lấy dữ liệu Đăng ký Yoga thực tế
+        List<YogaRegistration> yogaRegistrations = yogaRegistrationRepository.findByBookingIdAndStatus(activeBooking.getId(), "REGISTERED");
+        for (YogaRegistration reg : yogaRegistrations) {
+            if (reg.getSchedule() != null && !Boolean.TRUE.equals(reg.getSchedule().getIsDelete())) {
+                String instructorName = (reg.getSchedule().getInstructor() != null 
+                        && reg.getSchedule().getInstructor().getUser() != null)
+                        ? reg.getSchedule().getInstructor().getUser().getFullName() : "Huấn luyện viên";
+                events.add(ItineraryTimelineDTO.TimelineEvent.builder()
+                    .eventName("Yoga: " + reg.getSchedule().getYogaClass().getClassName())
+                    .time(reg.getSchedule().getStartTime())
+                    .location(reg.getSchedule().getLocation() != null ? reg.getSchedule().getLocation() : "Phòng tập Yoga")
+                    .description("Tham gia lớp học Yoga hướng dẫn bởi GV " + instructorName + ". Thời lượng: " + reg.getSchedule().getYogaClass().getDurationMinutes() + " phút.")
+                    .build());
+            }
         }
 
         // 4. Trả phòng (Check-out) - Chỉ hiện nếu đã xác định được giờ checkout

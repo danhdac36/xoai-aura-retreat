@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.AuraMoon.auramoon.yoga.repository.YogaRegistrationRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -36,6 +37,9 @@ public class ItineraryTimelineServiceTest {
     @Mock
     private MealOrderRepository mealOrderRepository;
 
+    @Mock
+    private YogaRegistrationRepository yogaRegistrationRepository;
+
     @InjectMocks
     private ItineraryServiceImpl itineraryService;
 
@@ -56,6 +60,7 @@ public class ItineraryTimelineServiceTest {
         when(bookingRepository.findByGuestId(guestId)).thenReturn(Collections.singletonList(booking));
         when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(1001)).thenReturn(Collections.emptyList());
         when(mealOrderRepository.findByBookingId(1001)).thenReturn(Collections.emptyList());
+        when(yogaRegistrationRepository.findByBookingIdAndStatus(1001, "REGISTERED")).thenReturn(Collections.emptyList());
 
         // Act
         ItineraryTimelineDTO result = itineraryService.getTimelineForGuest(guestId);

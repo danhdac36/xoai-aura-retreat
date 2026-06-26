@@ -176,7 +176,10 @@
      th:classappend="${stat.index % 2 != 0 ? 'bg-white shadow-[0px_12px_32px_rgba(51,51,51,0.04)]' : ''}">
 <div class="flex justify-between items-start mb-4">
 <h3 class="font-headline-sm text-headline-sm text-secondary" th:text="${e.eventName}">Tên sự kiện</h3>
-<span class="material-symbols-outlined text-primary" data-icon="event">event</span>
+<span class="material-symbols-outlined text-primary text-[28px]" 
+      th:text="${#strings.contains(e.eventName, 'Yoga') ? 'self_improvement' : (#strings.contains(e.eventName, 'Trị liệu') ? 'spa' : (#strings.contains(e.eventName, 'Bữa ăn') ? 'restaurant' : (#strings.contains(e.eventName, 'Nhận phòng') ? 'key' : (#strings.contains(e.eventName, 'Trả phòng') ? 'meeting_room' : 'event'))))}">
+    event
+</span>
 </div>
 <p class="text-on-surface-variant mb-6" th:text="${e.description}">Mô tả chi tiết sự kiện.</p>
 <div class="flex items-center gap-2 text-label-md text-primary opacity-80">

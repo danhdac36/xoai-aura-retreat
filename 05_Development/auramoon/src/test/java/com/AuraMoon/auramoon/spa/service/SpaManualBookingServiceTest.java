@@ -290,4 +290,69 @@ class SpaManualBookingServiceTest {
         // Ghi chú: Rollback thực tế được Spring thực hiện thông qua chú thích @Transactional(rollbackFor = Exception.class)
         // khi ném bất kỳ Exception/RuntimeException nào từ luồng xử lý.
     }
+
+    @Test
+    @DisplayName("SPA-TC-005-Manual: Lựa chọn kỹ thuật viên có số ca làm việc ít nhất trong ngày khi lễ tân đặt lịch")
+    void bookAdditionalService_shouldSelectTherapistWithLeastWorkload() {
+        // Arrange
+        Integer bookingId = 1001;
+        Integer serviceId = 200;
+        Integer folioId = 5001;
+        Integer receptionistUserId = 99;
+
+        SpaScheduleRequest request = new SpaScheduleRequest();
+        request.setBookingId(bookingId);
+        request.setServiceId(serviceId);
+        request.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
+
+        Booking booking = new Booking();
+        booking.setId(bookingId);
+        booking.setBookingStatus("Checked-In");
+
+        TreatmentService service = new TreatmentService();
+        service.setId(serviceId);
+        service.setDurationMinutes(60);
+        service.setPrice(java.math.BigDecimal.valueOf(100.0));
+
+        TreatmentRoom room = new TreatmentRoom();
+        room.setId(1);
+
+        Therapist t1 = new Therapist();
+        t1.setId(101);
+        t1.setTherapistCode("TH01");
+
+        Therapist t2 = new Therapist();
+        t2.setId(102);
+        t2.setTherapistCode("TH02");
+
+        TreatmentBooking treatmentBooking = new TreatmentBooking();
+        treatmentBooking.setId(100);
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+        when(treatmentServiceRepository.findById(serviceId)).thenReturn(Optional.of(service));
+        when(billingService.findFolioIdByBookingId(bookingId)).thenReturn(Optional.of(folioId));
+        when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(room));
+        when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(List.of(t1, t2));
+        when(treatmentBookingRepository.save(any(TreatmentBooking.class))).thenReturn(treatmentBooking);
+
+        // t1 has workload = 3, t2 has workload = 1. The system should pick t2!
+        when(scheduleRepository.countDailySchedulesForTherapist(eq(101), any(), any())).thenReturn(3L);
+        when(scheduleRepository.countDailySchedulesForTherapist(eq(102), any(), any())).thenReturn(1L);
+
+        Schedule savedSchedule = new Schedule();
+        savedSchedule.setId(999);
+        savedSchedule.setRoom(room);
+        savedSchedule.setTherapist(t2); // expected selected therapist
+        savedSchedule.setStartTime(request.getStartTime());
+        savedSchedule.setEndTime(request.getStartTime().plusMinutes(60));
+        when(scheduleRepository.save(any(Schedule.class))).thenReturn(savedSchedule);
+
+        // Act
+        SpaScheduleResponse response = spaManualBookingService.bookAdditionalService(request, receptionistUserId);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals("TH02", response.getTherapistCode()); // Verify that t2 was chosen
+        verify(scheduleRepository).save(org.mockito.ArgumentMatchers.argThat(s -> s.getTherapist().getId().equals(102)));
+    }
 }
