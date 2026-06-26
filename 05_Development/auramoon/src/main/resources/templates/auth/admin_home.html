@@ -1,20 +1,15 @@
 <!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::div})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Home - Aura Moon</title>
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 min-h-screen flex flex-col items-center justify-center p-6">
-    <div class="bg-white p-8 rounded-lg shadow-md border border-slate-200 text-center max-w-sm w-full">
-        <h1 class="text-2xl font-bold text-slate-800 mb-2">Admin Dashboard</h1>
-        <p class="text-slate-500 mb-6 text-sm">Chào mừng bạn đăng nhập với quyền ADMIN.</p>
-        <form th:action="@{/auth/logout}" method="post">
-            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-all font-medium">
-                Đăng xuất (Logout)
-            </button>
-        </form>
+<body>
+    <div class="flex flex-col items-center justify-center min-h-[50vh]">
+        <div class="bg-surface-container-lowest p-10 rounded-2xl shadow-sm border border-outline-variant text-center max-w-md w-full mx-auto">
+            <span class="material-symbols-outlined text-primary text-5xl mb-4">admin_panel_settings</span>
+            <h1 class="text-3xl font-headline-sm text-on-surface mb-2">Admin Dashboard</h1>
+            <p class="text-on-surface-variant font-body-md">Chào mừng bạn đăng nhập với quyền ADMIN.</p>
+        </div>
     </div>
 </body>
 </html>

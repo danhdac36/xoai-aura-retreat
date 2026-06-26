@@ -17,6 +17,9 @@ public class SecurityConfig {
         @Autowired
         private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
+        @Autowired
+        private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
         private static final String[] PUBLIC_ENDPOINTS = {
                         "/",
                         "/home",
@@ -37,33 +40,49 @@ public class SecurityConfig {
         };
 
         private static final String[] GUEST_ENDPOINTS = {
-                        // "/user/**",
-                        // "/orders/**",
-                        // "/cart/**",
-                        // "/profile/**"
+                        "/booking/itinerary/**",
+                        "/guest/booking-spa/**",
+                        "/fnb/meal-selection/**",
+                        "/fnb/alacarte-order/**",
+                        "/profile/health/**",
+                        "/packges/**"
         };
 
         private static final String[] ADMIN_ENDPOINTS = {
                         "/admin/**",
-                        "/dashboard/**",
-                        "/manage/**"
+                        "/manager/dashboard/**"
         };
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {
-                        // "/receptionist/**"
-                        // "/receptionist/**"
+                        "/receptionist/bookings/**",
+                        "/receptionist/booking-spa/**",
+                        "/receptionist/home"
         };
 
         private static final String[] THERAPIST_ENDPOINTS = {
-                        // "/therapist/**" };
+                        "/therapist/schedules/**",
+                        "/therapist/home"
         };
 
         private static final String[] CHEFF_ENDPOINTS = {
-                        "/F&B/**" };
+                        "/fnb/chef/**"
+        };
 
         private static final String[] MANAGER_ENDPOINTS = {
-                        "/management/**",
-                        "/manager/housekeeping/**"
+                        "/manager/housekeeping/**",
+                        "/billing/night-audit/**",
+                        "/manager/spa/**",
+                        "/manager/home"
+        };
+
+        private static final String[] MANAGER_ADMIN_ENDPOINTS = {
+                        "/manager/report/**",
+                        "/packages/**",
+                        "/manager/reviews/**"
+        };
+
+        private static final String[] RECEPTIONIST_ADMIN_ENDPOINTS = {
+                        "/receptionist/villa/**"
         };
 
         @Bean
@@ -76,15 +95,17 @@ public class SecurityConfig {
                                                 .requestMatchers(RECEPTIONIST_ENDPOINTS).hasRole("RECEPTIONIST")
                                                 .requestMatchers(THERAPIST_ENDPOINTS).hasRole("THERAPIST")
                                                 .requestMatchers(CHEFF_ENDPOINTS).hasRole("CHEFF")
-                                                .requestMatchers(MANAGER_ENDPOINTS).hasAnyRole("MANAGER", "ADMIN")
+                                                .requestMatchers(MANAGER_ENDPOINTS).hasRole("MANAGER")
+                                                .requestMatchers(MANAGER_ADMIN_ENDPOINTS).hasAnyRole("MANAGER", "ADMIN", "GUEST")
+
+                                                .requestMatchers(RECEPTIONIST_ADMIN_ENDPOINTS).hasAnyRole("RECEPTIONIST", "ADMIN")
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
-                                                .loginPage("/aut" +
-                                                                "h/login")
+                                                .loginPage("/auth/login")
                                                 .loginProcessingUrl("/auth/login")
                                                 .usernameParameter("email")
                                                 .passwordParameter("password")
-                                                .defaultSuccessUrl("/", false)
+                                                .successHandler(customAuthenticationSuccessHandler)
                                                 .failureUrl("/auth/login?error=true")
                                                 .permitAll())
                                 .oauth2Login(oauth2 -> oauth2
