@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!bookingForm) return;
 
     const checkinInput = document.getElementById("checkinDate");
+    const guestsInput = document.getElementById("totalGuests");
     const checkoutDisplay = document.getElementById("checkoutDateDisplay");
     const surchargeDisplay = document.getElementById("surchargeDisplay");
     const totalPriceDisplay = document.getElementById("totalPriceDisplay");
@@ -33,6 +34,12 @@ document.addEventListener("DOMContentLoaded", () => {
         updateCheckoutDate();
     }
 
+    // Listen for guest quantity changes
+    if (guestsInput) {
+        guestsInput.addEventListener("input", updatePricing);
+        guestsInput.addEventListener("change", updatePricing);
+    }
+
     // 2. Update checkout date dynamically
     function updateCheckoutDate() {
         if (!checkinInput || !checkinInput.value) return;
@@ -60,8 +67,9 @@ document.addEventListener("DOMContentLoaded", () => {
             surchargePerDay = parseFloat(selectedRadio.getAttribute("data-price")) || 0;
         }
 
+        const totalGuests = guestsInput ? (parseInt(guestsInput.value) || 1) : 1;
         const totalSurcharge = surchargePerDay * durationDays;
-        const finalPrice = basePrice + totalSurcharge;
+        const finalPrice = (basePrice * totalGuests) + totalSurcharge;
 
         if (surchargeDisplay) {
             surchargeDisplay.textContent = formatCurrency(totalSurcharge);

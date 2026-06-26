@@ -106,12 +106,14 @@ public class BookingServiceImpl implements BookingService {
                 // Create GuestFolio immediately so that payment and deposits can reference it
                 GuestFolio guestFolio = GuestFolio.builder()
                                 .bookingId(savedBooking.getId())
-                                .totalPackageAmount(savedBooking.getRetreatPackage().getPrice().add(
-                                                BigDecimal.valueOf(retreatPackage.getDurationDays())
+                                .totalPackageAmount(savedBooking.getRetreatPackage().getPrice()
+                                                .multiply(BigDecimal.valueOf(savedBooking.getTotalGuests()))
+                                                .add(BigDecimal.valueOf(retreatPackage.getDurationDays())
                                                                 .multiply(villaType.getPricePerDay())))
                                 .totalExtraFb(BigDecimal.ZERO)
-                                .finalAmount(savedBooking.getRetreatPackage().getPrice().add(
-                                                BigDecimal.valueOf(retreatPackage.getDurationDays())
+                                .finalAmount(savedBooking.getRetreatPackage().getPrice()
+                                                .multiply(BigDecimal.valueOf(savedBooking.getTotalGuests()))
+                                                .add(BigDecimal.valueOf(retreatPackage.getDurationDays())
                                                                 .multiply(villaType.getPricePerDay())))
                                 .status("OPEN")
                                 .build();

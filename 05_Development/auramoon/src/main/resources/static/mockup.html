@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hành Trình Tĩnh Tại | XOAI AURA RETREAT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#446255",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#5d7b6d",
+                        "on-primary-container": "#f5fff7",
+                        "secondary": "#5e5e5c",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#e1dfdc",
+                        "on-secondary-container": "#636361",
+                        "tertiary": "#795251",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fcf9f8",
+                        "on-background": "#1c1b1b",
+                        "surface": "#fcf9f8",
+                        "on-surface": "#1c1b1b",
+                        "surface-variant": "#e5e2e1",
+                        "on-surface-variant": "#424844",
+                        "outline": "#727974",
+                        "outline-variant": "#c1c8c3",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container": "#f0eded",
+                        "surface-container-high": "#eae7e7",
+                        "surface-container-highest": "#e5e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "container-max": "1280px",
+                        "unit": "8px",
+                        "section-gap": "128px",
+                        "gutter": "32px",
+                        "margin-mobile": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["EB Garamond"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["EB Garamond"],
+                        "headline-lg": ["EB Garamond"],
+                        "headline-md": ["EB Garamond"],
+                        "display-lg": ["EB Garamond"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.8", "letterSpacing": "0.01em", "fontWeight": "400" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.1", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "1.5", "letterSpacing": "0.12em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                        "headline-lg": ["48px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "400" }],
+                        "display-lg": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.7", "letterSpacing": "0.01em", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .scrim-bottom {
+            background: linear-gradient(to top, rgba(28, 27, 27, 0.8) 0%, rgba(28, 27, 27, 0.2) 60%, transparent 100%);
+        }
+        .editorial-shadow {
+            box-shadow: 0 30px 60px -12px rgba(68, 98, 85, 0.12), 0 18px 36px -18px rgba(0, 0, 0, 0.1);
+        }
+        .hover-card:hover .card-image {
+            transform: scale(1.03);
+        }
+        .link-underline {
+            background-image: linear-gradient(transparent, transparent), linear-gradient(currentColor, currentColor);
+            background-size: 0 1px, 100% 1px;
+            background-position: 100% 100%, 0 100%;
+            background-repeat: no-repeat;
+            transition: background-size 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .hover-card:hover .link-underline {
+            background-size: 100% 1px, 100% 1px;
+            background-position: 0 100%, 0 100%;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased selection:bg-primary-container selection:text-on-primary-container">
+<header class="fixed top-0 w-full z-50 bg-surface/60 backdrop-blur-xl border-b border-outline-variant/20">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-6 flex justify-between items-center">
+<a class="font-display-lg text-[28px] md:text-[32px] text-primary tracking-tight italic hover:opacity-80 transition-opacity" href="#">
+            XOAI AURA
+        </a>
+<nav class="hidden md:flex gap-10 items-center">
+<a class="font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface-variant/80 hover:text-primary transition-colors duration-300" href="#">Retreats</a>
+<a class="font-label-md text-label-md uppercase tracking-[0.2em] text-primary border-b-2 border-primary/30 pb-1" href="#">Journeys</a>
+<a class="font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface-variant/80 hover:text-primary transition-colors duration-300" href="#">Wellness</a>
+<a class="font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface-variant/80 hover:text-primary transition-colors duration-300" href="#">Journal</a>
+</nav>
+<div class="flex items-center gap-6">
+<button class="hidden md:block font-label-md text-label-md uppercase tracking-[0.12em] bg-primary text-on-primary px-8 py-3 rounded-sm hover:opacity-90 transition-opacity">
+                Check In
+            </button>
+<button class="md:hidden text-on-surface">
+<span class="material-symbols-outlined text-[28px]">menu</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-[160px] pb-section-gap">
+<!-- Hero Section -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-24 text-center">
+<span class="font-label-md text-label-md uppercase tracking-[0.4em] text-primary mb-6 block opacity-70">Bộ Sưu Tập Độc Bản</span>
+<h1 class="font-display-lg-mobile text-[48px] md:font-display-lg md:text-[84px] text-on-surface mb-10 leading-[1.05]">Hành Trình Tĩnh Tại</h1>
+<div class="max-w-2xl mx-auto">
+<p class="font-body-lg text-body-lg text-on-surface-variant/80 italic leading-relaxed">
+                "Nơi tâm hồn tìm thấy sự bình yên giữa nhịp sống vội vã. Những hành trình được thiết kế dành riêng cho sự tái sinh toàn diện."
+            </p>
+</div>
+</section>
+<!-- Refined Integrated Filters -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mb-24">
+<div class="flex flex-col md:flex-row justify-center items-center gap-12 py-8 border-y border-outline-variant/30">
+<div class="flex flex-wrap justify-center gap-10">
+<button class="font-label-md text-label-md uppercase tracking-widest text-primary border-b border-primary pb-1">Tất Cả</button>
+<button class="font-label-md text-label-md uppercase tracking-widest text-secondary/60 hover:text-primary transition-colors">Thanh Lọc</button>
+<button class="font-label-md text-label-md uppercase tracking-widest text-secondary/60 hover:text-primary transition-colors">Hồi Phục</button>
+<button class="font-label-md text-label-md uppercase tracking-widest text-secondary/60 hover:text-primary transition-colors">Tĩnh Tại</button>
+<button class="font-label-md text-label-md uppercase tracking-widest text-secondary/60 hover:text-primary transition-colors">Khai Phóng</button>
+</div>
+</div>
+</section>
+<!-- Asymmetric Editorial Grid -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-y-32 gap-x-12"><!-- Package 1: Mindfulness (Image Left) -->
+<div class="md:col-span-12 flex flex-col md:flex-row items-center gap-12 md:gap-16 group">
+<div class="w-full md:w-1/2 overflow-hidden editorial-shadow">
+<img alt="Con Đường Đến Sự Tĩnh Lặng" class="w-full aspect-[4/3] object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" src="https://lh3.googleusercontent.com/aida/AP1WRLsvOi9vkmz-HEGbAk3BM3MeuGgsdNp96HdAbioGrFoqut6cgFEDwE0Ru38_XEb7VNNAStX5gu8DCvmacduVL7BS-UA1VWMIFzPB5q_SosRIwTOUwC6dEwvFJPrBrgBO04OmSGHyAUm2ICn0a7qjhWDQcZwdediVG5GrfWZeApDIj-WibGiTN1V26E133GZ2fdrX2ZGCoPi_olh3IvKvWK9-9pcixmTl6wVQmOUyIbDodksy6N4kS0G58Wrx"/>
+</div>
+<div class="w-full md:w-1/2 space-y-6">
+<span class="font-label-md text-label-md text-primary uppercase tracking-[0.4em] block opacity-70">Mindfulness • 7 Ngày</span>
+<h2 class="font-headline-lg text-on-surface leading-tight">Con Đường Đến Sự Tĩnh Lặng</h2>
+<p class="font-body-lg text-on-surface-variant/80 italic">Một hành trình đắm chìm vào không gian tĩnh lặng tuyệt đối, kết hợp thiền định sâu và thực hành chánh niệm bên hồ sen buổi sớm.</p>
+<div class="pt-4">
+<span class="font-display-lg text-[32px] text-primary italic block mb-6">Từ $4,500</span>
+<a class="link-underline font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface inline-flex items-center gap-3" href="#">
+                Khám phá hành trình <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Package 2: Detox (Image Right) -->
+<div class="md:col-span-12 flex flex-col md:flex-row-reverse items-center gap-12 md:gap-16 group">
+<div class="w-full md:w-1/2 overflow-hidden editorial-shadow">
+<img alt="Nghi Thức Thanh Lọc Thân Tâm" class="w-full aspect-[4/3] object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" src="https://lh3.googleusercontent.com/aida/AP1WRLvbSFwYFXcGQjEtUpsWnIb3I_OqfKgNyQ6xUAZqjvw2wbJavtYWweGFiLgRPihSgt8iLTEbl47j8dYzkKNV2FRRgLlGhL5xHU4yjYYZ-UR6z5xetsMZKQDuGUBEGmuy5SOcwz2JdoUlqzMkRTd650NKGJj7jVXWNLO-VvkhwzTLgvMxDnnE6A302CqgS31N64ffn15z2Mil0AoM1gQB2ykqJmNi7Ala9pme8caM7JeeUKnqUTEiDUBNeFk"/>
+</div>
+<div class="w-full md:w-1/2 space-y-6">
+<span class="font-label-md text-label-md text-primary uppercase tracking-[0.4em] block opacity-70">Detox • 5 Ngày</span>
+<h2 class="font-headline-lg text-on-surface leading-tight">Nghi Thức Thanh Lọc Thân Tâm</h2>
+<p class="font-body-lg text-on-surface-variant/80 italic">Thanh tẩy độc tố thông qua dinh dưỡng thực vật tinh khiết và các liệu pháp trà thảo mộc cao cấp.</p>
+<div class="pt-4">
+<span class="font-display-lg text-[32px] text-primary italic block mb-6">Từ $3,200</span>
+<a class="link-underline font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface inline-flex items-center gap-3" href="#">
+                Khám phá hành trình <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Package 3: Nature (Image Left) -->
+<div class="md:col-span-12 flex flex-col md:flex-row items-center gap-12 md:gap-16 group">
+<div class="w-full md:w-1/2 overflow-hidden editorial-shadow">
+<img alt="Trở Về Nguồn Cội" class="w-full aspect-[4/3] object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" src="https://lh3.googleusercontent.com/aida/AP1WRLuGxTD0C4tvx_fwJNVc-o44O4TgsPLH_4A2GtogeJDIFOAVDFuxHrxhyGWMS8CAfv3wx6FbYfnJDMWWNNpw9NI-SLdViMgj1WuwLlTKB6f1WUlaz54YotV4CCS7K1M2QsaCbEx1R5g7rpoOq9XqhmTCwAlKADWhnGrK8nlPVoSstrrvnDjjV8pyNxhYJ0n8XcJjWBqkABYDIaFFKaVQDWZC_3w1Zd3Y5yM7t_DsG-C41ijuJV_UGEul4Pfg"/>
+</div>
+<div class="w-full md:w-1/2 space-y-6">
+<span class="font-label-md text-label-md text-primary uppercase tracking-[0.4em] block opacity-70">Nature • 7 Ngày</span>
+<h2 class="font-headline-lg text-on-surface leading-tight">Trở Về Nguồn Cội</h2>
+<p class="font-body-lg text-on-surface-variant/80 italic">Tái kết nối với thiên nhiên nguyên bản qua những buổi tắm rừng và thiền hành giữa rừng già.</p>
+<div class="pt-4">
+<span class="font-display-lg text-[32px] text-primary italic block mb-6">Từ $5,000</span>
+<a class="link-underline font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface inline-flex items-center gap-3" href="#">
+                Khám phá hành trình <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Package 4: Healing (Image Right) -->
+<div class="md:col-span-12 flex flex-col md:flex-row-reverse items-center gap-12 md:gap-16 group">
+<div class="w-full md:w-1/2 overflow-hidden editorial-shadow">
+<img alt="Thanh Xuân Tái Sinh" class="w-full aspect-[4/3] object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" src="https://lh3.googleusercontent.com/aida/AP1WRLvkv-psnXS4WT309aECdwM4N5h2Er3B_h56ocw2K6HGdMV0wR2MUoMQ6VGrZb0jAnsQdKieXJWSYo0O97eprTyqcgJ1nKeBrPTAuZ7LHTZk75bkdKF2PuiEwAhJDiOq1iWoCDTdgK0Dykz00CLcMHm9Inb-yfx9aM5Q-gtsGsVN2roJsAVAMn-sFAe2YKZggFtj9uP6RiNRfKk_ERd--zNKMR99iIu9n9qDQ0DyQDkjmwywd7O4W3Kcktph"/>
+</div>
+<div class="w-full md:w-1/2 space-y-6">
+<span class="font-label-md text-label-md text-primary uppercase tracking-[0.4em] block opacity-70">Healing • 6 Ngày</span>
+<h2 class="font-headline-lg text-on-surface leading-tight">Thanh Xuân Tái Sinh</h2>
+<p class="font-body-lg text-on-surface-variant/80 italic">Hồi phục năng lượng sống và vẻ đẹp tự nhiên từ bên trong bằng các liệu pháp cổ truyền Đông Phương.</p>
+<div class="pt-4">
+<span class="font-display-lg text-[32px] text-primary italic block mb-6">Từ $4,200</span>
+<a class="link-underline font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface inline-flex items-center gap-3" href="#">
+                Khám phá hành trình <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</div></div>
+</section>
+<!-- Bottom CTA -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop text-center mt-32">
+<div class="max-w-xl mx-auto py-24 border-t border-outline-variant/30">
+<h3 class="font-headline-md text-on-surface-variant italic mb-8">Chưa tìm thấy hành trình phù hợp?</h3>
+<p class="font-body-md text-on-surface-variant/80 mb-10">Hãy để các chuyên gia của chúng tôi thiết kế một hành trình riêng biệt cho tâm hồn bạn.</p>
+<button class="font-label-md text-label-md uppercase tracking-[0.2em] border border-primary text-primary px-12 py-4 hover:bg-primary hover:text-on-primary transition-all duration-500">
+                Tư vấn cá nhân
+            </button>
+</div>
+</section>
+</main>
+<footer class="w-full py-24 bg-surface-container-lowest border-t border-outline-variant/30">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
+<div class="space-y-6">
+<span class="font-display-lg text-[28px] text-primary italic">XOAI AURA</span>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest opacity-60">© 2024 XOAI AURA RETREAT. DESIGNED FOR SERENITY.</p>
+</div>
+<div class="flex flex-wrap gap-8 md:gap-16">
+<div class="flex flex-col gap-4">
+<span class="font-label-md text-label-md text-primary uppercase tracking-widest font-semibold">Khám Phá</span>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">Sứ Mệnh</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">Bền Vững</a>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label-md text-label-md text-primary uppercase tracking-widest font-semibold">Hỗ Trợ</span>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">Bảo Mật</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest" href="#">Liên Hệ</a>
+</div>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

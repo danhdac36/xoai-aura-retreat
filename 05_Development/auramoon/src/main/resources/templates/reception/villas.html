@@ -14,7 +14,7 @@
     <link rel="stylesheet" th:href="@{/css/reception/reception.css}">
 </head>
 
-<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans md:pl-64">
+<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans" th:classappend="${#authorization.expression('isAuthenticated() and !hasRole(''GUEST'')')} ? 'md:pl-64' : ''">
     <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 
     <main class="py-12 px-4 md:px-12 max-w-[1440px] mx-auto">

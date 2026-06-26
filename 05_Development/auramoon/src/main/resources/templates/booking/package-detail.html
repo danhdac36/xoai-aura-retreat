@@ -1,561 +1,1195 @@
 <!DOCTYPE html>
-<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Chi Tiết Gói Trị Liệu | Xoai Aura Retreat</title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title th:text="'Xoai Aura - ' + ${pkg.packageName}">Xoai Aura - Con Đường Đến Sự Tĩnh Lặng</title>
+    <!-- Tailwind CSS and Fonts -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@300;400;500;600&amp;display=swap"
-        rel="stylesheet">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
     <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+    </style>
+    <!-- Use original tailwind config -->
+    <th:block th:replace="~{fragments/tailwind-config :: tailwind-config}"></th:block>
+    <style>
+        .ambient-shadow {
+            box-shadow: 0 40px 80px -20px rgba(68, 98, 85, 0.04), 0 20px 40px -10px rgba(68, 98, 85, 0.02);
         }
-        body {
-            font-family: 'Inter', sans-serif !important;
-        }
-        h1, h2, h3, h4, h5, h6, .font-serif {
-            font-family: 'Playfair Display', serif !important;
+        .glass-panel {
+            background: rgba(252, 249, 248, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
     </style>
-    <th:block th:replace="~{fragments/tailwind-config :: tailwind-config}"></th:block>
 </head>
-<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans antialiased md:pl-64">
-    <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
+<body class="bg-background text-on-background font-body-md antialiased overflow-x-hidden bg-grain">
+    <!-- Top Navigation Bar -->
+    <th:block th:replace="~{fragments/public-header :: public-header}"></th:block>
 
-    <main class="max-w-6xl mx-auto px-8 py-12">
-        <a th:href="@{/packages}" class="inline-flex items-center gap-1.5 text-[#566342] hover:text-[#3f4b2c] font-medium transition-colors mb-8 group">
-            <span class="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">arrow_back</span>
-            <span>Quay lại danh sách gói</span>
-        </a>
-
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-10">
-
-            <div class="h-[420px] overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
-                <img th:src="${pkg.typePackage == 'Stress Relief' || pkg.typePackage == 'Spa'} ? @{/img/spa-retreat.jpg} :
+    <!-- Main Content -->
+    <main class="pt-[100px] md:pt-0 relative">
+        <!-- Back Button (Floating on Hero) -->
+        <div class="absolute top-[120px] left-4 md:left-12 z-20">
+            <a th:href="@{/packages}" class="inline-flex items-center gap-1.5 text-white/90 hover:text-white font-label-md uppercase tracking-widest text-sm transition-colors group bg-black/20 hover:bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm border border-white/20">
+                <span class="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">arrow_back</span>
+                <span>Trở Về Danh Sách</span>
+            </a>
+        </div>
+        <!-- Hero Section -->
+        <section class="relative w-full h-[85vh] flex items-center justify-center overflow-hidden">
+            <img alt="Hero Image" class="absolute inset-0 w-full h-full object-cover" 
+                 th:src="${pkg.typePackage == 'Stress Relief' || pkg.typePackage == 'Spa'} ? @{/img/spa-retreat.jpg} :
                          (${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'} ? @{/img/detox-retreat.jpg} :
                          (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
-                         @{/img/retreat-default.jpg}))" alt="Retreat Package" class="w-full h-full object-cover animate-fade-in">
+                          @{/img/retreat-default.jpg}))"/>
+            <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-surface"></div>
+            <div class="relative z-10 text-center px-margin-mobile md:px-margin-desktop max-w-4xl mx-auto flex flex-col items-center mt-20">
+                <span class="font-label-md text-label-md text-primary-fixed uppercase tracking-widest mb-6 block drop-shadow-md">Gói Nghỉ Dưỡng Đặc Quyền</span>
+                <h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-primary mb-6 drop-shadow-lg leading-tight" th:text="${pkg.packageName}">Con Đường Đến<br/>Sự Tĩnh Lặng</h1>
+                <p class="font-body-lg text-body-lg text-on-primary/90 max-w-2xl drop-shadow-md line-clamp-3" th:text="${pkg.description}">Một hành trình ba ngày được thiết kế tỉ mỉ để gột rửa tâm trí, đánh thức các giác quan và tái tạo năng lượng nguyên bản giữa thiên nhiên hoang sơ.</p>
             </div>
-
-            <div class="flex flex-col justify-between">
-                <div>
-                    <p class="uppercase tracking-widest text-xs font-semibold text-[#566342] bg-[#566342]/10 px-3 py-1 rounded-full w-fit mb-3" th:text="${pkg.typePackage}">
-                        Yoga
-                    </p>
-
-                    <h1 class="text-4xl font-serif font-bold text-gray-900 mb-4" th:text="${pkg.packageName}">
-                        Retreat Package Name
-                    </h1>
-
-                    <p class="text-gray-600 leading-relaxed mb-6" th:text="${pkg.description}">
-                        Package description
-                    </p>
-
-                    <!-- Premium Stats Grid -->
-                    <div class="grid grid-cols-3 gap-4 mb-6">
-                        <div class="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm">
-                            <span class="material-symbols-outlined text-[#566342] text-xl mb-1 block">schedule</span>
-                            <span class="text-[10px] text-gray-400 block uppercase tracking-wider font-semibold">Thời lượng</span>
-                            <span class="font-serif font-bold text-base text-gray-800" th:text="${pkg.durationDays} + ' Ngày'">3 Ngày</span>
-                        </div>
-                        <div class="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm">
-                            <span class="material-symbols-outlined text-[#566342] text-xl mb-1 block">payments</span>
-                            <span class="text-[10px] text-gray-400 block uppercase tracking-wider font-semibold">Giá từ</span>
-                            <span class="font-serif font-bold text-base text-gray-800" th:text="${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">15.000.000 đ</span>
-                        </div>
-                        <div class="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm">
-                            <span class="material-symbols-outlined text-[#566342] text-xl mb-1 block">spa</span>
-                            <span class="text-[10px] text-gray-400 block uppercase tracking-wider font-semibold">Trị liệu</span>
-                            <span class="font-serif font-bold text-base text-gray-800 truncate block px-1" th:text="${pkg.typePackage}">Yoga</span>
-                        </div>
-                    </div>
-
-                    <!-- Dynamic Service Pills -->
-                    <div class="mb-6 bg-[#566342]/5 p-5 rounded-xl border border-[#566342]/10">
-                        <h3 class="text-xs font-bold text-[#566342] mb-3 uppercase tracking-wider flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-base">verified</span> Dịch vụ đi kèm
-                        </h3>
-                        <div class="flex flex-wrap gap-2">
-                            <span th:each="service : ${#strings.arraySplit(pkg.services, ',')}" 
-                                  class="bg-white border border-[#566342]/10 text-[#566342] text-xs px-3 py-1.5 rounded-full font-medium shadow-sm flex items-center gap-1">
-                                <span class="material-symbols-outlined text-[14px] text-[#566342]">check_circle</span>
-                                <span th:text="${#strings.trim(service)}">Yoga</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <a th:href="@{/booking/create(packageId=${pkg.id})}" class="w-full md:w-auto text-center inline-block px-8 py-3.5 bg-[#566342] text-white font-medium rounded-xl hover:bg-[#3f4b2c] transition-colors duration-300 shadow-md shadow-[#566342]/10 hover:shadow-lg">
-                    Tiến hành đặt gói ngay
-                </a>
-            </div>
-
         </section>
 
-        <!-- Unified Premium Tab Component -->
-        <div class="mt-14 bg-white border border-[#c8c7be]/60 rounded-2xl shadow-sm overflow-hidden">
-            <!-- Tab Headers -->
-            <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-100 bg-[#fdfbf9]">
-                <!-- Tab Header 1: Itinerary -->
-                <button onclick="switchTab('itinerary')" id="tab-btn-itinerary" class="p-6 text-left border-b border-gray-100 md:border-b-0 md:border-r border-gray-100 transition-all duration-300 focus:outline-none hover:bg-white bg-white border-t-4 border-t-[#566342]">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="material-symbols-outlined text-[#566342] text-xl" id="tab-icon-itinerary">event_note</span>
-                        <span class="font-serif font-bold text-lg text-[#566342]" id="tab-title-itinerary">Lịch trình mẫu</span>
-                    </div>
-                    <p class="text-xs text-gray-500 leading-relaxed">Lộ trình ngày đêm chi tiết được thiết kế khoa học từ chánh niệm sớm đến thư giãn tối, tối ưu hóa theo số ngày thực tế.</p>
-                </button>
-                
-                <!-- Tab Header 2: Spa Services -->
-                <button onclick="switchTab('spa')" id="tab-btn-spa" class="p-6 text-left border-b border-gray-100 md:border-b-0 md:border-r border-gray-100 transition-all duration-300 focus:outline-none hover:bg-[#566342]/5 bg-transparent border-t-4 border-t-transparent">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="material-symbols-outlined text-gray-400 text-xl" id="tab-icon-spa">spa</span>
-                        <span class="font-serif font-bold text-lg text-gray-700" id="tab-title-spa">Dịch vụ spa đi kèm</span>
-                    </div>
-                    <p class="text-xs text-gray-400 leading-relaxed">Trải nghiệm liệu trình phục hồi cao cấp: massage thảo dược, xông đá muối Himalaya, ngâm bồn lá thuốc Dao đỏ và chuông xoay.</p>
-                </button>
-                
-                <!-- Tab Header 3: Nutrition Menu -->
-                <button onclick="switchTab('nutrition')" id="tab-btn-nutrition" class="p-6 text-left transition-all duration-300 focus:outline-none hover:bg-[#566342]/5 bg-transparent border-t-4 border-t-transparent">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="material-symbols-outlined text-gray-400 text-xl" id="tab-icon-nutrition">restaurant</span>
-                        <span class="font-serif font-bold text-lg text-gray-700" id="tab-title-nutrition">Thực đơn dinh dưỡng</span>
-                    </div>
-                    <p class="text-xs text-gray-400 leading-relaxed">Chế độ ăn lành mạnh 100% Organic & Farm-to-Table, được tính toán calo và thiết kế khoa học bổ trợ đắc lực cho liệu trình sức khỏe.</p>
-                </button>
-            </div>
-            
-            <!-- Tab Contents Area -->
-            <div class="p-8">
-                <!-- Panel 1: Detailed Itinerary -->
-                <div id="panel-itinerary" class="space-y-8">
-                    <h2 class="text-2xl font-serif text-[#566342] mb-6 border-b border-gray-100 pb-3 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#566342] text-2xl">event_note</span> Lộ Trình Chi Tiết Kỳ Nghỉ Mẫu
-                    </h2>
-                    
-                    <div class="space-y-8">
-                        <!-- Loop through each day -->
-                        <div th:each="dayNum : ${#numbers.sequence(1, pkg.durationDays)}" class="relative border-l-2 border-[#566342]/20 pl-6 pb-4 last:pb-0">
-                            <!-- Day marker dot -->
-                            <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-[#566342] border-2 border-white shadow-sm"></div>
-                            
-                            <h3 class="text-lg font-serif font-bold text-[#566342] mb-3" th:text="'Ngày ' + ${dayNum}">Ngày 1</h3>
-                            
-                            <div class="space-y-4 bg-[#fbf9f8] p-5 rounded-xl border border-gray-100 shadow-sm">
-                                <!-- Day 1 Schedule (Arrival) -->
-                                <div th:if="${dayNum == 1}" class="space-y-4">
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">14:00</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">Check-in & Trà Chào Mừng (Welcome Tea)</h4>
-                                            <p class="text-sm text-gray-600 mt-1">Làm thủ tục nhận phòng Villa và thưởng thức trà thảo mộc organic tại phòng chờ.</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">15:30</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">Tư Vấn Sức Khỏe & Thiết Lập Lộ Trình</h4>
-                                            <p class="text-sm text-gray-600 mt-1">Gặp gỡ chuyên gia trị liệu để đo chỉ số sinh học và tối ưu hóa liệu trình cá nhân.</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">18:30</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">Bữa Tối Dinh Dưỡng Hữu Cơ</h4>
-                                            <p class="text-sm text-gray-600 mt-1">Thực đơn nhẹ nhàng, thanh đạm phục hồi cơ thể sau chuyến đi.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Mid Days Schedule (Full Retreat Program) -->
-                                <div th:if="${dayNum > 1 && dayNum < pkg.durationDays}" class="space-y-4">
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">06:30</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900" 
-                                                th:text="${pkg.typePackage == 'Yoga' ? 'Luyện Tập Yoga Đón Bình Minh' : (pkg.typePackage == 'Stress Relief' ? 'Thiền Định Chánh Niệm' : 'Vận Động Cardio Nhẹ Nhàng')}">
-                                                Luyện Tập Yoga Đón Bình Minh
-                                            </h4>
-                                            <p class="text-sm text-gray-600 mt-1"
-                                               th:text="${pkg.typePackage == 'Yoga' ? 'Lớp Yoga khởi động khớp và kéo giãn cơ thể dưới ánh ban mai.' : (pkg.typePackage == 'Stress Relief' ? 'Lớp thiền thở kết chuông xoay giải phóng lo âu, làm dịu hệ thần kinh.' : 'Hoạt động đi bộ nhanh hoặc chạy bộ nhẹ nhàng kích hoạt cơ chế đốt mỡ.')}">
-                                                Hoạt động đánh thức năng lượng thể chất.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">08:00</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">Bữa Sáng Dinh Dưỡng</h4>
-                                            <p class="text-sm text-gray-600 mt-1">Thực đơn sinh tố xanh và ngũ cốc nguyên cám phục hồi năng lượng.</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">12:00</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900"
-                                                th:text="${pkg.typePackage == 'Detox' || pkg.typePackage == 'Weight Loss' ? 'Bữa Trưa Detox & Low-Cal' : 'Bữa Trưa Thanh Nhẹ'}">
-                                                Bữa Trưa Dinh Dưỡng
-                                            </h4>
-                                            <p class="text-sm text-gray-600 mt-1"
-                                               th:text="${pkg.typePackage == 'Detox' || pkg.typePackage == 'Weight Loss' ? 'Thực đơn súp rau củ hữu cơ, giàu vitamin đào thải độc tố và kiểm soát cân nặng.' : 'Bữa ăn lành mạnh cân bằng đạm và dưỡng chất thực vật.'}">
-                                                Thưởng thức ẩm thực dưỡng sinh.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">15:30</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900"
-                                                th:text="${pkg.typePackage == 'Spa' || pkg.typePackage == 'Stress Relief' ? 'Trị Liệu Massage & Thảo Dược' : 'Ngâm Khoáng Thải Độc & Xông Đá Muối'}">
-                                                Liệu Trình Spa Tự Nhiên
-                                            </h4>
-                                            <p class="text-sm text-gray-600 mt-1"
-                                               th:text="${pkg.typePackage == 'Spa' || pkg.typePackage == 'Stress Relief' ? 'Liệu trình massage tinh dầu thảo dược và tắm bồn thảo mộc ngủ ngon.' : 'Trải nghiệm xông hơi hồng ngoại và ngâm chân khoáng nóng thúc đẩy khí huyết.'}">
-                                                Nuôi dưỡng làn da và thư giãn gân cốt.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">18:30</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">Thưởng Trà Tĩnh Lặng & Bữa Tối Nhẹ</h4>
-                                            <p class="text-sm text-gray-600 mt-1">Trà chamomile organic giúp cơ thể thư giãn sâu và sẵn sàng cho giấc ngủ trọn vẹn.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Last Day Schedule (Departure) -->
-                                <div th:if="${dayNum == pkg.durationDays}" class="space-y-4">
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">06:30</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">Thiền Sớm Nhẹ Nhàng & Đi Bộ Tắm Rừng</h4>
-                                            <p class="text-sm text-gray-600 mt-1">Kết nối lại với thiên nhiên trong lành của resort trước khi kết thúc hành trình.</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">08:00</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">Bữa Sáng Tạm Biệt</h4>
-                                            <p class="text-sm text-gray-600 mt-1">Thực đơn trà thảo mộc cùng bánh ngũ cốc organic tươi.</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">10:00</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">Tổng Kết Lộ Trình & Tư Vấn Sau Kỳ Nghỉ</h4>
-                                            <p class="text-sm text-gray-600 mt-1">Đánh giá lại kết quả sức khỏe và nhận cẩm nang chăm sóc tại nhà từ chuyên gia.</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-start gap-4">
-                                        <span class="text-xs font-semibold bg-[#dae8be] text-[#3f4b2c] px-2.5 py-1 rounded">12:00</span>
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">Làm Thủ Tục Check-out</h4>
-                                            <p class="text-sm text-gray-600 mt-1">Hoàn tất hóa đơn Folio và kết thúc kỳ nghỉ dưỡng tốt đẹp.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+        <!-- Package Overview -->
+        <section class="py-section-gap px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-start">
+                <div class="md:col-span-5 md:sticky md:top-32">
+                    <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-8">Tổng Quan Hành Trình</h2>
+                    <div class="glass-panel p-8 md:p-12 rounded-2xl ambient-shadow border border-outline-variant/20">
+                        <div class="flex items-end gap-2 mb-8 border-b border-outline-variant/30 pb-8">
+                            <span class="font-display-lg text-[40px] md:text-display-lg text-on-surface leading-none" th:text="${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">$3,500</span>
+                            <span class="font-body-md text-on-surface-variant pb-2" th:text="'/ ' + ${pkg.durationDays} + ' Ngày'">/ 3 Đêm</span>
                         </div>
+                        <ul class="space-y-6 font-body-md text-on-surface mb-10">
+                            <!-- Loop through services -->
+                            <li th:if="${pkg.services != null && !pkg.services.isEmpty()}" th:each="service, stat : ${#strings.arraySplit(pkg.services, ',')}" class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-primary mt-1" th:text="${stat.index % 4 == 0 ? 'self_improvement' : (stat.index % 4 == 1 ? 'spa' : (stat.index % 4 == 2 ? 'restaurant' : 'villa'))}">self_improvement</span>
+                                <div>
+                                    <strong class="block font-medium mb-1" th:text="${#strings.trim(service)}">Dịch vụ</strong>
+                                </div>
+                            </li>
+                            <!-- Fallback if no services -->
+                            <li th:if="${pkg.services == null || pkg.services.isEmpty()}" class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-primary mt-1">spa</span>
+                                <div>
+                                    <strong class="block font-medium mb-1">Dịch vụ chuẩn 5 sao</strong>
+                                    <span class="text-on-surface-variant text-sm">Trải nghiệm cao cấp độc quyền.</span>
+                                </div>
+                            </li>
+                        </ul>
+                        <!-- Authenticated: Proceed to Book -->
+                        <a sec:authorize="isAuthenticated()" th:href="@{/booking/create(packageId=${pkg.id})}" class="block text-center w-full bg-primary hover:bg-surface-tint text-on-primary font-label-md text-label-md uppercase tracking-widest py-4 px-8 rounded-full transition-all duration-300 ease-out shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            Tiến Hành Đặt Gói
+                        </a>
+                        
+                        <!-- Not Authenticated: Prompt Login -->
+                        <a sec:authorize="!isAuthenticated()" th:href="@{/auth/login}" class="block text-center w-full border border-outline hover:bg-surface-container-low text-on-surface-variant hover:text-primary font-label-md text-label-md uppercase tracking-widest py-4 px-8 rounded-full transition-all duration-300 ease-out">
+                            Đăng Nhập Để Đặt Gói
+                        </a>
                     </div>
                 </div>
-
-                <!-- Panel 2: Detailed Spa Services -->
-                <div id="panel-spa" class="hidden space-y-8">
-                    <h2 class="text-2xl font-serif text-[#566342] mb-6 border-b border-gray-100 pb-3 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#566342] text-2xl">spa</span> Chi Tiết Liệu Trình Spa Trị Liệu & Phục Hồi
-                    </h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- If package is Yoga -->
-                        <th:block th:if="${pkg.typePackage == 'Yoga'}">
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">graphic_eq</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Liệu Pháp Chuông Xoay Tây Tạng (Sound Healing)</h3>
-                                    <p class="text-sm text-gray-600">Sử dụng tần số âm thanh từ chuông xoay để xoa dịu hệ thần kinh, giải phóng tắc nghẽn năng lượng và mang lại sự tĩnh lặng sâu sắc.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">60 phút</span>
-                                </div>
-                            </div>
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">self_improvement</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Tắm Thảo Dược Cổ Truyền Tây Bắc</h3>
-                                    <p class="text-sm text-gray-600">Ngâm mình trong bồn gỗ sồi với nước lá thuốc Dao đỏ giúp giãn cơ, kích thích tuần hoàn máu và đào thải độc tố toàn thân.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">45 phút</span>
-                                </div>
-                            </div>
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">airline_seat_recline_normal</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Massage Khí Huyết & Bấm Huyệt</h3>
-                                    <p class="text-sm text-gray-600">Liệu pháp massage ấn huyệt nhẹ nhàng tập trung vào vùng lưng và đầu, giải tỏa sự mệt mỏi thể chất sau các bài tập Yoga.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">60 phút</span>
-                                </div>
-                            </div>
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">footprint</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Trị Liệu Phản Xạ Bàn Chân (Foot Reflexology)</h3>
-                                    <p class="text-sm text-gray-600">Massage bấm huyệt lòng bàn chân kết hợp thảo dược ngâm chân hỗ trợ cân bằng lục phủ ngũ tạng và giúp ngủ sâu giấc.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">30 phút</span>
-                                </div>
-                            </div>
-                        </th:block>
-
-                        <!-- If package is Stress Relief -->
-                        <th:block th:if="${pkg.typePackage == 'Stress Relief'}">
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">energy_savings_leaf</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Aromatherapy Massage Thụy Điển</h3>
-                                    <p class="text-sm text-gray-600">Kỹ thuật vuốt miết thư giãn cơ kết hợp tinh dầu oải hương ấm hữu cơ tác động êm dịu lên toàn bộ các nhóm cơ căng mỏi.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">75 phút</span>
-                                </div>
-                            </div>
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">thermostat</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Xông Hơi Đá Muối Himalaya Hồng Ngoại</h3>
-                                    <p class="text-sm text-gray-600">Nhiệt hồng ngoại kết hợp ion âm từ đá muối Himalaya tự nhiên giúp giảm stress, khai thông đường hô hấp và cải thiện giấc ngủ.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">45 phút</span>
-                                </div>
-                            </div>
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">water_drop</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Tắm Bồn Sữa & Thảo Dược Dưỡng Thể</h3>
-                                    <p class="text-sm text-gray-600">Ngâm bồn nước ấm chứa sữa dê tươi và tinh chất thảo mộc giúp làn da mềm mại, giải tỏa toàn bộ căng thẳng trí não.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">30 phút</span>
-                                </div>
-                            </div>
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">mode_night</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Liệu Pháp Giấc Ngủ Vàng (Deep Sleep)</h3>
-                                    <p class="text-sm text-gray-600">Ấn huyệt nhẹ nhàng vùng đầu và mặt, kết hợp đắp túi thảo dược ấm ở mắt giúp giải tỏa mỏi mắt và chứng mất ngủ kinh niên.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">60 phút</span>
-                                </div>
-                            </div>
-                        </th:block>
-
-                        <!-- If package is Weight Loss / Detox -->
-                        <th:block th:if="${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'}">
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">water_lux</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Massage Đào Thải Độc Tố Hệ Bạch Huyết</h3>
-                                    <p class="text-sm text-gray-600">Massage chuyên biệt thúc đẩy hệ bạch huyết hoạt động mạnh mẽ, hỗ trợ cơ thể bài tiết mỡ thừa và các chất cặn bã.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">75 phút</span>
-                                </div>
-                            </div>
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">hot_tub</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Tắm Thảo Dược Tăng Trao Đổi Chất</h3>
-                                    <p class="text-sm text-gray-600">Ngâm bồn khoáng với tinh chất gừng, quế ấm kích thích nhiệt lượng nội sinh, thúc đẩy đốt cháy mỡ thừa qua da.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">30 phút</span>
-                                </div>
-                            </div>
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">oven_gen</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Xông Khô Đá Nóng Thảo Dược</h3>
-                                    <p class="text-sm text-gray-600">Kích hoạt quá trình bài tiết tuyến mồ hôi tối đa, tiêu hao lượng calo dư thừa và hỗ trợ tuần hoàn khí huyết.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">45 phút</span>
-                                </div>
-                            </div>
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">layers</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Liệu Pháp Quấn Săn Chắc Tảo Biển & Bùn Khoáng</h3>
-                                    <p class="text-sm text-gray-600">Ủ cơ thể bằng bùn khoáng thiên nhiên kết hợp tảo biển giúp làm săn chắc các mô mỡ, cấp ẩm sâu và làm mịn da.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">60 phút</span>
-                                </div>
-                            </div>
-                        </th:block>
-
-                        <!-- If package is anything else (default) -->
-                        <th:block th:if="${pkg.typePackage != 'Yoga' && pkg.typePackage != 'Stress Relief' && pkg.typePackage != 'Weight Loss' && pkg.typePackage != 'Detox'}">
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">spa</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Massage Trị Liệu Chuyên Sâu Aura Moon</h3>
-                                    <p class="text-sm text-gray-600">Liệu trình trị liệu độc quyền kết hợp đá nóng bazan và tinh dầu thiên nhiên Aura Moon giúp phục hồi năng lượng thể chất toàn diện.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">75 phút</span>
-                                </div>
-                            </div>
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">thermostat</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Xông Hơi Phục Hồi Thể Lực</h3>
-                                    <p class="text-sm text-gray-600">Kích thích hệ tuần hoàn, mở rộng lỗ chân lông giúp làm sạch sâu và thư giãn hệ cơ khớp.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">45 phút</span>
-                                </div>
-                            </div>
-                            <div class="p-6 bg-[#fbf9f8] rounded-xl border border-gray-100 flex gap-4 shadow-sm hover:shadow transition-shadow">
-                                <span class="material-symbols-outlined text-[#566342] text-3xl flex-shrink-0">water_drop</span>
-                                <div>
-                                    <h3 class="font-serif font-bold text-lg text-gray-900 mb-2">Ngâm Bồn Thảo Mộc Thư Giãn</h3>
-                                    <p class="text-sm text-gray-600">Thư giãn cơ thể trong làn nước ấm ngâm các vị thuốc bắc cổ truyền và lá thơm tự nhiên.</p>
-                                    <span class="inline-block mt-3 text-xs bg-[#dae8be] text-[#3f4b2c] font-semibold px-2.5 py-1 rounded-full">30 phút</span>
-                                </div>
-                            </div>
-                        </th:block>
-                    </div>
-                </div>
-
-                <!-- Panel 3: Detailed Nutrition Menu -->
-                <div id="panel-nutrition" class="hidden space-y-8">
-                    <h2 class="text-2xl font-serif text-[#566342] mb-6 border-b border-gray-100 pb-3 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[#566342] text-3xl">restaurant</span> Chi Tiết Thực Đơn Dinh Dưỡng Dưỡng Sinh
-                    </h2>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <!-- Philosophy Column -->
-                        <div class="lg:col-span-1 p-6 bg-[#566342]/5 rounded-xl border border-[#566342]/10 h-fit">
-                            <h3 class="font-serif font-bold text-xl text-[#566342] mb-4 flex items-center gap-2">
-                                <span class="material-symbols-outlined">psychology</span> Triết Lý Ẩm Thực
-                            </h3>
-                            <ul class="space-y-4 text-sm text-gray-700">
-                                <li class="flex items-start gap-2">
-                                    <span class="material-symbols-outlined text-[#566342] text-lg mt-0.5">check_circle</span>
-                                    <span><strong>100% Organic & Farm-to-Table:</strong> Nguyên liệu rau củ quả hữu cơ sạch, thu hoạch trực tiếp từ vườn sinh thái Aura Moon.</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="material-symbols-outlined text-[#566342] text-lg mt-0.5">check_circle</span>
-                                    <span><strong>Nói không với hóa chất:</strong> Hoàn toàn hạn chế gia vị hóa học và chất bảo quản, không dùng đường tinh luyện.</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="material-symbols-outlined text-[#566342] text-lg mt-0.5">check_circle</span>
-                                    <span><strong>Thiết kế cân bằng:</strong> Menu đo ni đóng giày bởi chuyên gia dinh dưỡng để hỗ trợ tốt nhất cho quá trình phục hồi cơ thể.</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- Daily Menu Plan Column -->
-                        <div class="lg:col-span-2 space-y-6">
-                            <h3 class="font-serif font-bold text-xl text-gray-900 mb-2">Thực Đơn Dinh Dưỡng Mẫu Trong Ngày</h3>
-                            
-                            <!-- Breakfast -->
-                            <div class="p-5 bg-[#fbf9f8] rounded-xl border border-gray-100 flex items-start gap-4 shadow-sm">
-                                <div class="bg-[#dae8be] text-[#3f4b2c] text-xs font-semibold px-3 py-1 rounded flex-shrink-0 mt-0.5">08:00</div>
-                                <div>
-                                    <h4 class="font-bold text-gray-900 mb-1">Bữa Sáng Lành Mạnh (Breakfast)</h4>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Yoga'}">
-                                        Sinh tố cải Kale, bơ chín & hạt chia organic. Ăn kèm bánh mì Sourdough ngũ cốc phết bơ hạnh nhân tự nhiên.
-                                    </p>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Stress Relief'}">
-                                        Cháo yến mạch ấm kết hợp hạt sen, hạt điều, kỷ tử và long nhãn giúp an thần, thư thái tâm hồn. Kèm ly trà gừng mật ong.
-                                    </p>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'}">
-                                        Smoothie bowl quả mọng (Berry Bowl) rắc hạt chia, hạt lanh và chuối lát. Kèm 1 ly nước ép cần tây & táo xanh nguyên chất.
-                                    </p>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage != 'Yoga' && pkg.typePackage != 'Stress Relief' && pkg.typePackage != 'Weight Loss' && pkg.typePackage != 'Detox'}">
-                                        Trứng chần hữu cơ kèm măng tây áp chảo nhẹ và cà chua bi nướng. Kèm ly nước ép trái cây theo mùa.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Lunch -->
-                            <div class="p-5 bg-[#fbf9f8] rounded-xl border border-gray-100 flex items-start gap-4 shadow-sm">
-                                <div class="bg-[#dae8be] text-[#3f4b2c] text-xs font-semibold px-3 py-1 rounded flex-shrink-0 mt-0.5">12:00</div>
-                                <div>
-                                    <h4 class="font-bold text-gray-900 mb-1">Bữa Trưa Thanh Dưỡng (Lunch)</h4>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Yoga'}">
-                                        Salad Quinoa ngũ sắc cầu vồng, đậu hũ áp chảo sốt mè rang organic, ăn cùng hạt điều và dưa chuột baby.
-                                    </p>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Stress Relief'}">
-                                        Cá hồi áp chảo sốt cam tươi thanh dịu, măng tây nướng tỏi, súp bí đỏ hạt sen ấm nóng bổ sung Omega-3 dồi dào.
-                                    </p>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'}">
-                                        Salad ức gà áp chảo sốt chanh leo, bông cải xanh hấp, canh rau củ thập cẩm thanh đạm không muối hỗ trợ giảm mỡ tích cực.
-                                    </p>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage != 'Yoga' && pkg.typePackage != 'Stress Relief' && pkg.typePackage != 'Weight Loss' && pkg.typePackage != 'Detox'}">
-                                        Cơm gạo lứt hạt sen, phi lê cá chẽm hấp hành gừng, bông cải xanh và cà rốt luộc chấm kho quẹt organic.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Afternoon Tea -->
-                            <div class="p-5 bg-[#fbf9f8] rounded-xl border border-gray-100 flex items-start gap-4 shadow-sm">
-                                <div class="bg-[#dae8be] text-[#3f4b2c] text-xs font-semibold px-3 py-1 rounded flex-shrink-0 mt-0.5">15:00</div>
-                                <div>
-                                    <h4 class="font-bold text-gray-900 mb-1">Bữa Trà Chiều Tĩnh Tâm (Wellness Tea)</h4>
-                                    <p class="text-sm text-gray-600">
-                                        Thưởng trà thảo mộc ấm (trà hoa cúc, trà hoa nhài hoặc trà cỏ ngọt) kèm một đĩa nhỏ các loại hạt sấy khô nguyên vị (hạnh nhân, óc chó, hạt bí).
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Dinner -->
-                            <div class="p-5 bg-[#fbf9f8] rounded-xl border border-gray-100 flex items-start gap-4 shadow-sm">
-                                <div class="bg-[#dae8be] text-[#3f4b2c] text-xs font-semibold px-3 py-1 rounded flex-shrink-0 mt-0.5">18:30</div>
-                                <div>
-                                    <h4 class="font-bold text-gray-900 mb-1">Bữa Tối Dưỡng Sinh (Dinner)</h4>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Yoga'}">
-                                        Súp rau củ mùa đông ăn kèm bánh mì nguyên cám nướng giòn và đậu hũ non hấp hành lá.
-                                    </p>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Stress Relief'}">
-                                        Canh dưỡng nhan thảo mộc, cá tuyết hấp xì dầu nhẹ và nấm đông cô, ăn kèm một phần nhỏ cơm lứt dẻo thơm.
-                                    </p>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'}">
-                                        Súp bí đỏ kem dừa rắc hạt chia, rau củ luộc thập cẩm chấm muối vừng. Hạn chế tối đa tinh bột trắng.
-                                    </p>
-                                    <p class="text-sm text-gray-600" th:if="${pkg.typePackage != 'Yoga' && pkg.typePackage != 'Stress Relief' && pkg.typePackage != 'Weight Loss' && pkg.typePackage != 'Detox'}">
-                                        Canh sườn non hầm củ sen bách hợp, cơm lứt đỏ hạt sen và rau xanh luộc.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                
+                <div class="md:col-span-1"></div>
+                
+                <div class="md:col-span-6 mt-16 md:mt-0">
+                    <img class="w-full aspect-[4/5] object-cover rounded-sm mb-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtUdLDb82hshsu-8KnQMhushLhfGGdHQnTF9ipF-rb0cNH0b06ZrkE5tE9Of37rCXSn8aT1mpBfb3K_dn39ea60QKn1TvbkcWllc1SrEy-AfscrDhhfnQ2xMS6DTBSKAM-KB9GM7im0NiXWMfA1pcwU-kahX2h7mhdOlGSfWfLfOTiQyZuhHrlErxEOb4a_ImUP3QrlmTC137ZRTn64g_oHeLOFeb_zKjOZ9pmfSO4H6yDb5Yf3wXGLEtMSfl5ynFW1mXIPRwP2CxJ" alt="Trải nghiệm thanh lọc"/>
+                    <h3 class="font-headline-md text-headline-md text-primary mb-6" th:text="${pkg.packageName}">Trải Nghiệm Thanh Lọc Cốt Lõi</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant mb-8 leading-relaxed whitespace-pre-line" th:text="${pkg.description}">
+                        Thoát khỏi nhịp sống hối hả, gói retreat là một lời mời gọi bạn quay về với bản ngã. Chúng tôi tin rằng sự xa xỉ đích thực không nằm ở vật chất, mà ở không gian, thời gian và sự bình yên vô bờ bản.
+                    </p>
+                    <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                        Từ khoảnh khắc bước chân lên lối đi lát đá rêu phong, đến những buổi chiều thả mình trong bồn tắm thảo mộc hướng ra thung lũng sương mù, mỗi khoảnh khắc tại đây là một nét vẽ hoàn thiện bức tranh tĩnh lặng của tâm hồn bạn. Mọi dịch vụ đều được thiết kế tỉ mỉ nhằm đánh thức toàn bộ các giác quan, mở ra một luồng sinh khí mới.
+                    </p>
                 </div>
             </div>
-        </div>
+        </section>
 
+        <!-- The Journey (Itinerary) - Static Content for now -->
+        <section class="py-section-gap bg-surface-container-low px-margin-mobile md:px-margin-desktop border-t border-outline-variant/20">
+            <div class="max-w-container-max mx-auto">
+                <div class="text-center mb-24">
+                    <span class="font-label-md text-label-md text-primary uppercase tracking-widest mb-4 block">Hành Trình</span>
+                    <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Khám Phá Bản Ngã</h2>
+                </div>
+                                <div class="relative w-full space-y-24" th:switch="${pkg.id}">
+                    <!-- Line for Mobile -->
+                    <div class="absolute left-4 top-0 bottom-0 w-px bg-outline-variant/30 md:hidden z-0"></div>
+                    <!-- Line for Desktop -->
+                    <div class="hidden md:block absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-outline-variant/30 z-0"></div>
+
+                    <!-- PACKAGE 1 -->
+                    <th:block th:case="1">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Đến & Buông Bỏ</h4>
+                                <p class="font-body-md text-on-surface-variant">14:00 – Đón khách tại sảnh, phục vụ trà thảo mộc chào đón và khăn lạnh thảo dược.<br/>15:00 – Hướng dẫn an vị phòng, trao cẩm nang hành trình.<br/>17:00 – Thiền định hoàng hôn tập thể tại khu vườn thiền.<br/>19:00 – Bữa tối thực dưỡng khai mạc nhẹ nhàng.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Đến & Buông Bỏ"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Buổi Sáng Chánh Niệm</h4>
+                                <p class="font-body-md text-on-surface-variant">05:30 – Thức giấc cùng tiếng chuông đồng.<br/>06:00 – Yoga nhẹ kéo giãn cơ thể (60 phút).<br/>08:00 – Bữa sáng thực dưỡng.<br/>10:00 – Lớp học Thiền Hành (Walking Meditation) trong rừng.<br/>14:00 – Buổi học về Chánh Niệm Hơi Thở (Anapana).<br/>19:00 – Bữa tối.<br/>20:30 – Thiền tự do.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Buổi Sáng Chánh Niệm"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Thanh Lọc Và Tĩnh Tâm</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga buổi sáng.<br/>09:00 – Xông hơi thảo dược thanh lọc cơ thể.<br/>11:00 – Liệu trình massage thư giãn toàn thân 90 phút.<br/>14:00 – Thiền quán từ bi (Metta Meditation).<br/>19:00 – Bữa tối.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Thanh Lọc Và Tĩnh Tâm"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 4 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 4</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Tri Ân Thân Thể</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga.<br/>09:00 – Workshop pha trà thảo mộc và nghi thức Trà đạo.<br/>14:00 – Thiền bản đồ cảm xúc (Body Scan).<br/>16:00 – Tự do khám phá thiên nhiên quanh khu nghỉ dưỡng.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Tri Ân Thân Thể"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 5 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 5</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Hồi Tưởng Và Biết Ơn</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga.<br/>09:00 – Lớp viết nhật ký chánh niệm.<br/>14:00 – Thiền âm thanh (Sound Bath) với chuông xoay.<br/>19:00 – Bữa tối đặc biệt dưới ánh nến ngoài trời.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Hồi Tưởng Và Biết Ơn"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 6 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 6</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Đào Sâu Tâm Thức</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Thiền động Qigong.<br/>10:00 – Buổi ngồi thiền sâu có hướng dẫn (60 phút).<br/>14:00 – Xem phim tài liệu về chánh niệm, thảo luận nhóm.<br/>19:00 – Bữa tối.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Đào Sâu Tâm Thức"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 7 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 7</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Trở Về — Mang Tĩnh Lặng Theo</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga khai mạc ngày cuối.<br/>09:00 – Tư vấn 1-1 xây dựng thói quen chánh niệm tại nhà.<br/>11:00 – Lễ bế mạc và chia sẻ vòng tròn.<br/>12:00 – Bữa trưa tiễn khách.<br/>13:00 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Trở Về — Mang Tĩnh Lặng Theo"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 2 -->
+                    <th:block th:case="2">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Khởi Đầu Tinh Khiết</h4>
+                                <p class="font-body-md text-on-surface-variant">13:00 – Check-in.<br/>14:00 – Khám sức khỏe sơ bộ, đo chỉ số BMI và tư vấn dinh dưỡng.<br/>16:00 – Tắm ngâm thảo dược mở lỗ chân lông (30 phút).<br/>18:30 – Bữa tối nhẹ: súp rau củ hữu cơ và nước ép.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Khởi Đầu Tinh Khiết"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Đào Thải Độc Tố Lớp Một</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Nước chanh ấm + 30 phút đi bộ chánh niệm.<br/>08:00 – Bữa sáng: sinh tố xanh và hạt dinh dưỡng.<br/>09:30 – Yoga phục hồi kích thích hệ bạch huyết (60 phút).<br/>14:00 – Massage ấn huyệt bạch huyết giải độc (90 phút).<br/>18:30 – Bữa tối detox.<br/>20:00 – Ngâm chân thảo dược.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Đào Thải Độc Tố Lớp Một"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Thanh Trừng Sâu</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Uống nước ép tươi nguyên chất.<br/>09:00 – Xông hơi hồng ngoại (Infrared Sauna, 40 phút).<br/>11:00 – Liệu pháp massage sâu hỗ trợ tiêu hóa (Abdominal Massage).<br/>14:00 – Lớp học nấu ăn thực dưỡng.<br/>18:30 – Bữa tối.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Thanh Trừng Sâu"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 4 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 4</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Cân Bằng Và Nạp Năng Lượng</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Thiền sáng.<br/>09:00 – Yoga tái tạo năng lượng (Yin Yoga).<br/>14:00 – Tư vấn dinh dưỡng cá nhân và lên thực đơn mang về nhà.<br/>18:30 – Bữa tối.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Cân Bằng Và Nạp Năng Lượng"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 5 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 5</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Ánh Sáng Mới</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Chào mặt trời cùng nhau.<br/>09:00 – Đo lại chỉ số sức khỏe và nhận xét thay đổi.<br/>10:00 – Nhận bộ kit detox và sổ tay dinh dưỡng mang về.<br/>11:00 – Bữa trưa tiễn khách.<br/>12:00 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Ánh Sáng Mới"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 3 -->
+                    <th:block th:case="3">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Thanh Âm Chữa Lành</h4>
+                                <p class="font-body-md text-on-surface-variant">14:00 – Check-in.<br/>15:00 – Liệu pháp hương thơm chào đón (Aromatherapy Welcome).<br/>17:00 – Workshop ngửi và phân biệt 12 loại tinh dầu trị liệu.<br/>20:00 – Sound Bath với chuông xoay Tây Tạng và đàn xoang (60 phút).</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Thanh Âm Chữa Lành"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Kết Nối Với Đất</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Đi chân trần trên bãi cỏ (Earthing, 20 phút).<br/>08:00 – Bữa sáng ẩm thực hữu cơ ngũ hành.<br/>10:00 – Liệu pháp đá nóng núi lửa toàn thân (Hot Stone Massage, 90 phút).<br/>14:00 – Thiền thư giãn sâu trong rừng.<br/>19:00 – Bữa tối ngoài trời dưới ánh đèn lồng.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Kết Nối Với Đất"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Bừng Tỉnh</h4>
+                                <p class="font-body-md text-on-surface-variant">06:30 – Bài tập đánh thức ngũ quan (Sensory Awakening Sequence).<br/>09:00 – Trà đạo chia tay.<br/>10:30 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Bừng Tỉnh"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 4 -->
+                    <th:block th:case="4">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Kết Nối Đất Mẹ</h4>
+                                <p class="font-body-md text-on-surface-variant">14:00 – Check-in.<br/>16:00 – Tour khám phá rừng và giới thiệu hệ sinh thái.<br/>19:00 – Bữa tối thực dưỡng ngoài trời bên bếp lửa.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Kết Nối Đất Mẹ"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Tắm Rừng (Shinrin-yoku)</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Thiền buổi sáng ven suối.<br/>09:00 – Hành trình Tắm Rừng 3 tiếng có hướng dẫn viên (Kỹ thuật Shinrin-yoku Nhật Bản).<br/>14:00 – Nghỉ ngơi tự do trong rừng.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Tắm Rừng (Shinrin-yoku)"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Thiền Hành Và Thảo Mộc</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga.<br/>09:00 – Đi bộ chánh niệm, nhận diện và thu hái thảo mộc địa phương.<br/>14:00 – Workshop sơ chế thảo mộc và nấu trà dược thảo.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Thiền Hành Và Thảo Mộc"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 4 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 4</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Thủ Công Và Đất Sét</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga.<br/>10:00 – Workshop làm đồ thủ công từ nguyên liệu thiên nhiên (lá, rễ cây, đất sét).<br/>14:00 – Liệu trình Spa thiên nhiên với bùn và lá cây 90 phút.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Thủ Công Và Đất Sét"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 5 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 5</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Lửa Trại Và Kể Chuyện</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga.<br/>09:00 – Thiền dưới ánh mặt trời tự do.<br/>19:00 – Lửa trại cộng đồng, kể chuyện và chia sẻ hành trình.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Lửa Trại Và Kể Chuyện"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 6 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 6</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Nhật Ký Rừng Xanh</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga.<br/>09:00 – Viết nhật ký trải nghiệm về thiên nhiên.<br/>14:00 – Tự do.<br/>19:00 – Bữa tối đặc biệt theo phong cách "Farm to Table".</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Nhật Ký Rừng Xanh"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 7 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 7</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Mang Rừng Về Phố</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Chào bình minh cùng rừng lần cuối.<br/>09:00 – Tư vấn xây dựng kết nối thiên nhiên trong cuộc sống đô thị.<br/>11:00 – Bữa trưa.<br/>12:00 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Mang Rừng Về Phố"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 5 -->
+                    <th:block th:case="5">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Hơi Thở Đầu Tiên</h4>
+                                <p class="font-body-md text-on-surface-variant">14:00 – Check-in.<br/>16:00 – Kiểm tra tư thế và định chuẩn cơ thể.<br/>19:00 – Buổi thiền Pranayama (kỹ thuật thở) nhập môn.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Hơi Thở Đầu Tiên"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Asana – Thức Dậy Thân Thể</h4>
+                                <p class="font-body-md text-on-surface-variant">05:30 – Yoga Hatha sáng (75 phút).<br/>08:00 – Bữa sáng chay.<br/>10:00 – Lớp học phân tích từng tư thế (Alignment Workshop).<br/>17:00 – Yoga chiều (75 phút).<br/>20:00 – Thiền chuông xoay.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Asana – Thức Dậy Thân Thể"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Pranayama – Thức Dậy Hơi Thở</h4>
+                                <p class="font-body-md text-on-surface-variant">05:30 – Yoga sáng.<br/>10:00 – Workshop chuyên sâu về 5 kỹ thuật thở Pranayama.<br/>14:00 – Massage giãn cơ sau Yoga (60 phút).<br/>17:00 – Yoga chiều.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Pranayama – Thức Dậy Hơi Thở"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 4 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 4</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Yin & Meditation</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yin Yoga (75 phút — các tư thế giữ lâu thả lỏng khớp).<br/>10:00 – Thiền Nidra (Yoga Sleep).<br/>17:00 – Yoga chiều.<br/>20:00 – Chia sẻ kinh nghiệm nhóm.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Yin & Meditation"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 5 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 5</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Chào Mặt Trời Đỉnh Cao</h4>
+                                <p class="font-body-md text-on-surface-variant">05:30 – Chuỗi Surya Namaskar 108 lần chào mặt trời.<br/>08:00 – Bữa sáng.<br/>10:00 – Nhận chứng chỉ tham dự và tư vấn duy trì thực hành tại nhà.<br/>12:00 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Chào Mặt Trời Đỉnh Cao"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 6 -->
+                    <th:block th:case="6">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Tiếp Nhận Và Đánh Giá</h4>
+                                <p class="font-body-md text-on-surface-variant">Check-in.<br/>Xét nghiệm máu cơ bản và tư vấn dinh dưỡng chuyên sâu 1-1 với chuyên gia.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Tiếp Nhận Và Đánh Giá"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2-3 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2-3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Chuẩn Bị Cơ Thể</h4>
+                                <p class="font-body-md text-on-surface-variant">Cắt giảm dần đạm động vật và đường tinh luyện.<br/>Xông hơi hồng ngoại buổi sáng.<br/>Massage nhẹ kích thích hệ tiêu hóa buổi chiều.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Chuẩn Bị Cơ Thể"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 4-7 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 4-7</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Thanh Lọc Đáy Cấp</h4>
+                                <p class="font-body-md text-on-surface-variant">Chế độ nước ép trái cây và rau củ hữu cơ 100%.<br/>Liệu pháp đại tràng (Colon Hydrotherapy) vào ngày 5.<br/>Massage thải độc gan và thận sâu (Detox Massage).<br/>Yoga nhẹ và thiền mỗi ngày.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Thanh Lọc Đáy Cấp"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 8-9 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 8-9</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Tái Thiết Lập Hệ Tiêu Hóa</h4>
+                                <p class="font-body-md text-on-surface-variant">Giới thiệu dần thức ăn dạng lỏng: cháo yến mạch, súp rau củ.<br/>Uống men vi sinh và các vi chất phục hồi hệ vi khuẩn đường ruột.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Tái Thiết Lập Hệ Tiêu Hóa"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 10 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 10</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Ánh Sáng Bên Trong</h4>
+                                <p class="font-body-md text-on-surface-variant">Đo lại chỉ số, phân tích sự thay đổi cơ thể sau 10 ngày.<br/>Nhận thực đơn và lịch trình duy trì 30 ngày sau khi về.<br/>Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Ánh Sáng Bên Trong"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 7 -->
+                    <th:block th:case="7">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Cắt Đứt Nguồn Lo</h4>
+                                <p class="font-body-md text-on-surface-variant">13:00 – Check-in.<br/>14:00 – Nộp toàn bộ thiết bị điện tử (khoá trong tủ an toàn).<br/>16:00 – Tắm ngâm Magnesium + trà thảo mộc an thần.<br/>20:00 – Liệu pháp ánh sáng đỏ và âm nhạc tần số 432Hz để chuẩn bị cho giấc ngủ.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Cắt Đứt Nguồn Lo"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Trị Liệu Thần Kinh Sâu</h4>
+                                <p class="font-body-md text-on-surface-variant">08:00 – Bữa sáng thực dưỡng.<br/>10:00 – Liệu pháp Shirodhara (nhỏ dầu ấm liên tục lên trán, 60 phút).<br/>14:00 – Sound Bath với chuông Tây Tạng (45 phút).<br/>20:00 – Yoga Nidra hướng dẫn trước khi ngủ.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Trị Liệu Thần Kinh Sâu"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Tái Lập Đồng Hồ Sinh Học</h4>
+                                <p class="font-body-md text-on-surface-variant">06:30 – Tiếp xúc ánh nắng sáng sớm (Light Therapy, 20 phút).<br/>10:00 – Lớp học vệ sinh giấc ngủ (Sleep Hygiene Workshop).<br/>14:00 – Massage thư giãn toàn thân Thụy Điển (90 phút).<br/>20:30 – Tắt đèn sớm, phòng tối hoàn toàn.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Tái Lập Đồng Hồ Sinh Học"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 4 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 4</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Tỉnh Thức Tươi Mới</h4>
+                                <p class="font-body-md text-on-surface-variant">06:30 – Quan sát bình minh.<br/>09:00 – Tư vấn thiết lập không gian ngủ lý tưởng tại nhà.<br/>11:00 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Tỉnh Thức Tươi Mới"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 8 -->
+                    <th:block th:case="8">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Chẩn Đoán Làn Da</h4>
+                                <p class="font-body-md text-on-surface-variant">Check-in.<br/>Soi da bằng máy phân tích chuyên sâu.<br/>Lên phác đồ chăm sóc cá nhân.<br/>Tắm khoáng nóng giàu Sulfur mở lỗ chân lông.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Chẩn Đoán Làn Da"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Nền Tảng Thanh Xuân</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Chăm sóc da mặt chuyên sâu với mặt nạ collagen tươi (90 phút).<br/>14:00 – Massage toàn thân nâng cơ bằng thảo dược.<br/>Bữa ăn giàu Vitamin C và Resveratrol chống oxy hóa.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Nền Tảng Thanh Xuân"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Ánh Sáng Từ Bên Trong</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Liệu pháp LED trị liệu da (LED Light Therapy).<br/>14:00 – Gua Sha mặt thủ công giảm nếp nhăn và nâng cơ.<br/>Truyền nước hỗ trợ hydrat hóa da.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Ánh Sáng Từ Bên Trong"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 4 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 4</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Nuôi Dưỡng Sâu</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Liệu pháp cạo gió và massage kinh lạc.<br/>14:00 – Tắm sữa hoa nhài và tinh dầu hoa hồng (Milk & Rose Bath).</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Nuôi Dưỡng Sâu"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 5 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 5</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Sức Sống Vận Động</h4>
+                                <p class="font-body-md text-on-surface-variant">07:00 – Yoga mặt (Face Yoga).<br/>10:00 – Liệu pháp thể dục chống lão hóa (Anti-Aging Movement).<br/>14:00 – Liệu trình cuối: Massage đầu và da đầu.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Sức Sống Vận Động"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 6 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 6</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Bừng Sáng Rực Rỡ</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Đánh giá và chụp ảnh kết quả.<br/>Nhận phác đồ chăm sóc da tại nhà.<br/>11:00 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Bừng Sáng Rực Rỡ"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 9 -->
+                    <th:block th:case="9">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Thiết Lập Mục Tiêu</h4>
+                                <p class="font-body-md text-on-surface-variant">Check-in.<br/>Đo InBody phân tích thành phần cơ thể.<br/>Tư vấn 1-1 lên kế hoạch cá nhân hóa.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Thiết Lập Mục Tiêu"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2-4 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2-4</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Khởi Động Trao Đổi Chất</h4>
+                                <p class="font-body-md text-on-surface-variant">Cardio nhẹ buổi sáng (đi bộ nhanh + leo cầu thang).<br/>Yoga tăng cường hằng ngày.<br/>Thực đơn Calorie Deficit cá nhân hóa do dinh dưỡng sư giám sát.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Khởi Động Trao Đổi Chất"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 5-10 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 5-10</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Giai Đoạn Đốt Mỡ</h4>
+                                <p class="font-body-md text-on-surface-variant">Huấn luyện viên kèm theo nhóm nhỏ (Strength Training + HIIT xen kẽ).<br/>Liệu pháp massage giảm cellulite 3 buổi/tuần.<br/>Theo dõi tiến độ hằng ngày.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Giai Đoạn Đốt Mỡ"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 11-13 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 11-13</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Bền Vững Hoá</h4>
+                                <p class="font-body-md text-on-surface-variant">Học cách tập luyện tự lập, không cần dụng cụ.<br/>Lớp học nấu ăn lành mạnh và đọc nhãn thực phẩm.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Bền Vững Hoá"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 14 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 14</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Phiên Bản Tốt Hơn</h4>
+                                <p class="font-body-md text-on-surface-variant">Đo InBody lần 2, phân tích sự tiến bộ.<br/>Nhận chứng chỉ, thực đơn và lịch tập 3 tháng.<br/>Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Phiên Bản Tốt Hơn"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 10 -->
+                    <th:block th:case="10">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Bước Vào Tịnh Giới</h4>
+                                <p class="font-body-md text-on-surface-variant">Check-in.<br/>Ký kết "Tịnh Khẩu Quy Ước" (không nói chuyện, không giao tiếp mắt từ ngày 2).<br/>Bữa tối cuối cùng được phép nói chuyện.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Bước Vào Tịnh Giới"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2-6 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2-6</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Tịnh Khẩu Tuyệt Đối</h4>
+                                <p class="font-body-md text-on-surface-variant">Mỗi ngày tuân theo lịch cứng: **04:30** thức dậy · **05:00–07:00** Thiền tọa · **07:00** Bữa sáng trong im lặng · **08:00–11:00** Thiền tọa · **11:00** Bữa trưa · **13:00–17:00** Thiền hành · **17:00** Trà nhẹ · **18:00–20:00** Thiền tọa · **20:30** Giảng pháp (nghe ghi âm) · **21:00** Nghỉ.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Tịnh Khẩu Tuyệt Đối"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 7 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 7</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Phá Nhất Tâm</h4>
+                                <p class="font-body-md text-on-surface-variant">Mở lời trở lại.<br/>Vòng tròn chia sẻ trải nghiệm và cảm ngộ.<br/>Bữa trưa chung ấm cúng.<br/>Nhận tài liệu thực hành Vipassana tại nhà.<br/>Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Phá Nhất Tâm"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 11 -->
+                    <th:block th:case="11">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Mở Cánh Cửa Tâm Hồn</h4>
+                                <p class="font-body-md text-on-surface-variant">Check-in.<br/>Giới thiệu nhóm trị liệu (6–8 người).<br/>Trò chơi phản tư xây dựng sự tin tưởng.<br/>Thiền buông bỏ trước khi ngủ.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Mở Cánh Cửa Tâm Hồn"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Chạm Vào Ký Ức</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Workshop Viết Nhật Ký Cảm Xúc có hướng dẫn.<br/>14:00 – Liệu pháp Vẽ Tranh Tự Do (Art Therapy) bộc lộ cảm xúc không lời.<br/>20:00 – Thiền tha thứ.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Chạm Vào Ký Ức"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Rơi Nước Mắt Và Nâng Đỡ</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Trị liệu nhóm có nhà tâm lý hướng dẫn.<br/>14:00 – Thiền khóc (Osho Mystic Rose — giai đoạn khóc).<br/>19:00 – Bữa tối chữa lành, nói chuyện chia sẻ.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Rơi Nước Mắt Và Nâng Đỡ"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 4 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 4</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Cười Và Ôm Ấp</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Thiền cười (Laughter Yoga).<br/>14:00 – Vòng tròn ôm ấp và lời khẳng định tích cực.<br/>19:00 – Đốt lửa tượng trưng những thứ muốn buông bỏ.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Cười Và Ôm Ấp"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 5 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 5</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Ôm Ấp Bản Thân</h4>
+                                <p class="font-body-md text-on-surface-variant">Lễ bế mạc.<br/>Trao nhau thư cảm ơn.<br/>Nhận sổ tay "Hành Trình Chữa Lành" cá nhân hoá.<br/>Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Ôm Ấp Bản Thân"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 12 -->
+                    <th:block th:case="12">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Vòng Tay Của Nước</h4>
+                                <p class="font-body-md text-on-surface-variant">Check-in.<br/>15:00 – Tắm bùn khoáng tự nhiên thải độc da (60 phút).<br/>17:00 – Ngâm chân thảo dược.<br/>19:00 – Bữa tối nhẹ ven hồ.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Vòng Tay Của Nước"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Chuyển Động Trọng Lượng Không</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Thủy trị liệu Watsu trong hồ nước ấm 35°C (Massage thả nổi, 60 phút).<br/>14:00 – Massage Thụy Điển kích thích tuần hoàn (60 phút).<br/>16:00 – Thiền nước tự do ven hồ.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Chuyển Động Trọng Lượng Không"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Dòng Chảy Vô Tận</h4>
+                                <p class="font-body-md text-on-surface-variant">07:00 – Bơi thiền buổi sáng nhẹ nhàng.<br/>09:00 – Trà chia tay ven hồ.<br/>10:30 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Dòng Chảy Vô Tận"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 13 -->
+                    <th:block th:case="13">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Khởi Nguồn Tình Yêu</h4>
+                                <p class="font-body-md text-on-surface-variant">Check-in vào Villa riêng tư dành cho cặp đôi.<br/>16:00 – Tắm hoa hồng champagne.<br/>19:00 – Bữa tối lãng mạn dưới ánh nến trong vườn riêng.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Khởi Nguồn Tình Yêu"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Kết Nối Qua Chuyển Động</h4>
+                                <p class="font-body-md text-on-surface-variant">07:00 – Partner Yoga buổi sáng (75 phút).<br/>10:00 – Liệu pháp Cacao Ceremony: Uống cacao nguyên chất theo nghi thức và chia sẻ cảm xúc cùng nhau.<br/>15:00 – Spa cho cặp đôi (Song Spa, 90 phút).</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Kết Nối Qua Chuyển Động"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Ngôn Ngữ Chánh Niệm</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Workshop "Giao Tiếp Không Bạo Lực" (NVC) dành cho cặp đôi.<br/>14:00 – Cùng nhau nấu bữa tối thực dưỡng theo hướng dẫn.<br/>19:00 – Thưởng thức thành quả bữa tối tự nấu.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Ngôn Ngữ Chánh Niệm"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 4 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 4</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Cam Kết Mới</h4>
+                                <p class="font-body-md text-on-surface-variant">08:00 – Chào bình minh cùng nhau.<br/>10:00 – Lễ trao quà lưu niệm khắc tên.<br/>Nhận "Lộ Trình Tình Yêu" — kế hoạch duy trì kết nối cảm xúc.<br/>12:00 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Cam Kết Mới"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 14 -->
+                    <th:block th:case="14">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Hương Trà Khởi Tâm</h4>
+                                <p class="font-body-md text-on-surface-variant">Check-in.<br/>16:00 – Giới thiệu 7 loại trà quý và nghệ thuật pha trà.<br/>17:30 – Lễ trà chào đón theo phong cách Việt kết hợp Nhật.<br/>20:00 – Thiền với âm nhạc truyền thống (đàn tranh, đàn bầu).</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Hương Trà Khởi Tâm"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Sắc Hoa Và Thanh Âm</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Workshop Ikebana (cắm hoa thiền định Nhật Bản).<br/>14:00 – Trị liệu âm nhạc cổ điển sống (Live Music Therapy).<br/>19:00 – Bữa tối nghệ thuật: Mỗi món ăn được đặt tên theo một nốt nhạc.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Sắc Hoa Và Thanh Âm"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Gói Trọn Tinh Hoa</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Trưng bày và chiêm ngưỡng tác phẩm cắm hoa.<br/>10:00 – Lễ trà bế mạc.<br/>11:00 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Gói Trọn Tinh Hoa"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- PACKAGE 15 -->
+                    <th:block th:case="15">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Hội Tụ Nữ Vị</h4>
+                                <p class="font-body-md text-on-surface-variant">Check-in.<br/>16:00 – Vòng tròn giới thiệu (toàn nữ giới).<br/>17:30 – Uống trà thảo mộc điều hòa nội tiết.<br/>20:00 – Thiền Trăng: Kết nối với chu kỳ thiên nhiên.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Hội Tụ Nữ Vị"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Đánh Thức Khung Xương Chậu</h4>
+                                <p class="font-body-md text-on-surface-variant">07:00 – Yoga nội tiết chuyên biệt cho vùng hông và khung chậu (75 phút).<br/>10:00 – Workshop "Hiểu Chu Kỳ Kinh Nguyệt" cùng chuyên gia phụ khoa.<br/>14:00 – Massage thư giãn tử cung bằng dầu castor ấm (Castor Oil Pack).</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Đánh Thức Khung Xương Chậu"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Giải Phóng Hình Thể</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Ecstatic Dance: Thiền khiêu vũ tự do theo nhạc (60 phút, không cần biết múa).<br/>14:00 – Lớp học vẽ tranh tự do về hình ảnh nữ tính.<br/>20:00 – Lễ Cacao Ceremony dành riêng cho nữ giới.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Giải Phóng Hình Thể"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 4 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 4</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Tôn Vinh Thân Thể</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Tắm hoa theo nghi thức cổ truyền.<br/>14:00 – Liệu trình Spa trọn gói chăm sóc da và cơ thể dành cho phụ nữ.<br/>19:00 – Bữa tối ngoài trời, thắp nến cùng nhau.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Tôn Vinh Thân Thể"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 5 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 5</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Rạng Rỡ Đóa Hoa</h4>
+                                <p class="font-body-md text-on-surface-variant">09:00 – Lễ bế mạc: Mỗi người nhận một bông hoa và đọc lời tuyên ngôn yêu thương bản thân.<br/>Nhận bộ kit chăm sóc sức khỏe phụ nữ.<br/>11:00 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Rạng Rỡ Đóa Hoa"/>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- DEFAULT FALLBACK -->
+                    <th:block th:case="*">
+                        <!-- Ngày 1 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 1</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Đến & Buông Bỏ</h4>
+                                <p class="font-body-md text-on-surface-variant">14:00 – Đón khách tại sảnh, phục vụ trà thảo mộc chào đón và khăn lạnh thảo dược.<br/>15:00 – Hướng dẫn an vị phòng, trao cẩm nang hành trình.<br/>17:00 – Thiền định hoàng hôn tập thể tại khu vườn thiền.<br/>19:00 – Bữa tối thực dưỡng khai mạc nhẹ nhàng.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Đến & Buông Bỏ"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 2 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 2</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Buổi Sáng Chánh Niệm</h4>
+                                <p class="font-body-md text-on-surface-variant">05:30 – Thức giấc cùng tiếng chuông đồng.<br/>06:00 – Yoga nhẹ kéo giãn cơ thể (60 phút).<br/>08:00 – Bữa sáng thực dưỡng.<br/>10:00 – Lớp học Thiền Hành (Walking Meditation) trong rừng.<br/>14:00 – Buổi học về Chánh Niệm Hơi Thở (Anapana).<br/>19:00 – Bữa tối.<br/>20:30 – Thiền tự do.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Buổi Sáng Chánh Niệm"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 3 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 3</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Thanh Lọc Và Tĩnh Tâm</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga buổi sáng.<br/>09:00 – Xông hơi thảo dược thanh lọc cơ thể.<br/>11:00 – Liệu trình massage thư giãn toàn thân 90 phút.<br/>14:00 – Thiền quán từ bi (Metta Meditation).<br/>19:00 – Bữa tối.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Thanh Lọc Và Tĩnh Tâm"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 4 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 4</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Tri Ân Thân Thể</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga.<br/>09:00 – Workshop pha trà thảo mộc và nghi thức Trà đạo.<br/>14:00 – Thiền bản đồ cảm xúc (Body Scan).<br/>16:00 – Tự do khám phá thiên nhiên quanh khu nghỉ dưỡng.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Tri Ân Thân Thể"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 5 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 5</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Hồi Tưởng Và Biết Ơn</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga.<br/>09:00 – Lớp viết nhật ký chánh niệm.<br/>14:00 – Thiền âm thanh (Sound Bath) với chuông xoay.<br/>19:00 – Bữa tối đặc biệt dưới ánh nến ngoài trời.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Hồi Tưởng Và Biết Ơn"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 6 -->
+                        <div class="relative flex flex-col md:flex-row-reverse items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 6</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Đào Sâu Tâm Thức</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Thiền động Qigong.<br/>10:00 – Buổi ngồi thiền sâu có hướng dẫn (60 phút).<br/>14:00 – Xem phim tài liệu về chánh niệm, thảo luận nhóm.<br/>19:00 – Bữa tối.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pr-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfcRYvJSROvFk2TNQ1A6YVPQ4qwaFu_Fu_3XSYIgfjqdpkaUXMQPDw2_ATBRrcFXzH6xWUNHve_uNSvFeOK9_JYBYjzQ_Ly_JsiD9qPYGzuY6wewgMRyie3Acsrt3HbMypgEkyW_iAaAQE8Y2wfvB1icMwD_Gl9FBiXFYzNXTIdcx_GN9UkrlxVe7hNcE2zh3dXzsU1_d4lOWGxaWPS3Ebco8rvzEPu8LKAeA_wBun_qofys_onRgJNdNbuBGNl7-hubU_1pjQJvdX" alt="Đào Sâu Tâm Thức"/>
+                            </div>
+                        </div>
+                        <!-- Ngày 7 -->
+                        <div class="relative flex flex-col md:flex-row items-start md:items-center w-full">
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-[10px] top-1 border-4 border-surface-container-low z-10 md:hidden"></div>
+                            <div class="md:w-1/2 md:pr-16 md:text-right pl-12 md:pl-0 pt-0 pb-8 md:pb-0 z-10">
+                                <span class="font-label-md text-label-md text-secondary uppercase tracking-widest block mb-2">Ngày 7</span>
+                                <h4 class="font-headline-md text-headline-md text-primary mb-4">Trở Về — Mang Tĩnh Lặng Theo</h4>
+                                <p class="font-body-md text-on-surface-variant">06:00 – Yoga khai mạc ngày cuối.<br/>09:00 – Tư vấn 1-1 xây dựng thói quen chánh niệm tại nhà.<br/>11:00 – Lễ bế mạc và chia sẻ vòng tròn.<br/>12:00 – Bữa trưa tiễn khách.<br/>13:00 – Check-out.</p>
+                            </div>
+                            <div class="absolute w-4 h-4 rounded-full bg-primary left-1/2 -translate-x-1/2 border-4 border-surface-container-low z-10 hidden md:block"></div>
+                            <div class="md:w-1/2 md:pl-16 pl-12 md:pl-0 z-10">
+                                <img class="w-full aspect-[16/9] md:aspect-square object-cover rounded-sm shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXWlJqWaBdBUgCWYW-r-9IAv4c2OE4UXHr4DJ9STZ-M4eQwRdQOeO10ykZA2M-t2tEXU1ueLhDOkW2OysOf0xQIm1fo4DRSwDkGvgf0j9YF6yiEhzc0suYDe8IaVxVt2jXW9zcvg5KjEL2WFdg3BarE7dcCwbwvdicvisnm7JpFhV7xtKZISpiBzUyjW3GvQ1CcrSD6F9RdBbjUqaFVs-xtPaIUnArS3bGvUrnZcfsPYcphrt9Y20O4U1jgmMXIcic_0zzg-ZuF_Ns" alt="Trở Về — Mang Tĩnh Lặng Theo"/>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <script>
-        function switchTab(tabId) {
-            // Hide all panels
-            document.getElementById('panel-itinerary').classList.add('hidden');
-            document.getElementById('panel-spa').classList.add('hidden');
-            document.getElementById('panel-nutrition').classList.add('hidden');
-            
-            // Reset all buttons style
-            const tabs = ['itinerary', 'spa', 'nutrition'];
-            tabs.forEach(id => {
-                const btn = document.getElementById('tab-btn-' + id);
-                const icon = document.getElementById('tab-icon-' + id);
-                const title = document.getElementById('tab-title-' + id);
-                const desc = btn.querySelector('p');
-                
-                btn.className = "p-6 text-left border-b border-gray-100 md:border-b-0 md:border-r last:border-r-0 transition-all duration-300 focus:outline-none hover:bg-[#566342]/5 bg-transparent border-t-4 border-t-transparent";
-                icon.className = "material-symbols-outlined text-gray-400 text-xl";
-                title.className = "font-serif font-bold text-lg text-gray-700";
-                desc.className = "text-xs text-gray-400 leading-relaxed";
-            });
-            
-            // Show selected panel
-            document.getElementById('panel-' + tabId).classList.remove('hidden');
-            
-            // Set active button style
-            const activeBtn = document.getElementById('tab-btn-' + tabId);
-            const activeIcon = document.getElementById('tab-icon-' + tabId);
-            const activeTitle = document.getElementById('tab-title-' + tabId);
-            const activeDesc = activeBtn.querySelector('p');
-            
-            activeBtn.className = "p-6 text-left border-b border-gray-100 md:border-b-0 md:border-r last:border-r-0 transition-all duration-300 focus:outline-none hover:bg-white bg-white border-t-4 border-t-[#566342]";
-            activeIcon.className = "material-symbols-outlined text-[#566342] text-xl";
-            activeTitle.className = "font-serif font-bold text-lg text-[#566342]";
-            activeDesc.className = "text-xs text-gray-500 leading-relaxed";
-        }
-    </script>
-</body>
+    <!-- Footer -->
+    <th:block th:replace="~{fragments/public-footer :: public-footer}"></th:block>
 
+</body>
 </html>
