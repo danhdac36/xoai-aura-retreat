@@ -68,6 +68,12 @@
                 <span class="material-symbols-outlined" data-icon="calendar">calendar_month</span>
                 <span class="font-label-md text-label-md">Spa Booking</span>
             </a>
+            <!-- Yoga Booking (YogaRegistrationController) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('GUEST','ADMIN')" th:href="@{/guest/booking-yoga}">
+                <span class="material-symbols-outlined" data-icon="self_improvement">self_improvement</span>
+                <span class="font-label-md text-label-md">Yoga Booking</span>
+            </a>
             <!-- Spa Receptionist Booking (SpaReceptionistController) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
                 sec:authorize="hasAnyRole('RECEPTIONIST','ADMIN')" th:href="@{/receptionist/booking-spa/manual}">
@@ -79,6 +85,12 @@
                 sec:authorize="hasAnyRole('THERAPIST','ADMIN')" th:href="@{/therapist/schedules/daily}">
                 <span class="material-symbols-outlined" data-icon="schedule">schedule</span>
                 <span class="font-label-md text-label-md">Therapist Daily</span>
+            </a>
+            <!-- Yoga Instructor Schedule -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('YOGA_INSTRUCTOR','ADMIN')" th:href="@{/instructor/yoga/schedule}">
+                <span class="material-symbols-outlined" data-icon="self_improvement">self_improvement</span>
+                <span class="font-label-md text-label-md">Yoga Instructor</span>
             </a>
 
             <!-- MANAGER - SPA MANAGEMENT -->
@@ -122,13 +134,14 @@
 
             <!-- USER - PROFILE -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-               th:href="@{/profile/me}">
+                th:href="@{/profile/me}">
                 <span class="material-symbols-outlined" data-icon="person">person</span>
                 <span class="font-label-md text-label-md">My profile</span>
             </a>
 
             <!-- Logout -->
-            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200">
+            <a
+                class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200">
                 <form th:action="@{/auth/logout}" method="post" class="w-full">
                     <button type="submit"
                         class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-all font-medium">

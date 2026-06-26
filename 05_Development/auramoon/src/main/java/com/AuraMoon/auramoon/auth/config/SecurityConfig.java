@@ -51,7 +51,7 @@ public class SecurityConfig {
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {
                         // "/receptionist/**"
-//                        "/receptionist/**"
+                        // "/receptionist/**"
         };
 
         private static final String[] THERAPIST_ENDPOINTS = {
@@ -80,7 +80,7 @@ public class SecurityConfig {
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/aut" +
-                                                        "h/login")
+                                                                "h/login")
                                                 .loginProcessingUrl("/auth/login")
                                                 .usernameParameter("email")
                                                 .passwordParameter("password")
