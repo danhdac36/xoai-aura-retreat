@@ -43,8 +43,8 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDateTime endDateTime = endDate != null ? endDate.atTime(LocalTime.MAX)
                 : LocalDateTime.now().with(LocalTime.MAX);
 
-        // 1. Get GuestFolios that are PAID
-        List<GuestFolio> folios = guestFolioRepository.findByStatusAndCreatedAtBetween("PAID", startDateTime,
+        // 1. Get GuestFolios that are CLOSED
+        List<GuestFolio> folios = guestFolioRepository.findByStatusAndCreatedAtBetween("CLOSED", startDateTime,
                 endDateTime);
 
         double packageRevenue = 0.0;
@@ -146,7 +146,7 @@ public class DashboardServiceImpl implements DashboardService {
         // 5. Calculate Monthly Trend (Last 3 months up to endDateTime)
         LocalDate trendEnd = endDate != null ? endDate : LocalDate.now();
         LocalDate trendStart = trendEnd.minusMonths(2).withDayOfMonth(1);
-        List<GuestFolio> trendFolios = guestFolioRepository.findByStatusAndCreatedAtBetween("PAID",
+        List<GuestFolio> trendFolios = guestFolioRepository.findByStatusAndCreatedAtBetween("CLOSED",
                 trendStart.atStartOfDay(), trendEnd.atTime(LocalTime.MAX));
 
         java.util.Map<String, Double> trendMap = new java.util.LinkedHashMap<>();

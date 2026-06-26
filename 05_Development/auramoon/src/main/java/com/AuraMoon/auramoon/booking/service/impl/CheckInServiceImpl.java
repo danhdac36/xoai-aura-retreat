@@ -111,6 +111,13 @@ public class CheckInServiceImpl implements CheckInService {
             guest.setGender(request.getGender().trim());
         }
         if (request.getDateOfBirth() != null) {
+            int age = java.time.Period.between(request.getDateOfBirth(), LocalDate.now()).getYears();
+            if (age < 18) {
+                throw new IllegalStateException("[BOOK-400] Khách hàng phải từ đủ 18 tuổi trở lên để làm thủ tục nhận phòng.");
+            }
+            if (age > 120) {
+                throw new IllegalStateException("[BOOK-400] Ngày sinh không hợp lệ (tuổi không được vượt quá 120).");
+            }
             guest.setDateOfBirth(request.getDateOfBirth());
         }
         guest.setIdentifyCode(request.getIdentifyCode());

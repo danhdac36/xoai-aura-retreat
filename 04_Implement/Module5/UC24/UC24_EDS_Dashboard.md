@@ -7,7 +7,7 @@
 | **Document ID**    | `AURA-DASH-IMP-024`                    |
 | **Version**        | 2.0                                      |
 | **Date**           | `2026-06-14`                           |
-| **Status**         | ✅ Approved                                     |
+| **Status**         | ✅ Approved                              |
 | **Document Owner** | Phùng Giang Hải                        |
 | **Author**         | `Phùng Giang Hải- Backend Developer` |
 | **Reviewed by**    | Phùng Giang Hải                        |
@@ -20,11 +20,11 @@
 
 > **Policy 4.4 — Immutable History:** Không bao giờ xóa thông tin cũ. Mọi thay đổi phải ghi vào bảng này.
 
-| Ngày      | Người thực hiện | Nội dung thay đổi                                                            |
-| ---------- | ------------------- | ------------------------------------------------------------------------------- |
-| 2026-06-10 | Phùng Giang Hải        | Tạo tài liệu EDS lần đầu — UC24 Revenue Dashboard                        |
-| 2026-06-13 | Phùng Giang Hải        | Viết lại hoàn chỉnh theo EDS v2.0 — bổ sung tất cả sections còn thiếu |
-| 2026-06-14 | Phùng Giang Hải        | Chuẩn hóa Bảng mã lỗi (Mục 10) về định dạng 5 cột và bảo toàn dữ liệu MVC |
+| Ngày      | Người thực hiện | Nội dung thay đổi                                                                      |
+| ---------- | ------------------- | ----------------------------------------------------------------------------------------- |
+| 2026-06-10 | Phùng Giang Hải   | Tạo tài liệu EDS lần đầu — UC24 Revenue Dashboard                                  |
+| 2026-06-13 | Phùng Giang Hải   | Viết lại hoàn chỉnh theo EDS v2.0 — bổ sung tất cả sections còn thiếu           |
+| 2026-06-14 | Phùng Giang Hải   | Chuẩn hóa Bảng mã lỗi (Mục 10) về định dạng 5 cột và bảo toàn dữ liệu MVC |
 
 # MỤC LỤC
 
@@ -47,16 +47,16 @@
 
 # 1. Tổng quan Module
 
-> Bảng điều khiển Doanh thu (Revenue Dashboard) cung cấp cái nhìn toàn cảnh về tình hình kinh doanh của khu nghỉ dưỡng cho Manager. Module tổng hợp dữ liệu từ các hóa đơn đã thanh toán (GUEST_FOLIO status = PAID) và FOLIO_ITEM để hiển thị doanh thu chia theo 3 mảng: Gói Retreat (Package), Spa bổ sung (Extra Spa), và F&B bổ sung (Extra F&B). Đồng thời hiển thị các chỉ số hiệu suất: Tỷ lệ lấp đầy phòng (Occupancy Rate) và Mức độ sử dụng Chuyên viên trị liệu (Therapist Utilization).
+> Bảng điều khiển Doanh thu thuần túy (Pure Revenue Dashboard) cung cấp cái nhìn toàn cảnh về tình hình dòng tiền của khu nghỉ dưỡng cho Manager. Module tổng hợp dữ liệu từ các hóa đơn đã thanh toán (GUEST_FOLIO status = CLOSED) và FOLIO_ITEM để hiển thị doanh thu chia theo các mảng cốt lõi: Gói Retreat (Package Revenue), và Dịch vụ bổ sung (Service Revenue gồm Spa & F&B). Màn hình này đặc tả chuyên sâu về Tài chính (Finance), tách biệt hoàn toàn với các báo cáo Vận hành (Operations) như Tỷ lệ lấp đầy hay Hiệu suất nhân sự (thuộc UC25).
 
-| Field                           | Value                                                                                                                    |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Module Name**           | `Module 5: Revenue Analytics Dashboard (UC24)`                                                                         |
-| **Bounded Context**       | `Reporting / Analytics`                                                                                                |
-| **Data Classification**   | `Internal / Confidential`                                                                                              |
-| **Compliance Scope**      | `N/A`                                                                                                                  |
-| **Upstream Dependencies** | `Billing Module (GUEST_FOLIO, FOLIO_ITEM, PAYMENT), Booking Module (BOOKING, VILLA), Spa Module (SCHEDULE, THERAPIST)` |
-| **Downstream Consumers**  | `UC25 (Export Report), Manager UI`                                                                                     |
+| Field                           | Value                                                 |
+| ------------------------------- | ----------------------------------------------------- |
+| **Module Name**           | `Module 5: Revenue Analytics Dashboard (UC24)`      |
+| **Bounded Context**       | `Reporting / Analytics`                             |
+| **Data Classification**   | `Internal / Confidential`                           |
+| **Compliance Scope**      | `N/A`                                               |
+| **Upstream Dependencies** | `Billing Module (GUEST_FOLIO, FOLIO_ITEM, PAYMENT)` |
+| **Downstream Consumers**  | `UC25 (Export Report), Manager UI`                  |
 
 # 2. Ma trận Truy vết (Traceability Matrix)
 
@@ -71,11 +71,11 @@
 
 ## ADR-024 — Tách biệt DTO và chiến lược tổng hợp doanh thu
 
-| Field              | Value                   |
-| ------------------ | ----------------------- |
-| **Status**   | Accepted                |
+| Field              | Value                        |
+| ------------------ | ---------------------------- |
+| **Status**   | Accepted                     |
 | **Deciders** | Phùng Giang Hải, Tech Lead |
-| **Date**     | 2026-06-13              |
+| **Date**     | 2026-06-13                   |
 
 **Bối cảnh (Context)**
 
@@ -83,10 +83,10 @@
 
 **Các phương án đã xem xét (Options Considered)**
 
-| Phương án | Mô tả                                                | Ưu điểm                                                                                           | Nhược điểm                                                                              |
-| ------------ | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| A            | Query doanh thu trực tiếp từ bảng `PAYMENT`      | + Phản ánh dòng tiền thực tế                                                                   | - Không phân biệt được nguồn doanh thu (Package vs Spa vs F&B)                       |
-| B            | Dùng `GUEST_FOLIO` + `FOLIO_ITEM` để tổng hợp | + Phân tách rõ ràng doanh thu theo category. + Nhất quán với mô hình Charge-to-Room (AHLEI) | - Phụ thuộc vào dữ liệu FOLIO_ITEM đã được các module khác ghi nhận đầy đủ |
+| Phương án | Mô tả                                               | Ưu điểm                                                                                           | Nhược điểm                                                                              |
+| ------------ | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| A            | Query doanh thu trực tiếp từ bảng`PAYMENT`      | + Phản ánh dòng tiền thực tế                                                                   | - Không phân biệt được nguồn doanh thu (Package vs Spa vs F&B)                       |
+| B            | Dùng`GUEST_FOLIO` + `FOLIO_ITEM` để tổng hợp | + Phân tách rõ ràng doanh thu theo category. + Nhất quán với mô hình Charge-to-Room (AHLEI) | - Phụ thuộc vào dữ liệu FOLIO_ITEM đã được các module khác ghi nhận đầy đủ |
 
 **Quyết định (Decision)**
 
@@ -186,10 +186,9 @@ class Schedule <<Entity>> {
 class RevenueDashboardDTO <<DTO>> {
   +totalRevenue: BigDecimal
   +packageRevenue: BigDecimal
+  +serviceRevenue: BigDecimal
   +spaRevenue: BigDecimal
   +fbRevenue: BigDecimal
-  +occupancyRate: Double
-  +therapistUtilization: Double
   +recentTransactions: List<TransactionSummary>
   +monthlyTrend: Map<String, BigDecimal>
 }
@@ -211,9 +210,6 @@ interface DashboardService <<interface>> {
 class DashboardServiceImpl {
   -guestFolioRepository: GuestFolioRepository
   -folioItemRepository: FolioItemRepository
-  -bookingRepository: BookingRepository
-  -villaRepository: VillaRepository
-  -scheduleRepository: ScheduleRepository
   +getDashboardData(startDate, endDate, category): RevenueDashboardDTO
 }
 
@@ -236,12 +232,11 @@ DashboardService <|.. DashboardServiceImpl
 // === DASHBOARD DTO: RevenueDashboardDTO ===
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class RevenueDashboardDTO {
-    private BigDecimal totalRevenue;      // = packageRevenue + spaRevenue + fbRevenue
-    private BigDecimal packageRevenue;    // SUM(GUEST_FOLIO.total_package_amout) WHERE status = 'PAID'
+    private BigDecimal totalRevenue;      // = packageRevenue + serviceRevenue
+    private BigDecimal packageRevenue;    // SUM(GUEST_FOLIO.total_package_amout) WHERE status = 'CLOSED'
+    private BigDecimal serviceRevenue;    // = spaRevenue + fbRevenue
     private BigDecimal spaRevenue;        // SUM(FOLIO_ITEM.amount) WHERE service_category = 'Extra Spa'
     private BigDecimal fbRevenue;         // SUM(FOLIO_ITEM.amount) WHERE service_category = 'Extra F&B'
-    private Double occupancyRate;         // (Occupied Villas / Total Villas) * 100
-    private Double therapistUtilization;  // (Completed Sessions / Total Capacity) * 100
     private List<TransactionSummary> recentTransactions; // Danh sách giao dịch gần nhất
     private Map<String, BigDecimal> monthlyTrend;        // Key: "2026-01", Value: revenue
 }
@@ -452,15 +447,15 @@ public class DashboardController {
 - Bộ lọc: `th:value="${startDate}"`, `th:value="${endDate}"`, `th:selected="${category == 'ALL'}"`
 - Biểu đồ Donut: `th:attr="data-package=${data.packageRevenue}, data-spa=${data.spaRevenue}, data-fb=${data.fbRevenue}"`
 - Biểu đồ Trend: `th:each="entry : ${data.monthlyTrend}"` → `th:text="${entry.key}"` (tháng) + `th:text="${entry.value}"` (doanh thu)
-- KPI Cards: `th:text="${data.totalRevenue}"`, `th:text="${data.occupancyRate}"`, `th:text="${data.therapistUtilization}"`
+- KPI Cards: `th:text="${data.totalRevenue}"`, `th:text="${data.packageRevenue}"`, `th:text="${data.serviceRevenue}"`
 - Bảng giao dịch: `th:each="tx : ${data.recentTransactions}"` → `th:text="${tx.guestName}"`, `th:text="${tx.amount}"`
 
 # 10. Bảng mã lỗi (Error Codes)
 
-| Code | HTTP Status | Message (EN) | Message (VI) | Trigger Condition |
-| --- | --- | --- | --- | --- |
-| `DASH-001` | 500 | Dashboard loading error | Đã xảy ra lỗi khi tải dữ liệu Dashboard. Vui lòng thử lại. | Lỗi tổng hợp doanh thu hoặc kết nối DB.<br/>• **Exception:** `Exception` (generic)<br/>• **Model Key:** `error` |
-| `DASH-002` | 200 | No data available | Không có dữ liệu trong khoảng thời gian đã chọn | Không có GuestFolio nào với status PAID trong khoảng lọc.<br/>• **Exception:** `N/A` (empty data)<br/>• **Model Key:** `N/A` (Thymeleaf conditions handle empty list) |
+| Code         | HTTP Status | Message (EN)            | Message (VI)                                                         | Trigger Condition                                                                                                                                                                                     |
+| ------------ | ----------- | ----------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DASH-001` | 500         | Dashboard loading error | Đã xảy ra lỗi khi tải dữ liệu Dashboard. Vui lòng thử lại. | Lỗi tổng hợp doanh thu hoặc kết nối DB.``• **Exception:** `Exception` (generic)``• **Model Key:** `error`                                                       |
+| `DASH-002` | 200         | No data available       | Không có dữ liệu trong khoảng thời gian đã chọn             | Không có GuestFolio nào với status PAID trong khoảng lọc.``• **Exception:** `N/A` (empty data)``• **Model Key:** `N/A` (Thymeleaf conditions handle empty list) |
 
 > **Lưu ý:** UC24 là chức năng Read-only, không phát sinh lỗi nghiệp vụ nghiêm trọng. Trường hợp không có dữ liệu, dashboard hiển thị giá trị mặc định (0).
 
@@ -495,9 +490,7 @@ Tạo `DashboardService` interface và `DashboardServiceImpl`:
 
 - Lấy danh sách GuestFolio (PAID, trong khoảng ngày)
 - Tính `packageRevenue` = SUM(folio.totalPackageAmount)
-- Lấy FolioItems → `Collectors.groupingBy(serviceCategory)` → tính `spaRevenue`, `fbRevenue`
-- Tính `occupancyRate` từ Villa count
-- Tính `therapistUtilization` từ Schedule count
+- Tính `spaRevenue`, `fbRevenue`, `serviceRevenue`
 - Build `monthlyTrend` Map
 - Build `recentTransactions` List
 
@@ -553,13 +546,13 @@ git checkout -- auramoon/src/main/resources/static/css/dashboard/
 
 > Chi tiết đầy đủ tại tài liệu `UC24_TDD_Dashboard.md`. Tóm tắt:
 
-| TC ID       | Tên                                                  | Mức độ | Kết quả mong đợi                                                    |
-| ----------- | ----------------------------------------------------- | --------- | ----------------------------------------------------------------------- |
-| DASH-TC-001 | Tính tổng doanh thu chính xác từ hóa đơn PAID | HIGH      | DTO chứa đúng packageRevenue + spaRevenue + fbRevenue = totalRevenue |
-| DASH-TC-002 | Lọc đúng khoảng thời gian (Date Range)           | HIGH      | Chỉ tính hóa đơn trong khoảng startDate-endDate                   |
-| DASH-TC-003 | Loại bỏ hóa đơn UNPAID                           | CRITICAL  | totalRevenue = 0 khi chỉ có hóa đơn chưa thanh toán              |
-| DASH-TC-004 | Không có dữ liệu → Dashboard trả về 0          | MEDIUM    | DTO trả về tất cả revenue = 0, rate = 0                             |
-| DASH-TC-005 | Tính Occupancy Rate chính xác                      | MEDIUM    | (occupied / total) * 100 = giá trị chính xác                        |
+| TC ID       | Tên                                                  | Mức độ | Kết quả mong đợi                                                                             |
+| ----------- | ----------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------ |
+| DASH-TC-001 | Tính tổng doanh thu chính xác từ hóa đơn PAID | HIGH      | DTO chứa đúng packageRevenue + spaRevenue + fbRevenue = totalRevenue                          |
+| DASH-TC-002 | Lọc đúng khoảng thời gian (Date Range)           | HIGH      | Chỉ tính hóa đơn trong khoảng startDate-endDate                                            |
+| DASH-TC-003 | Loại bỏ hóa đơn UNPAID                           | CRITICAL  | totalRevenue = 0 khi chỉ có hóa đơn chưa thanh toán                                       |
+| DASH-TC-004 | Không có dữ liệu → Dashboard trả về 0          | MEDIUM    | DTO trả về tất cả revenue = 0, rate = 0                                                      |
+| DASH-TC-005 | Tính Occupancy Rate chính xác                      | MEDIUM    | (occupied / total) * 100 = giá trị chính xác                                                 |
 | DASH-TC-006 | Unauthorized access (Delegated to Module 1)           | LOW       | Module 1 Global Filter/Interceptor handles redirect to login hoặc 403. Module 5 tests disabled. |
 
 # 14. Phương pháp Xác minh
@@ -597,7 +590,7 @@ ORDER BY month;
 ## 14.2. UI Verification
 
 1. Truy cập `http://localhost:8080/manager/dashboard`
-2. Kiểm tra KPI cards hiển thị: Total Revenue, Occupancy Rate, Therapist Utilization
+2. Kiểm tra KPI cards hiển thị: Total Revenue, Package Revenue, Service Revenue
 3. Kiểm tra Donut Chart chia đúng 3 phần: Package, Spa, F&B
 4. Thay đổi bộ lọc Date Range → Dashboard reload đúng dữ liệu
 5. Kiểm tra bảng Recent Transactions hiển thị đúng danh sách

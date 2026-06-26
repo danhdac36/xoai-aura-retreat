@@ -16,9 +16,9 @@
             </a>
             <!--Phân role sec:authorize="hasRole('ADMIN')"-->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasRole('ADMIN')" th:href="@{/manager/dashboard}">
+                sec:authorize="hasAnyRole('MANAGER','ADMIN')" th:href="@{/manager/dashboard}">
                 <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-                <span class="font-label-md text-label-md">Dashboard (Admin)</span>
+                <span class="font-label-md text-label-md">Dashboard (Manager/Admin)</span>
             </a>
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
                 sec:authorize="hasAnyRole('MANAGER','ADMIN')" th:href="@{/manager/report}">
@@ -122,13 +122,14 @@
 
             <!-- USER - PROFILE -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-               th:href="@{/profile/me}">
+                th:href="@{/profile/me}">
                 <span class="material-symbols-outlined" data-icon="person">person</span>
                 <span class="font-label-md text-label-md">My profile</span>
             </a>
 
             <!-- Logout -->
-            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200">
+            <a
+                class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200">
                 <form th:action="@{/auth/logout}" method="post" class="w-full">
                     <button type="submit"
                         class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-all font-medium">

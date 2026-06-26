@@ -180,9 +180,9 @@
 
                 <div class="flex flex-col gap-2 mb-4">
                     <!-- Guest Date of Birth Input -->
-                    <label for="dateOfBirth" class="text-sm font-semibold text-gray-700">Ngày sinh</label>
-                    <input type="date" id="dateOfBirth" name="dateOfBirth"
-                        th:max="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"
+                    <label for="dateOfBirth" class="text-sm font-semibold text-gray-700">Ngày sinh (Từ đủ 18 tuổi)</label>
+                    <input type="date" id="dateOfBirth" name="dateOfBirth" required
+                        th:max="${#temporals.format(T(java.time.LocalDate).now().minusYears(18), 'yyyy-MM-dd')}"
                         class="w-full bg-transparent border-gray-300 rounded-lg focus:ring-[#566342] focus:border-[#566342]" />
                 </div>
 
@@ -190,6 +190,7 @@
                 <div class="flex flex-col gap-2 mb-4">
                     <label for="identifyCode" class="text-sm font-semibold text-gray-700">Số CCCD / Hộ chiếu</label>
                     <input type="text" id="identifyCode" name="identifyCode" required
+                        pattern="^(\d{12}|[A-Za-z0-9]{8,12})$" title="CCCD phải gồm đúng 12 chữ số, hoặc Hộ chiếu từ 8-12 ký tự chữ và số"
                         placeholder="Nhập 12 số CCCD hoặc số Hộ chiếu"
                         class="w-full bg-transparent border-gray-300 rounded-lg focus:ring-[#566342] focus:border-[#566342]" />
                 </div>
