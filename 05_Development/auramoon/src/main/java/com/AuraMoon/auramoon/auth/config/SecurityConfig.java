@@ -51,7 +51,7 @@ public class SecurityConfig {
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {
                         // "/receptionist/**"
-//                        "/receptionist/**"
+                        // "/receptionist/**"
         };
 
         private static final String[] THERAPIST_ENDPOINTS = {
@@ -80,7 +80,7 @@ public class SecurityConfig {
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/aut" +
-                                                        "h/login")
+                                                                "h/login")
                                                 .loginProcessingUrl("/auth/login")
                                                 .usernameParameter("email")
                                                 .passwordParameter("password")
@@ -92,7 +92,7 @@ public class SecurityConfig {
                                                 .successHandler(oAuth2LoginSuccessHandler))
                                 .logout(logout -> logout
                                                 .logoutUrl("/auth/logout")
-                                                .logoutSuccessUrl("/auth/login?logout=true")
+                                                .logoutSuccessUrl("/")
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID")
                                                 .permitAll())

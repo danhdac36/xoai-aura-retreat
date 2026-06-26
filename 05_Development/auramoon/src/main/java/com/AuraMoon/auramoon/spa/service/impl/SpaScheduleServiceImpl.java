@@ -15,6 +15,9 @@ import com.AuraMoon.auramoon.spa.repository.TreatmentRoomRepository;
 import com.AuraMoon.auramoon.spa.repository.TreatmentServiceRepository;
 import com.AuraMoon.auramoon.booking.repository.BookingRepository;
 import com.AuraMoon.auramoon.booking.entity.Booking;
+import com.AuraMoon.auramoon.auth.repository.UserRepository;
+import com.AuraMoon.auramoon.auth.entity.User;
+import com.AuraMoon.auramoon.billing.service.IEmailNotificationService;
 import com.AuraMoon.auramoon.spa.service.SpaScheduleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,19 +37,25 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
     private final TreatmentBookingRepository treatmentBookingRepository;
     private final TreatmentServiceRepository treatmentServiceRepository;
     private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final IEmailNotificationService emailNotificationService;
 
     public SpaScheduleServiceImpl(ScheduleRepository scheduleRepository,
             TreatmentRoomRepository roomRepository,
             TherapistRepository therapistRepository,
             TreatmentBookingRepository treatmentBookingRepository,
             TreatmentServiceRepository treatmentServiceRepository,
-            BookingRepository bookingRepository) {
+            BookingRepository bookingRepository,
+            UserRepository userRepository,
+            IEmailNotificationService emailNotificationService) {
         this.scheduleRepository = scheduleRepository;
         this.roomRepository = roomRepository;
         this.therapistRepository = therapistRepository;
         this.treatmentBookingRepository = treatmentBookingRepository;
         this.treatmentServiceRepository = treatmentServiceRepository;
         this.bookingRepository = bookingRepository;
+        this.userRepository = userRepository;
+        this.emailNotificationService = emailNotificationService;
     }
 
     @Override
@@ -103,7 +112,19 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
         if (availableTherapists.isEmpty()) {
             throw new SpaBusinessException("SPA-010", "No available Therapist or Therapy Room could be found.");
         }
+        
+        // Cân bằng công việc: Lựa chọn Therapist có số ca làm việc ít nhất trong ngày
         Therapist selectedTherapist = availableTherapists.get(0);
+        long minWorkload = Long.MAX_VALUE;
+        LocalDateTime startOfDay = startTime.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = startTime.toLocalDate().atTime(java.time.LocalTime.MAX);
+        for (Therapist t : availableTherapists) {
+            long workload = scheduleRepository.countDailySchedulesForTherapist(t.getId(), startOfDay, endOfDay);
+            if (workload < minWorkload) {
+                minWorkload = workload;
+                selectedTherapist = t;
+            }
+        }
 
         // 4. Tạo bản ghi Schedule
         Schedule schedule = new Schedule();
@@ -130,6 +151,23 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
         response.setRoomId(schedule.getRoom().getId());
         response.setStartTime(schedule.getStartTime());
         response.setEndTime(schedule.getEndTime());
+
+        // 4.5. Gửi email nhắc lịch hẹn cho khách (Bọc trong try-catch để tránh rollback giao dịch nếu lỗi mail)
+        try {
+            User guest = userRepository.findById(guestBooking.getGuestId()).orElse(null);
+            if (guest != null && guest.getEmail() != null) {
+                String formattedTime = startTime.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy"));
+                emailNotificationService.sendSpaBookingReminderEmail(
+                        guest.getEmail(),
+                        guest.getFullName() != null ? guest.getFullName() : "Guest",
+                        service.getServiceName(),
+                        selectedRoom.getRoomName(),
+                        formattedTime
+                );
+            }
+        } catch (Exception e) {
+            System.err.println("[WARNING] Không thể gửi email nhắc lịch Spa: " + e.getMessage());
+        }
 
         return response;
     }
