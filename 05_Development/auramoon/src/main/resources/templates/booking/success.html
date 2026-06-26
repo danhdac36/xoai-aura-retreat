@@ -18,7 +18,7 @@
     </style>
     <th:block th:replace="~{fragments/tailwind-config :: tailwind-config}"></th:block>
 </head>
-<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans flex items-center justify-center min-h-screen p-4" th:classappend="${#authorization.expression('isAuthenticated() and !hasRole(''GUEST'')')} ? 'md:pl-64' : ''">
+<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans flex items-center justify-center min-h-screen p-4" th:classappend="${#authorization.expression('isAuthenticated()')} ? 'md:pl-64' : ''">
     <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
     <main class="w-full max-w-lg">
         <div class="glass-card bg-white/80 backdrop-blur-md border border-white/30 p-8 md:p-10 rounded-3xl shadow-2xl text-center relative overflow-hidden animate-fade-in">

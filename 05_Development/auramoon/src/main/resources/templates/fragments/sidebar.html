@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 
 <body>
-    <aside th:fragment="sidebar" sec:authorize="isAuthenticated() and !hasRole('GUEST')"
+    <aside th:fragment="sidebar" sec:authorize="isAuthenticated()"
         class="h-screen w-64 fixed left-0 top-0 bg-surface-container-low border-r border-outline-variant flex flex-col py-stack-lg z-50">
         <div class="px-6 mb-10">
             <h1 class="font-headline-sm text-headline-sm text-primary">Xoai Aura</h1>

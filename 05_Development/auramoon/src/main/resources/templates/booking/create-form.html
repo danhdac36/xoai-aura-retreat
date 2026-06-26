@@ -30,7 +30,7 @@
     <th:block th:replace="~{fragments/tailwind-config :: tailwind-config}"></th:block>
 </head>
 
-<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans" th:classappend="${#authorization.expression('isAuthenticated() and !hasRole(''GUEST'')')} ? 'md:pl-64' : ''">
+<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans" th:classappend="${#authorization.expression('isAuthenticated()')} ? 'md:pl-64' : ''">
     <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
     <main class="min-h-screen py-16 px-4 md:px-8 max-w-4xl mx-auto">
         <a th:href="@{/packages/{id}(id=${pkg.id})}"
