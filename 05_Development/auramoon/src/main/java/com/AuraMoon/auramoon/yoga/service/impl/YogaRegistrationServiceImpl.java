@@ -85,15 +85,7 @@ public class YogaRegistrationServiceImpl implements IYogaRegistrationService {
         Optional<YogaRegistration> existingReg = yogaRegistrationRepository
                 .findByBookingIdAndSchedule_IdAndStatus(request.getBookingId(), schedule.getId(), "REGISTERED");
         if (existingReg.isPresent()) {
-            return YogaRegistrationResponse.builder()
-                    .registrationId(existingReg.get().getId())
-                    .bookingId(existingReg.get().getBookingId())
-                    .yogaScheduleId(schedule.getId())
-                    .className(schedule.getYogaClass().getClassName())
-                    .location(schedule.getLocation())
-                    .startTime(schedule.getStartTime())
-                    .status(existingReg.get().getStatus())
-                    .build();
+            throw new YogaBusinessException("YOGA-007", "Bạn đã đăng ký lớp học này rồi");
         }
 
         // 4. Kiểm tra sĩ số lớp tối đa (BR-YOGA-02)

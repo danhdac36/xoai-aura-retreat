@@ -36,4 +36,26 @@ public interface YogaScheduleRepository extends JpaRepository<YogaSchedule, Inte
                      @Param("instructorUserId") Integer instructorUserId,
                      @Param("start") LocalDateTime start,
                      @Param("end") LocalDateTime end);
+
+       @Query("SELECT COUNT(s) FROM YogaSchedule s " +
+              "WHERE s.isDelete = false " +
+              "AND s.instructor.instructorId = :instructorId " +
+              "AND (:excludeScheduleId IS NULL OR s.id <> :excludeScheduleId) " +
+              "AND (s.startTime < :endTime AND s.endTime > :startTime)")
+       long countOverlappingInstructorSchedules(
+              @Param("instructorId") Integer instructorId,
+              @Param("startTime") LocalDateTime startTime,
+              @Param("endTime") LocalDateTime endTime,
+              @Param("excludeScheduleId") Integer excludeScheduleId);
+
+       @Query("SELECT COUNT(s) FROM YogaSchedule s " +
+              "WHERE s.isDelete = false " +
+              "AND s.location = :location " +
+              "AND (:excludeScheduleId IS NULL OR s.id <> :excludeScheduleId) " +
+              "AND (s.startTime < :endTime AND s.endTime > :startTime)")
+       long countOverlappingLocationSchedules(
+              @Param("location") String location,
+              @Param("startTime") LocalDateTime startTime,
+              @Param("endTime") LocalDateTime endTime,
+              @Param("excludeScheduleId") Integer excludeScheduleId);
 }

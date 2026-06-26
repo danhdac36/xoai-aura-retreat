@@ -137,7 +137,7 @@ public class YogaRegistrationController {
             errorWrapper.put("error", errorDetail);
 
             HttpStatus status = HttpStatus.BAD_REQUEST;
-            if ("YOGA-002".equals(e.getErrorCode()) || "YOGA-003".equals(e.getErrorCode())) {
+            if ("YOGA-002".equals(e.getErrorCode()) || "YOGA-003".equals(e.getErrorCode()) || "YOGA-007".equals(e.getErrorCode())) {
                 status = HttpStatus.CONFLICT;
             } else if ("YOGA-006".equals(e.getErrorCode())) {
                 status = HttpStatus.FORBIDDEN;

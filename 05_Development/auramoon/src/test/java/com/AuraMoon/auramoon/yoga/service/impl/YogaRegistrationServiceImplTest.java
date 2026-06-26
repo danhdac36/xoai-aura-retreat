@@ -134,6 +134,28 @@ class YogaRegistrationServiceImplTest {
     }
 
     @Test
+    @DisplayName("YOGA-TC-001.5 - Báo lỗi khi đã đăng ký lịch học này từ trước")
+    void registerYogaClass_alreadyRegistered_throwsException() {
+        YogaRegistrationRequest request = YogaRegistrationRequest.builder()
+                .bookingId(1)
+                .yogaScheduleId(5)
+                .confirmHealthWarning(false)
+                .build();
+
+        when(bookingRepository.findById(1)).thenReturn(Optional.of(checkedInBooking));
+        when(yogaScheduleRepository.findByIdForUpdate(5)).thenReturn(Optional.of(activeSchedule));
+        
+        YogaRegistration existing = YogaRegistration.builder().id(101).bookingId(1).schedule(activeSchedule).status("REGISTERED").build();
+        when(yogaRegistrationRepository.findByBookingIdAndSchedule_IdAndStatus(1, 5, "REGISTERED"))
+                .thenReturn(Optional.of(existing));
+
+        YogaBusinessException ex = assertThrows(YogaBusinessException.class,
+                () -> yogaRegistrationService.registerYogaClass(request));
+        assertEquals("YOGA-007", ex.getErrorCode());
+        assertEquals("Bạn đã đăng ký lớp học này rồi", ex.getMessage());
+    }
+
+    @Test
     @DisplayName("YOGA-TC-002 - Báo lỗi khi lớp học đã đầy sĩ số (Over-capacity)")
     void registerYogaClass_classFull_throwsException() {
         YogaRegistrationRequest request = YogaRegistrationRequest.builder()

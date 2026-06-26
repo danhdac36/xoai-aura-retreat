@@ -100,6 +100,18 @@
                 <span class="font-label-md text-label-md">Spa Staff Management</span>
             </a>
 
+            <!-- MANAGER - YOGA MANAGEMENT -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('MANAGER', 'ADMIN')" th:href="@{/manager/yoga/classes}">
+                <span class="material-symbols-outlined" data-icon="fitness_center">fitness_center</span>
+                <span class="font-label-md text-label-md">Yoga Class Management</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('MANAGER', 'ADMIN')" th:href="@{/manager/yoga/schedules}">
+                <span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+                <span class="font-label-md text-label-md">Yoga Schedule Management</span>
+            </a>
+
             <!-- F&B Guest -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
                 sec:authorize="hasAnyRole('GUEST', 'ADMIN')" th:href="@{/fnb/meal-selection}">
