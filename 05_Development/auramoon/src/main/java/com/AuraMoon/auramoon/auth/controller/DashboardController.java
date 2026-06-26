@@ -30,4 +30,9 @@ public class DashboardController {
     public String cheffHome() {
         return "auth/cheff_home";
     }
+
+    @GetMapping("/instructor/yoga/home")
+    public String instructorHome() {
+        return "auth/instructor_home";
+    }
 }

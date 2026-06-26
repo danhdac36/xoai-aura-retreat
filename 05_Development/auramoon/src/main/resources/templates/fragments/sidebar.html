@@ -35,6 +35,11 @@
                 <span class="material-symbols-outlined" data-icon="home">home</span>
                 <span class="font-label-md text-label-md">Home</span>
             </a>
+            <a sec:authorize="hasRole('YOGA_INSTRUCTOR')" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/instructor/yoga/home}">
+                <span class="material-symbols-outlined" data-icon="home">home</span>
+                <span class="font-label-md text-label-md">Home</span>
+            </a>
             <a sec:authorize="hasRole('GUEST')" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
                 th:href="@{/}">
                 <span class="material-symbols-outlined" data-icon="home">home</span>
@@ -114,7 +119,7 @@
             </a>
             <!-- Yoga Instructor Schedule -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasAnyRole('YOGA_INSTRUCTOR','ADMIN')" th:href="@{/instructor/yoga/schedule}">
+                sec:authorize="hasAnyRole('YOGA_INSTRUCTOR','MANAGER')" th:href="@{/instructor/yoga/schedule}">
                 <span class="material-symbols-outlined" data-icon="self_improvement">self_improvement</span>
                 <span class="font-label-md text-label-md">Yoga Instructor</span>
             </a>
@@ -128,12 +133,12 @@
 
             <!-- MANAGER - YOGA MANAGEMENT -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasAnyRole('MANAGER', 'ADMIN')" th:href="@{/manager/yoga/classes}">
+                sec:authorize="hasAnyRole('MANAGER')" th:href="@{/manager/yoga/classes}">
                 <span class="material-symbols-outlined" data-icon="fitness_center">fitness_center</span>
                 <span class="font-label-md text-label-md">Yoga Class Management</span>
             </a>
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasAnyRole('MANAGER', 'ADMIN')" th:href="@{/manager/yoga/schedules}">
+                sec:authorize="hasAnyRole('MANAGER')" th:href="@{/manager/yoga/schedules}">
                 <span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
                 <span class="font-label-md text-label-md">Yoga Schedule Management</span>
             </a>

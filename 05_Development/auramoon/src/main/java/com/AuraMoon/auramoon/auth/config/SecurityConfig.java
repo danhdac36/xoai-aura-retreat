@@ -85,6 +85,10 @@ public class SecurityConfig {
                         "/receptionist/villa/**"
         };
 
+        private static final String[] YOGA_INSTRUCTOR_ENDPOINTS = {
+                        "/instructor/yoga/**"
+        };
+
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
@@ -97,6 +101,7 @@ public class SecurityConfig {
                                                 .requestMatchers(CHEFF_ENDPOINTS).hasRole("CHEFF")
                                                 .requestMatchers(MANAGER_ENDPOINTS).hasRole("MANAGER")
                                                 .requestMatchers(MANAGER_ADMIN_ENDPOINTS).hasAnyRole("MANAGER", "ADMIN", "GUEST")
+                                                .requestMatchers(YOGA_INSTRUCTOR_ENDPOINTS).hasRole("YOGA_INSTRUCTOR")
 
                                                 .requestMatchers(RECEPTIONIST_ADMIN_ENDPOINTS).hasAnyRole("RECEPTIONIST", "ADMIN")
                                                 .anyRequest().authenticated())

@@ -7,4 +7,5 @@ public enum UserRole {
     THERAPIST,
     MANAGER,
     ADMIN,
+    YOGA_INSTRUCTOR,
 }
