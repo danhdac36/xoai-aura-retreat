@@ -177,6 +177,7 @@
     </style>
 </head>
 <body class="text-on-surface relative overflow-x-hidden min-h-screen">
+<th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 <!-- Animated Photo Background -->
 <div class="bg-animated-image"></div>
 <div class="bg-overlay"></div>
@@ -186,7 +187,7 @@
 <div class="fixed top-0 right-0 w-96 h-96 bg-[#c5c1b6]/40 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-2000 pointer-events-none z-[-1]"></div>
 <div class="fixed -bottom-32 left-20 w-96 h-96 bg-[#869273]/30 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-4000 pointer-events-none z-[-1]"></div>
 
-<main class="max-w-[1440px] mx-auto px-margin-desktop py-12 relative">
+<main class="max-w-[1440px] mx-auto px-margin-desktop py-12 relative md:ml-64">
     
     <!-- Back Button -->
     <div class="mb-8 animate-fade-in-up opacity-0 relative z-10">
