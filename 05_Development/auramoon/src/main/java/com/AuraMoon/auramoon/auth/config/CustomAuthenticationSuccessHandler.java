@@ -37,6 +37,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             } else if (role.equals("ROLE_CHEFF")) {
                 redirectUrl = "/fnb/chef/home";
                 break;
+            } else if (role.equals("ROLE_YOGA_INSTRUCTOR")) {
+                redirectUrl = "/instructor/yoga/home";
+                break;
             }
         }
 
