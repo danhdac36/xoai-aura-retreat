@@ -4,19 +4,26 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Hành Trình Tĩnh Tại | XOAI AURA RETREAT</title>
+    <title>Hành Trình Tĩnh Lại | XOAI AURA RETREAT</title>
     <!-- Tailwind CSS and Fonts -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@300;400;500;600&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
     <style>
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
     </style>
     <!-- Use original tailwind config -->
     <th:block th:replace="~{fragments/tailwind-config :: tailwind-config}"></th:block>
 </head>
 
-<body class="bg-surface-variant text-on-background antialiased selection:bg-primary-container selection:text-on-primary-container bg-grain">
+<body
+    class="bg-surface-variant text-on-background antialiased selection:bg-primary-container selection:text-on-primary-container bg-grain">
     <!-- Top Navigation Bar -->
     <th:block th:replace="~{fragments/public-header :: public-header}"></th:block>
 
@@ -26,9 +33,13 @@
         <section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-16 md:py-24">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-end">
                 <div class="md:col-span-8">
-                    <h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface mb-6">Hành Trình Tĩnh Tại</h1>
+                    <h1
+                        class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface mb-6">
+                        Hành Trình Tĩnh Lại</h1>
                     <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
-                        Hãy để không gian tĩnh lặng dẫn lối bạn trở về với bản ngã chân thật nhất. Những hành trình nghỉ dưỡng được thiết kế tỉ mỉ để khôi phục sự cân bằng, xoa dịu tâm trí và đánh thức nguồn năng lượng sống sâu thẳm bên trong bạn.
+                        Hãy để không gian tĩnh lặng dẫn lối bạn trở về với bản ngã chân thật nhất. Những hành trình nghỉ
+                        dưỡng được thiết kế tỉ mỉ để khôi phục sự cân bằng, xoa dịu tâm trí và đánh thức nguồn năng
+                        lượng sống sâu thẳm bên trong bạn.
                     </p>
                 </div>
             </div>
@@ -37,15 +48,16 @@
         <!-- Filters Section -->
         <section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop mb-16">
             <form th:action="@{/packages}" method="get" id="filterForm">
-                <input type="hidden" name="type" id="filterType" th:value="${selectedType == 'All' ? '' : selectedType}" />
+                <input type="hidden" name="type" id="filterType"
+                    th:value="${selectedType == 'All' ? '' : selectedType}" />
                 <div class="flex flex-wrap gap-8 items-center border-b border-surface-variant pb-4">
                     <button type="submit" onclick="document.getElementById('filterType').value=''"
                         th:class="${selectedType == null || selectedType == 'All' || selectedType == ''} ? 'font-label-md text-label-md uppercase text-primary border-b border-primary pb-2' : 'font-label-md text-label-md uppercase text-secondary hover:text-primary transition-colors pb-2'">
                         Tất Cả
                     </button>
-                    <button type="submit" th:each="type : ${types}" 
-                        onclick="document.getElementById('filterType').value=this.getAttribute('data-value')" th:attr="data-value=${type}"
-                        th:text="${type}"
+                    <button type="submit" th:each="type : ${types}"
+                        onclick="document.getElementById('filterType').value=this.getAttribute('data-value')"
+                        th:attr="data-value=${type}" th:text="${type}"
                         th:class="${type == selectedType} ? 'font-label-md text-label-md uppercase text-primary border-b border-primary pb-2' : 'font-label-md text-label-md uppercase text-secondary hover:text-primary transition-colors pb-2'">
                         Category
                     </button>
@@ -56,28 +68,37 @@
         <!-- Asymmetric Editorial Grid -->
         <section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-y-32 gap-x-12">
-                
-                <div th:each="pkg, iterStat : ${packages}" 
-                     class="md:col-span-12 flex flex-col md:flex-row items-center gap-12 md:gap-16 group"
-                     th:classappend="${iterStat.even} ? 'md:flex-row-reverse' : ''">
-                     
+
+                <div th:each="pkg, iterStat : ${packages}"
+                    class="md:col-span-12 flex flex-col md:flex-row items-center gap-12 md:gap-16 group"
+                    th:classappend="${iterStat.even} ? 'md:flex-row-reverse' : ''">
+
                     <div class="w-full md:w-1/2 overflow-hidden shadow-2xl border border-surface-variant/20">
                         <a th:href="@{/packages/{id}(id=${pkg.id})}">
                             <img th:src="${pkg.typePackage == 'Stress Relief' || pkg.typePackage == 'Spa'} ? @{/img/spa-retreat.jpg} :
                                      (${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'} ? @{/img/detox-retreat.jpg} :
                                      (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
                                       @{/img/retreat-default.jpg}))" th:alt="${pkg.packageName}"
-                                 class="w-full aspect-[4/3] object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" />
+                                class="w-full aspect-[4/3] object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" />
                         </a>
                     </div>
-                    
+
                     <div class="w-full md:w-1/2 space-y-6">
-                        <span class="font-label-md text-label-md text-primary uppercase tracking-[0.4em] block opacity-70" th:text="${pkg.typePackage} + ' • ' + ${pkg.durationDays} + ' Ngày'">Mindfulness • 7 Ngày</span>
-                        <h2 class="font-headline-sm text-[24px] md:text-[32px] text-on-surface leading-tight" th:text="${pkg.packageName}">Con Đường Đến Sự Tĩnh Lặng</h2>
-                        <p class="font-body-lg text-body-lg text-on-surface-variant/80 italic line-clamp-4" th:text="${pkg.description}">Một hành trình đắm chìm vào không gian tĩnh lặng tuyệt đối...</p>
+                        <span
+                            class="font-label-md text-label-md text-primary uppercase tracking-[0.4em] block opacity-70"
+                            th:text="${pkg.typePackage} + ' • ' + ${pkg.durationDays} + ' Ngày'">Mindfulness • 7
+                            Ngày</span>
+                        <h2 class="font-headline-sm text-[24px] md:text-[32px] text-on-surface leading-tight"
+                            th:text="${pkg.packageName}">Con Đường Đến Sự Tĩnh Lặng</h2>
+                        <p class="font-body-lg text-body-lg text-on-surface-variant/80 italic line-clamp-4"
+                            th:text="${pkg.description}">Một hành trình đắm chìm vào không gian tĩnh lặng tuyệt đối...
+                        </p>
                         <div class="pt-4">
-                            <span class="font-display-lg text-[24px] md:text-[28px] text-primary italic block mb-6" th:text="'Từ ' + ${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">Từ $4,500</span>
-                            <a class="font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface inline-flex items-center gap-3 border-b border-primary/30 pb-1 hover:border-primary transition-all duration-300" th:href="@{/packages/{id}(id=${pkg.id})}">
+                            <span class="font-display-lg text-[24px] md:text-[28px] text-primary italic block mb-6"
+                                th:text="'Từ ' + ${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">Từ
+                                $4,500</span>
+                            <a class="font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface inline-flex items-center gap-3 border-b border-primary/30 pb-1 hover:border-primary transition-all duration-300"
+                                th:href="@{/packages/{id}(id=${pkg.id})}">
                                 Khám phá hành trình <span class="material-symbols-outlined text-sm">arrow_forward</span>
                             </a>
                         </div>
@@ -85,10 +106,12 @@
                 </div>
 
             </div>
-            
+
             <div th:if="${#lists.isEmpty(packages)}" class="py-20 text-center">
                 <h2 class="font-headline-md text-headline-md text-secondary mb-4">Không tìm thấy gói phù hợp</h2>
-                <a th:href="@{/packages}" class="font-label-md text-label-md uppercase tracking-[0.2em] text-primary border-b border-primary/30 pb-1 hover:border-primary transition-all duration-300">Xem tất cả hành trình</a>
+                <a th:href="@{/packages}"
+                    class="font-label-md text-label-md uppercase tracking-[0.2em] text-primary border-b border-primary/30 pb-1 hover:border-primary transition-all duration-300">Xem
+                    tất cả hành trình</a>
             </div>
         </section>
     </main>
@@ -97,4 +120,5 @@
     <th:block th:replace="~{fragments/public-footer :: public-footer}"></th:block>
 
 </body>
+
 </html>

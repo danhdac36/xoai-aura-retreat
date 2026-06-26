@@ -85,7 +85,7 @@
                         </a>
                         
                         <!-- Not Authenticated: Prompt Login -->
-                        <a sec:authorize="!isAuthenticated()" th:href="@{/auth/login}" class="block text-center w-full border border-outline hover:bg-surface-container-low text-on-surface-variant hover:text-primary font-label-md text-label-md uppercase tracking-widest py-4 px-8 rounded-full transition-all duration-300 ease-out">
+                        <a sec:authorize="!isAuthenticated()" th:href="@{/booking/create(packageId=${pkg.id})}" class="block text-center w-full border border-outline hover:bg-surface-container-low text-on-surface-variant hover:text-primary font-label-md text-label-md uppercase tracking-widest py-4 px-8 rounded-full transition-all duration-300 ease-out">
                             Đăng Nhập Để Đặt Gói
                         </a>
                     </div>
