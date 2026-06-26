@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::div})}">
+
+<head>
+    <title>Quản lý Lịch học Yoga | Aura Manager</title>
+</head>
+
+<body>
+    <div class="w-full">
+        <div class="max-w-7xl mx-auto">
+            <!-- Alert Messages -->
+            <div th:if="${successMessage}" class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-xl flex items-center gap-3">
+                <span class="material-symbols-outlined text-green-700">check_circle</span>
+                <p class="font-body-md text-green-800" th:text="${successMessage}">Thực hiện thành công</p>
+            </div>
+            <div th:if="${errorMessage}" class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-xl flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-700">error</span>
+                <p class="font-body-md text-red-800" th:text="${errorMessage}">Đã xảy ra lỗi</p>
+            </div>
+
+            <!-- Page Header Section -->
+            <section class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-stack-lg">
+                <div>
+                    <h2 class="font-headline-lg text-headline-lg text-on-background mb-2">Phân lịch học Yoga</h2>
+                    <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+                        Xếp lịch dạy cho giáo viên, bố trí phòng tập và quản lý ca học Yoga hàng ngày tại Xoai Aura Retreat.
+                    </p>
+                </div>
+                <div>
+                    <button onclick="openCreateModal()" class="flex items-center gap-2 bg-[#566342] hover:bg-[#3f4b2c] text-white px-5 py-3 rounded-full font-medium shadow-sm transition-all duration-200">
+                        <span class="material-symbols-outlined text-[20px]">add</span>
+                        <span>Xếp lịch học mới</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Date Selector & Navigation Panel -->
+            <section class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl shadow-sm mb-stack-lg flex flex-col sm:flex-row justify-between items-center gap-4">
+                <form id="dateForm" th:action="@{/manager/yoga/schedules}" method="get" class="flex items-center gap-3 w-full sm:w-auto">
+                    <span class="font-label-md text-on-surface-variant whitespace-nowrap">Chọn ngày xem lịch:</span>
+                    <input type="date" id="selectedDate" name="date" 
+                           th:value="${#temporals.format(selectedDate, 'yyyy-MM-dd')}" 
+                           onchange="document.getElementById('dateForm').submit()"
+                           class="border border-outline-variant rounded-lg px-4 py-2 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                </form>
+                
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <a th:href="@{/manager/yoga/schedules(date=${#temporals.format(selectedDate.minusDays(1), 'yyyy-MM-dd')})}" 
+                       class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container flex items-center transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+                    </a>
+                    <a th:href="@{/manager/yoga/schedules(date=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')})}" 
+                       class="px-4 py-2 border border-outline-variant rounded-lg hover:bg-surface-container font-medium text-sm transition-colors">
+                        Hôm nay
+                    </a>
+                    <a th:href="@{/manager/yoga/schedules(date=${#temporals.format(selectedDate.plusDays(1), 'yyyy-MM-dd')})}" 
+                       class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container flex items-center transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Schedules Table -->
+            <section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+                <div class="px-8 py-5 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+                    <h3 class="font-headline-sm text-headline-sm text-primary font-bold">
+                        Lịch học ngày <span class="text-secondary" th:text="${#temporals.format(selectedDate, 'dd/MM/yyyy')}">28/06/2026</span>
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-surface-container-low">
+                            <tr>
+                                <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider">Thời gian</th>
+                                <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider">Lớp học</th>
+                                <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider">Huấn luyện viên</th>
+                                <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider">Địa điểm</th>
+                                <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">Sĩ số</th>
+                                <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-outline-variant">
+                            <tr th:each="sch : ${schedules}" class="hover:bg-surface-bright transition-colors">
+                                <!-- Time -->
+                                <td class="px-6 py-5 font-body-md text-body-md text-on-surface font-semibold">
+                                    <div class="flex flex-col">
+                                        <span class="text-primary" th:text="${#temporals.format(sch.startTime, 'HH:mm') + ' - ' + #temporals.format(sch.endTime, 'HH:mm')}">08:00 - 09:00</span>
+                                        <span class="text-xs text-on-surface-variant opacity-70 font-normal" th:text="${#temporals.format(sch.startTime, 'dd/MM/yyyy')}">28/06/2026</span>
+                                    </div>
+                                </td>
+                                <!-- Class Info -->
+                                <td class="px-6 py-5">
+                                    <div class="flex flex-col">
+                                        <span class="font-body-md text-body-md text-on-surface font-bold" th:text="${sch.className}">Hatha Yoga</span>
+                                        <span class="text-xs text-secondary font-medium" th:text="${sch.durationMinutes} + ' phút'">60 phút</span>
+                                    </div>
+                                </td>
+                                <!-- Instructor -->
+                                <td class="px-6 py-5 font-body-md text-body-md text-on-surface font-semibold" 
+                                    th:text="${sch.instructorName != null ? sch.instructorName : 'Chưa phân công'}">
+                                    Instructor Name
+                                </td>
+                                <!-- Location -->
+                                <td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant" th:text="${sch.location}">
+                                    Room 1
+                                </td>
+                                <!-- Registered / Max -->
+                                <td class="px-6 py-5 text-center font-body-md text-body-md">
+                                    <div class="flex flex-col items-center">
+                                        <span class="font-bold text-primary" th:text="${sch.countRegistered} + ' / ' + ${sch.maxCapacity}">0 / 15</span>
+                                        <span class="text-[10px] text-green-700 font-semibold" th:if="${sch.countRegistered >= sch.maxCapacity}">ĐÃ ĐẦY</span>
+                                    </div>
+                                </td>
+                                <!-- Action Buttons -->
+                                <td class="px-6 py-5 text-center font-body-md text-body-md">
+                                    <div class="flex items-center justify-center gap-3">
+                                        <button th:data-id="${sch.scheduleId}"
+                                                th:data-class-id="${sch.classId}"
+                                                th:data-instructor-id="${sch.instructorId}"
+                                                th:data-location="${sch.location}"
+                                                th:data-start="${#temporals.format(sch.startTime, 'yyyy-MM-dd\'T\'HH:mm')}"
+                                                th:data-end="${#temporals.format(sch.endTime, 'yyyy-MM-dd\'T\'HH:mm')}"
+                                                th:data-capacity="${sch.maxCapacity}"
+                                                onclick="openEditModal(this)"
+                                                class="text-on-surface-variant hover:text-secondary p-1 flex items-center" title="Chỉnh sửa lịch">
+                                            <span class="material-symbols-outlined text-[20px]">edit</span>
+                                        </button>
+                                        <button th:data-id="${sch.scheduleId}"
+                                                th:data-name="${sch.className}"
+                                                th:data-registered="${sch.countRegistered}"
+                                                onclick="confirmDelete(this)"
+                                                class="text-red-600 hover:text-red-800 p-1 flex items-center" title="Hủy lịch học">
+                                            <span class="material-symbols-outlined text-[20px]">delete</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${schedules.isEmpty()}">
+                                <td colspan="6" class="px-6 py-12 text-center text-on-surface-variant font-body-md text-body-md">
+                                    Không có lịch học Yoga nào được lên lịch cho ngày này.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+    <!-- CREATE SCHEDULE MODAL -->
+    <div id="createModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl w-full max-w-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+                <h3 class="font-headline-sm text-headline-sm text-primary font-bold">Xếp lịch học mới</h3>
+                <button onclick="closeCreateModal()" class="text-on-surface-variant hover:text-on-surface flex items-center">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form th:action="@{/manager/yoga/schedules/create}" method="post" th:object="${scheduleRequest}" class="p-6 space-y-4">
+                <div>
+                    <label for="classId" class="block font-label-md text-label-md text-on-surface-variant mb-1">Lớp học Yoga <span class="text-red-500">*</span></label>
+                    <select id="classId" th:field="*{classId}" required
+                            class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary">
+                        <option value="" disabled selected>-- Chọn lớp học --</option>
+                        <option th:each="clazz : ${classes}" th:value="${clazz.classId}" th:text="${clazz.className} + ' (' + ${clazz.durationMinutes} + ' phút)'"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="instructorId" class="block font-label-md text-label-md text-on-surface-variant mb-1">Huấn luyện viên <span class="text-red-500">*</span></label>
+                    <select id="instructorId" th:field="*{instructorId}" required
+                            class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary">
+                        <option value="" disabled selected>-- Chọn giáo viên --</option>
+                        <option th:each="ins : ${instructors}" th:value="${ins.instructorId}" th:text="${ins.user != null ? ins.user.fullName : 'Huấn luyện viên'}"></option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="location" class="block font-label-md text-label-md text-on-surface-variant mb-1">Địa điểm <span class="text-red-500">*</span></label>
+                        <input type="text" id="location" th:field="*{location}" required
+                               placeholder="Ví dụ: Phòng tập A, Room 1..."
+                               class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"/>
+                    </div>
+                    <div>
+                        <label for="maxCapacity" class="block font-label-md text-label-md text-on-surface-variant mb-1">Sĩ số tối đa <span class="text-red-500">*</span></label>
+                        <input type="number" id="maxCapacity" th:field="*{maxCapacity}" min="1" required
+                               placeholder="Ví dụ: 15"
+                               class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"/>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="startTime" class="block font-label-md text-label-md text-on-surface-variant mb-1">Bắt đầu <span class="text-red-500">*</span></label>
+                        <input type="datetime-local" id="startTime" th:field="*{startTime}" required
+                               class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"/>
+                    </div>
+                    <div>
+                        <label for="endTime" class="block font-label-md text-label-md text-on-surface-variant mb-1">Kết thúc <span class="text-red-500">*</span></label>
+                        <input type="datetime-local" id="endTime" th:field="*{endTime}" required
+                               class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"/>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-outline-variant flex justify-end gap-3">
+                    <button type="button" onclick="closeCreateModal()" class="px-5 py-2.5 border border-outline-variant hover:bg-surface-container rounded-full font-medium transition-colors">
+                        Hủy bỏ
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 bg-[#566342] hover:bg-[#3f4b2c] text-white rounded-full font-medium shadow-sm transition-colors">
+                        Xếp lịch
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT SCHEDULE MODAL -->
+    <div id="editModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl w-full max-w-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
+                <h3 class="font-headline-sm text-headline-sm text-primary font-bold">Chỉnh sửa lịch học</h3>
+                <button onclick="closeEditModal()" class="text-on-surface-variant hover:text-on-surface flex items-center">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="editForm" method="post" class="p-6 space-y-4">
+                <div>
+                    <label for="editClassId" class="block font-label-md text-label-md text-on-surface-variant mb-1">Lớp học Yoga <span class="text-red-500">*</span></label>
+                    <select id="editClassId" name="classId" required
+                            class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary">
+                        <option th:each="clazz : ${classes}" th:value="${clazz.classId}" th:text="${clazz.className} + ' (' + ${clazz.durationMinutes} + ' phút)'"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="editInstructorId" class="block font-label-md text-label-md text-on-surface-variant mb-1">Huấn luyện viên <span class="text-red-500">*</span></label>
+                    <select id="editInstructorId" name="instructorId" required
+                            class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary">
+                        <option th:each="ins : ${instructors}" th:value="${ins.instructorId}" th:text="${ins.user != null ? ins.user.fullName : 'Huấn luyện viên'}"></option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="editLocation" class="block font-label-md text-label-md text-on-surface-variant mb-1">Địa điểm <span class="text-red-500">*</span></label>
+                        <input type="text" id="editLocation" name="location" required
+                               class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"/>
+                    </div>
+                    <div>
+                        <label for="editMaxCapacity" class="block font-label-md text-label-md text-on-surface-variant mb-1">Sĩ số tối đa <span class="text-red-500">*</span></label>
+                        <input type="number" id="editMaxCapacity" name="maxCapacity" min="1" required
+                               class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"/>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="editStartTime" class="block font-label-md text-label-md text-on-surface-variant mb-1">Bắt đầu <span class="text-red-500">*</span></label>
+                        <input type="datetime-local" id="editStartTime" name="startTime" required
+                               class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"/>
+                    </div>
+                    <div>
+                        <label for="editEndTime" class="block font-label-md text-label-md text-on-surface-variant mb-1">Kết thúc <span class="text-red-500">*</span></label>
+                        <input type="datetime-local" id="editEndTime" name="endTime" required
+                               class="w-full border border-outline-variant rounded-lg px-4 py-2.5 bg-background text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary"/>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-outline-variant flex justify-end gap-3">
+                    <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 border border-outline-variant hover:bg-surface-container rounded-full font-medium transition-colors">
+                        Hủy bỏ
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 bg-[#566342] hover:bg-[#3f4b2c] text-white rounded-full font-medium shadow-sm transition-colors">
+                        Cập nhật
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DELETE FORM (HIDDEN) -->
+    <form id="deleteForm" method="post" style="display: none;"></form>
+
+    <script th:inline="javascript">
+        function openCreateModal() {
+            document.getElementById('createModal').classList.remove('hidden');
+        }
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.add('hidden');
+        }
+
+        function openEditModal(button) {
+            const scheduleId = button.getAttribute('data-id');
+            const classId = button.getAttribute('data-class-id');
+            const instructorId = button.getAttribute('data-instructor-id');
+            const location = button.getAttribute('data-location');
+            const startTime = button.getAttribute('data-start');
+            const endTime = button.getAttribute('data-end');
+            const maxCapacity = button.getAttribute('data-capacity');
+
+            const form = document.getElementById('editForm');
+            form.action = '/manager/yoga/schedules/edit/' + scheduleId;
+            
+            document.getElementById('editClassId').value = classId;
+            document.getElementById('editInstructorId').value = instructorId;
+            document.getElementById('editLocation').value = location || '';
+            document.getElementById('editMaxCapacity').value = maxCapacity || 15;
+            
+            // Limit datetime-local input string length to 16 chars: yyyy-MM-ddTHH:mm
+            if (startTime) document.getElementById('editStartTime').value = startTime.substring(0, 16);
+            if (endTime) document.getElementById('editEndTime').value = endTime.substring(0, 16);
+            
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function confirmDelete(button) {
+            const scheduleId = button.getAttribute('data-id');
+            const className = button.getAttribute('data-name');
+            const countRegistered = parseInt(button.getAttribute('data-registered') || '0', 10);
+
+            if (countRegistered > 0) {
+                alert('Không thể hủy lịch học "' + className + '" này vì đã có ' + countRegistered + ' học viên đăng ký tham gia.');
+                return;
+            }
+            if (confirm('Bạn có chắc chắn muốn hủy lịch học "' + className + '" này không?')) {
+                const form = document.getElementById('deleteForm');
+                form.action = '/manager/yoga/schedules/delete/' + scheduleId;
+                form.submit();
+            }
+        }
+    </script>
+    </div>
+</body>
+
+</html>
