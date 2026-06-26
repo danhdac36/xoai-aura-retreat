@@ -16,6 +16,8 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Integer> {
 
     List<AuditLog> findTop5ByActionTypeStartingWithOrderByTimestampDesc(String actionTypePrefix);
 
+    List<AuditLog> findTop10ByActorIdOrderByTimestampDesc(Integer actorId);
+
     // Dùng cho test mock
     default void saveAuditLog(String actionType, Integer actorId, String details) {
         AuditLog log = new AuditLog();
@@ -24,5 +26,15 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Integer> {
         log.setDetails(details);
         log.setTimestamp(new java.util.Date());
         this.save(log);
+    }
+
+    @Override
+    default void deleteAll() {
+        throw new UnsupportedOperationException("Audit logs cannot be deleted");
+    }
+
+    @Override
+    default void deleteById(Integer id) {
+        throw new UnsupportedOperationException("Audit logs cannot be deleted");
     }
 }

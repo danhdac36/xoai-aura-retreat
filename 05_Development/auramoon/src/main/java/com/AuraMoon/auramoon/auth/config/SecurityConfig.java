@@ -10,8 +10,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
         @Autowired
@@ -51,7 +54,7 @@ public class SecurityConfig {
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {
                         // "/receptionist/**"
-//                        "/receptionist/**"
+                        // "/receptionist/**"
         };
 
         private static final String[] THERAPIST_ENDPOINTS = {
@@ -80,7 +83,7 @@ public class SecurityConfig {
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/aut" +
-                                                        "h/login")
+                                                                "h/login")
                                                 .loginProcessingUrl("/auth/login")
                                                 .usernameParameter("email")
                                                 .passwordParameter("password")

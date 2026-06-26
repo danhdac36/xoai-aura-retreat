@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::div})}">
+<head>
+    <title>Staff Profile | Lumina Wellness</title>
+</head>
+<body>
+    <div class="w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-20">
+        <!-- Load specific CSS and JS -->
+        <script th:src="@{/js/hr/profile-tailwind.js}"></script>
+        <link rel="stylesheet" th:href="@{/css/hr/profile.css}" />
+
+        <!-- Header Navigation (Back button) -->
+        <div class="mb-12 flex justify-between items-center">
+            <a th:href="@{/manager/spa/therapists}" class="cursor-pointer transition-transform duration-200 active:scale-95 group flex items-center gap-2 text-on-surface-variant hover:text-primary">
+                <span class="material-symbols-outlined">arrow_back</span>
+                <span class="font-label-caps text-label-caps uppercase tracking-widest text-[12px]">Back to Staff List</span>
+            </a>
+        </div>
+
+        <!-- Header Section: Profile Summary -->
+        <section class="flex flex-col md:flex-row items-center md:items-end gap-8 mb-section-gap animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div class="relative group">
+                <div class="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-white shadow-xl transform transition-transform duration-500 group-hover:scale-105">
+                    <img alt="Profile Picture" class="w-full h-full object-cover" th:src="${profile.avatar != null ? profile.avatar : 'https://lh3.googleusercontent.com/aida-public/AB6AXuAtExxyJOwvMT-ePqN2zfaBtaJnjntPRBhFQPOjLw2JwAhmw1d27xE8h8xdl1hcglqhFE5p_0V0lAFIUd-Zx4Zb01pmnw1cd6SIlrAVfBrpiL1sWTn6bl3qB8FlEZpwxmsjEUjl7WTyBRu79_L2mwPeXeML2bsVdR2x476JBRW3gCFb8gACgWRq4UQidnYh6XsX3A5KfI1WtF3OWWGJ5Bzu9d26CePoenFwwPq1TV1zbEsU0Vd193prTb8juDtxqgapSLViAG9LRc54'}"/>
+                </div>
+                <div class="absolute bottom-2 right-2 bg-primary text-white p-2 rounded-full border-2 border-white shadow-lg">
+                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                </div>
+            </div>
+            
+            <div class="text-center md:text-left flex-1 space-y-3">
+                <div class="inline-block px-4 py-1.5 bg-primary-container/10 text-primary-container rounded-full font-label-caps text-label-caps border border-primary-container/20">
+                    <span th:text="${profile.roleName}">SPA THERAPIST</span>
+                </div>
+                <h1 class="font-headline-md text-display-lg-mobile md:text-headline-md lg:text-display-lg text-primary leading-tight">
+                    <span th:text="${profile.fullName}">Nguyen Lan Anh</span>
+                </h1>
+                <p class="text-on-surface-variant font-body-lg max-w-lg">
+                    Dedicated to creating pathways for mental and physical serenity in the Aura Retreat ecosystem.
+                </p>
+            </div>
+            
+            <div class="flex gap-4">
+                <button class="bg-primary text-white px-8 py-3 rounded-full font-label-caps text-[12px] uppercase tracking-widest hover:scale-105 transition-transform duration-300 organic-shadow">
+                    SCHEDULE SESSION
+                </button>
+            </div>
+        </section>
+
+        <!-- Body Section: Two Card Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+            <!-- Card 1: Thông tin cá nhân -->
+            <div class="lg:col-span-7 bg-surface-container-lowest rounded-[24px] p-8 md:p-12 organic-shadow border border-outline-variant/20 animate-in fade-in slide-in-from-left-4 duration-700 delay-100">
+                <div class="flex items-center gap-4 mb-10">
+                    <span class="material-symbols-outlined text-primary-container text-3xl">person_outline</span>
+                    <h2 class="font-headline-sm text-headline-sm text-on-surface">Thông tin cá nhân</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                    <div class="space-y-1 group">
+                        <label class="font-label-caps text-[11px] text-on-surface-variant opacity-60 uppercase">Email Address</label>
+                        <p class="font-body-md text-on-surface group-hover:text-primary transition-colors" th:text="${profile.email}">anh.nguyen@xoai-aura.com</p>
+                        <div class="h-px w-full bg-outline-variant/30 mt-2 group-hover:bg-primary/30 transition-colors"></div>
+                    </div>
+                    <div class="space-y-1 group">
+                        <label class="font-label-caps text-[11px] text-on-surface-variant opacity-60 uppercase">Phone Number</label>
+                        <p class="font-body-md text-on-surface group-hover:text-primary transition-colors" th:text="${profile.phoneNumber}">+84 90 123 4567</p>
+                        <div class="h-px w-full bg-outline-variant/30 mt-2 group-hover:bg-primary/30 transition-colors"></div>
+                    </div>
+                    <div class="space-y-1 group">
+                        <label class="font-label-caps text-[11px] text-on-surface-variant opacity-60 uppercase">Primary Location</label>
+                        <p class="font-body-md text-on-surface group-hover:text-primary transition-colors">Aura Resort</p>
+                        <div class="h-px w-full bg-outline-variant/30 mt-2 group-hover:bg-primary/30 transition-colors"></div>
+                    </div>
+                    <div class="space-y-1 group">
+                        <label class="font-label-caps text-[11px] text-on-surface-variant opacity-60 uppercase">Spoken Languages</label>
+                        <div class="flex gap-2 pt-1">
+                            <span class="px-3 py-0.5 bg-surface-container rounded-full text-[13px] font-medium text-on-surface-variant">Vietnamese</span>
+                            <span class="px-3 py-0.5 bg-surface-container rounded-full text-[13px] font-medium text-on-surface-variant">English</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-16 pt-8 border-t border-outline-variant/10">
+                    <div class="p-6 bg-primary-container/5 rounded-xl border border-primary-container/10 flex items-start gap-4 italic text-on-surface-variant font-body-md leading-relaxed">
+                        <span class="material-symbols-outlined text-primary-container">format_quote</span>
+                        "My approach to wellness is rooted in the belief that true healing begins when we reconnect with the natural rhythms of our own bodies and the world around us."
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card 2: Lịch sử Hoạt động -->
+            <div class="lg:col-span-5 bg-surface-container-low rounded-[24px] p-8 md:p-10 organic-shadow border border-outline-variant/20 animate-in fade-in slide-in-from-right-4 duration-700 delay-200">
+                <div class="flex items-center justify-between mb-10">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-primary-container text-3xl">history</span>
+                        <h2 class="font-headline-sm text-headline-sm text-on-surface">Lịch sử Hoạt động</h2>
+                    </div>
+                </div>
+                
+                <div class="relative space-y-10">
+                    <th:block th:each="act : ${profile.recentActivities}">
+                        <div class="timeline-item flex gap-6 group">
+                            <div class="timeline-line relative shrink-0">
+                                <div class="w-4 h-4 rounded-full bg-primary ring-4 ring-primary/10 z-10 relative mt-1.5 transition-transform group-hover:scale-125"></div>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-body-md font-semibold text-on-surface" th:text="${act.actionType}">Action</h4>
+                                <p class="font-label-caps text-[11px] text-on-surface-variant opacity-60 uppercase tracking-wider" th:text="${act.timestamp}">Time</p>
+                                <p class="text-sm text-on-surface-variant/80 mt-1" th:text="${act.details}">Details</p>
+                            </div>
+                        </div>
+                    </th:block>
+                    
+                    <div th:if="${#lists.isEmpty(profile.recentActivities)}" class="text-center text-on-surface-variant italic py-4">
+                        Không có hoạt động nào gần đây.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // Subtle interaction for the cards
+            document.querySelectorAll('.organic-shadow').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = (y - centerY) / 30;
+                    const rotateY = (centerX - x) / 30;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+                    card.style.transition = 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+                });
+                
+                card.addEventListener('mouseenter', () => {
+                    card.style.transition = 'none';
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>
