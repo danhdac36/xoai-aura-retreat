@@ -43,12 +43,16 @@ public class SecurityConfig {
         };
 
         private static final String[] GUEST_ENDPOINTS = {
-                        "/booking/itinerary/**",
                         "/guest/booking-spa/**",
                         "/fnb/meal-selection/**",
                         "/fnb/alacarte-order/**",
                         "/profile/health/**",
                         "/packges/**"
+        };
+
+        private static final String[] SHARED_BOOKING_ENDPOINTS = {
+                        "/booking/itinerary/**",
+                        "/booking/history/**"
         };
 
         private static final String[] ADMIN_ENDPOINTS = {
@@ -98,6 +102,7 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                                                 .requestMatchers(GUEST_ENDPOINTS).hasRole("GUEST")
+                                                .requestMatchers(SHARED_BOOKING_ENDPOINTS).hasAnyRole("GUEST", "MANAGER", "RECEPTIONIST", "ADMIN")
                                                 .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
                                                 .requestMatchers(RECEPTIONIST_ENDPOINTS).hasRole("RECEPTIONIST")
                                                 .requestMatchers(THERAPIST_ENDPOINTS).hasRole("THERAPIST")

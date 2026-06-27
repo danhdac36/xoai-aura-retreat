@@ -52,7 +52,12 @@
             </div>
 
             <div class="flex gap-4">
-                <button
+                <a th:if="${profile.roleName == 'GUEST'}"
+                   th:href="@{/booking/history(guestId=${profile.id})}"
+                   class="bg-primary text-white px-8 py-3 rounded-full font-label-caps text-[12px] uppercase tracking-widest hover:scale-105 transition-transform duration-300 organic-shadow inline-block">
+                    VIEW BOOKING HISTORY
+                </a>
+                <button th:unless="${profile.roleName == 'GUEST'}"
                     class="bg-primary text-white px-8 py-3 rounded-full font-label-caps text-[12px] uppercase tracking-widest hover:scale-105 transition-transform duration-300 organic-shadow">
                     SCHEDULE SESSION
                 </button>

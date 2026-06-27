@@ -1815,7 +1815,9 @@ reviews after completing their retreat experience.</td>
 <tr>
 <td style="text-align: right;">Alternative Flows:</td>
 <td colspan="3">- A1. Room fails inspection.<br />
-→ Manager rejects and assigns it back to the Housekeeper for recleaning. Status remains DIRTY.</td>
+→ Manager rejects and assigns it back to the Housekeeper for recleaning. Status remains DIRTY.<br />
+- A2. Room requires maintenance.<br />
+→ Manager clicks "Report Maintenance", system prompts for issue details (text). System updates Villa status to OUT_OF_ORDER and locks it from Receptionists until resolved by Maintenance Technician.</td>
 </tr>
 <tr>
 <td style="text-align: right;">Exceptions:</td>
@@ -2163,6 +2165,100 @@ reviews after completing their retreat experience.</td>
 <td style="text-align: right;">Assumptions:</td>
 <td colspan="3">None.</td>
 </tr>
+</tbody>
+</table>
+
+### 2.11 Inventory Management
+
+#### 2.11.1 UC31 – Spa Inventory Auto-Tracking
+
+<table>
+<colgroup><col style="width: 19%" /><col style="width: 29%" /><col style="width: 22%" /><col style="width: 27%" /></colgroup>
+<tbody>
+<tr><td style="text-align: right;">ID and Name:</td><td colspan="3"><strong>UC31 – Spa Inventory Auto-Tracking</strong></td></tr>
+<tr><td style="text-align: right;">Primary Actor:</td><td>System (Automated)</td><td style="text-align: right;">Secondary Actors:</td><td>Spa Manager</td></tr>
+<tr><td style="text-align: right;">Description:</td><td colspan="3">Hệ thống tự động trừ số lượng vật tư tiêu hao (tinh dầu, kem massage) trong kho Spa mỗi khi Chuyên viên đánh dấu một phiên trị liệu là "Đã hoàn thành". Quản lý có thể xem cảnh báo sắp hết hàng.</td></tr>
+<tr><td style="text-align: right;">Trigger:</td><td colspan="3">Spa Therapist marks a Spa Session as COMPLETED.</td></tr>
+<tr><td style="text-align: right;">Preconditions:</td><td colspan="3">- The Spa Session is valid.<br/>- The system has an active mapping of required materials for the specific therapy type.</td></tr>
+<tr><td style="text-align: right;">Postconditions:</td><td colspan="3">- Inventory quantity is deducted.<br/>- Low-stock alert is generated if quantity falls below threshold.</td></tr>
+<tr><td style="text-align: right;">Normal Flow:</td><td colspan="3"><ol type="1"><li>Therapist updates Spa Session status to COMPLETED.</li><li>System retrieves the Material Bill of Materials (BOM) for the completed therapy.</li><li>System deducts the exact amount from the Inventory table.</li><li>System checks if the remaining amount is below the safety threshold.</li><li>If below threshold, System generates a Low-Stock Alert on the Manager Dashboard.</li></ol></td></tr>
+<tr><td style="text-align: right;">Alternative Flows:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Exceptions:</td><td colspan="3">- E1. Insufficient virtual inventory (data mismatch).<br/>→ System forces deduction (negative balance) and sends a Critical Alert to the Manager for manual reconciliation.</td></tr>
+<tr><td style="text-align: right;">Priority:</td><td colspan="3">High</td></tr>
+<tr><td style="text-align: right;">Frequency of Use:</td><td colspan="3">High (Every completed spa session)</td></tr>
+<tr><td style="text-align: right;">Business Rules:</td><td colspan="3">BR-28 – Inventory Transaction Integrity.</td></tr>
+<tr><td style="text-align: right;">Other Information:</td><td colspan="3">- Executes asynchronously but guarantees transactional integrity.</td></tr>
+<tr><td style="text-align: right;">Assumptions:</td><td colspan="3">None.</td></tr>
+</tbody>
+</table>
+
+### 2.12 Loyalty Management
+
+#### 2.12.1 UC32 – Loyalty & Tier Program
+
+<table>
+<colgroup><col style="width: 19%" /><col style="width: 29%" /><col style="width: 22%" /><col style="width: 27%" /></colgroup>
+<tbody>
+<tr><td style="text-align: right;">ID and Name:</td><td colspan="3"><strong>UC32 – Loyalty & Tier Program</strong></td></tr>
+<tr><td style="text-align: right;">Primary Actor:</td><td>System (Automated)</td><td style="text-align: right;">Secondary Actors:</td><td>Guest</td></tr>
+<tr><td style="text-align: right;">Description:</td><td colspan="3">Tự động cộng điểm "Aura Points" cho khách sau khi thanh toán xong hóa đơn. Tự động thăng hạng khách hàng dựa trên tổng điểm và sinh mã giảm giá.</td></tr>
+<tr><td style="text-align: right;">Trigger:</td><td colspan="3">Guest Folio payment is completed (Balance = 0).</td></tr>
+<tr><td style="text-align: right;">Preconditions:</td><td colspan="3">- Checkout is complete and payment is successful.</td></tr>
+<tr><td style="text-align: right;">Postconditions:</td><td colspan="3">- Guest's Aura Points are increased.<br/>- Tier status is upgraded if points exceed the threshold.</td></tr>
+<tr><td style="text-align: right;">Normal Flow:</td><td colspan="3"><ol type="1"><li>System listens for Folio Payment Completed event.</li><li>System calculates points based on Total Paid Amount.</li><li>System adds points to the Guest's Loyalty Profile.</li><li>System evaluates the total lifetime points against Tier Thresholds.</li><li>If eligible, System upgrades Guest Tier (e.g., Member -> Silver).</li><li>System automatically issues a specific Discount Code to the Guest's account.</li></ol></td></tr>
+<tr><td style="text-align: right;">Alternative Flows:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Exceptions:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Priority:</td><td colspan="3">Medium</td></tr>
+<tr><td style="text-align: right;">Frequency of Use:</td><td colspan="3">Medium (Once per checkout)</td></tr>
+<tr><td style="text-align: right;">Business Rules:</td><td colspan="3">BR-29 – Loyalty Points Issuance.</td></tr>
+<tr><td style="text-align: right;">Other Information:</td><td colspan="3">- Admin can configure the points-to-currency conversion rate.</td></tr>
+<tr><td style="text-align: right;">Assumptions:</td><td colspan="3">None.</td></tr>
+</tbody>
+</table>
+
+### 2.13 Guest Experience
+
+#### 2.13.1 UC35 – Post-Retreat Wellness Assessment
+
+<table>
+<colgroup><col style="width: 19%" /><col style="width: 29%" /><col style="width: 22%" /><col style="width: 27%" /></colgroup>
+<tbody>
+<tr><td style="text-align: right;">ID and Name:</td><td colspan="3"><strong>UC35 – Post-Retreat Wellness Assessment</strong></td></tr>
+<tr><td style="text-align: right;">Primary Actor:</td><td>Guest</td><td style="text-align: right;">Secondary Actors:</td><td>None</td></tr>
+<tr><td style="text-align: right;">Description:</td><td colspan="3">Khách hàng thực hiện bài kiểm tra sức khỏe đầu vào và đầu ra. Hệ thống vẽ biểu đồ Radar thể hiện sự thay đổi sức khỏe.</td></tr>
+<tr><td style="text-align: right;">Trigger:</td><td colspan="3">Guest accesses the "Wellness Assessment" module.</td></tr>
+<tr><td style="text-align: right;">Preconditions:</td><td colspan="3">- Guest is logged in.</td></tr>
+<tr><td style="text-align: right;">Postconditions:</td><td colspan="3">- Assessment scores are saved.<br/>- Radar chart is updated and displayed.</td></tr>
+<tr><td style="text-align: right;">Normal Flow:</td><td colspan="3"><ol type="1"><li>Guest clicks "Take Assessment".</li><li>System displays a form with scale 1-10 for dimensions (Stress, Sleep, Muscle Pain).</li><li>Guest fills out the form and clicks "Submit".</li><li>System saves the data with a timestamp (Pre-retreat or Post-retreat).</li><li>System generates and renders a Radar Chart overlaying Pre and Post scores.</li></ol></td></tr>
+<tr><td style="text-align: right;">Alternative Flows:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Exceptions:</td><td colspan="3">- E1. Incomplete form submission.<br/>→ System prompts Guest to complete all required fields.</td></tr>
+<tr><td style="text-align: right;">Priority:</td><td colspan="3">Medium</td></tr>
+<tr><td style="text-align: right;">Frequency of Use:</td><td colspan="3">Low (Twice per retreat)</td></tr>
+<tr><td style="text-align: right;">Business Rules:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Other Information:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Assumptions:</td><td colspan="3">Frontend charting library (e.g. Chart.js) is available.</td></tr>
+</tbody>
+</table>
+
+#### 2.13.2 UC36 – Incident & Service Recovery Management
+
+<table>
+<colgroup><col style="width: 19%" /><col style="width: 29%" /><col style="width: 22%" /><col style="width: 27%" /></colgroup>
+<tbody>
+<tr><td style="text-align: right;">ID and Name:</td><td colspan="3"><strong>UC36 – Incident & Service Recovery Management</strong></td></tr>
+<tr><td style="text-align: right;">Primary Actor:</td><td>Manager</td><td style="text-align: right;">Secondary Actors:</td><td>Receptionist, Guest</td></tr>
+<tr><td style="text-align: right;">Description:</td><td colspan="3">Quản lý nhận diện sự cố từ đánh giá in-stay của khách, tạo Ticket và xử lý vòng đời Ticket từ OPEN -> IN_PROGRESS -> RESOLVED.</td></tr>
+<tr><td style="text-align: right;">Trigger:</td><td colspan="3">Guest submits poor in-stay feedback OR Staff manually creates a Ticket.</td></tr>
+<tr><td style="text-align: right;">Preconditions:</td><td colspan="3">- Manager is logged in.</td></tr>
+<tr><td style="text-align: right;">Postconditions:</td><td colspan="3">- Incident status is updated.</td></tr>
+<tr><td style="text-align: right;">Normal Flow:</td><td colspan="3"><ol type="1"><li>Manager views the Incident Dashboard.</li><li>System displays all OPEN tickets.</li><li>Manager assigns a ticket to a specific department (e.g., Maintenance, Spa) and changes status to IN_PROGRESS.</li><li>Staff resolves the issue offline.</li><li>Manager updates ticket status to RESOLVED and records the resolution action.</li></ol></td></tr>
+<tr><td style="text-align: right;">Alternative Flows:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Exceptions:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Priority:</td><td colspan="3">High</td></tr>
+<tr><td style="text-align: right;">Frequency of Use:</td><td colspan="3">Medium</td></tr>
+<tr><td style="text-align: right;">Business Rules:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Other Information:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Assumptions:</td><td colspan="3">None.</td></tr>
 </tbody>
 </table>
 
@@ -3826,16 +3922,13 @@ location (e.g., "Page 1 / 8").</td>
   - Attaches the stream directly to an email dispatched to the guest.
   - Instantly destroys the byte array post-dispatch to ensure absolute data minimization and prevent disk-level data breaches.
 
-### 3.7 Housekeeping & HR Management
+### 3.7 Housekeeping, Maintenance & Operations
 
 #### 3.7.1 Housekeeping Operations
-- **Description**: A dedicated interface for the Housekeeping Manager to oversee villa statuses. Automatically flags villas as DIRTY upon guest check-out (UC22). Managers assign staff, conduct QA inspections, and update statuses to CLEAN/AVAILABLE to re-enter the booking pool (UC28).
+- **Description**: A dedicated interface for the Housekeeping Manager to oversee villa statuses. Automatically flags villas as DIRTY upon guest check-out (UC22). Managers assign staff, conduct QA inspections, and update statuses to CLEAN/AVAILABLE. Additionally, managers can report maintenance issues, locking the villa as OUT_OF_ORDER and preventing receptionist assignments until resolved (UC28).
 
-#### 3.7.2 Time Attendance (Timesheet)
-- **Description**: A module for staff (Receptionist, Therapist, Chef) to clock in and out (UC29). Records timestamps into the `timesheet` table to track daily working hours, directly linked to their user profiles.
-
-#### 3.7.3 Commission & Payroll Calculation
-- **Description**: An automated dashboard for managers to generate monthly payroll for Spa Therapists (UC32). Combines base salary (from `timesheet` data) with performance commission (from completed Spa Sessions tracked in Module 3) to output a finalized salary sheet.
+#### 3.7.2 Spa Inventory Auto-Tracking
+- **Description**: An automated inventory control system for Spa supplies. Deducts material quantities automatically when therapists mark Spa Sessions as completed. Features a Low-stock alert dashboard for Managers to proactively restock items (UC31).
 
 ### 3.8 Customer Reviews Management
 
@@ -4049,6 +4142,22 @@ location (e.g., "Page 1 / 8").</td>
 <tr><td>(2) Back to History Button</td><td>Action: Returns to the Booking History List.</td></tr>
 </tbody>
 </table>
+
+### 3.12 Loyalty & Tier Program
+
+#### 3.12.1 Loyalty Points Generation
+- **Description**: Automatically processes the Guest Folio total upon check-out (UC32). Converts the total paid amount into Aura Points based on the active conversion rate and updates the Guest's profile. Also evaluates tier thresholds to determine if the guest qualifies for a tier upgrade.
+
+### 3.13 Post-Retreat Wellness Assessment
+
+#### 3.13.1 Wellness Assessment Form & Radar Chart
+- **Description**: An interface for guests to input their self-assessment scores (1-10) for stress, sleep quality, and muscle tension. The system dynamically generates a comparative Radar Chart showing the pre-retreat and post-retreat improvement levels (UC35).
+
+### 3.14 Incident & Service Recovery Management
+
+#### 3.14.1 Incident Ticket Dashboard
+- **Description**: A management dashboard that aggregates low-rated in-stay feedback into trackable Incident Tickets. Managers can assign tickets to specific departments and track resolution status from OPEN to IN_PROGRESS to RESOLVED (UC36).
+
 
 ## 4. Non-Functional Requirements - ??c
 
@@ -4285,12 +4394,13 @@ forth.\]*
 |    BR-19    |                 Zero Balance Bypass                   |                                         If a guest's total balance due is exactly 0 VND (e.g., fully pre-paid), the checkout process shall automatically bypass the payment gateway selection and complete the checkout immediately without generating a pending payment transaction.                                         |              UC22              |
 |    BR-20    |           Night Audit Consolidation                   |                                         The system shall automatically or manually consolidate all completed Spa (COMPLETED) and delivered F&B (DELIVERED) charges into the Guest Folio as Folio Items at midnight (00:00) daily. Once audited, these records shall be locked and cannot be modified or deleted.                                         |              UC26              |
 |    BR-21    |          Invoice Formatting Standard                  |                                         File PDF Hóa đơn Gộp được tạo ra bắt buộc phải tuân thủ chuẩn biểu mẫu hóa đơn cơ bản theo quy định của Bộ Tài chính Việt Nam (Bao gồm tên công ty, Mã số thuế, Thuế suất VAT 10% tách riêng, tổng tiền bằng chữ). Không lưu file vật lý.                                         |              UC27              |
-|    BR-22    |     Housekeeping Status Constraint                    |                                         Only users with the Housekeeping Manager (or equivalent Admin) role may change a Villa status from DIRTY to CLEAN. Receptionists are restricted to changing status from CLEAN to OCCUPIED.                                         |              UC28              |
-|    BR-23    |     Payroll Commission Logic                          |                                         The monthly payroll calculation for Therapists must strictly use the number of COMPLETED spa sessions multiplied by the commission rate, in addition to base pay determined by valid Timesheet entries.                                         |              UC32              |
-|    BR-24    |     Review Immutability                               |                                         Customer reviews reflect objective feedback. Managers shall NOT be allowed to edit or delete any review content. The Reviews Dashboard provides Read-only access.                                         |              UC29              |
-|    BR-25    |     Audit Log Integrity                               |                                         Audit logs are strictly confidential and used for system monitoring. No user (including Administrators) shall have the right to modify or delete records from the AUDIT_LOG table.                                         |              UC30              |
-|    BR-26    |     Automated Logging                                 |                                         The system shall automatically trigger the Audit Logging Service to record events whenever a sensitive operation (e.g., Check-out, Payment, Night Audit, Data Erasure) is successfully completed.                                         |              UC30              |
-|    BR-27    |     Guest Booking History Access Control              |                                         Guests shall only be able to view their own booking history. Managers/Admins are allowed to view the booking history of any Guest via the Guest Profile, but sensitive health information within itineraries must remain hidden.                                         |              UC34              |
+|    BR-22    |     Housekeeping Status Constraint                    | Only Housekeeping Managers can change a Villa status from DIRTY to CLEAN. Receptionists can only change from CLEAN to OCCUPIED. Villas marked OUT_OF_ORDER cannot be assigned to any Booking until Maintenance resolves the issue. | UC28 |
+|    BR-23    |     Review Immutability                               | Customer reviews reflect objective feedback. Managers shall NOT be allowed to edit or delete any review content. The Reviews Dashboard provides Read-only access. | UC29 |
+|    BR-24    |     Audit Log Integrity                               | Audit logs are strictly confidential and used for system monitoring. No user (including Administrators) shall have the right to modify or delete records from the AUDIT_LOG table. | UC30 |
+|    BR-25    |     Automated Logging                                 | The system shall automatically trigger the Audit Logging Service to record events whenever a sensitive operation (e.g., Check-out, Payment, Night Audit, Data Erasure) is successfully completed. | UC30 |
+|    BR-26    |     Guest Booking History Access Control              | Guests shall only be able to view their own booking history. Managers/Admins are allowed to view the booking history of any Guest via the Guest Profile, but sensitive health information within itineraries must remain hidden. | UC34 |
+|    BR-27    |     Inventory Transaction Integrity                   | Deducting spa inventory materials must occur within the same Database Transaction as marking the Spa Session as COMPLETED. | UC31 |
+|    BR-28    |     Loyalty Points Issuance                           | Loyalty points are only issued when the Folio payment reaches exactly 0 VND balance. Points conversion rates are configured by Admin. | UC32 |
 
 ### 5.2 System Messages
 

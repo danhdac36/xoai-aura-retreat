@@ -223,6 +223,7 @@ class ItineraryServiceImplTest {
         Integer guestId = 1;
         RetreatPackage retreatPackage = RetreatPackage.builder()
                 .packageName("Gói Tĩnh Dưỡng Cuối Tuần")
+                .price(java.math.BigDecimal.valueOf(5000000))
                 .build();
 
         Booking booking1 = Booking.builder()
@@ -231,14 +232,12 @@ class ItineraryServiceImplTest {
                 .checkinDate(LocalDateTime.of(2026, 5, 1, 14, 0))
                 .checkoutDate(LocalDateTime.of(2026, 5, 3, 12, 0))
                 .bookingStatus("CHECKED_OUT")
-                .totalAmount(java.math.BigDecimal.valueOf(5000000))
                 .retreatPackage(retreatPackage)
                 .build();
 
         when(bookingRepository.findByGuestId(guestId)).thenReturn(Collections.singletonList(booking1));
 
         // Act
-        // This method and DTO don't exist yet! Wait for implementation phase.
         java.util.List<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> dtos = itineraryService.getBookingHistory(guestId);
 
         // Assert

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Aura Wellness - Lịch sử Đặt phòng</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Inter:wght@300;400;500;600&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link th:href="@{/css/booking/history.css}" rel="stylesheet">
+    <script th:src="@{/js/public/tailwind-config.js}"></script>
+</head>
+
+<body class="font-body-md text-body-md text-on-surface bg-surface">
+
+    <!-- Header -->
+    <header class="w-full top-0 sticky z-50 bg-surface/80 backdrop-blur-md flex justify-between items-center px-5 py-4 border-b border-outline-variant/30">
+        <a th:href="@{/profile/home}" class="flex items-center hover:opacity-80 transition-opacity cursor-pointer">
+            <span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+        </a>
+        <h1 class="font-display-lg text-[20px] tracking-tight text-primary uppercase">AURA WELLNESS</h1>
+        <div class="w-8"></div>
+    </header>
+
+    <main class="pb-16 px-5 max-w-lg mx-auto">
+        <!-- Section Header -->
+        <div class="py-8 fade-in">
+            <h2 class="font-headline-sm text-headline-sm text-primary mb-2">Lịch sử Đặt phòng</h2>
+            <p class="text-on-surface-variant text-[14px]">Những hành trình chữa lành và tái tạo năng lượng của bạn.</p>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(bookings)}" class="text-center py-16 fade-in">
+            <span class="material-symbols-outlined text-[64px] text-outline-variant mb-4">calendar_month</span>
+            <p class="text-on-surface-variant font-body-md">Bạn chưa có lịch sử đặt phòng nào.</p>
+        </div>
+
+        <!-- Booking List -->
+        <div class="space-y-6" th:if="${!#lists.isEmpty(bookings)}">
+            <div th:each="booking, iterStat : ${bookings}"
+                 th:classappend="${booking.status == 'CHECKED_OUT'} ? 'opacity-80' : ''"
+                 class="bg-surface-container-lowest rounded-xl p-6 organic-shadow border border-surface-variant/30 fade-in cursor-pointer transition-transform hover:scale-[1.01]">
+
+                <a th:href="@{/booking/itinerary(bookingId=${booking.bookingId})}" class="block">
+                    <!-- Status + Booking ID -->
+                    <div class="flex justify-between items-start mb-4">
+                        <!-- Trạng thái: CONFIRMED -->
+                        <span th:if="${booking.status == 'CONFIRMED'}"
+                              class="bg-primary text-on-primary font-label-md text-[12px] px-3 py-1 rounded-[9999px] uppercase tracking-wider">
+                            Đã Xác nhận
+                        </span>
+                        <!-- Trạng thái: CHECKED_IN -->
+                        <span th:if="${booking.status == 'CHECKED_IN' or booking.status == 'CHECKED-IN'}"
+                              class="bg-secondary-container text-on-secondary-container font-label-md text-[12px] px-3 py-1 rounded-[9999px] uppercase tracking-wider">
+                            Đang Lưu trú
+                        </span>
+                        <!-- Trạng thái: CHECKED_OUT -->
+                        <span th:if="${booking.status == 'CHECKED_OUT'}"
+                              class="bg-outline-variant text-on-surface-variant font-label-md text-[12px] px-3 py-1 rounded-[9999px] uppercase tracking-wider">
+                            Đã Trả phòng
+                        </span>
+                        <!-- Trạng thái: CANCELLED -->
+                        <span th:if="${booking.status == 'CANCELLED'}"
+                              class="bg-error-container text-on-error-container font-label-md text-[12px] px-3 py-1 rounded-[9999px] uppercase tracking-wider">
+                            Đã Hủy
+                        </span>
+                        <!-- Trạng thái: Khác -->
+                        <span th:if="${booking.status != 'CONFIRMED' and booking.status != 'CHECKED_IN' and booking.status != 'CHECKED-IN' and booking.status != 'CHECKED_OUT' and booking.status != 'CANCELLED'}"
+                              class="bg-surface-container-high text-on-surface font-label-md text-[12px] px-3 py-1 rounded-[9999px] uppercase tracking-wider"
+                              th:text="${booking.status}">
+                            Trạng thái
+                        </span>
+
+                        <span class="text-primary font-label-md text-[12px]"
+                              th:text="'#AURA-' + ${booking.bookingId}">
+                            #AURA-101
+                        </span>
+                    </div>
+
+                    <!-- Package Name -->
+                    <h3 class="font-headline-sm text-[20px] text-on-surface leading-tight mb-2"
+                        th:text="${booking.packageName}">
+                        Gói nghỉ dưỡng
+                    </h3>
+
+                    <!-- Villa Name -->
+                    <div class="flex items-center gap-2 text-on-surface-variant mb-4">
+                        <span class="material-symbols-outlined text-[18px]">location_on</span>
+                        <span class="text-[14px]" th:text="${booking.villaName}">Villa</span>
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="grid grid-cols-2 gap-4 border-t border-surface-variant/50 pt-4 mb-4">
+                        <div>
+                            <p class="text-on-surface-variant font-label-md text-[10px] uppercase tracking-widest mb-1">Ngày đến</p>
+                            <p class="font-body-lg text-primary"
+                               th:text="${booking.checkInDate != null} ? ${#temporals.format(booking.checkInDate, 'dd/MM/yyyy')} : '—'">
+                                01/01/2026
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-on-surface-variant font-label-md text-[10px] uppercase tracking-widest mb-1">Ngày đi</p>
+                            <p class="font-body-lg text-primary"
+                               th:text="${booking.checkOutDate != null} ? ${#temporals.format(booking.checkOutDate, 'dd/MM/yyyy')} : '—'">
+                                05/01/2026
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Total Amount -->
+                    <div class="flex justify-between items-end border-t border-surface-variant/50 pt-4">
+                        <p class="text-on-surface-variant text-[14px]">Tổng thanh toán</p>
+                        <p class="font-display-lg text-[22px] text-primary"
+                           th:text="${#numbers.formatDecimal(booking.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'">
+                            5.000.000 VND
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="h-12"></div>
+    </main>
+
+    <script th:src="@{/js/booking/history.js}"></script>
+</body>
+</html>

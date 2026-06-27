@@ -93,11 +93,11 @@
                 <span class="material-symbols-outlined" data-icon="package">package_2</span>
                 <span class="font-label-md text-label-md">Retreat Package</span>
             </a>
-            <!-- Guest Itinerary (UC10) -->
+            <!-- Guest Itinerary (UC10) & Booking History (UC34) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasRole('GUEST')" th:href="@{/booking/itinerary}">
-                <span class="material-symbols-outlined" data-icon="timeline">timeline</span>
-                <span class="font-label-md text-label-md">My Itinerary</span>
+                sec:authorize="hasRole('GUEST')" th:href="@{/booking/history}">
+                <span class="material-symbols-outlined" data-icon="history">history</span>
+                <span class="font-label-md text-label-md">My Booking History</span>
             </a>
             <!-- Spa Schedule (SpaScheduleController) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
