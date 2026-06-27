@@ -22,100 +22,110 @@
     <th:block th:replace="~{fragments/tailwind-config :: tailwind-config}"></th:block>
 </head>
 
-<body
-    class="bg-surface-variant text-on-background antialiased selection:bg-primary-container selection:text-on-primary-container bg-grain">
-    <!-- Top Navigation Bar -->
-    <th:block th:replace="~{fragments/public-header :: public-header}"></th:block>
+<body class="bg-[#e9e6df] text-[#2b3327] antialiased">
+    
+    <!-- Hero Section with Background -->
+    <div class="relative w-full min-h-[75vh] flex flex-col justify-between bg-cover bg-center bg-no-repeat"
+         style="background-image: url('/images/backgrounds/packages-hero.jpg');">
+         
+        <div class="absolute inset-0 bg-[#f4f1ea]/40 mix-blend-multiply"></div>
 
-    <!-- Main Content -->
-    <main class="pt-[140px] pb-section-gap relative z-10">
-        <!-- Hero Section -->
-        <section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-16 md:py-24">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-end">
-                <div class="md:col-span-8">
-                    <h1
-                        class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface mb-6">
-                        Hành Trình Tĩnh Lại</h1>
-                    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
-                        Hãy để không gian tĩnh lặng dẫn lối bạn trở về với bản ngã chân thật nhất. Những hành trình nghỉ
-                        dưỡng được thiết kế tỉ mỉ để khôi phục sự cân bằng, xoa dịu tâm trí và đánh thức nguồn năng
-                        lượng sống sâu thẳm bên trong bạn.
-                    </p>
-                </div>
+        <div class="w-full relative z-50">
+            <th:block th:replace="~{fragments/public-header :: public-header}"></th:block>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center pb-20 pt-32">
+            <h1 class="font-serif text-5xl md:text-7xl text-[#1a1f18] mb-8 tracking-tight drop-shadow-sm">Hành Trình Tĩnh Lại</h1>
+            
+            <div class="flex items-center justify-center gap-4 mb-8">
+                <div class="h-[2px] bg-[#8a9973] w-12 opacity-70"></div>
+                <span class="material-symbols-outlined text-[#8a9973]">spa</span>
+                <div class="h-[2px] bg-[#8a9973] w-12 opacity-70"></div>
             </div>
-        </section>
 
+            <p class="font-sans text-lg md:text-xl text-[#2b3327] max-w-3xl mx-auto font-medium drop-shadow-sm">
+                Hãy để không gian tĩnh lặng dẫn lối bạn trở về với bản ngã chân thật nhất. Những hành trình nghỉ dưỡng được thiết kế tỉ mỉ để khôi phục sự cân bằng, xoa dịu tâm trí và đánh thức nguồn năng lượng sống sâu thẳm bên trong bạn.
+            </p>
+        </div>
+        
         <!-- Filters Section -->
-        <section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop mb-16">
-            <form th:action="@{/packages}" method="get" id="filterForm">
-                <input type="hidden" name="type" id="filterType"
-                    th:value="${selectedType == 'All' ? '' : selectedType}" />
-                <div class="flex flex-wrap gap-8 items-center border-b border-surface-variant pb-4">
-                    <button type="submit" onclick="document.getElementById('filterType').value=''"
-                        th:class="${selectedType == null || selectedType == 'All' || selectedType == ''} ? 'font-label-md text-label-md uppercase text-primary border-b border-primary pb-2' : 'font-label-md text-label-md uppercase text-secondary hover:text-primary transition-colors pb-2'">
-                        Tất Cả
-                    </button>
-                    <button type="submit" th:each="type : ${types}"
-                        onclick="document.getElementById('filterType').value=this.getAttribute('data-value')"
-                        th:attr="data-value=${type}" th:text="${type}"
-                        th:class="${type == selectedType} ? 'font-label-md text-label-md uppercase text-primary border-b border-primary pb-2' : 'font-label-md text-label-md uppercase text-secondary hover:text-primary transition-colors pb-2'">
-                        Category
-                    </button>
-                </div>
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-6 pb-8">
+            <form th:action="@{/packages}" method="get" id="filterForm" class="flex justify-center flex-wrap gap-x-10 gap-y-6">
+                <input type="hidden" name="type" id="filterType" th:value="${selectedType == 'All' ? '' : selectedType}" />
+                
+                <button type="submit" onclick="document.getElementById('filterType').value=''"
+                    th:class="${selectedType == null || selectedType == 'All' || selectedType == ''} ? 'text-[12px] font-bold tracking-[0.2em] uppercase text-[#1a1f18] border-b-[3px] border-[#687a5a] pb-2 transition-all' : 'text-[12px] font-bold tracking-[0.2em] uppercase text-[#4a5547] hover:text-[#1a1f18] transition-all pb-2'">
+                    TẤT CẢ
+                </button>
+                <button type="submit" th:each="type : ${types}"
+                    onclick="document.getElementById('filterType').value=this.getAttribute('data-value')"
+                    th:attr="data-value=${type}" th:text="${type}"
+                    th:class="${type == selectedType} ? 'text-[12px] font-bold tracking-[0.2em] uppercase text-[#1a1f18] border-b-[3px] border-[#687a5a] pb-2 transition-all' : 'text-[12px] font-bold tracking-[0.2em] uppercase text-[#4a5547] hover:text-[#1a1f18] transition-all pb-2'">
+                    CATEGORY
+                </button>
             </form>
-        </section>
+        </div>
+    </div>
 
-        <!-- Asymmetric Editorial Grid -->
-        <section class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-y-32 gap-x-12">
-
-                <div th:each="pkg, iterStat : ${packages}"
-                    class="md:col-span-12 flex flex-col md:flex-row items-center gap-12 md:gap-16 group"
-                    th:classappend="${iterStat.even} ? 'md:flex-row-reverse' : ''">
-
-                    <div class="w-full md:w-1/2 overflow-hidden shadow-2xl border border-surface-variant/20">
-                        <a th:href="@{/packages/{id}(id=${pkg.id})}">
-                            <img th:src="${pkg.typePackage == 'Stress Relief' || pkg.typePackage == 'Spa'} ? @{/img/spa-retreat.jpg} :
-                                     (${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'} ? @{/img/detox-retreat.jpg} :
-                                     (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
-                                      @{/img/retreat-default.jpg}))" th:alt="${pkg.packageName}"
-                                class="w-full aspect-[4/3] object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" />
+    <!-- Main Content Grid -->
+    <main class="relative z-10 max-w-[1440px] mx-auto px-4 md:px-12 py-12 lg:-mt-12">
+        <section class="flex flex-col gap-16">
+            
+            <!-- Loop Packages -->
+            <div th:each="pkg, iterStat : ${packages}" class="bg-[#f7f5f0] shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[500px]">
+                
+                <!-- Image Side -->
+                <div class="w-full lg:w-1/2 relative overflow-hidden group cursor-pointer" th:onclick="'window.location.href=\'/packages/' + ${pkg.id} + '\''">
+                    <img th:src="${pkg.typePackage == 'Stress Relief' || pkg.typePackage == 'Spa'} ? @{/img/spa-retreat.jpg} :
+                             (${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'} ? @{/img/detox-retreat.jpg} :
+                             (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
+                              @{/img/retreat-default.jpg}))" th:alt="${pkg.packageName}"
+                        class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105 min-h-[400px]" />
+                </div>
+                
+                <!-- Content Side -->
+                <div class="w-full lg:w-1/2 p-10 md:p-16 lg:p-24 flex flex-col justify-center bg-[#f4f2eb]">
+                    <div class="flex items-center gap-3 mb-6 opacity-80">
+                        <span class="text-[11px] font-bold tracking-[0.3em] uppercase text-[#4a5547]" th:text="${pkg.typePackage}">MINDFULNESS</span>
+                        <span class="text-[#8a9973] text-[10px]">●</span>
+                        <span class="text-[11px] font-bold tracking-[0.3em] uppercase text-[#4a5547]" th:text="${pkg.durationDays} + ' NGÀY'">7 NGÀY</span>
+                    </div>
+                    
+                    <h2 class="font-serif text-4xl lg:text-5xl text-[#1a1f18] leading-tight mb-8" th:text="${pkg.packageName}">Con Đường Đến Sự Tĩnh Lặng</h2>
+                    
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="material-symbols-outlined text-[#8a9973] opacity-60 rotate-90 text-[18px]">eco</span>
+                        <div class="h-[1px] w-12 bg-[#8a9973] opacity-30"></div>
+                        <span class="material-symbols-outlined text-[#8a9973] opacity-60 -rotate-90 text-[18px]">eco</span>
+                    </div>
+                    
+                    <p class="font-sans text-[#4a5547] text-lg leading-relaxed mb-12" th:text="${pkg.description}">
+                        Hành trình bảy ngày giúp tái tạo sự tĩnh tại thông qua thiền định, chánh niệm và kết nối sâu sắc với thiên nhiên.
+                    </p>
+                    
+                    <div class="flex items-center gap-8 flex-wrap">
+                        <a th:href="@{/packages/{id}(id=${pkg.id})}" class="bg-[#687a5a] text-white px-8 py-4 text-[12px] font-bold tracking-[0.1em] uppercase hover:bg-[#526245] transition-colors shadow-lg rounded-sm">
+                            KHÁM PHÁ HÀNH TRÌNH
+                        </a>
+                        <a th:href="@{/packages/{id}(id=${pkg.id})}" class="text-[#1a1f18] text-[12px] font-bold tracking-[0.1em] uppercase flex items-center gap-2 hover:text-[#687a5a] transition-colors group">
+                            XEM CHI TIẾT <span class="material-symbols-outlined text-[16px] transition-transform group-hover:translate-x-1">arrow_forward_ios</span>
                         </a>
                     </div>
-
-                    <div class="w-full md:w-1/2 space-y-6">
-                        <span
-                            class="font-label-md text-label-md text-primary uppercase tracking-[0.4em] block opacity-70"
-                            th:text="${pkg.typePackage} + ' • ' + ${pkg.durationDays} + ' Ngày'">Mindfulness • 7
-                            Ngày</span>
-                        <h2 class="font-headline-sm text-[24px] md:text-[32px] text-on-surface leading-tight"
-                            th:text="${pkg.packageName}">Con Đường Đến Sự Tĩnh Lặng</h2>
-                        <p class="font-body-lg text-body-lg text-on-surface-variant/80 italic line-clamp-4"
-                            th:text="${pkg.description}">Một hành trình đắm chìm vào không gian tĩnh lặng tuyệt đối...
-                        </p>
-                        <div class="pt-4">
-                            <span class="font-display-lg text-[24px] md:text-[28px] text-primary italic block mb-6"
-                                th:text="'Từ ' + ${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">Từ
-                                $4,500</span>
-                            <a class="font-label-md text-label-md uppercase tracking-[0.2em] text-on-surface inline-flex items-center gap-3 border-b border-primary/30 pb-1 hover:border-primary transition-all duration-300"
-                                th:href="@{/packages/{id}(id=${pkg.id})}">
-                                Khám phá hành trình <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                            </a>
-                        </div>
-                    </div>
                 </div>
-
             </div>
-
-            <div th:if="${#lists.isEmpty(packages)}" class="py-20 text-center">
-                <h2 class="font-headline-md text-headline-md text-secondary mb-4">Không tìm thấy gói phù hợp</h2>
-                <a th:href="@{/packages}"
-                    class="font-label-md text-label-md uppercase tracking-[0.2em] text-primary border-b border-primary/30 pb-1 hover:border-primary transition-all duration-300">Xem
-                    tất cả hành trình</a>
+            
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(packages)}" class="py-32 text-center bg-[#f4f2eb] shadow-xl">
+                <h2 class="font-serif text-3xl text-[#1a1f18] mb-6">Không tìm thấy gói phù hợp</h2>
+                <a th:href="@{/packages}" class="text-[#687a5a] text-[14px] font-bold tracking-[0.1em] uppercase border-b-2 border-[#687a5a] pb-1 hover:text-[#1a1f18] hover:border-[#1a1f18] transition-all">
+                    Xem tất cả hành trình
+                </a>
             </div>
+            
         </section>
     </main>
-
+    
     <!-- Footer -->
     <th:block th:replace="~{fragments/public-footer :: public-footer}"></th:block>
 

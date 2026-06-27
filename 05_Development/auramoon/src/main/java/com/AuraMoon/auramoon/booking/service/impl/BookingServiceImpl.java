@@ -82,6 +82,7 @@ public class BookingServiceImpl implements BookingService {
                 Booking booking = Booking.builder()
                                 .guestId(guestId)
                                 .retreatPackage(retreatPackage)
+                                .requestedVillaType(villaType)
                                 .checkinDate(checkinDate)
                                 .checkoutDate(null)
                                 .totalGuests(request.getTotalGuests())
@@ -128,6 +129,9 @@ public class BookingServiceImpl implements BookingService {
                                 .bookingStatus(savedBooking.getBookingStatus())
                                 .paymentStatus(savedBooking.getPaymentStatus())
                                 .retreatPackageName(savedBooking.getRetreatPackage().getPackageName())
+                                .requestedVillaTypeName(savedBooking.getRequestedVillaType() != null 
+                                                ? savedBooking.getRequestedVillaType().getTypeName() 
+                                                : "Không xác định")
                                 .assignedVillaCode(savedBooking.getAssignedVilla() != null
                                                 ? savedBooking.getAssignedVilla().getVillaCode()
                                                 : null)

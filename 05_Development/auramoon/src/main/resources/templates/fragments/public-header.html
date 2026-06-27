@@ -35,16 +35,72 @@
                     Login
                 </a>
                 
-                <!-- Profile & Logout (Authenticated) -->
-                <div sec:authorize="isAuthenticated()" class="flex items-center gap-4 border-l border-white/30 pl-4">
-                    <a th:href="@{/profile/me}" class="text-white hover:text-white/80 transition-colors flex items-center" title="My Profile">
-                        <span class="material-symbols-outlined text-2xl">account_circle</span>
-                    </a>
-                    <form th:action="@{/auth/logout}" method="post" class="m-0 p-0 flex items-center">
-                        <button type="submit" class="text-white/80 hover:text-red-400 transition-colors flex items-center" title="Logout">
-                            <span class="material-symbols-outlined text-2xl">logout</span>
-                        </button>
-                    </form>
+                <!-- Profile Dropdown (Authenticated) -->
+                <div sec:authorize="isAuthenticated()" class="relative border-l border-white/30 pl-4 group">
+                    <button class="flex items-center gap-2 text-white hover:text-white/80 transition-all focus:outline-none">
+                        <img th:src="${#authentication.principal.avatar != null ? #authentication.principal.avatar : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCjxKxWNM9Mdwd1q-Ntb2XBP2tWZHOJnGCL2k0tVQxMSkLJ5lXLFy4YVhr2xzIstoSmY3eeDxmsvUxgGR1ZidvlK-lkv5B2u_qNh0i4tffRO5hu4TTt-NPTZVPcnEYjcqbIjcIGI-opV3GJWWC6PWB1oftS39SpGphQD7UDCSz0WfQkOA8VoDi3CIwXCLILpVge3ruSs76fgrW729VAHHhA6RpB3syTU-QWYVL4_wHFwND14cNM_H0Nchj6_3Bf1sj91ZcH50GAf6s'}" 
+                             class="w-9 h-9 rounded-full object-cover border border-white/40 shadow-sm" alt="Profile">
+                        <span class="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:rotate-180">expand_more</span>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div class="absolute right-0 mt-4 w-60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right translate-y-2 group-hover:translate-y-0 z-50">
+                        <div class="bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-white overflow-hidden">
+                            <!-- User Info -->
+                            <div class="px-5 py-4 border-b border-outline-variant/10 bg-[#fbf9f8]">
+                                <p class="text-[14px] font-semibold text-[#1b1c1c] truncate" sec:authentication="principal.fullName">User Name</p>
+                                <p class="text-[10px] text-outline/60 uppercase tracking-[0.2em] mt-1" sec:authentication="principal.roleName">Role</p>
+                            </div>
+                            
+                            <!-- Links -->
+                            <div class="py-2">
+                                <a th:href="@{/profile/me}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">person</span>
+                                    My Profile
+                                </a>
+                                
+                                <a sec:authorize="hasRole('GUEST')" th:href="@{/booking/itinerary}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">timeline</span>
+                                    My Itinerary
+                                </a>
+                                
+                                <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/home}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">admin_panel_settings</span>
+                                    Admin Workspace
+                                </a>
+                                <a sec:authorize="hasRole('MANAGER') and !hasRole('ADMIN')" th:href="@{/manager/home}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">manage_accounts</span>
+                                    Manager Workspace
+                                </a>
+                                <a sec:authorize="hasRole('RECEPTIONIST') and !hasRole('ADMIN')" th:href="@{/receptionist/home}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">room_service</span>
+                                    Reception Workspace
+                                </a>
+                                <a sec:authorize="hasRole('THERAPIST')" th:href="@{/therapist/home}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">spa</span>
+                                    Therapist Workspace
+                                </a>
+                                <a sec:authorize="hasRole('YOGA_INSTRUCTOR')" th:href="@{/instructor/yoga/schedule}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">self_improvement</span>
+                                    Yoga Workspace
+                                </a>
+                                <a sec:authorize="hasRole('CHEFF')" th:href="@{/fnb/chef/home}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">restaurant</span>
+                                    Chef Workspace
+                                </a>
+                            </div>
+                            
+                            <!-- Logout -->
+                            <div class="border-t border-outline-variant/10">
+                                <form th:action="@{/auth/logout}" method="post" class="w-full m-0 p-0">
+                                    <button type="submit" class="w-full flex items-center px-5 py-3.5 text-[13px] text-error/80 hover:text-error hover:bg-error/5 transition-colors cursor-pointer text-left bg-transparent border-none">
+                                        <span class="material-symbols-outlined text-[18px] mr-3">logout</span>
+                                        <span class="font-medium tracking-wide">Sign Out</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <button class="md:hidden text-white">

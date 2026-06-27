@@ -67,9 +67,10 @@ document.addEventListener("DOMContentLoaded", () => {
             surchargePerDay = parseFloat(selectedRadio.getAttribute("data-price")) || 0;
         }
 
-        const totalGuests = guestsInput ? (parseInt(guestsInput.value) || 1) : 1;
         const totalSurcharge = surchargePerDay * durationDays;
-        const finalPrice = (basePrice * totalGuests) + totalSurcharge;
+        // Package base price is strictly per booking (1 person taking the retreat).
+        // Accompanying guests only share the villa and are not charged the retreat fee.
+        const finalPrice = basePrice + totalSurcharge;
 
         if (surchargeDisplay) {
             surchargeDisplay.textContent = formatCurrency(totalSurcharge);
