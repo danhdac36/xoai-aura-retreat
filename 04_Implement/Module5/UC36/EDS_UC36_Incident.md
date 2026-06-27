@@ -115,6 +115,15 @@ Sự cố phát sinh có một chu trình sống (Lifecycle) nhất định: Kh�
 | :--- | :--- | :--- | :--- | :--- |
 | Retention | Lưu trữ ticket đã close | 3 năm | Backup policy | — |
 
+### 4.3. Security
+| Category | Requirement | Target | Verification Method | Compliance Basis |
+| :--- | :--- | :--- | :--- | :--- |
+| Access control | Chỉ Manager xem được Dashboard | Admin/Manager Role | Auth Matrix (§16) | RBAC |
+
+### 4.4. Scalability & Capacity Planning
+> [!NOTE]
+> Số lượng sự cố thường rất ít so với số lượng khách (khoảng 1-2 sự cố/ngày). Không yêu cầu kiến trúc scale lớn hay caching.
+
 ---
 
 ## 5. Static Modeling (Mô hình Tĩnh)
@@ -230,10 +239,27 @@ sequenceDiagram
 
 ## 7. Domain Event Catalog
 
-### 7.1. Events Consumed (Tiêu thụ)
+### 7.1. Events Published (Phát ra)
+| Event Name | Trigger | Publisher | Subscriber(s) | Payload Schema | Async? |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `IncidentResolvedEvent` | Ticket status = RESOLVED | `IncidentService` | `NotificationService` | `IncidentTicket` | Yes |
+
+### 7.2. Events Consumed (Tiêu thụ)
 | Event Name | Source | Handler | Action thực hiện |
 | :--- | :--- | :--- | :--- |
 | `NegativeReviewSubmittedEvent` | Review Module | `IncidentListener` | Tự động tạo `IncidentTicket` với trạng thái `OPEN` |
+
+### 7.3. Payload Schema
+
+```java
+// IncidentResolvedEvent.java
+public class IncidentResolvedEvent {
+    private Long incidentId;
+    private String resolutionAction;
+    private String resolvedBy;
+    private LocalDateTime occurredAt;
+}
+```
 
 ---
 
@@ -261,11 +287,15 @@ public interface IIncidentService {
 > [!IMPORTANT]
 > **Tuân thủ Nguyên tắc 12**: Spring Boot MVC, trả về Thymeleaf Template.
 
-| Method | Path | Auth Level | Required Roles | Target View |
-| :--- | :--- | :--- | :--- | :--- |
-| GET | `/manager/incidents` | Session | `ROLE_MANAGER` | `manager/incident-dashboard.html` |
-| POST | `/manager/incidents/{id}/assign` | Session | `ROLE_MANAGER` | `redirect:/manager/incidents` |
-| POST | `/manager/incidents/{id}/resolve` | Session | `ROLE_MANAGER` | `redirect:/manager/incidents` |
+| Method | Path | Auth Level | Required Roles | Idempotent? | Target View |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| GET | `/manager/incidents` | Session | `ROLE_MANAGER` | Yes | `manager/incident-dashboard.html` |
+| POST | `/manager/incidents/{id}/assign` | Session | `ROLE_MANAGER` | No | `redirect:/manager/incidents` |
+| POST | `/manager/incidents/{id}/resolve` | Session | `ROLE_MANAGER` | No | `redirect:/manager/incidents` |
+
+### 9.2. Request / Response Schemas
+> [!NOTE]
+> Dự án sử dụng Spring Boot MVC trả về Thymeleaf View. Section Request/Response JSON Schema không áp dụng. Dữ liệu truyền qua `Model` và submit qua `Form Data`.
 
 ---
 
@@ -282,19 +312,48 @@ public interface IIncidentService {
 
 ### 11.1. Prerequisites
 - [x] Áp dụng SQL migration cho bảng `incident_tickets`.
+- [x] Bảng `reviews` đã tồn tại để thiết lập foreign key.
+
+### 11.2. Pre-Migration Checklist
+- [ ] Đã backup DB staging.
+- [ ] Migration đã test trên local để đảm bảo không lỗi foreign key với bảng `reviews` có sẵn.
 
 ### 11.3. Implementation Steps
-- Chạy app Spring Boot.
+- Chạy app Spring Boot `mvn spring-boot:run`.
+
+### 11.4. Deployment Checklist
+- [ ] Migration chạy thành công.
+- [ ] Truy cập được `/manager/incidents` không bị 500 lỗi Template.
+- [ ] Tạo thử ticket bằng `NegativeReviewSubmittedEvent` thành công.
 
 ---
 
 ## 12. Rollback & Incident Runbook
 
 ### 12.1. Điều kiện kích hoạt Rollback (Trigger Conditions)
-- Ticket không thể tạo được do lỗi liên kết Khóa ngoại với `Review`.
+
+| Điều kiện | Ngưỡng | Người quyết định |
+| :--- | :--- | :--- |
+| Lỗi Foreign Key khi liên kết với Review | Bất kỳ case nào | Tech Lead |
+| Lỗi 500 do Template HTML sai cấu trúc | Tần suất > 10% | On-call Engineer |
 
 ### 12.2. Rollback Procedure
-- Xóa khóa ngoại và chỉ dùng logic cấp ứng dụng (soft reference).
+1. Nếu lỗi FK: Xóa khóa ngoại và chỉ dùng logic cấp ứng dụng (soft reference). Rollback migration: `mvn flyway:undo`.
+2. Nếu lỗi UI: Revert code controller/template về bản commit trước đó.
+3. Chạy `mvn spring-boot:run` kiểm tra lại.
+
+### 12.3. Notification Protocol
+
+| Thời điểm | Người nhận | Kênh |
+| :--- | :--- | :--- |
+| Khi có ticket mới tạo | Manager | Notification / Email |
+| Khi ticket bị lỗi DB | Tech Lead | Slack / Teams |
+
+### 12.4. Post-Incident Review (PIR)
+- **Timeline**: Các sự kiện diễn ra.
+- **Root Cause**: Phân tích lỗi (VD: thiếu data ở bảng `reviews`).
+- **Remediation**: Cách đã fix (VD: drop foreign key, handle null).
+- **Prevention**: Action items cho tương lai.
 
 ---
 
@@ -342,3 +401,24 @@ curl -X POST http://localhost:8080/manager/incidents/1/assign \
 | GET `/manager/incidents` | ❌ | ❌ | ✅ | ❌ |
 | POST `/manager/incidents/*/assign`| ❌ | ❌ | ✅ | ❌ |
 | POST `/manager/incidents/*/resolve`| ❌ | ❌ | ✅ | ❌ |
+
+---
+
+## PHỤ LỤC
+
+### A. Glossary (Thuật ngữ)
+
+| Thuật ngữ | Định nghĩa |
+| :--- | :--- |
+| Incident Ticket | Phiếu ghi nhận sự cố, xuất phát từ đánh giá tiêu cực hoặc phàn nàn trực tiếp |
+| State Machine | Mô hình quản lý trạng thái, đảm bảo luồng chuyển đổi (OPEN -> IN_PROGRESS -> RESOLVED) |
+| Negative Review | Đánh giá có số sao (rating) <= 2 |
+| BaseEntity | Entity cơ sở chứa `createdAt`, `updatedAt`, `isDelete` |
+
+### B. Tài liệu tham khảo
+
+| Document | Link / Path |
+| :--- | :--- |
+| SRS UC36 | `02_Requirement/Module5/SRS_Document.md` §2.14.1 |
+| ADR-036-1 | Xem §3 trong tài liệu này |
+| BR-36 | Incident Lifecycle & Resolution (Chặn nhảy trạng thái) |

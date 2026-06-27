@@ -106,11 +106,26 @@ Các chỉ số sức khỏe của khách hàng (stress, sleep, muscle_tension) 
 
 ## 4. Non-Functional Requirements & SLA
 
-### 4.1. Security
+### 4.1. Performance & Availability
+| Category | Requirement | Target SLA | Measurement Method | Compliance Basis |
+| :--- | :--- | :--- | :--- | :--- |
+| Latency | Form submit + encrypt | < 200ms | APM Tool | — |
+
+### 4.2. Data Integrity & Retention
 | Category | Requirement | Target | Verification Method | Compliance Basis |
 | :--- | :--- | :--- | :--- | :--- |
-| Encryption at rest | Field-level encryption | AES-256 | SQL query ra string vô nghĩa | BR-09, GDPR |
+| Durability | Dữ liệu sức khỏe không bị mất | 100% | DB backup policy | GDPR Art. 5.1(f) |
+
+### 4.3. Security
+| Category | Requirement | Target | Verification Method | Compliance Basis |
+| :--- | :--- | :--- | :--- | :--- |
+| Encryption at rest | Field-level encryption | AES-256 | SQL query ra string vô nghĩa | BR-09, GDPR Art. 32 |
 | Logging | No PII Leak | Tuyệt đối không log scores | Kibana/Log scan | Rule 5 |
+| Access control | Chỉ Guest xem của mình | Own data only | Auth Matrix (§16) | GDPR Art. 9 |
+
+### 4.4. Scalability & Capacity Planning
+> [!NOTE]
+> Tần suất đánh giá rất thấp (~2 lần/retreat/guest). Không cần caching hay horizontal scaling.
 
 ---
 
@@ -207,6 +222,46 @@ sequenceDiagram
     deactivate Controller
 ```
 
+### 6.2. Sequence Diagram — Error Path (Missing Consent)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Guest
+    participant Controller
+    participant WellnessService
+    participant DB as PostgreSQL
+
+    Guest->>Controller: POST /guest/wellness/submit
+    activate Controller
+    Controller->>WellnessService: submitAssessment(dto)
+    activate WellnessService
+    WellnessService->>DB: query CONSENT(userId, type="HEALTH_DATA")
+    DB-->>WellnessService: Consent(consentStatus = false)
+    WellnessService->>WellnessService: throw ConsentRequiredException("WEL-001")
+    deactivate WellnessService
+    Controller-->>Guest: Error Page (400 — Cần cấp quyền xử lý)
+    deactivate Controller
+```
+
+---
+
+## 7. Domain Event Catalog
+
+### 7.1. Events Published (Phát ra)
+| Event Name | Trigger | Publisher | Subscriber(s) | Payload Schema | Async? |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| N/A | Module này không phát ra event nào | — | — | — | — |
+
+### 7.2. Events Consumed (Tiêu thụ)
+| Event Name | Source | Handler | Action thực hiện |
+| :--- | :--- | :--- | :--- |
+| N/A | Module này không tiêu thụ event nào (Guest chủ động truy cập) | — | — |
+
+### 7.3. Payload Schema
+> [!NOTE]
+> N/A — Module này không sử dụng Domain Events.
+
 ---
 
 ## 8. Interface Specification (Đặc tả Giao diện)
@@ -232,12 +287,15 @@ public interface IWellnessService {
 > [!IMPORTANT]
 > **Tuân thủ Nguyên tắc 12**: Spring Boot MVC, trả về Thymeleaf Template. Giao diện chứa script thư viện Chart.js để render biểu đồ.
 
-| Method | Path | Auth Level | Required Roles | Target View |
-| :--- | :--- | :--- | :--- | :--- |
-| GET | `/guest/wellness/form` | Session | `ROLE_GUEST` | `guest/wellness-form.html` |
-| POST | `/guest/wellness/submit` | Session | `ROLE_GUEST` | `redirect:/guest/wellness/chart` |
-| GET | `/guest/wellness/chart` | Session | `ROLE_GUEST` | `guest/wellness-chart.html` |
+| Method | Path | Auth Level | Required Roles | Idempotent? | Target View |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| GET | `/guest/wellness/form` | Session | `ROLE_GUEST` | Yes | `guest/wellness-form.html` |
+| POST | `/guest/wellness/submit` | Session | `ROLE_GUEST` | No | `redirect:/guest/wellness/chart` |
+| GET | `/guest/wellness/chart` | Session | `ROLE_GUEST` | Yes | `guest/wellness-chart.html` |
 
+### 9.2. Request / Response Schemas
+> [!NOTE]
+> Dự án sử dụng Spring Boot MVC trả về Thymeleaf View. Section Request/Response JSON Schema không áp dụng.
 ---
 
 ## 10. Bảng mã lỗi (Error Codes)
@@ -253,16 +311,53 @@ public interface IWellnessService {
 ### 11.1. Prerequisites
 - [ ] DPO đã sign-off phương pháp mã hóa AES-256.
 - [x] Áp dụng SQL migration cho bảng `wellness_assessments`.
+- [x] `AesDataEncryptor` đã tồn tại trong `auth.config`.
+
+### 11.2. Pre-Migration Checklist
+- [ ] Đã backup DB staging.
+- [ ] Migration đã chạy thành công trên local.
+- [ ] DPO đã sign-off nếu migration thay đổi cấu trúc lưu PII.
+
+### 11.3. Implementation Steps
+- Tạo bảng `wellness_assessments`.
+- Cấu hình `AES_SECRET_KEY` trong environment.
+- Chạy ứng dụng Spring Boot `mvn spring-boot:run`.
+
+### 11.4. Deployment Checklist
+- [ ] Migration chạy thành công.
+- [ ] Health check endpoint trả về 200.
+- [ ] Native SQL query trả về chuỗi mã hóa (không plaintext).
+- [ ] Consent check hoạt động đúng (từ chối khi chưa đồng ý).
 
 ---
 
 ## 12. Rollback & Incident Runbook
 
 ### 12.1. Điều kiện kích hoạt Rollback (Trigger Conditions)
-- Mất Key giải mã (`AES_SECRET_KEY`) trên môi trường Production gây lỗi toàn bộ hiển thị Radar Chart.
+
+| Điều kiện | Ngưỡng | Người quyết định |
+| :--- | :--- | :--- |
+| Mất Key giải mã `AES_SECRET_KEY` | Bất kỳ case nào | Tech Lead + DPO |
+| Dữ liệu plaintext xuất hiện trong DB | Bất kỳ case nào | DPO |
 
 ### 12.2. Rollback Procedure
-- Khôi phục biến môi trường `AES_SECRET_KEY` từ backup bảo mật (Vault).
+1. Khôi phục biến môi trường `AES_SECRET_KEY` từ backup bảo mật.
+2. Verify lại Radar Chart hiển thị đúng dữ liệu.
+3. Nếu AES key bị lộ, thực hiện key rotation.
+
+### 12.3. Notification Protocol
+
+| Thời điểm | Người nhận | Kênh |
+| :--- | :--- | :--- |
+| Ngay khi phát hiện | DPO + Tech Lead | Email khẩn cấp |
+| Trong 72 giờ | DPA | Email (bắt buộc nếu có data breach — GDPR Art. 33) |
+
+### 12.4. Post-Incident Review (PIR)
+- **Timeline**: Ghi lại diễn biến theo thứ tự thời gian.
+- **Root Cause**: Phân tích nguyên nhân gốc (5 Whys).
+- **Impact**: Số Guest bị ảnh hưởng, PII có bị lộ?
+- **Remediation**: Các bước đã khắc phục.
+- **Prevention**: Action items tránh tái diễn.
 
 ---
 
@@ -309,3 +404,25 @@ curl -X GET http://localhost:8080/guest/wellness/chart \
 | :--- | :---: | :---: | :---: | :---: |
 | GET `/guest/wellness/*` | ✅ (Own) | ❌ | ❌ (Sensitive) | ✅ (Assigned) |
 | POST `/guest/wellness/submit`| ✅ (Own) | ❌ | ❌ | ❌ |
+
+---
+
+## PHỤ LỤC
+
+### A. Glossary (Thuật ngữ)
+
+| Thuật ngữ | Định nghĩa |
+| :--- | :--- |
+| Radar Chart | Biểu đồ hình nhện so sánh chỉ số sức khỏe Pre/Post |
+| AesDataEncryptor | JPA AttributeConverter mã hóa AES-256 có sẵn trong `auth.config` |
+| Consent | Bảng lưu trạng thái đồng ý xử lý dữ liệu của Guest |
+| BaseEntity | Entity cơ sở chứa `createdAt`, `updatedAt`, `isDelete` |
+
+### B. Tài liệu tham khảo
+
+| Document | Link / Path |
+| :--- | :--- |
+| SRS UC35 | `02_Requirement/Module5/SRS_Document.md` §2.13.1 |
+| ADR-035-1 | Xem §3 trong tài liệu này |
+| BR-08 | Yêu cầu Consent cho dữ liệu sức khỏe (GDPR Art. 9) |
+| BR-09 | Mã hóa dữ liệu sức khỏe (GDPR Art. 32) |

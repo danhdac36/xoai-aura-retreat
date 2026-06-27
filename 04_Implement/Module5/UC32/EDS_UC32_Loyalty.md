@@ -91,6 +91,12 @@
 #### Bối cảnh (Context)
 Cộng điểm thưởng chỉ xảy ra sau khi Checkout hoàn tất (khách thanh toán xong). Việc đặt logic cộng điểm trong transaction checkout có thể làm chậm quá trình xuất hóa đơn và gây lỗi không đáng có (ví dụ lỗi cộng điểm làm rollback luôn hóa đơn).
 
+#### Các phương án đã xem xét (Options Considered)
+| Phương án | Mô tả | Ưu điểm | Nhược điểm |
+| :--- | :--- | :--- | :--- |
+| A. Synchronous Call | Gọi trực tiếp `LoyaltyService` trong `BillingService.checkout()` | Transaction chung, dễ debug | Checkout chậm, coupling cao, lỗi điểm rollback cả invoice |
+| B. Async Event Listener | Lắng nghe `CheckoutCompletedEvent` qua `@TransactionalEventListener` | Decoupled, checkout nhanh | Eventual consistency, điểm có thể trễ 1-2s |
+
 #### Quyết định (Decision)
 > [!NOTE]
 > Module Loyalty sẽ lắng nghe sự kiện `@Async TransactionalEventListener(phase = AFTER_COMMIT)` từ `CheckoutCompletedEvent` (được bắn ra từ `BillingServiceImpl`) để xử lý việc cộng điểm. Điều này đảm bảo tính eventual consistency và tái sử dụng Event đã có sẵn.
@@ -116,6 +122,15 @@ Cộng điểm thưởng chỉ xảy ra sau khi Checkout hoàn tất (khách tha
 | Category | Requirement | Target | Verification Method | Compliance Basis |
 | :--- | :--- | :--- | :--- | :--- |
 | Consistency | Điểm không bị mất | 100% | Retry mechanism | BR-28 |
+
+### 4.3. Security
+| Category | Requirement | Target | Verification Method | Compliance Basis |
+| :--- | :--- | :--- | :--- | :--- |
+| Access control | Dashboard chỉ Guest xem của mình | Own data only | Auth Matrix (§16) | RBAC |
+
+### 4.4. Scalability & Capacity Planning
+> [!NOTE]
+> Tần suất cộng điểm = tần suất checkout (~20 lượt/ngày). Không cần caching hay horizontal scaling.
 
 ---
 
@@ -194,6 +209,24 @@ sequenceDiagram
     deactivate LoyaltyService
 ```
 
+### 6.2. Sequence Diagram — Error Path (Profile Not Found)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant LoyaltyListener
+    participant LoyaltyService
+    participant DB as PostgreSQL
+
+    LoyaltyListener->>LoyaltyService: awardPoints(bookingId, folioId)
+    activate LoyaltyService
+    LoyaltyService->>DB: findByGuestId(guestId)
+    DB-->>LoyaltyService: null (Profile Not Found)
+    LoyaltyService->>LoyaltyService: Tạo mới LoyaltyProfile(points=0, tier=MEMBER)
+    LoyaltyService->>DB: save(newProfile)
+    deactivate LoyaltyService
+```
+
 ---
 
 ## 7. Domain Event Catalog
@@ -207,6 +240,19 @@ sequenceDiagram
 | Event Name | Source | Handler | Action thực hiện |
 | :--- | :--- | :--- | :--- |
 | `CheckoutCompletedEvent` | Billing Module | `LoyaltyListener` | Lấy `GuestFolio.finalAmount` và cộng điểm |
+
+### 7.3. Payload Schema
+
+```java
+// TierUpgradedEvent.java
+public class TierUpgradedEvent {
+    private Long guestId;
+    private String previousTier;
+    private String newTier;
+    private Integer totalPoints;
+    private LocalDateTime occurredAt;
+}
+```
 
 ---
 
@@ -245,10 +291,13 @@ public interface ILoyaltyService {
 > [!IMPORTANT]
 > **Tuân thủ Nguyên tắc 12**: Spring Boot MVC, trả về Thymeleaf Template.
 
-| Method | Path | Auth Level | Required Roles | Target View |
-| :--- | :--- | :--- | :--- | :--- |
-| GET | `/guest/loyalty` | Session | `ROLE_GUEST` | `guest/loyalty-dashboard.html` |
+| Method | Path | Auth Level | Required Roles | Idempotent? | Target View |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| GET | `/guest/loyalty` | Session | `ROLE_GUEST` | Yes | `guest/loyalty-dashboard.html` |
 
+### 9.2. Request / Response Schemas
+> [!NOTE]
+> Dự án sử dụng Spring Boot MVC trả về Thymeleaf View. Section Request/Response JSON Schema không áp dụng.
 ---
 
 ## 10. Bảng mã lỗi (Error Codes)
@@ -263,19 +312,51 @@ public interface ILoyaltyService {
 
 ### 11.1. Prerequisites
 - [x] Áp dụng SQL migration cho bảng `loyalty_profiles`.
+- [x] `CheckoutCompletedEvent` đã tồn tại trong `billing.dto`.
+
+### 11.2. Pre-Migration Checklist
+- [ ] Đã backup DB staging.
+- [ ] Migration đã chạy thành công trên local.
+- [ ] Rollback script đã được test.
 
 ### 11.3. Implementation Steps
-- Tạo script seed cấu hình Tier (Silver: 1000đ, Gold: 5000đ).
+- Tạo bảng `loyalty_profiles` và script seed cấu hình Tier.
+- Chạy ứng dụng Spring Boot `mvn spring-boot:run`.
+
+### 11.4. Deployment Checklist
+- [ ] Migration chạy thành công.
+- [ ] Health check endpoint trả về 200.
+- [ ] Audit Log ghi nhận `UPGRADE_TIER` khi thăng hạng.
+- [ ] Điểm tính toán chính xác từ `GuestFolio.finalAmount`.
 
 ---
 
 ## 12. Rollback & Incident Runbook
 
 ### 12.1. Điều kiện kích hoạt Rollback (Trigger Conditions)
-- Tính sai điểm cho khách hàng trên diện rộng (tăng vọt bất thường).
+
+| Điều kiện | Ngưỡng | Người quyết định |
+| :--- | :--- | :--- |
+| Tính sai điểm trên diện rộng | > 5 Guest bị sai | Tech Lead |
+| Event Listener không nhận được event | Bất kỳ case nào | On-call Engineer |
 
 ### 12.2. Rollback Procedure
-- Sửa lại hệ số quy đổi điểm và chạy query truy hồi dựa trên `Folio` để tính lại điểm toàn hệ thống.
+1. Sửa lại hệ số quy đổi điểm.
+2. Chạy query truy hồi dựa trên `GuestFolio` để tính lại điểm toàn hệ thống.
+3. Verify lại bảng `loyalty_profiles`.
+
+### 12.3. Notification Protocol
+
+| Thời điểm | Người nhận | Kênh |
+| :--- | :--- | :--- |
+| Ngay khi phát hiện | Tech Lead | Chat nhóm |
+| Trong 30 phút | Manager | Email |
+
+### 12.4. Post-Incident Review (PIR)
+- **Timeline**: Ghi lại diễn biến theo thứ tự thời gian.
+- **Root Cause**: Phân tích nguyên nhân gốc (5 Whys).
+- **Remediation**: Các bước đã khắc phục.
+- **Prevention**: Action items tránh tái diễn.
 
 ---
 
@@ -320,3 +401,23 @@ curl -X GET http://localhost:8080/guest/loyalty \
 | Endpoint | GUEST | RECEPTIONIST | MANAGER | THERAPIST |
 | :--- | :---: | :---: | :---: | :---: |
 | GET `/guest/loyalty` | ✅ (Own) | ❌ | ✅ (All) | ❌ |
+
+---
+
+## PHỤ LỤC
+
+### A. Glossary (Thuật ngữ)
+
+| Thuật ngữ | Định nghĩa |
+| :--- | :--- |
+| Aura Points | Đơn vị điểm thưởng khách hàng thân thiết |
+| Tier | Hạng khách hàng: MEMBER, SILVER, GOLD, PLATINUM |
+| BaseEntity | Entity cơ sở chứa `createdAt`, `updatedAt`, `isDelete` |
+
+### B. Tài liệu tham khảo
+
+| Document | Link / Path |
+| :--- | :--- |
+| SRS UC32 | `02_Requirement/Module5/SRS_Document.md` §2.12.1 |
+| ADR-032-1 | Xem §3 trong tài liệu này |
+| BR-28 | Loyalty Points Issuance |

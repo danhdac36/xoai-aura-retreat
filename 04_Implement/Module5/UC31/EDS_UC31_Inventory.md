@@ -127,6 +127,10 @@ Khi Therapist hoàn thành một Spa Session, hệ thống cần tự động tr
 | :--- | :--- | :--- | :--- | :--- |
 | Access control | Dashboard cho Manager | Admin Role | Auth Matrix (§16) | RBAC |
 
+### 4.4. Scalability & Capacity Planning
+> [!NOTE]
+> Module Inventory không có yêu cầu scale đặc biệt. Tần suất trừ kho tỷ lệ thuận với số phiên Spa/ngày (~50 phiên/ngày). Không cần caching.
+
 ---
 
 ## 5. Static Modeling (Mô hình Tĩnh)
@@ -209,6 +213,22 @@ sequenceDiagram
     deactivate InventoryService
 ```
 
+### 6.2. Sequence Diagram — Error Path
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant InventoryService
+    participant DB as PostgreSQL
+    participant AuditLogService
+
+    InventoryService->>DB: fetch SpaInventory (quantity = 10)
+    InventoryService->>InventoryService: Calculate: 10 - 20 = -10 (NEGATIVE)
+    InventoryService->>DB: UPDATE spa_inventory SET quantity = -10
+    InventoryService->>AuditLogService: log("CRITICAL: Negative Inventory", level=CRITICAL)
+    Note over InventoryService: Giao dịch Spa KHÔNG bị rollback (SRS E1)
+```
+
 ---
 
 ## 7. Domain Event Catalog
@@ -222,6 +242,19 @@ sequenceDiagram
 | Event Name | Source | Handler | Action thực hiện |
 | :--- | :--- | :--- | :--- |
 | Trạng thái Entity thay đổi | `TreatmentBooking` (khi status chuyển sang `TreatmentBookingStatus.COMPLETED`) | `InventoryListener` | Trừ kho lượng vật tư tương ứng với BOM |
+
+### 7.3. Payload Schema
+
+```java
+// LowStockAlertEvent.java
+public class LowStockAlertEvent {
+    private Long inventoryId;       // ID vật tư
+    private String itemName;        // Tên vật tư
+    private Double currentQuantity; // Số lượng hiện tại
+    private Double threshold;       // Ngưỡng cảnh báo
+    private LocalDateTime occurredAt;
+}
+```
 
 ---
 
@@ -256,11 +289,14 @@ public interface IInventoryService {
 > [!IMPORTANT]
 > **Tuân thủ Nguyên tắc 12**: Spring Boot MVC, trả về Thymeleaf Template.
 
-| Method | Path | Auth Level | Required Roles | Target View |
-| :--- | :--- | :--- | :--- | :--- |
-| GET | `/manager/inventory` | Session | `ROLE_MANAGER` | `manager/inventory-dashboard.html` |
-| POST | `/manager/inventory/restock`| Session | `ROLE_MANAGER` | `redirect:/manager/inventory` |
+| Method | Path | Auth Level | Required Roles | Idempotent? | Target View |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| GET | `/manager/inventory` | Session | `ROLE_MANAGER` | Yes | `manager/inventory-dashboard.html` |
+| POST | `/manager/inventory/restock`| Session | `ROLE_MANAGER` | No | `redirect:/manager/inventory` |
 
+### 9.2. Request / Response Schemas
+> [!NOTE]
+> Dự án sử dụng Spring Boot MVC trả về Thymeleaf View (không phải REST API trả JSON). Do đó section Request/Response JSON Schema không áp dụng. Dữ liệu được truyền qua `ModelAttribute` và `Model`.
 ---
 
 ## 10. Bảng mã lỗi (Error Codes)
@@ -275,22 +311,50 @@ public interface IInventoryService {
 ## 11. Quy trình Triển khai (Step-by-Step)
 
 ### 11.1. Prerequisites
-- [x] Áp dụng SQL migration cho bảng `inventory_items` và `therapy_bom`.
+- [x] Áp dụng SQL migration cho bảng `spa_inventory` và `therapy_bom`.
+
+### 11.2. Pre-Migration Checklist
+- [ ] Đã backup DB staging.
+- [ ] Migration đã chạy thành công trên môi trường local >= 24 giờ.
+- [ ] Rollback script đã được test trên local.
 
 ### 11.3. Implementation Steps
-- Cập nhật database với script `V1__init_inventory.sql`.
-- Chạy ứng dụng Spring Boot.
+- Cập nhật database với script migration.
+- Chạy ứng dụng Spring Boot `mvn spring-boot:run`.
 
+### 11.4. Deployment Checklist
+- [ ] Migration chạy thành công.
+- [ ] Health check endpoint trả về 200.
+- [ ] Audit log đang sinh ra đúng format khi trừ kho.
+- [ ] Low-stock alert hiển thị đúng trên Manager Dashboard.
 ---
 
 ## 12. Rollback & Incident Runbook
 
 ### 12.1. Điều kiện kích hoạt Rollback (Trigger Conditions)
-- Số lượng kho âm liên tục do sai số BOM. -> Disable Event Listener.
+
+| Điều kiện | Ngưỡng | Người quyết định |
+| :--- | :--- | :--- |
+| Kho âm liên tục do sai BOM | > 3 lần/ngày | Tech Lead |
+| Event Listener không kích hoạt | Bất kỳ case nào | On-call Engineer |
 
 ### 12.2. Rollback Procedure
-- Chạy script SQL fix lại số lượng từ Audit Log.
+1. Disable `InventoryListener` bằng cách comment `@EventListener`.
+2. Chạy script SQL fix lại số lượng từ Audit Log.
+3. Verify lại bảng `spa_inventory` đã đúng số lượng.
 
+### 12.3. Notification Protocol
+
+| Thời điểm | Người nhận | Kênh |
+| :--- | :--- | :--- |
+| Ngay khi phát hiện | Tech Lead | Chat nhóm |
+| Trong 30 phút | Spa Manager | Email |
+
+### 12.4. Post-Incident Review (PIR)
+- **Timeline**: Ghi lại diễn biến theo thứ tự thời gian.
+- **Root Cause**: Phân tích nguyên nhân gốc (5 Whys).
+- **Remediation**: Các bước đã khắc phục.
+- **Prevention**: Action items tránh tái diễn.
 ---
 
 ## 13. Kịch bản Kiểm thử Chi tiết
@@ -335,3 +399,23 @@ curl -X GET http://localhost:8080/manager/inventory \
 | :--- | :---: | :---: | :---: | :---: |
 | GET `/manager/inventory` | ❌ | ❌ | ✅ | ❌ |
 | POST `/manager/inventory/restock`| ❌ | ❌ | ✅ | ❌ |
+
+---
+
+## PHỤ LỤC
+
+### A. Glossary (Thuật ngữ)
+
+| Thuật ngữ | Định nghĩa |
+| :--- | :--- |
+| BOM | Bill of Materials — Danh sách vật tư tiêu hao cho một loại trị liệu |
+| Low-stock Alert | Cảnh báo khi tồn kho dưới ngưỡng `threshold` |
+| BaseEntity | Entity cơ sở chứa `createdAt`, `updatedAt`, `isDelete` |
+
+### B. Tài liệu tham khảo
+
+| Document | Link / Path |
+| :--- | :--- |
+| SRS UC31 | `02_Requirement/Module5/SRS_Document.md` §2.11.1 |
+| ADR-031-1 | Xem §3 trong tài liệu này |
+| BR-27 | Inventory Transaction Integrity |
