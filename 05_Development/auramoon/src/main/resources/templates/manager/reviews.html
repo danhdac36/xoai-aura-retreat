@@ -7,7 +7,6 @@
     <div class="w-full">
         <!-- Load specific CSS and JS -->
         <link rel="stylesheet" th:href="@{/css/booking/reviews.css}" />
-        <script th:src="@{/js/booking/reviews-tailwind.js}"></script>
 
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-stack-lg">
@@ -69,14 +68,15 @@
             <!-- Responsive List/Table -->
             <div class="space-y-4 md:space-y-0">
                 <th:block th:each="review : ${reviews}">
-                    <div class="bg-white md:bg-transparent p-6 md:px-6 md:py-8 rounded-xl md:rounded-none md:border-b border-outline-variant/10 flex flex-col md:flex-row md:items-start transition-all hover:bg-secondary-container/10">
+                    <div class="review-row bg-white md:bg-transparent p-6 md:px-6 md:py-8 rounded-xl md:rounded-none md:border-b border-outline-variant/10 flex flex-col md:flex-row md:items-start transition-all hover:bg-secondary-container/10">
                         <div class="md:w-1/6 mb-2 md:mb-0">
                             <span class="md:hidden font-label-caps text-[10px] text-on-surface-variant block">Booking ID</span>
-                            <a class="text-primary font-semibold hover:underline" href="#" th:text="'#XA-' + ${review.booking.id}">#XA-9283</a>
+                            <a class="text-primary font-semibold hover:underline" href="#" th:text="${review.bookingId}">9283</a>
                         </div>
                         <div class="md:w-1/6 mb-4 md:mb-0">
                             <span class="md:hidden font-label-caps text-[10px] text-on-surface-variant block">Guest</span>
-                            <a class="text-primary font-semibold hover:underline" href="#" th:text="'Guest ' + ${review.booking.guestId}">Nguyen Lan Anh</a>
+                            <a th:if="${review.guestId != null}" class="text-primary font-semibold hover:underline" th:href="@{/manager/staff/profile/{id}(id=${review.guestId})}" th:text="${review.guestName}">Nguyen Lan Anh</a>
+                            <span th:if="${review.guestId == null}" class="text-on-surface-variant font-semibold" th:text="${review.guestName}">Nguyen Lan Anh</span>
                         </div>
                         <div class="md:w-1/6 mb-4 md:mb-0">
                             <div class="flex text-primary">
@@ -89,9 +89,11 @@
                             <p class="italic text-on-surface-variant font-headline-sm text-sm leading-relaxed" th:text="${review.comment}">"An absolutely transformative experience."</p>
                         </div>
                         <div class="md:w-1/6 text-right">
-                            <button th:data-id="${review.id}" class="bg-primary-container text-on-primary-container px-5 py-2 rounded-full font-label-caps text-[10px] uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all">
-                                Hide
-                            </button>
+                            <form th:action="@{/manager/reviews/hide/{id}(id=${review.id})}" method="post" class="hide-review-form m-0 inline">
+                                <button type="submit" class="bg-primary-container text-on-primary-container px-5 py-2 rounded-full font-label-caps text-[10px] uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all">
+                                    Hide
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </th:block>
@@ -99,24 +101,7 @@
         </section>
 
         <!-- Micro-interactions Script -->
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const buttons = document.querySelectorAll('button');
-                buttons.forEach(btn => {
-                    if (btn.innerText.includes('Hide')) {
-                        btn.addEventListener('click', function() {
-                            const row = this.closest('.bg-white, .md:bg-transparent');
-                            row.style.opacity = '0';
-                            row.style.transform = 'translateY(10px)';
-                            row.style.transition = 'all 0.4s ease';
-                            setTimeout(() => {
-                                row.style.display = 'none';
-                            }, 400);
-                        });
-                    }
-                });
-            });
-        </script>
+        <!-- Script removed for standard form submission -->
     </div>
 </body>
 </html>

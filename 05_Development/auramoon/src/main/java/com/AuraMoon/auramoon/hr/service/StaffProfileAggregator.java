@@ -40,6 +40,10 @@ public class StaffProfileAggregator implements IStaffProfileAggregator {
         dto.setFullName(user.getFullName());
         dto.setEmail(user.getEmail());
         dto.setPhoneNumber(user.getPhone());
+        dto.setGender(user.getGender());
+        dto.setDateOfBirth(user.getDateOfBirth());
+        dto.setAvatar(user.getAvatar());
+        dto.setStatus(user.getStatus());
         
         if (user.getRole() != null) {
             dto.setRoleName(user.getRole().getRoleName());
@@ -47,7 +51,10 @@ public class StaffProfileAggregator implements IStaffProfileAggregator {
                 Optional<Therapist> therapistOpt = therapistRepository.findById(user.getId());
                 therapistOpt.ifPresent(therapist -> {
                     dto.setTherapistCode(therapist.getTherapistCode());
-                    // Any other specific therapist fields
+                    dto.setTherapistStatus(therapist.getStatus());
+                    
+                    Long sessions = treatmentBookingRepository.countByTherapistIdAndStatus(user.getId(), "COMPLETED");
+                    dto.setCompletedSessions(sessions != null ? sessions : 0L);
                 });
             }
         }

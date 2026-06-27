@@ -24,9 +24,8 @@ public class ManagerReviewController {
 
     @org.springframework.web.bind.annotation.PostMapping("/manager/reviews/hide/{id}")
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
-    @org.springframework.web.bind.annotation.ResponseBody
-    public org.springframework.http.ResponseEntity<?> hideReview(@org.springframework.web.bind.annotation.PathVariable long id) {
+    public String hideReview(@org.springframework.web.bind.annotation.PathVariable long id) {
         managerReviewService.hideReview(id);
-        return org.springframework.http.ResponseEntity.ok().build();
+        return "redirect:/manager/reviews";
     }
 }

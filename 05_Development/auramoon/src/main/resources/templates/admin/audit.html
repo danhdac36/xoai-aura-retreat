@@ -67,17 +67,19 @@
                     <tbody class="divide-y divide-outline-variant/10">
                         <th:block th:each="log : ${logsPage.content}">
                             <tr class="data-table-row group hover:bg-secondary-container/10 transition-colors">
-                                <td class="px-8 py-6 font-mono text-[13px] text-on-surface-variant" th:text="'XA-LOG-' + ${log.logId}">XA-LOG-8924</td>
+                                <td class="px-8 py-6 font-mono text-[13px] text-on-surface-variant" th:text="${log.logId}">8924</td>
                                 <td class="px-6 py-6">
                                     <span class="inline-flex items-center px-3 py-1 rounded-full bg-error-container/20 text-error font-label-caps text-[10px] tracking-widest font-bold" th:text="${log.actionType}">HIDE_REVIEW</span>
                                 </td>
-                                <td class="px-6 py-6 font-body-md text-on-surface font-semibold" th:text="${log.actorName}">Admin_Eleanor</td>
+                                <td class="px-6 py-6">
+                                    <a class="font-body-md text-primary font-semibold hover:underline" th:href="@{/manager/staff/profile/{id}(id=${log.actorId})}" th:text="${log.actorName}">Admin_Eleanor</a>
+                                </td>
                                 <td class="px-6 py-6">
                                     <a class="text-primary-container border-b border-primary-container/30 hover:border-primary-container transition-all" href="#" th:text="${log.targetId}">REV-4492-B</a>
                                 </td>
                                 <td class="px-6 py-6 text-on-surface-variant/80 text-body-md" th:text="${log.timestamp}">Oct 31, 2023, 14:30</td>
                                 <td class="px-8 py-6 text-right">
-                                    <button class="py-2 px-5 rounded-full border border-primary-container text-primary-container font-label-caps text-[11px] hover:bg-primary-container hover:text-on-primary transition-all duration-300" th:data-details="${log.details}" onclick="alert('Details: ' + this.getAttribute('data-details'))">INSPECT</button>
+                                    <button class="inspect-btn py-2 px-5 rounded-full border border-primary-container text-primary-container font-label-caps text-[11px] hover:bg-primary-container hover:text-on-primary transition-all duration-300" th:data-details="${log.details}" th:data-id="${log.logId}">INSPECT</button>
                                 </td>
                             </tr>
                         </th:block>
@@ -111,39 +113,110 @@
             </div>
         </section>
 
-        <!-- Visual Atmosphere Component -->
-        <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-gutter">
-            <div class="bg-surface-container-low p-10 rounded-[40px] flex flex-col justify-center items-start space-y-6 relative overflow-hidden group border border-outline-variant/20">
-                <div class="absolute top-0 right-0 p-8 opacity-10">
-                    <span class="material-symbols-outlined text-[120px] text-primary">verified_user</span>
-                </div>
-                <span class="font-label-caps text-[12px] text-primary tracking-[0.2em]">INTEGRITY FIRST</span>
-                <h3 class="font-headline-sm text-headline-sm text-on-surface">Immutable System Chains</h3>
-                <p class="text-on-surface-variant leading-relaxed opacity-80">Our audit logs are cryptographically sealed to ensure that every interaction with the resort management system remains transparent and untampered, preserving the sanctity of our administrative flow.</p>
-                <button class="group flex items-center gap-2 text-primary font-bold font-label-caps text-[12px]">
-                    LEARN ABOUT SECURITY PROTOCOLS
-                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+
+
+        <!-- Inspect Modal -->
+        <div id="inspectModal" class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-400">
+            <!-- Blur overlay -->
+            <div class="absolute inset-0 bg-[#000000]/40 backdrop-blur-md transition-opacity" onclick="closeModal()"></div>
+            
+            <!-- Modal Content -->
+            <div class="bg-surface border border-outline-variant/20 shadow-[0_24px_80px_rgba(45,90,39,0.15)] rounded-[32px] p-8 md:p-10 relative z-10 w-full max-w-lg transform scale-95 transition-all duration-400 ease-out" id="modalCard">
+                <button onclick="closeModal()" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest hover:bg-surface-container-highest transition-colors text-on-surface-variant hover:text-on-surface">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
                 </button>
-            </div>
-            <div class="rounded-[40px] overflow-hidden relative h-[360px]">
-                <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCj-2L5kKWI6tA86k97rlI3q5GT2EUzxgdBNqszKG7cuob9LQXqu_1Yf1R0r9pV2_uI3Tix06Gzr7qQYOHnLIn9qGbp86lIli9H00mqxzdgcOmY2nHQ6w7SHw3ubblAcr54nsWUBV7rl3XS6xn-MMX57pjmqFQkpuAPaVUXu-dUDT7MH-YIDlRAWk3BwvbgjrJ7vLbq3q_tM1HG6chqAysnCaN8EUS3tvr9sp9luULaXI_3532bZBcONkdRnG1cDVTkcTqGPo9Pvq8b')">
+                
+                <div class="flex items-center gap-5 mb-8">
+                    <div class="w-14 h-14 rounded-full bg-primary-container/30 flex items-center justify-center text-primary border border-primary/10">
+                        <span class="material-symbols-outlined text-[28px]" data-icon="manage_search">manage_search</span>
+                    </div>
+                    <div>
+                        <h3 class="font-headline-sm text-on-surface">System Action Details</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="w-2 h-2 rounded-full bg-primary"></span>
+                            <p class="font-label-caps text-[10px] tracking-widest text-on-surface-variant uppercase" id="modalLogId">ID</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
-                <div class="absolute bottom-0 left-0 p-10">
-                    <p class="font-headline-sm text-on-primary italic mb-2">"True luxury is peace of mind."</p>
-                    <p class="font-label-caps text-[12px] text-on-primary/80 opacity-70">Aura Resort Operations Philosophy</p>
+
+                <div class="font-mono text-sm bg-surface-container-lowest rounded-[24px] p-6 border border-outline-variant/10 shadow-inner" id="modalDetailsContent">
+                    <!-- Dynamic details go here -->
+                </div>
+                
+                <div class="mt-8 flex justify-end">
+                    <button onclick="closeModal()" class="bg-primary text-on-primary px-8 py-3.5 rounded-full font-label-caps text-[11px] tracking-[0.15em] hover:shadow-xl hover:shadow-primary/30 transition-all hover:-translate-y-1 active:translate-y-0">
+                        ACKNOWLEDGE
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- Script -->
         <script>
-            document.querySelectorAll('button').forEach(btn => {
-                btn.addEventListener('mousedown', function() {
-                    this.style.transform = 'scale(0.97)';
+            let modal, modalCard, modalDetails, modalLogId;
+
+            function openModal(logId, detailsRaw) {
+                if(!modal) return;
+                let formatted = '';
+                try {
+                    if (detailsRaw && detailsRaw.includes(':')) {
+                        const pairs = detailsRaw.split(',').map(s => s.trim());
+                        formatted = pairs.map(p => {
+                            const splitIdx = p.indexOf(':');
+                            if (splitIdx === -1) return `<div class="py-1">${p}</div>`;
+                            const rawK = p.substring(0, splitIdx).trim();
+                            // Convert camelCase to Title Case: totalActiveFolios -> Total Active Folios
+                            const k = rawK.replace(/([A-Z])/g, ' $1').trim();
+                            const v = p.substring(splitIdx + 1).trim();
+                            return `<div class="flex justify-between items-center py-3 border-b border-outline-variant/10 last:border-0">
+                                <span class="text-on-surface-variant/70 font-label-caps text-[11px] uppercase tracking-wider">${k}</span>
+                                <span class="text-on-surface font-semibold text-[13px]">${v}</span>
+                            </div>`;
+                        }).join('');
+                    } else {
+                        formatted = `<div class="py-3 text-on-surface-variant leading-relaxed">${detailsRaw || 'No details provided.'}</div>`;
+                    }
+                } catch(e) {
+                    formatted = `<div class="py-3">${detailsRaw}</div>`;
+                }
+
+                modalLogId.innerText = logId;
+                modalDetails.innerHTML = formatted;
+
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modalCard.classList.remove('scale-95');
+                modalCard.classList.add('scale-100');
+            }
+
+            function closeModal() {
+                if(!modal) return;
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modalCard.classList.remove('scale-100');
+                modalCard.classList.add('scale-95');
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('button').forEach(btn => {
+                    if(!btn.classList.contains('inspect-btn') && !btn.hasAttribute('onclick')) {
+                        btn.addEventListener('mousedown', function() {
+                            this.style.transform = 'scale(0.97)';
+                        });
+                        btn.addEventListener('mouseup', function() {
+                            this.style.transform = 'scale(1)';
+                        });
+                    }
                 });
-                btn.addEventListener('mouseup', function() {
-                    this.style.transform = 'scale(1)';
+
+                // Initialize modal elements safely
+                modal = document.getElementById('inspectModal');
+                modalCard = document.getElementById('modalCard');
+                modalDetails = document.getElementById('modalDetailsContent');
+                modalLogId = document.getElementById('modalLogId');
+
+                document.querySelectorAll('.inspect-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        openModal(this.getAttribute('data-id'), this.getAttribute('data-details'));
+                    });
                 });
             });
         </script>
