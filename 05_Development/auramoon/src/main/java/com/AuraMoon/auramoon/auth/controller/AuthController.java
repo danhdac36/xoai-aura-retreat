@@ -77,6 +77,6 @@ public class AuthController {
         if (auth != null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
-        return "redirect:/auth/login?logout=true";
+        return "redirect:/";
     }
 }

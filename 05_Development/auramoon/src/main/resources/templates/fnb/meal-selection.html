@@ -13,12 +13,20 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="/css/fnb/fnb.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            corePlugins: { preflight: false }
+        }
+    </script>
 </head>
 
 <body>
+<th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 
     <!-- Header -->
-    <header class="header-container"
+    <header class="header-container md:ml-64"
         style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 24px;">
         <div>
             <h1>Thực đơn dinh dưỡng cá nhân</h1>
@@ -36,7 +44,7 @@
     </header>
 
     <!-- Main Container -->
-    <main class="main-content">
+    <main class="main-content md:ml-64">
 
         <!-- Left Column: Menu Items -->
         <section aria-label="Danh sách thực đơn">

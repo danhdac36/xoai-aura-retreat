@@ -48,7 +48,7 @@ public class ManagerReviewServiceImpl implements IManagerReviewService {
                 if (guestId != null) {
                     com.AuraMoon.auramoon.auth.entity.User user = userRepository.findById(guestId).orElse(null);
                     dto.put("guestName", user != null && user.getFullName() != null ? user.getFullName() : "Guest " + guestId);
-                    dto.put("guestId", guestId);
+                    dto.put("guestId", user != null ? guestId : null);
                 } else {
                     dto.put("guestName", "Unknown Guest");
                     dto.put("guestId", null);

@@ -21,6 +21,12 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.*;
+import com.AuraMoon.auramoon.yoga.repository.YogaRegistrationRepository;
+import com.AuraMoon.auramoon.yoga.entity.YogaRegistration;
+import com.AuraMoon.auramoon.yoga.entity.YogaSchedule;
+import com.AuraMoon.auramoon.yoga.entity.YogaClass;
+import com.AuraMoon.auramoon.yoga.entity.YogaInstructor;
 
 @ExtendWith(MockitoExtension.class)
 class ItineraryServiceImplTest {
@@ -36,6 +42,9 @@ class ItineraryServiceImplTest {
 
     @Mock
     private com.AuraMoon.auramoon.fnb.repository.MealOrderRepository mealOrderRepository;
+
+    @Mock
+    private YogaRegistrationRepository yogaRegistrationRepository;
 
     @InjectMocks
     private ItineraryServiceImpl itineraryService;
@@ -65,6 +74,7 @@ class ItineraryServiceImplTest {
 
         when(userRepository.findById(guestId)).thenReturn(Optional.of(guest));
         when(bookingRepository.findByGuestId(guestId)).thenReturn(Collections.singletonList(booking));
+        when(yogaRegistrationRepository.findByBookingIdAndStatus(anyInt(), anyString())).thenReturn(Collections.emptyList());
 
         // Act
         ItineraryTimelineDTO timeline = itineraryService.getTimelineForGuest(guestId);
@@ -101,6 +111,7 @@ class ItineraryServiceImplTest {
 
         when(userRepository.findById(guestId)).thenReturn(Optional.of(guest));
         when(bookingRepository.findByGuestId(guestId)).thenReturn(Collections.singletonList(booking));
+        when(yogaRegistrationRepository.findByBookingIdAndStatus(anyInt(), anyString())).thenReturn(Collections.emptyList());
 
         // Act
         ItineraryTimelineDTO timeline = itineraryService.getTimelineForGuest(guestId);
@@ -145,5 +156,98 @@ class ItineraryServiceImplTest {
         });
 
         assertTrue(exception.getMessage().contains("chưa có bất kỳ lịch đặt phòng nào"));
+    }
+
+    @Test
+    @DisplayName("ITI10-TC-005 - Lấy Timeline lịch trình thành công có kèm lịch Yoga đã đăng ký")
+    void getTimelineForGuest_Success_WithYogaEvents() {
+        // Arrange
+        Integer guestId = 1;
+        User guest = User.builder().id(guestId).fullName("Nguyễn Văn Khách").build();
+        Booking booking = Booking.builder()
+                .id(101)
+                .guestId(guestId)
+                .bookingStatus("CHECKED_IN")
+                .checkinDate(LocalDateTime.of(2026, 6, 20, 10, 0))
+                .checkoutDate(LocalDateTime.of(2026, 6, 22, 12, 0))
+                .build();
+
+        when(userRepository.findById(guestId)).thenReturn(Optional.of(guest));
+        when(bookingRepository.findByGuestId(guestId)).thenReturn(Collections.singletonList(booking));
+
+        // Mock Yoga registration
+        User instructorUser = User.builder().fullName("Học viên Yoga GV").build();
+        YogaInstructor instructor = YogaInstructor.builder().user(instructorUser).build();
+        YogaClass yogaClass = YogaClass.builder().className("Hatha Yoga Class").durationMinutes(60).build();
+        YogaSchedule schedule = YogaSchedule.builder()
+                .id(201)
+                .yogaClass(yogaClass)
+                .instructor(instructor)
+                .location("Phòng tập A")
+                .startTime(LocalDateTime.of(2026, 6, 21, 8, 0))
+                .endTime(LocalDateTime.of(2026, 6, 21, 9, 0))
+                .isDelete(false)
+                .build();
+
+        YogaRegistration yogaReg = YogaRegistration.builder()
+                .id(301)
+                .bookingId(101)
+                .schedule(schedule)
+                .status("REGISTERED")
+                .build();
+
+        when(yogaRegistrationRepository.findByBookingIdAndStatus(101, "REGISTERED"))
+                .thenReturn(Collections.singletonList(yogaReg));
+
+        // Act
+        ItineraryTimelineDTO timeline = itineraryService.getTimelineForGuest(guestId);
+
+        // Assert
+        assertNotNull(timeline);
+        assertEquals(3, timeline.getEvents().size()); // 1. Checkin, 2. Yoga, 3. Checkout
+
+        ItineraryTimelineDTO.TimelineEvent yogaEvent = timeline.getEvents().stream()
+                .filter(e -> e.getEventName().contains("Yoga"))
+                .findFirst().orElse(null);
+
+        assertNotNull(yogaEvent);
+        assertEquals("Yoga: Hatha Yoga Class", yogaEvent.getEventName());
+        assertEquals("Phòng tập A", yogaEvent.getLocation());
+        assertTrue(yogaEvent.getDescription().contains("GV Học viên Yoga GV"));
+    }
+
+    @Test
+    @DisplayName("BKG-SVC-001 - Lấy danh sách lịch sử đặt phòng thành công")
+    void getBookingHistory_Success() {
+        // Arrange
+        Integer guestId = 1;
+        RetreatPackage retreatPackage = RetreatPackage.builder()
+                .packageName("Gói Tĩnh Dưỡng Cuối Tuần")
+                .build();
+
+        Booking booking1 = Booking.builder()
+                .id(101)
+                .guestId(guestId)
+                .checkinDate(LocalDateTime.of(2026, 5, 1, 14, 0))
+                .checkoutDate(LocalDateTime.of(2026, 5, 3, 12, 0))
+                .bookingStatus("CHECKED_OUT")
+                .totalAmount(java.math.BigDecimal.valueOf(5000000))
+                .retreatPackage(retreatPackage)
+                .build();
+
+        when(bookingRepository.findByGuestId(guestId)).thenReturn(Collections.singletonList(booking1));
+
+        // Act
+        // This method and DTO don't exist yet! Wait for implementation phase.
+        java.util.List<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> dtos = itineraryService.getBookingHistory(guestId);
+
+        // Assert
+        assertNotNull(dtos);
+        assertEquals(1, dtos.size());
+        com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO dto = dtos.get(0);
+        assertEquals(101, dto.getBookingId());
+        assertEquals("Gói Tĩnh Dưỡng Cuối Tuần", dto.getPackageName());
+        assertEquals("CHECKED_OUT", dto.getStatus());
+        assertEquals(5000000.0, dto.getTotalAmount());
     }
 }

@@ -9,8 +9,39 @@
             <p class="font-label-md text-label-md text-on-surface-variant opacity-70">Luxury Wellness Retreat</p>
         </div>
         <nav class="flex-1 px-4 space-y-1">
-            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                th:href="@{/home}">
+            <!-- Dynamic Home Buttons -->
+            <a sec:authorize="hasRole('ADMIN')" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/admin/home}">
+                <span class="material-symbols-outlined" data-icon="home">home</span>
+                <span class="font-label-md text-label-md">Home</span>
+            </a>
+            <a sec:authorize="hasRole('MANAGER') and !hasRole('ADMIN')" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/manager/home}">
+                <span class="material-symbols-outlined" data-icon="home">home</span>
+                <span class="font-label-md text-label-md">Home</span>
+            </a>
+            <a sec:authorize="hasRole('RECEPTIONIST') and !hasRole('ADMIN')" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/receptionist/home}">
+                <span class="material-symbols-outlined" data-icon="home">home</span>
+                <span class="font-label-md text-label-md">Home</span>
+            </a>
+            <a sec:authorize="hasRole('THERAPIST')" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/therapist/home}">
+                <span class="material-symbols-outlined" data-icon="home">home</span>
+                <span class="font-label-md text-label-md">Home</span>
+            </a>
+            <a sec:authorize="hasRole('CHEFF')" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/fnb/chef/home}">
+                <span class="material-symbols-outlined" data-icon="home">home</span>
+                <span class="font-label-md text-label-md">Home</span>
+            </a>
+            <a sec:authorize="hasRole('YOGA_INSTRUCTOR')" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/instructor/yoga/home}">
+                <span class="material-symbols-outlined" data-icon="home">home</span>
+                <span class="font-label-md text-label-md">Home</span>
+            </a>
+            <a sec:authorize="hasRole('GUEST')" class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                th:href="@{/}">
                 <span class="material-symbols-outlined" data-icon="home">home</span>
                 <span class="font-label-md text-label-md">Home</span>
             </a>
@@ -33,19 +64,19 @@
             </a>
             <!-- Housekeeping Dashboard (UC28) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasAnyRole('MANAGER','ADMIN')" th:href="@{/manager/housekeeping}">
+                sec:authorize="hasAnyRole('MANAGER')" th:href="@{/manager/housekeeping}">
                 <span class="material-symbols-outlined" data-icon="cleaning_services">cleaning_services</span>
                 <span class="font-label-md text-label-md">Housekeeping</span>
             </a>
             <!-- Night Audit (UC26) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasRole('MANAGER')" th:href="@{/billing/night-audit}">
+                sec:authorize="hasAnyRole('MANAGER')" th:href="@{/billing/night-audit}">
                 <span class="material-symbols-outlined" data-icon="nightlight_round">nightlight_round</span>
                 <span class="font-label-md text-label-md">Night Audit</span>
             </a>
             <!-- Quản lý Đặt phòng (Chỉ hiển thị cho RECEPTIONIST và ADMIN) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasAnyRole('RECEPTIONIST','ADMIN')" th:href="@{/receptionist/bookings}">
+                sec:authorize="hasAnyRole('RECEPTIONIST')" th:href="@{/receptionist/bookings}">
                 <span class="material-symbols-outlined" data-icon="book">book</span>
                 <span class="font-label-md text-label-md">Quản lý Đặt phòng</span>
             </a>
@@ -58,7 +89,7 @@
             </a>
 
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                th:href="@{/packages}">
+                sec:authorize="hasAnyRole('MANAGER','ADMIN')" th:href="@{/packages}">
                 <span class="material-symbols-outlined" data-icon="package">package_2</span>
                 <span class="font-label-md text-label-md">Retreat Package</span>
             </a>
@@ -74,40 +105,64 @@
                 <span class="material-symbols-outlined" data-icon="calendar">calendar_month</span>
                 <span class="font-label-md text-label-md">Spa Booking</span>
             </a>
+            <!-- Yoga Booking (YogaRegistrationController) -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('GUEST','ADMIN')" th:href="@{/guest/booking-yoga}">
+                <span class="material-symbols-outlined" data-icon="self_improvement">self_improvement</span>
+                <span class="font-label-md text-label-md">Yoga Booking</span>
+            </a>
             <!-- Spa Receptionist Booking (SpaReceptionistController) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasAnyRole('RECEPTIONIST','ADMIN')" th:href="@{/receptionist/booking-spa/manual}">
+                sec:authorize="hasAnyRole('RECEPTIONIST')" th:href="@{/receptionist/booking-spa/manual}">
                 <span class="material-symbols-outlined" data-icon="receipt">receipt_long</span>
                 <span class="font-label-md text-label-md">Spa Receptionist</span>
             </a>
             <!-- Therapist Daily (TherapistScheduleController) -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasRole('THERAPIST')" th:href="@{/therapist/schedules/daily}">
+                sec:authorize="hasAnyRole('THERAPIST')" th:href="@{/therapist/schedules/daily}">
                 <span class="material-symbols-outlined" data-icon="schedule">schedule</span>
                 <span class="font-label-md text-label-md">Therapist Daily</span>
+            </a>
+            <!-- Yoga Instructor Schedule -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('YOGA_INSTRUCTOR','MANAGER')" th:href="@{/instructor/yoga/schedule}">
+                <span class="material-symbols-outlined" data-icon="self_improvement">self_improvement</span>
+                <span class="font-label-md text-label-md">Yoga Instructor</span>
             </a>
 
             <!-- MANAGER - SPA MANAGEMENT -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasAnyRole('MANAGER', 'ADMIN')" th:href="@{/manager/spa/therapists}">
+                sec:authorize="hasAnyRole('MANAGER')" th:href="@{/manager/spa/therapists}">
                 <span class="material-symbols-outlined" data-icon="group">group</span>
                 <span class="font-label-md text-label-md">Spa Staff Management</span>
             </a>
 
+            <!-- MANAGER - YOGA MANAGEMENT -->
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('MANAGER')" th:href="@{/manager/yoga/classes}">
+                <span class="material-symbols-outlined" data-icon="fitness_center">fitness_center</span>
+                <span class="font-label-md text-label-md">Yoga Class Management</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
+                sec:authorize="hasAnyRole('MANAGER')" th:href="@{/manager/yoga/schedules}">
+                <span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+                <span class="font-label-md text-label-md">Yoga Schedule Management</span>
+            </a>
+
             <!-- F&B Guest -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasRole('GUEST')" th:href="@{/fnb/meal-selection}">
+                sec:authorize="hasAnyRole('GUEST')" th:href="@{/fnb/meal-selection}">
                 <span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
                 <span class="font-label-md text-label-md">Meal Selection</span>
             </a>
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasRole('GUEST')" th:href="@{/fnb/alacarte-order}">
+                sec:authorize="hasAnyRole('GUEST')" th:href="@{/fnb/alacarte-order}">
                 <span class="material-symbols-outlined" data-icon="room_service">room_service</span>
                 <span class="font-label-md text-label-md">A-La-Carte Order</span>
             </a>
             <!-- F&B Chef -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                sec:authorize="hasAnyRole('CHEFF', 'ADMIN')" th:href="@{/fnb/chef/dashboard}">
+                sec:authorize="hasAnyRole('CHEFF')" th:href="@{/fnb/chef/dashboard}">
                 <span class="material-symbols-outlined" data-icon="kitchen">kitchen</span>
                 <span class="font-label-md text-label-md">Chef Dashboard</span>
             </a>
@@ -121,7 +176,7 @@
 
             <!-- USER - SENSITIVE PROFILE -->
             <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200"
-                th:href="@{/profile/health}">
+                sec:authorize="hasRole('GUEST')" th:href="@{/profile/health}">
                 <span class="material-symbols-outlined" data-icon="person">person</span>
                 <span class="font-label-md text-label-md">Sensitive profile</span>
             </a>

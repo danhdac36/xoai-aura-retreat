@@ -23,8 +23,8 @@ public class ReviewServiceImpl implements ReviewService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found: " + bookingId));
                 
-        if (!"COMPLETED".equalsIgnoreCase(booking.getBookingStatus())) {
-            throw new BookingNotCompletedException("Chỉ có thể đánh giá khi đơn hàng đã hoàn tất (COMPLETED).");
+        if (!"CHECKED_OUT".equalsIgnoreCase(booking.getBookingStatus())) {
+            throw new BookingNotCompletedException("Chỉ có thể đánh giá khi đơn hàng đã check-out (CHECKED_OUT).");
         }
 
         if (reviewRepository.existsByBookingId(bookingId)) {
@@ -49,6 +49,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .booking(booking)
                 .rating(rating)
                 .comment(safeComment)
+                .isDelete(false)
                 .build();
                 
         return reviewRepository.save(review);

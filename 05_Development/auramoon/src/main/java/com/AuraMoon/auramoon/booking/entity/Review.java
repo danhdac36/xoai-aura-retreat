@@ -27,6 +27,7 @@ public class Review {
     @Column(name = "comment")
     private String comment;
 
+    @Builder.Default
     @Column(name = "is_delete", nullable = false, columnDefinition = "bit default 0")
     private Boolean isDelete = false;
 }

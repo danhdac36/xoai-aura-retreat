@@ -34,7 +34,8 @@ public class SpaManagerServiceImpl implements SpaManagerService {
     @Override
     @Transactional
     public void updateTherapistStatus(String therapistCode, String newStatus, Integer actorId) {
-        if (!"AVAILABLE".equalsIgnoreCase(newStatus) && !"BUSY".equalsIgnoreCase(newStatus) && !"OFF_DUTY".equalsIgnoreCase(newStatus)) {
+        if (!"AVAILABLE".equalsIgnoreCase(newStatus) && !"BUSY".equalsIgnoreCase(newStatus)
+                && !"OFF_DUTY".equalsIgnoreCase(newStatus)) {
             throw new SpaBusinessException("SPA-131-01", "Trạng thái không hợp lệ");
         }
 
@@ -47,21 +48,23 @@ public class SpaManagerServiceImpl implements SpaManagerService {
             // Auto-Reassignment logic
             LocalDateTime now = LocalDateTime.now();
             List<Schedule> futureSchedules = scheduleRepository.findFutureSchedules(therapistCode, now);
-            
+
             for (Schedule schedule : futureSchedules) {
                 // Find a replacement therapist
-                List<Therapist> availableTherapists = therapistRepository.findAvailableTherapistsWithLock(schedule.getStartTime(), schedule.getEndTime());
-                
+                List<Therapist> availableTherapists = therapistRepository
+                        .findAvailableTherapistsWithLock(schedule.getStartTime(), schedule.getEndTime());
+
                 // Filter out the current therapist
                 Therapist replacement = availableTherapists.stream()
                         .filter(t -> !t.getTherapistCode().equals(therapistCode))
                         .findFirst()
                         .orElse(null);
-                
+
                 if (replacement == null) {
-                    throw new SpaBusinessException("SPA-131-03", "Không thể chuyển ca tự động. Ca lúc " + schedule.getStartTime() + " không có nhân viên thay thế.");
+                    throw new SpaBusinessException("SPA-131-03", "Không thể chuyển ca tự động. Ca lúc "
+                            + schedule.getStartTime() + " không có nhân viên thay thế.");
                 }
-                
+
                 schedule.setTherapist(replacement);
                 scheduleRepository.save(schedule);
             }

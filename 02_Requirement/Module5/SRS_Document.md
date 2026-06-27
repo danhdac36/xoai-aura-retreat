@@ -543,6 +543,7 @@ table form as below\]*
 |      31      | Record Time Attendance                                    | HR Management                 | Staff members (Receptionist, Therapist, Chef) check-in and check-out to record their daily working hours into the timesheet.                                                                           |
 |      32      | Calculate Commission Payroll                              | HR & Analytics                | The Manager calculates the monthly payroll for Spa Therapists based on base salary from timesheets and commissions from completed spa sessions.                                                        |
 |      33      | View Staff Profile Details                                | HR Management                 | The Manager or Administrator views the detailed profile of a staff member including personal information and employment history.                                                                       |
+|      34      | View Booking History & Itinerary                          | Booking Tracking              | Khách hàng hoặc Quản lý xem toàn bộ lịch sử các gói nghỉ dưỡng và chi tiết lịch trình của khách hàng.                                                                                              |
 
 #### 1.3.2 Use Case Diagrams
 
@@ -648,7 +649,8 @@ specific system user role names\]*
 | Payment                         |        X        |                        |                    |                      |                |
 | Success Page                    |        X        |                        |                    |                      |                |
 | Guest Dashboard                 |        X        |                        |                    |                      |                |
-| Itinerary Timeline              |        X        |                        |                    |                      |                |
+| Booking History List            |        X        |                        |                    |                      |        X        |
+| Itinerary Timeline              |        X        |                        |                    |                      |        X        |
 | Spa Scheduling                  |        X        |                        |                    |                      |                |
 | A la-carte Menu                 |        X        |                        |                    |                      |                |
 | Dietary Menu                    |        X        |                        |                    |                      |                |
@@ -2081,6 +2083,85 @@ reviews after completing their retreat experience.</td>
 <tr>
 <td style="text-align: right;">Assumptions:</td>
 <td colspan="3">- The deep linking routing mechanism is supported by the frontend framework.</td>
+</tr>
+</tbody>
+</table>
+
+#### 2.10.2 UC34 – View Booking History & Itinerary
+
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr>
+<td style="text-align: right;">ID and Name:</td>
+<td colspan="3"><strong>UC34 – View Booking History & Itinerary</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">Primary Actor:</td>
+<td>Guest, Manager</td>
+<td style="text-align: right;">Secondary Actors:</td>
+<td>None</td>
+</tr>
+<tr>
+<td style="text-align: right;">Description:</td>
+<td colspan="3">Cho phép Khách hàng xem lịch sử đặt phòng của mình, hoặc Quản lý xem lịch sử đặt phòng của khách. Từ đó bấm vào từng lịch sử để xem Timeline lịch trình cụ thể của gói đó.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Trigger:</td>
+<td colspan="3">Guest clicks "Booking History" on sidebar OR Manager clicks "LỊCH SỬ ĐẶT PHÒNG" from Guest Profile.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Preconditions:</td>
+<td colspan="3">- User is logged in as Guest or Manager.<br/>- Guest account has existing booking records.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Postconditions:</td>
+<td colspan="3">- Booking history and detailed itinerary timeline are displayed.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Normal Flow:</td>
+<td colspan="3"><ol type="1">
+<li>User requests to view booking history (via URL /booking/history).</li>
+<li>System checks role. If Guest, system fetches their own history. If Manager, system fetches history for the specified guestId.</li>
+<li>System renders the Booking History List.</li>
+<li>User clicks "View Itinerary" on a specific booking.</li>
+<li>System retrieves timeline events for that specific bookingId.</li>
+<li>System renders the Itinerary Timeline screen.</li>
+</ol></td>
+</tr>
+<tr>
+<td style="text-align: right;">Alternative Flows:</td>
+<td colspan="3">None.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Exceptions:</td>
+<td colspan="3">- E1. No booking history found.<br/>
+→ System displays MSG-24.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Priority:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Frequency of Use:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Business Rules:</td>
+<td colspan="3">BR-27 – Guest Booking History Access Control.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Other Information:</td>
+<td colspan="3">- Timeline only shows service events, not sensitive health data.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Assumptions:</td>
+<td colspan="3">None.</td>
 </tr>
 </tbody>
 </table>
@@ -3930,6 +4011,45 @@ location (e.g., "Page 1 / 8").</td>
 </tbody>
 </table>
 
+### 3.11 Booking History & Itinerary Viewer
+
+#### 3.11.1 Booking History List Screen
+**[Content #1]**
+- The UI contains a list or table of past and current bookings.
+- Each record includes: Booking ID, Package Name, Dates, Total Amount, Status, and an action button "View Itinerary".
+
+**[Content #2]**
+- **Description**: This screen shows the complete history of a guest's bookings. It adapts based on user role (Guest sees own, Manager sees target guest's).
+- **Mapped Use Case**: UC34 - View Booking History & Itinerary.
+
+**[Content #3]**
+<table style="width:97%;">
+<colgroup><col style="width: 21%" /><col style="width: 76%" /></colgroup>
+<tbody>
+<tr><td><strong>Field Name</strong></td><td><strong>Description</strong></td></tr>
+<tr><td>(1) Booking List Grid</td><td>Displays booking summary fields.</td></tr>
+<tr><td>(2) View Itinerary Button</td><td>Action: Navigates to the Itinerary Timeline screen with the specific bookingId.</td></tr>
+</tbody>
+</table>
+
+#### 3.11.2 Itinerary Detail by Booking Screen
+**[Content #1]**
+- Reuses the existing Timeline layout but fetches data specifically for the selected `bookingId` rather than just the latest one.
+
+**[Content #2]**
+- **Description**: Displays the exact scheduled events for the selected booking.
+- **Mapped Use Case**: UC34 - View Booking History & Itinerary.
+
+**[Content #3]**
+<table style="width:97%;">
+<colgroup><col style="width: 21%" /><col style="width: 76%" /></colgroup>
+<tbody>
+<tr><td><strong>Field Name</strong></td><td><strong>Description</strong></td></tr>
+<tr><td>(1) Timeline Events</td><td>Displays time, location, and service name.</td></tr>
+<tr><td>(2) Back to History Button</td><td>Action: Returns to the Booking History List.</td></tr>
+</tbody>
+</table>
+
 ## 4. Non-Functional Requirements - ??c
 
 ### 4.1 External Interfaces
@@ -4170,6 +4290,7 @@ forth.\]*
 |    BR-24    |     Review Immutability                               |                                         Customer reviews reflect objective feedback. Managers shall NOT be allowed to edit or delete any review content. The Reviews Dashboard provides Read-only access.                                         |              UC29              |
 |    BR-25    |     Audit Log Integrity                               |                                         Audit logs are strictly confidential and used for system monitoring. No user (including Administrators) shall have the right to modify or delete records from the AUDIT_LOG table.                                         |              UC30              |
 |    BR-26    |     Automated Logging                                 |                                         The system shall automatically trigger the Audit Logging Service to record events whenever a sensitive operation (e.g., Check-out, Payment, Night Audit, Data Erasure) is successfully completed.                                         |              UC30              |
+|    BR-27    |     Guest Booking History Access Control              |                                         Guests shall only be able to view their own booking history. Managers/Admins are allowed to view the booking history of any Guest via the Guest Profile, but sensitive health information within itineraries must remain hidden.                                         |              UC34              |
 
 ### 5.2 System Messages
 
@@ -4199,6 +4320,6 @@ forth.\]*
 |      21      |     MSG-21     |     Error     |      Night Audit execution failed     |    Night Audit process failed. Please review the error log and retry manually. |
 |      22      |     MSG-22     |    Warning    |       Missing Email address           |    Khách hàng không có địa chỉ email hợp lệ. Vui lòng in hóa đơn giấy tại quầy. |
 |      23      |     MSG-23     |     Error     |       SMTP / Email dispatch error     |    Lỗi hệ thống: Không thể gửi email hóa đơn. Dữ liệu đã được đưa vào hàng đợi gửi lại. |
-
+|      24      |     MSG-24     |     Info      |       No booking history              |    Không tìm thấy lịch sử đặt phòng nào cho khách hàng này. |
 
 

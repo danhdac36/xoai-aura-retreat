@@ -19,6 +19,9 @@ public class StaffProfileController {
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
     public String viewStaffProfile(@PathVariable Long id, Model model) {
         FullStaffProfileDTO profile = aggregator.getAggregatedProfile(id);
+        if (profile == null) {
+            return "redirect:/manager/dashboard";
+        }
         model.addAttribute("profile", profile);
         return "manager/staff-profile";
     }

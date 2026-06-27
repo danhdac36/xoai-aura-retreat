@@ -158,6 +158,7 @@
     </style>
 </head>
 <body class="text-on-surface relative overflow-x-hidden min-h-screen">
+<th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 <div class="bg-animated-image"></div>
 <div class="bg-overlay"></div>
 
@@ -167,7 +168,7 @@
     <span id="toastMessage">Message</span>
 </div>
 
-<main class="max-w-[1440px] mx-auto px-margin-desktop py-12 relative">
+<main class="max-w-[1440px] mx-auto px-margin-desktop py-12 relative md:ml-64">
     <!-- Back to Dashboard / Navigation -->
     <div class="absolute left-margin-desktop top-12">
         <a href="#" onclick="history.back(); return false;" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md group">

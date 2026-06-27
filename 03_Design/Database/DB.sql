@@ -195,6 +195,8 @@ CREATE TABLE MENU_ITEM (
     menu_item_id INT IDENTITY(1,1) PRIMARY KEY,
     item_name NVARCHAR(100) NOT NULL,
     price DECIMAL(18, 2),
+    image_url VARCHAR(255),
+    category VARCHAR(50),
     ingredient NVARCHAR(MAX),
     is_available BIT DEFAULT 1,
     image_url VARCHAR(255),
@@ -211,6 +213,7 @@ CREATE TABLE MEAL_ORDER (
     guest_id INT NOT NULL,
     ordered_at DATETIME DEFAULT GETDATE(),
     ordered_by INT,
+    serving_time VARCHAR(20),
     place_order VARCHAR(100),
     note NVARCHAR(MAX),
     order_status VARCHAR(20) CHECK (order_status IN ('PENDING', 'PREPARING', 'DELIVERED', 'CANCELLED')),
@@ -273,5 +276,53 @@ CREATE TABLE AUDIT_LOG (
     details NVARCHAR(MAX),
     timestamp DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_AUDIT_ACTOR FOREIGN KEY (actor_id) REFERENCES [USER](user_id)
+);
+GO
+
+-- 23. Table YOGA_CLASS
+CREATE TABLE YOGA_CLASS (
+    class_id INT IDENTITY(1,1) PRIMARY KEY,
+    class_name NVARCHAR(100) NOT NULL,
+    description NVARCHAR(MAX),
+    duration_minutes INT NOT NULL,
+    image_url VARCHAR(255),
+    is_delete BIT DEFAULT 0
+);
+GO
+
+-- 24. Table YOGA_INSTRUCTOR
+CREATE TABLE YOGA_INSTRUCTOR (
+    instructor_id INT PRIMARY KEY,
+    instructor_code VARCHAR(10) NOT NULL UNIQUE,
+    status VARCHAR(20) DEFAULT 'AVAILABLE',
+    is_delete BIT DEFAULT 0,
+    CONSTRAINT FK_YOGA_INST_USER FOREIGN KEY (instructor_id) REFERENCES [USER](user_id)
+);
+GO
+
+-- 25. Table YOGA_SCHEDULE
+CREATE TABLE YOGA_SCHEDULE (
+    schedule_id INT IDENTITY(1,1) PRIMARY KEY,
+    class_id INT NOT NULL,
+    instructor_id INT NOT NULL,
+    location NVARCHAR(100) NOT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    max_capacity INT NOT NULL,
+    is_delete BIT DEFAULT 0,
+    CONSTRAINT FK_YOGA_SCHED_CLASS FOREIGN KEY (class_id) REFERENCES YOGA_CLASS(class_id),
+    CONSTRAINT FK_YOGA_SCHED_INST FOREIGN KEY (instructor_id) REFERENCES YOGA_INSTRUCTOR(instructor_id)
+);
+GO
+
+-- 26. Table YOGA_REGISTRATION
+CREATE TABLE YOGA_REGISTRATION (
+    registration_id INT IDENTITY(1,1) PRIMARY KEY,
+    booking_id INT NOT NULL,
+    yoga_schedule_id INT NOT NULL,
+    registered_at DATETIME NOT NULL DEFAULT GETDATE(),
+    status VARCHAR(20) NOT NULL DEFAULT 'REGISTERED',
+    CONSTRAINT FK_YOGA_REG_BOOKING FOREIGN KEY (booking_id) REFERENCES BOOKING(booking_id),
+    CONSTRAINT FK_YOGA_REG_SCHED FOREIGN KEY (yoga_schedule_id) REFERENCES YOGA_SCHEDULE(schedule_id)
 );
 GO

@@ -72,6 +72,7 @@ Dự án này được thiết kế thành 5 module độc lập nhưng liên k�
 - **UC31 (Time Attendance)**: Với tư cách là Nhân viên (Lễ tân, Chuyên viên Spa, Đầu bếp), tôi muốn truy cập hệ thống để bấm nút "Check-in (Vào ca)" và "Check-out (Tan ca)". Hệ thống sẽ ghi nhận vào bảng `timesheet` (gồm `id`, `user_id`, `check_in_time`, `check_out_time`, `work_date`).
 - **UC32 (Commission Payroll)**: Với tư cách là Quản lý, tôi muốn hệ thống tự động tính Bảng lương cuối tháng cho Chuyên viên Spa. Công thức: Lương cứng (tính theo ngày công từ bảng `timesheet`) + Tiền Hoa hồng (Commission nhân với tổng số ca Spa đã hoàn thành được trích xuất từ báo cáo của Module 3).
 - **UC33 (Staff Profile Management)**: Với tư cách là Admin/Quản lý, tôi muốn xem trang Hồ sơ Chi tiết (Profile Details) của nhân viên/quản lý cấp dưới để tra cứu thông tin (có thể được điều hướng tới thông qua deep link từ Audit Log).
+- **UC34 (Guest Booking History & Itinerary Viewer)**: Với tư cách là Khách hàng HOẶC Quản lý, tôi muốn xem danh sách toàn bộ Lịch sử các gói nghỉ dưỡng (Booking History) của khách hàng. Đồng thời, tôi có thể nhấn vào từng chuyến đi để xem chi tiết Lịch trình (Timeline) thực tế của chính gói đó.
 
 # 5. Quy tắc Nghiệp vụ - Ràng buộc Nghiêm ngặt (Strict Constraints)
 
