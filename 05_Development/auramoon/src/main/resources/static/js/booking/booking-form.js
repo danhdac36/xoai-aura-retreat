@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!bookingForm) return;
 
     const checkinInput = document.getElementById("checkinDate");
+    const guestsInput = document.getElementById("totalGuests");
     const checkoutDisplay = document.getElementById("checkoutDateDisplay");
     const surchargeDisplay = document.getElementById("surchargeDisplay");
     const totalPriceDisplay = document.getElementById("totalPriceDisplay");
@@ -31,6 +32,12 @@ document.addEventListener("DOMContentLoaded", () => {
         // Listen for check-in date changes
         checkinInput.addEventListener("change", updateCheckoutDate);
         updateCheckoutDate();
+    }
+
+    // Listen for guest quantity changes
+    if (guestsInput) {
+        guestsInput.addEventListener("input", updatePricing);
+        guestsInput.addEventListener("change", updatePricing);
     }
 
     // 2. Update checkout date dynamically
@@ -61,6 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const totalSurcharge = surchargePerDay * durationDays;
+        // Package base price is strictly per booking (1 person taking the retreat).
+        // Accompanying guests only share the villa and are not charged the retreat fee.
         const finalPrice = basePrice + totalSurcharge;
 
         if (surchargeDisplay) {

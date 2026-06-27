@@ -19,67 +19,56 @@
                     <p class="font-body-lg text-body-lg text-white/90 max-w-2xl">Sự sang trọng kiến trúc hòa quyện cùng tĩnh lặng của thiên nhiên. Khám phá không gian được thiết kế cho sự nghỉ ngơi và tái tạo sâu sắc.</p>
                 </div>
             </section>
-            <!-- Featured Villas -->
+            
+            <!-- Featured Villas (Dynamic Loop) -->
             <section class="py-section-gap bg-background">
                 <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center mb-[120px]">
-                        <div class="md:col-span-5 md:pr-12">
-                            <h2 class="font-headline-lg text-headline-lg text-primary mb-stack-lg">Biệt thự Canopy</h2>
+                    
+                    <div th:each="vt, stat : ${villaTypes}" class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center mb-[120px]">
+                        
+                        <!-- Text Block -->
+                        <div th:class="${stat.odd} ? 'md:col-span-5 md:pr-12' : 'md:col-span-5 md:pl-12 order-1 md:order-2'">
+                            <h2 class="font-headline-lg text-headline-lg text-primary mb-stack-lg" th:text="${vt.typeName}">Tên Biệt Thự</h2>
                             <p class="font-body-md text-body-md text-on-surface-variant mb-stack-lg leading-relaxed">
-                                Nằm ẩn mình giữa những vòm lá cổ thụ, Biệt thự Canopy mang đến một cuộc đối thoại không lời với thiên nhiên. Hệ thống kính sát trần có thể thu gọn hoàn toàn, xóa nhòa ranh giới giữa sự tiện nghi nội thất và sắc xanh ngút ngàn bên ngoài.
+                                Nằm ẩn mình giữa vẻ đẹp nguyên sơ, <span class="font-bold text-primary" th:text="${vt.typeName}"></span> mang đến một cuộc đối thoại không lời với thiên nhiên. Thiết kế tinh tế xóa nhòa ranh giới giữa tiện nghi nội thất và sắc xanh ngút ngàn bên ngoài.
+                                <br><br>
+                                <span class="text-sm">Phụ thu nâng cấp: <strong class="text-secondary" th:text="${#numbers.formatDecimal(vt.pricePerDay,0,'POINT',0,'COMMA')} + ' VNĐ/Ngày'"></strong></span>
                             </p>
                             <ul class="space-y-4 mb-stack-lg">
                                 <li class="flex items-center gap-3">
                                     <span class="material-symbols-outlined text-secondary" data-icon="king_bed">king_bed</span>
-                                    <span class="font-body-md text-body-md text-on-surface">Phòng ngủ Master &amp; Khu vực sinh hoạt</span>
+                                    <span class="font-body-md text-body-md text-on-surface">Phòng ngủ Master siêu rộng</span>
                                 </li>
                                 <li class="flex items-center gap-3">
                                     <span class="material-symbols-outlined text-secondary" data-icon="pool">pool</span>
-                                    <span class="font-body-md text-body-md text-on-surface">Hồ bơi vô cực nước ấm</span>
+                                    <span class="font-body-md text-body-md text-on-surface">Hồ bơi vô cực & Khu vực thư giãn riêng</span>
                                 </li>
                                 <li class="flex items-center gap-3">
                                     <span class="material-symbols-outlined text-secondary" data-icon="smart_toy">smart_toy</span>
-                                    <span class="font-body-md text-body-md text-on-surface">Hệ thống điều khiển ánh sáng &amp; khí hậu thông minh</span>
+                                    <span class="font-body-md text-body-md text-on-surface">Hệ thống điều khiển ánh sáng & khí hậu thông minh</span>
                                 </li>
                             </ul>
-                            <a class="inline-block text-secondary border-b border-secondary/30 pb-1 font-label-md hover:border-secondary transition-all" href="#">KHÁM PHÁ BIỆT THỰ</a>
+                            <a class="inline-block text-secondary border-b border-secondary/30 pb-1 font-label-md hover:border-secondary transition-all" th:href="@{/packages}">XEM CÁC GÓI TRỊ LIỆU ÁP DỤNG</a>
                         </div>
-                        <div class="md:col-span-7 relative h-[600px] mt-8 md:mt-0">
+                        
+                        <!-- Image Block -->
+                        <div th:class="${stat.odd} ? 'md:col-span-7 relative h-[600px] mt-8 md:mt-0' : 'md:col-span-7 relative h-[600px] order-2 md:order-1 mt-8 md:mt-0'">
                             <div class="relative w-full h-full overflow-hidden rounded-xl bg-surface-variant">
-                                <img alt="Interior of a luxury minimalist villa" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC34x9CuzUPYEOqclaHiUhOh0LL2vBxNqCmcTdc8Y2eytlbMkyHv6Zrp7_DbP1HOZqk-NuV6YeG0XpAfQNNVKbg7OI80SxZjgwJpfmOc445sq3MoizJpzuS3zekQa7Y9hygsiNkQ3JSOfKCrufHoJbWaqkPlpA9VmIsoskKr0MC0udHoFIJsUTGpJtXtFGNChIT3toZE-qzCKK22E9Y3d2_XRAf-Q-iHNwWw3QDNKwnPIG-QAYOd59rhEcbzzYBE3rjKwWFn7RckEY">
+                                <img th:alt="${vt.typeName}" class="w-full h-full object-cover" 
+                                     th:src="${vt.image != null and !vt.image.isEmpty() ? vt.image : 'https://lh3.googleusercontent.com/aida-public/AB6AXuC34x9CuzUPYEOqclaHiUhOh0LL2vBxNqCmcTdc8Y2eytlbMkyHv6Zrp7_DbP1HOZqk-NuV6YeG0XpAfQNNVKbg7OI80SxZjgwJpfmOc445sq3MoizJpzuS3zekQa7Y9hygsiNkQ3JSOfKCrufHoJbWaqkPlpA9VmIsoskKr0MC0udHoFIJsUTGpJtXtFGNChIT3toZE-qzCKK22E9Y3d2_XRAf-Q-iHNwWw3QDNKwnPIG-QAYOd59rhEcbzzYBE3rjKwWFn7RckEY'}">
                             </div>
                         </div>
+
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
-                        <div class="md:col-span-7 relative h-[600px] order-2 md:order-1 mt-8 md:mt-0">
-                            <div class="relative w-full h-full overflow-hidden rounded-xl bg-surface-variant">
-                                <img alt="Expansive open-plan villa living area" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZ5dUbEiyDGo1VguojPpLR5sHpkNjY-0i9r_gTGRRq7snh3PnnWB66ccuwRRa3K7kViWIBC0MfutvdKpO1v8gl0cMbBK_GF5VE9hUV1QhSn-9PyhhjfQg0QggjudJlfLCFfuV9vlGXZ-EcmLT024TE8-4tk935OzLWyPF_74jQDknHL0AAAYoVjPTOvAO8ufSjUiikov-7Y_jZPUt8rbYhmdtu619Uk4JbBMVGrogg7FxtzxYyy5mH2LssEGO4IP2vUXsVF4HDS3Y">
-                            </div>
-                        </div>
-                        <div class="md:col-span-5 md:pl-12 order-1 md:order-2">
-                            <h2 class="font-headline-lg text-headline-lg text-primary mb-stack-lg">Dinh thự Terra</h2>
-                            <p class="font-body-md text-body-md text-on-surface-variant mb-stack-lg leading-relaxed">
-                                Vững chãi và rộng mở, Dinh thự Terra được xây dựng nép mình vào sườn đồi từ đá địa phương và gỗ tái chế. Nơi đây mang đến sự riêng tư tuyệt đối cùng mặt bằng khoáng đạt, được thiết kế cho những kỳ nghỉ dưỡng dài ngày và sự tĩnh tại sâu thẳm.
-                            </p>
-                            <ul class="space-y-4 mb-stack-lg">
-                                <li class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-secondary" data-icon="balcony">balcony</span>
-                                    <span class="font-body-md text-body-md text-on-surface">Hiên nhà rộng lớn riêng tư</span>
-                                </li>
-                                <li class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-secondary" data-icon="spa">spa</span>
-                                    <span class="font-body-md text-body-md text-on-surface">Phòng trị liệu Spa ngay tại biệt thự</span>
-                                </li>
-                                <li class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-secondary" data-icon="restaurant">restaurant</span>
-                                    <span class="font-body-md text-body-md text-on-surface">Khu vực dùng bữa &amp; Bếp riêng cho đầu bếp</span>
-                                </li>
-                            </ul>
-                            <a class="inline-block text-secondary border-b border-secondary/30 pb-1 font-label-md hover:border-secondary transition-all" href="#">KHÁM PHÁ DINH THỰ</a>
-                        </div>
+                    
+                    <!-- Message if no data -->
+                    <div th:if="${#lists.isEmpty(villaTypes)}" class="text-center py-12">
+                        <p class="text-on-surface-variant font-body-lg">Hiện chưa có dữ liệu biệt thự nào.</p>
                     </div>
+
                 </div>
             </section>
+            
             <!-- Villa Amenities -->
             <section class="py-section-gap bg-surface-container-low">
                 <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html class="light" lang="en" xmlns:th="http://www.thymeleaf.org">
+<html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Retreat Package Booking | Xoai Aura Retreat</title>
+    <title>Hành Trình Tĩnh Lại | XOAI AURA RETREAT</title>
+    <!-- Tailwind CSS and Fonts -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@300;400;500;600&amp;display=swap"
@@ -12,535 +13,122 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet">
     <style>
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-        }
-
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        /* Dual Range Slider Styles */
-        .slider-wrapper {
-            position: relative;
-            width: 100%;
-            height: 24px;
-            margin-top: 8px;
-            margin-bottom: 24px;
-        }
-
-        .slider-container {
-            position: relative;
-            width: 100%;
-            height: 6px;
-            top: 9px;
-        }
-
-        .slider-track {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: #e4e2e1;
-            border-radius: 3px;
-            z-index: 1;
-        }
-
-        .slider-range {
-            position: absolute;
-            height: 100%;
-            background: #566342;
-            /* secondary color */
-            border-radius: 3px;
-            z-index: 2;
-        }
-
-        .dual-slider {
-            position: absolute;
-            width: 100%;
-            pointer-events: none;
-            -webkit-appearance: none;
-            z-index: 3;
-            height: 6px;
-            background: none;
-            margin: 0;
-            top: 9px;
-        }
-
-        .dual-slider::-webkit-slider-thumb {
-            pointer-events: auto;
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #566342;
-            border: 2px solid #ffffff;
-            cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            margin-top: 0px;
-        }
-
-        .dual-slider::-moz-range-thumb {
-            pointer-events: auto;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #566342;
-            border: 2px solid #ffffff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif !important;
-        }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        .font-serif {
-            font-family: 'Playfair Display', serif !important;
         }
     </style>
+    <!-- Use original tailwind config -->
     <th:block th:replace="~{fragments/tailwind-config :: tailwind-config}"></th:block>
 </head>
 
-<body class="bg-background text-on-background font-body-md overflow-x-hidden md:pl-64">
-    <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
-    <!-- Top Navigation Bar -->
-    <th:block th:replace="~{fragments/header :: header}"></th:block> <!-- header-->
+<body class="bg-[#e9e6df] text-[#2b3327] antialiased">
+    
+    <!-- Hero Section with Background -->
+    <div class="relative w-full min-h-[75vh] flex flex-col justify-between bg-cover bg-center bg-no-repeat"
+         style="background-image: url('/images/backgrounds/packages-hero.jpg');">
+         
+        <div class="absolute inset-0 bg-[#f4f1ea]/40 mix-blend-multiply"></div>
 
-    <main class="pt-12 pb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
-        <!-- Title Section -->
-        <div class="mb-10 border-b border-outline-variant pb-6">
-            <h1 class="font-headline-lg text-headline-lg text-on-surface font-serif">
-                Danh Sách Gói Retreat
-            </h1>
-            <p class="text-on-surface-variant mt-2 font-body-md text-base">Tìm kiếm và lọc các liệu trình trị liệu nghỉ
-                dưỡng cao cấp tại Xoai Aura.</p>
+        <div class="w-full relative z-50">
+            <th:block th:replace="~{fragments/public-header :: public-header}"></th:block>
         </div>
 
-        <!-- 2-Column Layout Container -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
-
-            <!-- Left Column: Sidebar Filters (1/4 width) -->
-            <aside
-                class="lg:col-span-1 bg-surface-container-lowest p-6 border border-outline-variant rounded shadow-sm sticky top-6">
-                <h3
-                    class="font-semibold text-lg text-secondary mb-6 pb-2 border-b border-outline-variant flex items-center gap-2">
-                    <span class="material-symbols-outlined">filter_list</span> Bộ lọc tìm kiếm
-                </h3>
-
-                <form th:action="@{/packages}" method="get" id="filterForm" class="space-y-6">
-                    <!-- Hidden input for Type Package, so selection works -->
-                    <input type="hidden" name="type" id="filterType"
-                        th:value="${selectedType == 'All' ? '' : selectedType}" />
-
-                    <!-- Retreat Type (Checkboxes / Radio list matching the health goals check buttons) -->
-                    <div class="flex flex-col gap-2">
-                        <label class="font-label-md text-sm text-on-surface-variant font-semibold">
-                            Mục tiêu sức khỏe
-                        </label>
-                        <div class="flex flex-col gap-2 mt-1">
-                            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-on-surface-variant">
-                                <input type="radio" name="typeRadio" value=""
-                                    th:checked="${selectedType == null || selectedType == 'All' || selectedType == ''}"
-                                    class="text-secondary focus:ring-secondary border-gray-300 rounded-full"
-                                    onchange="document.getElementById('filterType').value=this.value; triggerFilterSubmit();" />
-                                <span class="text-sm">Tất cả loại gói</span>
-                            </label>
-                            <label th:each="type : ${types}"
-                                class="flex items-center gap-2.5 cursor-pointer text-sm text-on-surface-variant">
-                                <input type="radio" name="typeRadio" th:value="${type}"
-                                    th:checked="${type == selectedType}"
-                                    class="text-secondary focus:ring-secondary border-gray-300 rounded-full"
-                                    onchange="document.getElementById('filterType').value=this.value; triggerFilterSubmit();" />
-                                <span th:text="${type}" class="text-sm">Yoga</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- DURATION Filter with range slider and quick selects -->
-                    <div class="flex flex-col gap-2">
-                        <div class="flex justify-between items-center">
-                            <label class="font-label-md text-sm text-on-surface-variant font-semibold">
-                                Thời lượng
-                            </label>
-                            <span id="durationDisplay" class="text-xs font-semibold text-secondary">
-                                <span th:text="${minDays}">2</span> - <span th:text="${maxDays}">7</span> ngày
-                            </span>
-                        </div>
-
-                        <div class="slider-wrapper">
-                            <div class="slider-container">
-                                <div class="slider-track"></div>
-                                <div id="durationRange" class="slider-range"></div>
-                            </div>
-                            <input type="range" id="durationMin" name="minDays" min="2" max="7" th:value="${minDays}"
-                                class="dual-slider" />
-                            <input type="range" id="durationMax" name="maxDays" min="2" max="7" th:value="${maxDays}"
-                                class="dual-slider" />
-                        </div>
-
-                        <!-- Quick select duration options matching the design layout -->
-                        <div class="flex flex-wrap gap-2">
-                            <label class="cursor-pointer">
-                                <input type="radio" name="durationQuick" value="all"
-                                    th:checked="${minDays == 2 && maxDays == 7}" class="sr-only peer"
-                                    onchange="setDurationRange(2, 7);" />
-                                <span
-                                    class="px-2.5 py-1 border border-outline-variant rounded text-xs font-semibold block peer-checked:bg-secondary peer-checked:text-on-secondary peer-checked:border-secondary hover:bg-secondary/5 transition-colors">Tất
-                                    cả</span>
-                            </label>
-                            <label class="cursor-pointer">
-                                <input type="radio" name="durationQuick" value="3-5"
-                                    th:checked="${minDays == 3 && maxDays == 5}" class="sr-only peer"
-                                    onchange="setDurationRange(3, 5);" />
-                                <span
-                                    class="px-2.5 py-1 border border-outline-variant rounded text-xs font-semibold block peer-checked:bg-secondary peer-checked:text-on-secondary peer-checked:border-secondary hover:bg-secondary/5 transition-colors">3
-                                    - 5 ngày</span>
-                            </label>
-                            <label class="cursor-pointer">
-                                <input type="radio" name="durationQuick" value="6-7"
-                                    th:checked="${minDays == 6 && maxDays == 7}" class="sr-only peer"
-                                    onchange="setDurationRange(6, 7);" />
-                                <span
-                                    class="px-2.5 py-1 border border-outline-variant rounded text-xs font-semibold block peer-checked:bg-secondary peer-checked:text-on-secondary peer-checked:border-secondary hover:bg-secondary/5 transition-colors">6
-                                    - 7 ngày</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- PRICE RANGE Filter with range slider and quick selects -->
-                    <div class="flex flex-col gap-2">
-                        <div class="flex justify-between items-center">
-                            <label class="font-label-md text-sm text-on-surface-variant font-semibold">
-                                Khoảng giá
-                            </label>
-                            <span id="priceDisplay" class="text-[11px] font-semibold text-secondary">
-                                <span th:text="${#numbers.formatDecimal(minPrice,0,'POINT',0,'COMMA')}">10M</span> -
-                                <span th:text="${#numbers.formatDecimal(maxPrice,0,'POINT',0,'COMMA')}">50M</span> đ
-                            </span>
-                        </div>
-
-                        <div class="slider-wrapper">
-                            <div class="slider-container">
-                                <div class="slider-track"></div>
-                                <div id="priceRange" class="slider-range"></div>
-                            </div>
-                            <input type="range" id="priceMin" name="minPrice" min="10000000" max="50000000"
-                                step="1000000" th:value="${#numbers.formatInteger(minPrice, 0)}" class="dual-slider" />
-                            <input type="range" id="priceMax" name="maxPrice" min="10000000" max="50000000"
-                                step="1000000" th:value="${#numbers.formatInteger(maxPrice, 0)}" class="dual-slider" />
-                        </div>
-
-                        <!-- Quick select price options matching the design layout -->
-                        <div class="flex flex-col gap-2 mt-1">
-                            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-on-surface-variant">
-                                <input type="radio" name="priceQuick" value="all"
-                                    th:checked="${minPrice <= 10000000 && maxPrice >= 50000000}"
-                                    class="text-secondary focus:ring-secondary border-gray-300 rounded-full"
-                                    onchange="setPriceRange(10000000, 50000000);" />
-                                <span class="text-sm">Tất cả mức giá</span>
-                            </label>
-                            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-on-surface-variant">
-                                <input type="radio" name="priceQuick" value="under_20"
-                                    th:checked="${minPrice <= 10000000 && maxPrice == 20000000}"
-                                    class="text-secondary focus:ring-secondary border-gray-300 rounded-full"
-                                    onchange="setPriceRange(10000000, 20000000);" />
-                                <span class="text-sm">Dưới 20.000.000 đ</span>
-                            </label>
-                            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-on-surface-variant">
-                                <input type="radio" name="priceQuick" value="20_30"
-                                    th:checked="${minPrice == 20000000 && maxPrice == 30000000}"
-                                    class="text-secondary focus:ring-secondary border-gray-300 rounded-full"
-                                    onchange="setPriceRange(20000000, 30000000);" />
-                                <span class="text-sm">20.000.000 đ - 30.000.000 đ</span>
-                            </label>
-                            <label class="flex items-center gap-2.5 cursor-pointer text-sm text-on-surface-variant">
-                                <input type="radio" name="priceQuick" value="over_30"
-                                    th:checked="${minPrice == 30000000 && maxPrice >= 50000000}"
-                                    class="text-secondary focus:ring-secondary border-gray-300 rounded-full"
-                                    onchange="setPriceRange(30000000, 50000000);" />
-                                <span class="text-sm font-medium">Trên 30.000.000 đ</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Reset filter button if any filter is active -->
-                    <div class="pt-2">
-                        <a th:if="${selectedType != 'All' || minDays != 2 || maxDays != 7 || minPrice != 10000000.0 || maxPrice != 50000000.0}"
-                            th:href="@{/packages}"
-                            class="w-full border border-secondary text-secondary py-2.5 rounded text-center block text-sm font-semibold hover:bg-secondary/5 transition-colors">
-                            Xóa bộ lọc
-                        </a>
-                    </div>
-                </form>
-            </aside>
-
-            <!-- Right Column: Packages Grid (3/4 width) -->
-            <section class="lg:col-span-3">
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
-                    <article th:each="pkg : ${packages}"
-                        class="bg-surface-container-lowest border border-outline-variant rounded overflow-hidden group flex flex-col justify-between h-full hover:shadow-md transition-shadow duration-300">
-                        <div>
-                            <div class="relative h-60 overflow-hidden">
-                                <img th:src="${pkg.typePackage == 'Stress Relief' || pkg.typePackage == 'Spa'} ? @{/img/spa-retreat.jpg} :
-                                         (${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'} ? @{/img/detox-retreat.jpg} :
-                                         (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
-                                          @{/img/retreat-default.jpg}))" alt="Retreat Package"
-                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                                <div class="absolute inset-0 bg-secondary/10"></div>
-                                <span
-                                    class="absolute top-4 left-4 bg-secondary text-on-secondary px-3 py-1 text-xs uppercase font-semibold tracking-wider rounded-full"
-                                    th:text="${pkg.typePackage}">Yoga</span>
-                            </div>
-
-                            <div class="p-6">
-                                <h2 class="font-headline-sm text-xl font-serif text-gray-900 mb-2 group-hover:text-secondary transition-colors"
-                                    th:text="${pkg.packageName}">
-                                    Sunrise Yoga Weekend
-                                </h2>
-
-                                <div class="mb-4 flex items-center gap-1 text-sm text-secondary font-medium">
-                                    <span class="material-symbols-outlined text-base">schedule</span>
-                                    <span
-                                        th:text="${pkg.durationDays} + ' ngày ' + (${pkg.durationDays} - 1) + ' đêm'">3
-                                        ngày 2 đêm</span>
-                                </div>
-
-                                <p class="font-body-md text-sm text-on-surface-variant mb-5 leading-relaxed line-clamp-3"
-                                    th:text="${pkg.description}">
-                                    Mô tả gói ngắn gọn...
-                                </p>
-
-                                <div class="mb-2">
-                                    <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                                        Dịch vụ bao gồm
-                                    </div>
-                                    <div class="flex flex-wrap gap-1.5"
-                                        th:if="${pkg.services != null && !#strings.isEmpty(pkg.services)}">
-                                        <span th:each="service : ${#strings.arraySplit(pkg.services, ',')}"
-                                            th:text="${#strings.trim(service)}"
-                                            class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-xs rounded">
-                                            Spa
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            class="p-6 border-t border-outline-variant bg-gray-50/50 flex justify-between items-center gap-2 mt-auto">
-                            <div>
-                                <span class="text-[10px] text-gray-400 block uppercase tracking-wider">
-                                    Giá trọn gói
-                                </span>
-                                <span class="text-lg font-bold text-secondary font-serif"
-                                    th:text="${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">
-                                    15.000.000 đ
-                                </span>
-                            </div>
-
-                            <div class="flex gap-2">
-                                <a th:href="@{/packages/{id}(id=${pkg.id})}"
-                                    class="px-3 py-2 border border-secondary text-secondary text-xs font-semibold rounded hover:bg-secondary/5 transition-all duration-300">
-                                    Chi tiết
-                                </a>
-                                <a th:href="@{/booking/create(packageId=${pkg.id})}"
-                                    class="px-3 py-2 bg-secondary text-on-secondary text-xs font-semibold rounded hover:opacity-90 transition-all duration-300">
-                                    Đặt ngay
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-
-                </div>
-            </section>
-        </div>
-        <div th:if="${#lists.isEmpty(packages)}" class="py-20">
-
-            <div class="text-center mb-10">
-                <h2 class="text-2xl text-secondary">
-                    Không tìm thấy gói phù hợp
-                </h2>
-
-                <p class="text-on-surface-variant mt-2">
-                    Gợi ý các gói phổ biến dưới đây
-                </p>
+        <!-- Hero Content -->
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center pb-20 pt-32">
+            <h1 class="font-serif text-5xl md:text-7xl text-[#1a1f18] mb-8 tracking-tight drop-shadow-sm">Hành Trình Tĩnh Lại</h1>
+            
+            <div class="flex items-center justify-center gap-4 mb-8">
+                <div class="h-[2px] bg-[#8a9973] w-12 opacity-70"></div>
+                <span class="material-symbols-outlined text-[#8a9973]">spa</span>
+                <div class="h-[2px] bg-[#8a9973] w-12 opacity-70"></div>
             </div>
 
-            <section th:if="${popularPackages != null}"
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+            <p class="font-sans text-lg md:text-xl text-[#2b3327] max-w-3xl mx-auto font-medium drop-shadow-sm">
+                Hãy để không gian tĩnh lặng dẫn lối bạn trở về với bản ngã chân thật nhất. Những hành trình nghỉ dưỡng được thiết kế tỉ mỉ để khôi phục sự cân bằng, xoa dịu tâm trí và đánh thức nguồn năng lượng sống sâu thẳm bên trong bạn.
+            </p>
+        </div>
+        
+        <!-- Filters Section -->
+        <div class="relative z-10 w-full max-w-7xl mx-auto px-6 pb-8">
+            <form th:action="@{/packages}" method="get" id="filterForm" class="flex justify-center flex-wrap gap-x-10 gap-y-6">
+                <input type="hidden" name="type" id="filterType" th:value="${selectedType == 'All' ? '' : selectedType}" />
+                
+                <button type="submit" onclick="document.getElementById('filterType').value=''"
+                    th:class="${selectedType == null || selectedType == 'All' || selectedType == ''} ? 'text-[12px] font-bold tracking-[0.2em] uppercase text-[#1a1f18] border-b-[3px] border-[#687a5a] pb-2 transition-all' : 'text-[12px] font-bold tracking-[0.2em] uppercase text-[#4a5547] hover:text-[#1a1f18] transition-all pb-2'">
+                    TẤT CẢ
+                </button>
+                <button type="submit" th:each="type : ${types}"
+                    onclick="document.getElementById('filterType').value=this.getAttribute('data-value')"
+                    th:attr="data-value=${type}" th:text="${type}"
+                    th:class="${type == selectedType} ? 'text-[12px] font-bold tracking-[0.2em] uppercase text-[#1a1f18] border-b-[3px] border-[#687a5a] pb-2 transition-all' : 'text-[12px] font-bold tracking-[0.2em] uppercase text-[#4a5547] hover:text-[#1a1f18] transition-all pb-2'">
+                    CATEGORY
+                </button>
+            </form>
+        </div>
+    </div>
 
-                <article th:each="pkg : ${popularPackages}" class="bg-surface-container-lowest overflow-hidden group">
-
-                    <div class="relative h-80 overflow-hidden">
-
-                        <img th:src="${pkg.typePackage == 'Stress Relief' || pkg.typePackage == 'Spa'} ? @{/img/spa-retreat.jpg} :
+    <!-- Main Content Grid -->
+    <main class="relative z-10 max-w-[1440px] mx-auto px-4 md:px-12 py-12 lg:-mt-12">
+        <section class="flex flex-col gap-16">
+            
+            <!-- Loop Packages -->
+            <div th:each="pkg, iterStat : ${packages}" class="bg-[#f7f5f0] shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[500px]">
+                
+                <!-- Image Side -->
+                <div class="w-full lg:w-1/2 relative overflow-hidden group cursor-pointer" th:onclick="'window.location.href=\'/packages/' + ${pkg.id} + '\''">
+                    <img th:src="${pkg.typePackage == 'Stress Relief' || pkg.typePackage == 'Spa'} ? @{/img/spa-retreat.jpg} :
                              (${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'} ? @{/img/detox-retreat.jpg} :
                              (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
-                             @{/img/retreat-default.jpg}))" alt="Retreat Package"
-                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-
-                        <div class="absolute inset-0 bg-secondary/10"></div>
+                              @{/img/retreat-default.jpg}))" th:alt="${pkg.packageName}"
+                        class="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-105 min-h-[400px]" />
+                </div>
+                
+                <!-- Content Side -->
+                <div class="w-full lg:w-1/2 p-10 md:p-16 lg:p-24 flex flex-col justify-center bg-[#f4f2eb]">
+                    <div class="flex items-center gap-3 mb-6 opacity-80">
+                        <span class="text-[11px] font-bold tracking-[0.3em] uppercase text-[#4a5547]" th:text="${pkg.typePackage}">MINDFULNESS</span>
+                        <span class="text-[#8a9973] text-[10px]">●</span>
+                        <span class="text-[11px] font-bold tracking-[0.3em] uppercase text-[#4a5547]" th:text="${pkg.durationDays} + ' NGÀY'">7 NGÀY</span>
                     </div>
-
-                    <div class="p-8 border border-t-0 border-outline-variant">
-
-                        <h2 class="font-headline-sm text-headline-sm mb-4" th:text="${pkg.packageName}">
-                        </h2>
-
-                        <div class="mb-3 text-secondary">
-                            <span th:text="${pkg.durationDays}"></span> ngày
-                        </div>
-
-                        <p class="font-body-md text-body-md text-on-surface-variant mb-4 leading-relaxed"
-                            th:text="${pkg.description}">
-                        </p>
-
-                        <div class="flex justify-between items-end">
-
-                            <div>
-                                <span class="font-label-md text-label-md text-on-surface-variant block uppercase">
-                                    Giá từ
-                                </span>
-
-                                <span class="font-headline-sm text-headline-sm text-secondary"
-                                    th:text="${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">
-                                </span>
-                            </div>
-
-                            <a th:href="@{/packages/{id}(id=${pkg.id})}"
-                                class="px-6 py-3 border border-secondary text-secondary font-label-md hover:bg-secondary hover:text-on-secondary transition-all duration-300">
-                                Xem chi tiết
-                            </a>
-
-                        </div>
-
+                    
+                    <h2 class="font-serif text-4xl lg:text-5xl text-[#1a1f18] leading-tight mb-8" th:text="${pkg.packageName}">Con Đường Đến Sự Tĩnh Lặng</h2>
+                    
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="material-symbols-outlined text-[#8a9973] opacity-60 rotate-90 text-[18px]">eco</span>
+                        <div class="h-[1px] w-12 bg-[#8a9973] opacity-30"></div>
+                        <span class="material-symbols-outlined text-[#8a9973] opacity-60 -rotate-90 text-[18px]">eco</span>
                     </div>
-
-                </article>
-
-            </section>
-
-        </div>
+                    
+                    <p class="font-sans text-[#4a5547] text-lg leading-relaxed mb-12" th:text="${pkg.description}">
+                        Hành trình bảy ngày giúp tái tạo sự tĩnh tại thông qua thiền định, chánh niệm và kết nối sâu sắc với thiên nhiên.
+                    </p>
+                    
+                    <div class="flex items-center gap-8 flex-wrap">
+                        <a th:href="@{/packages/{id}(id=${pkg.id})}" class="bg-[#687a5a] text-white px-8 py-4 text-[12px] font-bold tracking-[0.1em] uppercase hover:bg-[#526245] transition-colors shadow-lg rounded-sm">
+                            KHÁM PHÁ HÀNH TRÌNH
+                        </a>
+                        <a th:href="@{/packages/{id}(id=${pkg.id})}" class="text-[#1a1f18] text-[12px] font-bold tracking-[0.1em] uppercase flex items-center gap-2 hover:text-[#687a5a] transition-colors group">
+                            XEM CHI TIẾT <span class="material-symbols-outlined text-[16px] transition-transform group-hover:translate-x-1">arrow_forward_ios</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(packages)}" class="py-32 text-center bg-[#f4f2eb] shadow-xl">
+                <h2 class="font-serif text-3xl text-[#1a1f18] mb-6">Không tìm thấy gói phù hợp</h2>
+                <a th:href="@{/packages}" class="text-[#687a5a] text-[14px] font-bold tracking-[0.1em] uppercase border-b-2 border-[#687a5a] pb-1 hover:text-[#1a1f18] hover:border-[#1a1f18] transition-all">
+                    Xem tất cả hành trình
+                </a>
+            </div>
+            
+        </section>
     </main>
-    <!-- Booking Modal -->
+    
     <!-- Footer -->
-    <footer
-        class="w-full px-margin-desktop py-section-gap flex flex-col md:flex-row justify-between items-start gap-gutter bg-surface-container-low border-t border-outline-variant">
-        <div class="space-y-4">
-            <div class="font-headline-sm text-headline-sm text-secondary">Xoai Aura Retreat</div>
-            <p class="font-body-md text-body-md text-on-surface-variant max-w-xs">Nơi trú ẩn cho tâm hồn, sự kết hợp
-                giữa di sản Việt Nam và sự sang trọng hiện đại.</p>
-        </div>
-        <div class="flex flex-col md:flex-row gap-stack-lg">
-            <div class="flex flex-col gap-2">
-                <span class="font-label-md text-label-md text-secondary uppercase mb-2">Khám phá</span>
-                <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-4"
-                    href="#">Hành trình</a>
-                <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-4"
-                    href="#">Bền vững</a>
-            </div>
-            <div class="flex flex-col gap-2">
-                <span class="font-label-md text-label-md text-secondary uppercase mb-2">Pháp lý</span>
-                <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-4"
-                    href="#">Chính sách Bảo mật</a>
-                <a class="font-label-md text-label-md text-on-surface-variant hover:text-secondary transition-colors hover:underline underline-offset-4"
-                    href="#">Cổng thông tin nhân viên</a>
-            </div>
-        </div>
-        <div class="text-on-surface-variant font-body-md text-sm md:self-end">© 2024 Xoai Aura Retreat. Tuân thủ Quy
-            định Bảo vệ Dữ liệu Việt Nam.</div>
-    </footer>
+    <th:block th:replace="~{fragments/public-footer :: public-footer}"></th:block>
 
-
-
-    <script>
-        function formatVND(value) {
-            return new Intl.NumberFormat("vi-VN").format(value);
-        }
-
-        function initDualSlider(minId, maxId, rangeId, displayId, isCurrency) {
-            const minInput = document.getElementById(minId);
-            const maxInput = document.getElementById(maxId);
-            const rangeEl = document.getElementById(rangeId);
-            const displayEl = document.getElementById(displayId);
-
-            function updateTrack() {
-                let minVal = parseFloat(minInput.value);
-                let maxVal = parseFloat(maxInput.value);
-
-                if (minVal > maxVal) {
-                    // Swap values to prevent crossed range handles
-                    let temp = minInput.value;
-                    minInput.value = maxInput.value;
-                    maxInput.value = temp;
-                    minVal = parseFloat(minInput.value);
-                    maxVal = parseFloat(maxInput.value);
-                }
-
-                const minPercent = ((minVal - minInput.min) / (minInput.max - minInput.min)) * 100;
-                const maxPercent = ((maxVal - maxInput.min) / (maxInput.max - minInput.min)) * 100;
-
-                rangeEl.style.left = minPercent + "%";
-                rangeEl.style.width = (maxPercent - minPercent) + "%";
-
-                if (isCurrency) {
-                    displayEl.innerHTML = `${formatVND(minVal)} - ${formatVND(maxVal)} đ`;
-                } else {
-                    displayEl.innerHTML = `${minVal} - ${maxVal} ngày`;
-                }
-            }
-
-            minInput.addEventListener("input", updateTrack);
-            maxInput.addEventListener("input", updateTrack);
-
-            minInput.addEventListener("change", triggerFilterSubmit);
-            maxInput.addEventListener("change", triggerFilterSubmit);
-
-            updateTrack();
-        }
-
-        function setDurationRange(min, max) {
-            document.getElementById("durationMin").value = min;
-            document.getElementById("durationMax").value = max;
-            triggerFilterSubmit();
-        }
-
-        function setPriceRange(min, max) {
-            document.getElementById("priceMin").value = min;
-            document.getElementById("priceMax").value = max;
-            triggerFilterSubmit();
-        }
-
-        function triggerFilterSubmit() {
-            document.getElementById("filterForm").submit();
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            initDualSlider("durationMin", "durationMax", "durationRange", "durationDisplay", false);
-            initDualSlider("priceMin", "priceMax", "priceRange", "priceDisplay", true);
-        });
-    </script>
 </body>
 
 </html>

@@ -14,100 +14,118 @@
     <link rel="stylesheet" th:href="@{/css/reception/reception.css}">
 </head>
 
-<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans md:pl-64">
-    <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
+<body class="text-[#1b1c1c] font-sans bg-cover bg-center bg-no-repeat bg-fixed"
+      style="background-image: url('/images/backgrounds/bg-villa.png');"
+      th:classappend="${#authorization.expression('isAuthenticated()')} ? 'md:pl-[280px]' : ''">
+      
+    <!-- Subtle Earth Tone Overlay to ensure contrast -->
+    <div class="fixed inset-0 bg-[#e6e2d6]/70 backdrop-blur-[2px] z-0 pointer-events-none mix-blend-multiply"></div>
 
-    <main class="py-12 px-4 md:px-12 max-w-[1440px] mx-auto">
-        <!-- Nút quay lại trang trước đó -->
-        <a href="javascript:history.back()"
-            class="inline-flex items-center gap-1.5 text-[#566342] hover:text-[#3f4b2c] font-medium transition-colors mb-6 group">
-            <span
-                class="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">arrow_back</span>
-            <span>Quay lại trang trước</span>
-        </a>
+    <div class="relative z-10 w-full min-h-screen">
+        <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
+        <th:block th:replace="~{fragments/header :: header}"></th:block>
 
-        <div class="mb-8">
-            <h1 class="text-3xl font-serif text-gray-900">Sơ Đồ Tình Trạng Biệt Thự (Villa Diagram)</h1>
-            <p class="text-gray-500 mt-1">Trạng thái thời gian thực của các căn biệt thự nghỉ dưỡng.</p>
-        </div>
+        <main class="py-12 px-4 md:px-12 max-w-[1440px] mx-auto">
+            <!-- Nút quay lại trang trước đó -->
+            <a href="javascript:history.back()"
+                class="inline-flex items-center gap-1.5 text-[#2b3327] hover:text-black font-medium transition-colors mb-6 group">
+                <span
+                    class="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">arrow_back</span>
+                <span>Quay lại trang trước</span>
+            </a>
 
-        <!-- Feedback Alert Messages -->
-        <div th:if="${param.success}"
-            class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-r-lg flex items-center gap-2">
-            <span class="material-symbols-outlined">check_circle</span>
-            <span th:text="${param.success}">Thành công</span>
-        </div>
-        <div th:if="${param.error}"
-            class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg flex items-center gap-2">
-            <span class="material-symbols-outlined">error</span>
-            <span th:text="${param.error}">Lỗi</span>
-        </div>
+            <div class="mb-8">
+                <h1 class="text-4xl font-serif text-[#2b3327] mb-2 tracking-tight">Sơ Đồ Tình Trạng Biệt Thự</h1>
+                <p class="text-[#3a4536] mt-1 font-medium">Trạng thái thời gian thực của các căn biệt thự nghỉ dưỡng.</p>
+            </div>
 
-        <!-- Villa Grid Diagram -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <div th:each="v : ${villas}"
-                class="border border-gray-200 bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-                <div>
-                    <!-- Villa Code & Type -->
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <span class="text-xs font-semibold uppercase text-gray-400 block"
-                                th:text="${v.villaTypeName}">Ocean View</span>
-                            <span class="text-xl font-bold text-gray-900 mt-1 block"
-                                th:text="${v.villaCode}">VIL-101</span>
-                        </div>
+            <!-- Feedback Alert Messages -->
+            <div th:if="${param.success}"
+                class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-r-lg flex items-center gap-2">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span th:text="${param.success}">Thành công</span>
+            </div>
+            <div th:if="${param.error}"
+                class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg flex items-center gap-2">
+                <span class="material-symbols-outlined">error</span>
+                <span th:text="${param.error}">Lỗi</span>
+            </div>
 
-                        <!-- Status indicator color badge -->
-                        <span th:if="${v.villaStatus == 'AVAILABLE'}"
-                            class="px-2 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-600">Trống</span>
-                        <span th:if="${v.villaStatus == 'OCCUPIED'}"
-                            class="px-2 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-600">Đang ở</span>
-                        <span th:if="${v.villaStatus == 'MAINTENANCE'}"
-                            class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-50 text-yellow-600">Bảo
-                            trì</span>
+            <!-- Villa Grid Diagram -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <div th:each="v : ${villas}"
+                    class="bg-[#f5f1ea] rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col overflow-hidden border border-[#d2c5af]/30 group">
+                    
+                    <!-- Villa Image -->
+                    <div class="h-48 w-full relative overflow-hidden bg-gray-200">
+                        <img th:src="${v.image != null ? v.image : '/images/default-villa.jpg'}" 
+                             alt="Villa Image" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                     </div>
 
-                    <div class="border-t border-gray-100 pt-4 space-y-2 text-sm text-gray-600">
-                        <div class="flex justify-between">
-                            <span>Sức chứa:</span>
-                            <span class="font-medium text-gray-900" th:text="${v.limitPerson} + ' Khách'">2 Khách</span>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <!-- Villa Code & Type -->
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="text-[11px] font-bold uppercase text-[#5a6b57] tracking-wider block"
+                                    th:text="${v.villaTypeName}">Ocean View</span>
+                                <span class="text-2xl font-serif font-bold text-[#2b3327] mt-1 block"
+                                    th:text="${v.villaCode}">VIL-101</span>
+                            </div>
+
+                            <!-- Status indicator color badge -->
+                            <span th:if="${v.villaStatus == 'AVAILABLE'}"
+                                class="px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded-full bg-[#d7e5bb]/50 text-[#3f4b2c] border border-[#d7e5bb]">Trống</span>
+                            <span th:if="${v.villaStatus == 'OCCUPIED'}"
+                                class="px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded-full bg-red-100 text-red-700 border border-red-200">Đang ở</span>
+                            <span th:if="${v.villaStatus == 'MAINTENANCE'}"
+                                class="px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded-full bg-yellow-100 text-yellow-700 border border-yellow-200">Bảo
+                                trì</span>
                         </div>
-                        <div class="flex justify-between">
-                            <span>Vệ sinh:</span>
-                            <span th:if="${v.cleaningStatus == 'CLEAN'}" class="text-green-600 font-semibold">Đã dọn
-                                dẹp</span>
-                            <span th:if="${v.cleaningStatus == 'DIRTY'}" class="text-red-500 font-semibold">Chưa dọn
-                                dẹp</span>
+
+                        <div class="border-t border-[#d2c5af]/30 pt-4 space-y-3 text-sm text-[#4a5547] mt-auto">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-[18px] text-[#847867]">group</span>
+                                <span class="flex-1">Sức chứa:</span>
+                                <span class="font-semibold text-[#2b3327]" th:text="${v.limitPerson} + ' Khách'">2 Khách</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-[18px] text-[#847867]">cleaning_services</span>
+                                <span class="flex-1">Vệ sinh:</span>
+                                <span th:if="${v.cleaningStatus == 'CLEAN'}" class="text-[#3f4b2c] font-bold">Đã dọn dẹp</span>
+                                <span th:if="${v.cleaningStatus == 'DIRTY'}" class="text-red-600 font-bold">Chưa dọn dẹp</span>
+                                <span th:if="${v.cleaningStatus == 'CLEANING'}" class="text-yellow-600 font-bold">Đang dọn</span>
+                            </div>
                         </div>
+
+                        <!-- Update Status Form -->
+                        <form th:action="@{/receptionist/villa/status}" method="post"
+                            class="mt-6 border-t border-[#d2c5af]/30 pt-4 grid grid-cols-2 gap-3">
+                            <input type="hidden" name="villaId" th:value="${v.id}" />
+                            <select name="villaStatus"
+                                class="bg-white/50 border border-[#d2c5af] rounded-lg text-xs p-2.5 focus:ring-[#2b3327] focus:border-[#2b3327] font-medium text-[#2b3327]">
+                                <option value="AVAILABLE" th:selected="${v.villaStatus == 'AVAILABLE'}">Trống</option>
+                                <option value="OCCUPIED" th:selected="${v.villaStatus == 'OCCUPIED'}">Đang ở</option>
+                                <option value="MAINTENANCE" th:selected="${v.villaStatus == 'MAINTENANCE'}">Bảo trì</option>
+                            </select>
+
+                            <select name="cleaningStatus"
+                                class="bg-white/50 border border-[#d2c5af] rounded-lg text-xs p-2.5 focus:ring-[#2b3327] focus:border-[#2b3327] font-medium text-[#2b3327]">
+                                <option value="CLEAN" th:selected="${v.cleaningStatus == 'CLEAN'}">Sạch</option>
+                                <option value="DIRTY" th:selected="${v.cleaningStatus == 'DIRTY'}">Bẩn</option>
+                                <option value="CLEANING" th:selected="${v.cleaningStatus == 'CLEANING'}">Đang dọn</option>
+                            </select>
+
+                            <button type="submit"
+                                class="col-span-2 mt-2 py-3 bg-[#2b3327] text-[#d2c5af] font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-[#3a4536] transition-colors shadow-md">
+                                Cập nhật
+                            </button>
+                        </form>
                     </div>
                 </div>
-
-                <!-- Update Status Form -->
-                <form th:action="@{/receptionist/villa/status}" method="post"
-                    class="mt-6 border-t border-gray-100 pt-4 grid grid-cols-2 gap-2">
-                    <input type="hidden" name="villaId" th:value="${v.id}" />
-                    <select name="villaStatus"
-                        class="bg-gray-50 border border-gray-200 rounded-lg text-xs p-2 focus:ring-[#566342] focus:border-[#566342]">
-                        <option value="AVAILABLE" th:selected="${v.villaStatus == 'AVAILABLE'}">Trống</option>
-                        <option value="OCCUPIED" th:selected="${v.villaStatus == 'OCCUPIED'}">Đang ở</option>
-                        <option value="MAINTENANCE" th:selected="${v.villaStatus == 'MAINTENANCE'}">Bảo trì</option>
-                    </select>
-
-                    <select name="cleaningStatus"
-                        class="bg-gray-50 border border-gray-200 rounded-lg text-xs p-2 focus:ring-[#566342] focus:border-[#566342]">
-                        <option value="CLEAN" th:selected="${v.cleaningStatus == 'CLEAN'}">Sạch</option>
-                        <option value="DIRTY" th:selected="${v.cleaningStatus == 'DIRTY'}">Bẩn</option>
-                        <option value="CLEANING" th:selected="${v.cleaningStatus == 'CLEANING'}">Đang dọn</option>
-                    </select>
-
-                    <button type="submit"
-                        class="col-span-2 mt-2 py-2 bg-gray-100 text-[#566342] font-semibold text-xs rounded-lg hover:bg-[#566342]/10 transition-colors">
-                        Cập nhật
-                    </button>
-                </form>
-            </div>
-        </section>
-    </main>
+            </section>
+        </main>
+    </div>
 </body>
 
 </html>
