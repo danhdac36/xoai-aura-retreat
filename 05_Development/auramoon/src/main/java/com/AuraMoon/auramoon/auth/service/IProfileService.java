@@ -8,6 +8,7 @@ import com.AuraMoon.auramoon.auth.dto.ChangePasswordDto;
 public interface IProfileService {
     SensitiveProfileDto getSensitiveProfile(Integer userId);
     void saveSensitiveProfile(SensitiveProfileDto inputDto, Integer userId);
+    void deleteSensitiveProfile(Integer userId);
 
     PersonalProfileDto getPersonalProfile(Integer userId);
     void savePersonalProfile(PersonalProfileDto dto, Integer userId);

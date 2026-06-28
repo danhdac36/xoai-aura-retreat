@@ -129,6 +129,38 @@ public class ProfileServiceImpl implements IProfileService {
     }
 
     @Override
+    @Transactional
+    public void deleteSensitiveProfile(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Hard Delete Physical Health Profile
+        physicalHealthProfileRepository.findByUserId(userId)
+                .ifPresent(p -> physicalHealthProfileRepository.delete(p));
+
+        // Hard Delete Dietary Profile
+        dietaryProfileRepository.findByUserId(userId)
+                .ifPresent(d -> dietaryProfileRepository.delete(d));
+
+        // Set consentStatus = false for auditing (BR-10, BR-15)
+        java.util.List<Consent> consents = consentRepository.findByUser_Id(userId);
+        for (Consent c : consents) {
+            c.setConsentStatus(false);
+            c.setUpdatedAt(LocalDateTime.now());
+            consentRepository.save(c);
+        }
+
+        // Audit Log for deletion
+        AuditLog log = AuditLog.builder()
+                .actionType("DELETE_HEALTH_PROFILE")
+                .actorId(userId)
+                .details("Guest permanently deleted their sensitive health and dietary profile")
+                .timestamp(new Date())
+                .build();
+        auditLogRepository.save(log);
+    }
+
+    @Override
     public PersonalProfileDto getPersonalProfile(Integer userId) {
         User user = userRepository.findById(userId).orElse(null);
         return PersonalProfileDto.fromEntity(user);

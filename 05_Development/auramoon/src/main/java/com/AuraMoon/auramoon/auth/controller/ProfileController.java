@@ -24,7 +24,9 @@ public class ProfileController {
 
     @GetMapping("/health")
     public String viewHealthProfile(Model model, Authentication authentication,
-                                    @RequestParam(value = "success", required = false) String success) {
+                                    @RequestParam(value = "success", required = false) String success,
+                                    @RequestParam(value = "deleted", required = false) String deleted,
+                                    @RequestParam(value = "error", required = false) String paramError) {
         Integer userId = extractUserId(authentication);
         if (userId == null) return "redirect:/auth/login";
 
@@ -33,6 +35,12 @@ public class ProfileController {
 
         if ("true".equals(success)) {
             model.addAttribute("successMessage", "Hồ sơ sức khỏe & dinh dưỡng đã được lưu thành công!");
+        } else if ("true".equals(deleted)) {
+            model.addAttribute("successMessage", "Dữ liệu nhạy cảm đã được xóa thành công!");
+        }
+        
+        if ("true".equals(paramError)) {
+            model.addAttribute("error", "Đã xảy ra lỗi khi xóa dữ liệu. Vui lòng thử lại.");
         }
 
         return "auth/update-health-profile";
@@ -65,6 +73,18 @@ public class ProfileController {
         }
     }
 
+    @PostMapping("/health/delete")
+    public String deleteHealthProfile(Authentication authentication) {
+        try {
+            Integer userId = extractUserId(authentication);
+            if (userId == null) return "redirect:/auth/login";
+
+            profileService.deleteSensitiveProfile(userId);
+            return "redirect:/profile/health?deleted=true";
+        } catch (Exception e) {
+            return "redirect:/profile/health?error=true";
+        }
+    }
 
     private Integer extractUserId(Authentication authentication) {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetailsResponse) {
