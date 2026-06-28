@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 
 <body>
     <th:block th:fragment="public-header">
@@ -11,7 +11,7 @@
                 class="font-display-lg text-2xl text-white hover:opacity-80 transition-opacity tracking-tight uppercase"
                 style="font-family: 'Playfair Display'; font-size: 1.5rem; line-height: 2rem;">Xoai Aura</a>
             <nav class="hidden md:flex items-center gap-stack-lg">
-                <a th:href="@{/}"
+                <a th:href="@{/packages}"
                     class="nav-link font-label-md text-label-md text-white/80 hover:text-white hover:border-b-2 hover:border-white pb-1 transition-all duration-300 uppercase tracking-widest whitespace-nowrap">Retreats</a>
                 <a th:href="@{/wellness}"
                     class="nav-link font-label-md text-label-md text-white/80 hover:text-white hover:border-b-2 hover:border-white pb-1 transition-all duration-300 uppercase tracking-widest whitespace-nowrap">Wellness</a>
@@ -22,10 +22,87 @@
                 <a th:href="@{/culinary}"
                     class="nav-link font-label-md text-label-md text-white/80 hover:text-white hover:border-b-2 hover:border-white pb-1 transition-all duration-300 uppercase tracking-widest">Culinary</a>
             </nav>
-            <a th:href="@{/packages}"
-                class="hidden md:block bg-secondary text-on-secondary font-label-md text-label-md py-3 px-8 rounded hover:opacity-90 transition-opacity uppercase tracking-widest text-center">
-                Book Now
-            </a>
+            <div class="hidden md:flex items-center gap-4">
+                <!-- Book Now Button -->
+                <a th:href="@{/packages}"
+                    class="bg-secondary text-on-secondary font-label-md text-label-md py-3 px-8 rounded hover:opacity-90 transition-opacity uppercase tracking-widest text-center">
+                    Book Now
+                </a>
+                
+                <!-- Login Button (Guest) -->
+                <a sec:authorize="!isAuthenticated()" th:href="@{/auth/login}"
+                    class="text-white hover:text-white/80 font-label-md uppercase tracking-widest border border-white/30 px-6 py-3 rounded transition-colors duration-300">
+                    Login
+                </a>
+                
+                <!-- Profile Dropdown (Authenticated) -->
+                <div sec:authorize="isAuthenticated()" class="relative border-l border-white/30 pl-4 group">
+                    <button class="flex items-center gap-2 text-white hover:text-white/80 transition-all focus:outline-none">
+                        <img th:src="${#authentication.principal.avatar != null ? #authentication.principal.avatar : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCjxKxWNM9Mdwd1q-Ntb2XBP2tWZHOJnGCL2k0tVQxMSkLJ5lXLFy4YVhr2xzIstoSmY3eeDxmsvUxgGR1ZidvlK-lkv5B2u_qNh0i4tffRO5hu4TTt-NPTZVPcnEYjcqbIjcIGI-opV3GJWWC6PWB1oftS39SpGphQD7UDCSz0WfQkOA8VoDi3CIwXCLILpVge3ruSs76fgrW729VAHHhA6RpB3syTU-QWYVL4_wHFwND14cNM_H0Nchj6_3Bf1sj91ZcH50GAf6s'}" 
+                             class="w-9 h-9 rounded-full object-cover border border-white/40 shadow-sm" alt="Profile">
+                        <span class="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:rotate-180">expand_more</span>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div class="absolute right-0 mt-4 w-60 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right translate-y-2 group-hover:translate-y-0 z-50">
+                        <div class="bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-white overflow-hidden">
+                            <!-- User Info -->
+                            <div class="px-5 py-4 border-b border-outline-variant/10 bg-[#fbf9f8]">
+                                <p class="text-[14px] font-semibold text-[#1b1c1c] truncate" sec:authentication="principal.fullName">User Name</p>
+                                <p class="text-[10px] text-outline/60 uppercase tracking-[0.2em] mt-1" sec:authentication="principal.roleName">Role</p>
+                            </div>
+                            
+                            <!-- Links -->
+                            <div class="py-2">
+                                <a th:href="@{/profile/me}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">person</span>
+                                    My Profile
+                                </a>
+                                
+                                <a sec:authorize="hasRole('GUEST')" th:href="@{/booking/itinerary}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">timeline</span>
+                                    My Itinerary
+                                </a>
+                                
+                                <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/home}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">admin_panel_settings</span>
+                                    Admin Workspace
+                                </a>
+                                <a sec:authorize="hasRole('MANAGER') and !hasRole('ADMIN')" th:href="@{/manager/home}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">manage_accounts</span>
+                                    Manager Workspace
+                                </a>
+                                <a sec:authorize="hasRole('RECEPTIONIST') and !hasRole('ADMIN')" th:href="@{/receptionist/home}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">room_service</span>
+                                    Reception Workspace
+                                </a>
+                                <a sec:authorize="hasRole('THERAPIST')" th:href="@{/therapist/home}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">spa</span>
+                                    Therapist Workspace
+                                </a>
+                                <a sec:authorize="hasRole('YOGA_INSTRUCTOR')" th:href="@{/instructor/yoga/schedule}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">self_improvement</span>
+                                    Yoga Workspace
+                                </a>
+                                <a sec:authorize="hasRole('CHEFF')" th:href="@{/fnb/chef/home}" class="flex items-center px-5 py-2.5 text-[13px] text-on-surface-variant/80 hover:text-primary hover:bg-[#fbf9f8] transition-colors">
+                                    <span class="material-symbols-outlined text-[18px] mr-3 opacity-70">restaurant</span>
+                                    Chef Workspace
+                                </a>
+                            </div>
+                            
+                            <!-- Logout -->
+                            <div class="border-t border-outline-variant/10">
+                                <form th:action="@{/auth/logout}" method="post" class="w-full m-0 p-0">
+                                    <button type="submit" class="w-full flex items-center px-5 py-3.5 text-[13px] text-error/80 hover:text-error hover:bg-error/5 transition-colors cursor-pointer text-left bg-transparent border-none">
+                                        <span class="material-symbols-outlined text-[18px] mr-3">logout</span>
+                                        <span class="font-medium tracking-wide">Sign Out</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <button class="md:hidden text-white">
                 <span class="material-symbols-outlined">menu</span>
             </button>

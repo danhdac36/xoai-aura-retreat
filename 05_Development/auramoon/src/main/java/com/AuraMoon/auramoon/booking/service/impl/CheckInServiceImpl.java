@@ -184,6 +184,7 @@ public class CheckInServiceImpl implements CheckInService {
                     .checkinDate(b.getCheckinDate())
                     .checkoutDate(b.getCheckoutDate())
                     .assignedVillaCode(b.getAssignedVilla() != null ? b.getAssignedVilla().getVillaCode() : null)
+                    .requestedVillaTypeName(b.getRequestedVillaType() != null ? b.getRequestedVillaType().getTypeName() : "Không xác định")
                     .bookingStatus(b.getBookingStatus())
                     .consentApproved(consentApproved)
                     .guestName(guestName)

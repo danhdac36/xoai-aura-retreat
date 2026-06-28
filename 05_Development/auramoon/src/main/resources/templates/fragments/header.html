@@ -3,33 +3,29 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <body>
-<header class="flex justify-between items-center h-20 px-margin-desktop sticky top-0 bg-surface-bright border-b border-outline-variant z-40"
+<header class="flex justify-between items-center h-20 px-8 sticky top-0 bg-transparent z-40 transition-all duration-300"
         th:fragment="header">
+    <!-- Left: Search -->
     <div class="flex items-center gap-4">
-        <div class="relative">
-                <span class="absolute inset-y-0 left-3 flex items-center text-on-surface-variant">
-                    <span class="material-symbols-outlined text-xl" data-icon="search">search</span>
-                </span>
-            <input
-                    class="pl-10 pr-4 py-2 bg-surface-container border-none rounded-full text-sm focus:ring-2 focus:ring-primary/20 w-64 transition-all"
-                    placeholder="Tìm kiếm hồ sơ..." type="text">
-        </div>
+        <!-- Optional: we can remove the search or make it match the theme -->
     </div>
+    
+    <!-- Right: Notifications & Profile -->
     <div class="flex items-center gap-6">
-        <div class="flex items-center gap-4 text-on-surface-variant">
-            <button class="hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container">
-                <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-            </button>
-            <button class="hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container">
-                <span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+        <div class="flex items-center gap-4 text-[#2b3327]">
+            <button class="hover:text-black transition-colors p-2 rounded-full relative">
+                <span class="material-symbols-outlined text-[24px]" data-icon="notifications">notifications</span>
+                <!-- Notification dot -->
+                <span class="absolute top-2 right-2 w-2 h-2 bg-[#d2c5af] rounded-full border border-white"></span>
             </button>
         </div>
-        <div class="flex items-center gap-3 pl-6 border-l border-outline-variant">
-            <div class="text-right" sec:authorize="isAuthenticated()">
-                <p class="text-sm font-semibold" sec:authentication="principal.fullName">Tên</p>
-                <p class="text-xs text-on-surface-variant" sec:authentication="principal.roleName">Role</p>
+        
+        <div class="flex items-center gap-4">
+            <div class="px-5 py-2 bg-[#2b3327] rounded-full text-right flex items-center gap-2 cursor-pointer shadow-md" sec:authorize="isAuthenticated()">
+                <p class="text-[13px] font-medium text-[#d2c5af]">Xin chào, <span sec:authentication="principal.fullName">Tên</span></p>
+                <span class="material-symbols-outlined text-[#d2c5af] text-[18px]">keyboard_arrow_down</span>
             </div>
-            <img alt="Staff Profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant"
+            <img alt="Staff Profile" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-md hover:scale-105 transition-transform cursor-pointer"
                  th:src="${#authentication.principal.avatar != null ? #authentication.principal.avatar : 'https://lh3.googleusercontent.com/aida-public/AB6AXuCjxKxWNM9Mdwd1q-Ntb2XBP2tWZHOJnGCL2k0tVQxMSkLJ5lXLFy4YVhr2xzIstoSmY3eeDxmsvUxgGR1ZidvlK-lkv5B2u_qNh0i4tffRO5hu4TTt-NPTZVPcnEYjcqbIjcIGI-opV3GJWWC6PWB1oftS39SpGphQD7UDCSz0WfQkOA8VoDi3CIwXCLILpVge3ruSs76fgrW729VAHHhA6RpB3syTU-QWYVL4_wHFwND14cNM_H0Nchj6_3Bf1sj91ZcH50GAf6s'}">
         </div>
     </div>

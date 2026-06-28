@@ -15,6 +15,26 @@ function openCheckInModal(button) {
         if (genderInput) genderInput.value = button.getAttribute("data-guest-gender") || "Male";
         if (dobInput) dobInput.value = button.getAttribute("data-guest-dob") || "";
         
+        // Smart filtering for Villa Assignment
+        const requestedType = button.getAttribute("data-requested-villa-type");
+        const villaSelect = document.getElementById("villaId");
+        if (villaSelect) {
+            villaSelect.value = ""; // reset selection
+            Array.from(villaSelect.options).forEach(option => {
+                if (option.value === "") return; // keep the placeholder
+                const optionType = option.getAttribute("data-villa-type");
+                if (requestedType && requestedType !== "Không xác định") {
+                    if (optionType === requestedType) {
+                        option.style.display = "block";
+                    } else {
+                        option.style.display = "none";
+                    }
+                } else {
+                    option.style.display = "block"; // Show all if requested type is unknown
+                }
+            });
+        }
+        
         modal.classList.remove("hidden");
     }
 }

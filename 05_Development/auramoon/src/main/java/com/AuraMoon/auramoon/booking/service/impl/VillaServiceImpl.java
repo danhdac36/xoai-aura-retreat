@@ -95,6 +95,7 @@ public class VillaServiceImpl implements VillaService {
                     .limitPerson(v.getLimitPerson())
                     .villaStatus(v.getVillaStatus())
                     .cleaningStatus(v.getCleaningStatus())
+                    .image(v.getVillaType() != null ? v.getVillaType().getImage() : null)
                     .build());
         }
         return dtos;
