@@ -4,7 +4,7 @@ File này lưu trữ các nguyên tắc cốt lõi trong quá trình phát tri�
 
 ## Nguyên tắc 1: Kiến trúc Spring Boot MVC
 
-Đây là dự án viết bằng Java sử dụng mô hình **MVC (Model-View-Controller)** của Spring Boot để thiết kế (Ví dụ: Controller trả về giao diện View như Thymeleaf, xử lý ModelAttributes) chứ **KHÔNG** phải là thiết kế theo hướng RESTful API (trả về dữ liệu JSON).
+Đây là dự án viết bằng Java sử dụng mô hình **MVC (Model-View-Controller)** của Spring Boot để thiết kế (Ví dụ: Controller trả về giao diện View như Thymeleaf, xử lý ModelAttributes)
 
 Cách đặt thên method, class, tất cả phải tuân thủ theo phương pháp java naming convention
 

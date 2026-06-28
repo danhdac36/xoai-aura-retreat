@@ -8,5 +8,11 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
+    boolean existsByEmail(String email);
+    List<User> findByIsDeleteFalse();
+    List<User> findByIsDeleteFalseAndEmailContainingIgnoreCase(String email);
+    List<User> findByIsDeleteTrue();
+    List<User> findByIsDeleteTrueAndEmailContainingIgnoreCase(String email);
+    java.util.Optional<User> findByEmail(String email);
     List<User> findByFullNameContainingIgnoreCase(String fullName);
 }

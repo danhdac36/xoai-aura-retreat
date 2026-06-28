@@ -284,6 +284,20 @@
             </div>
         </div>
     </form>
+
+    <!-- Delete Health Data Section -->
+    <div class="mt-stack-lg border-t border-error/20 pt-stack-lg flex flex-col items-center">
+        <h3 class="font-headline-sm text-error mb-2">Quản lý Quyền riêng tư</h3>
+        <p class="font-body-md text-on-surface-variant opacity-80 mb-6 text-center max-w-2xl">
+            Bạn có quyền yêu cầu xoá vĩnh viễn dữ liệu sức khoẻ và dị ứng khỏi hệ thống của chúng tôi. Hành động này không thể hoàn tác.
+        </p>
+        <form th:action="@{/profile/health/delete}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xoá vĩnh viễn toàn bộ dữ liệu sức khoẻ và dị ứng không? Hành động này không thể hoàn tác.');">
+            <button type="submit" class="border border-error text-error px-8 py-3 rounded font-label-md hover:bg-error/10 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">delete_forever</span>
+                XÓA DỮ LIỆU NHẠY CẢM
+            </button>
+        </form>
+    </div>
 </main>
 <!-- Footer -->
 <footer class="w-full mt-section-gap bg-surface-container dark:bg-surface-container-high border-t border-outline-variant/20">

@@ -8,4 +8,5 @@ import java.util.Optional;
 @Repository
 public interface ConsentRepository extends JpaRepository<Consent, Integer> {
     Optional<Consent> findFirstByUser_IdOrderByUpdatedAtDesc(Integer userId);
+    java.util.List<Consent> findByUser_Id(Integer userId);
 }
