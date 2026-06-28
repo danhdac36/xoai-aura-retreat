@@ -1,5 +1,7 @@
 package com.AuraMoon.auramoon.auth.service.impl;
 
+import com.AuraMoon.auramoon.auth.dto.ChangePasswordDto;
+import com.AuraMoon.auramoon.auth.dto.MyAccountDto;
 import com.AuraMoon.auramoon.auth.dto.PersonalProfileDto;
 import com.AuraMoon.auramoon.auth.dto.SensitiveProfileDto;
 import com.AuraMoon.auramoon.auth.entity.Consent;
@@ -14,6 +16,7 @@ import com.AuraMoon.auramoon.fnb.repository.DietaryProfileRepository;
 import com.AuraMoon.auramoon.spa.entity.PhysicalHealthProfile;
 import com.AuraMoon.auramoon.spa.repository.PhysicalHealthProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +40,47 @@ public class ProfileServiceImpl implements IProfileService {
 
     @Autowired
     private IUserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Override
+    public MyAccountDto getMyAccountInfo(Integer userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        return MyAccountDto.fromEntity(user);
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(Integer userId, ChangePasswordDto dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản"));
+
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("Mật khẩu hiện tại không chính xác");
+        }
+
+        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            throw new IllegalArgumentException("Mật khẩu xác nhận không khớp");
+        }
+
+        if (passwordEncoder.matches(dto.getNewPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("Mật khẩu mới không được trùng với mật khẩu hiện tại");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        AuditLog log = AuditLog.builder()
+                .actionType("CHANGE_PASSWORD")
+                .actorId(userId)
+                .targetId(userId)
+                .details("Người dùng thay đổi mật khẩu")
+                .timestamp(new Date())
+                .build();
+        auditLogRepository.save(log);
+    }
 
     @Override
     public SensitiveProfileDto getSensitiveProfile(Integer userId) {

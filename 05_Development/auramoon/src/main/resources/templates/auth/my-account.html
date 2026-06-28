@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>AuraMoon Retreat | Thông tin Tài khoản</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap"
+          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+          rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1b1c1c",
+                        "surface-container": "#f0eded",
+                        "primary-container": "#f5f2ed",
+                        "tertiary": "#406840",
+                        "outline-variant": "#c8c7be",
+                        "outline": "#787770",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#5f5e5b",
+                        "on-background": "#1b1c1c",
+                        "on-tertiary-fixed-variant": "#284f2a",
+                        "secondary": "#566342",
+                        "on-secondary-container": "#5a6745",
+                        "on-primary-fixed-variant": "#474743",
+                        "background": "#fbf9f8",
+                        "tertiary-fixed-dim": "#a5d2a2",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#e5e2dd",
+                        "on-secondary-fixed": "#141f05",
+                        "secondary-fixed": "#dae8be",
+                        "secondary-container": "#d7e5bb",
+                        "surface-variant": "#e4e2e1",
+                        "on-tertiary-container": "#4f784f",
+                        "on-primary-fixed": "#1c1c19",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#303030",
+                        "tertiary-fixed": "#c1eebc",
+                        "surface-dim": "#dcd9d9",
+                        "secondary-fixed-dim": "#becca3",
+                        "on-surface-variant": "#474741",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f3f0f0",
+                        "primary-fixed-dim": "#c9c6c2",
+                        "surface-tint": "#5f5e5b",
+                        "surface": "#fbf9f8",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#6f6e6a",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-secondary-fixed-variant": "#3f4b2c",
+                        "on-tertiary-fixed": "#002106",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fbf9f8",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#d1ffcb",
+                        "surface-container-low": "#f6f3f2",
+                        "surface-container-high": "#eae8e7",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#c9c6c2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "margin-desktop": "80px",
+                        "stack-md": "16px",
+                        "section-gap": "120px",
+                        "stack-lg": "32px",
+                        "gutter": "24px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "headline-sm": ["Playfair Display"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
+                        "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .form-input-minimal {
+            border: none;
+            border-bottom: 2px solid #e4e2e1;
+            background-color: transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input-minimal:focus {
+            outline: none;
+            border-color: #406840; /* tertiary as sage-green substitute */
+            ring: 0;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
+<main class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg md:ml-64">
+    <!-- Hero Section -->
+    <section class="mb-stack-lg animate-fade-in">
+        <div class="relative w-full h-[200px] overflow-hidden rounded-xl mb-stack-md">
+            <!-- You can change this image to a suitable one -->
+            <img alt="My Account Header"
+                 class="w-full h-full object-cover opacity-80 scale-105 hover:scale-100 transition-transform duration-1000"
+                 src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2000&auto=format&fit=crop">
+            <div class="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+        </div>
+        <div class="max-w-2xl">
+            <h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Trạng thái Tài khoản</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant opacity-80">
+                Xem thông tin đăng nhập và quản lý bảo mật cho tài khoản của bạn.
+            </p>
+        </div>
+    </section>
+
+    <!-- Error/Success Alerts -->
+    <div th:if="${error}" class="mb-6 p-4 bg-error-container text-on-error-container rounded-xl border border-error/20 flex items-center gap-3">
+        <span class="material-symbols-outlined text-error">error</span>
+        <span class="font-body-md" th:text="${error}"></span>
+    </div>
+    <div th:if="${successMessage}" class="mb-6 p-4 bg-tertiary-container text-on-tertiary-container rounded-xl border border-tertiary/20 flex items-center gap-3">
+        <span class="material-symbols-outlined text-tertiary">check_circle</span>
+        <span class="font-body-md" th:text="${successMessage}"></span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-section-gap">
+        <!-- Left Column: Readonly Info -->
+        <div class="space-y-stack-lg">
+            <div class="border-b border-outline-variant pb-stack-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary">info</span>
+                <h2 class="font-headline-sm text-headline-sm text-secondary">Thông tin Tài khoản</h2>
+            </div>
+            
+            <div class="space-y-stack-sm" th:object="${myAccountDto}">
+                <div class="space-y-2">
+                    <label class="font-label-md text-label-md text-on-surface-variant">Địa chỉ Email</label>
+                    <input class="w-full form-input-minimal py-2 font-body-md text-on-surface-variant/60 cursor-not-allowed border-dashed bg-surface-container-low" 
+                           th:value="*{email}" readonly type="text">
+                </div>
+
+                <div class="space-y-2 mt-4">
+                    <label class="font-label-md text-label-md text-on-surface-variant">Vai trò (Role)</label>
+                    <input class="w-full form-input-minimal py-2 font-body-md text-on-surface-variant/60 cursor-not-allowed border-dashed bg-surface-container-low" 
+                           th:value="*{roleName}" readonly type="text">
+                </div>
+
+                <div class="space-y-2 mt-4">
+                    <label class="font-label-md text-label-md text-on-surface-variant">Trạng thái (Status)</label>
+                    <div class="pt-2">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                              th:classappend="*{status == 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+                            <span class="w-2 h-2 rounded-full mr-2"
+                                  th:classappend="*{status == 'ACTIVE' ? 'bg-green-500' : 'bg-red-500'}"></span>
+                            <span th:text="*{status}"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="space-y-2 mt-4">
+                    <label class="font-label-md text-label-md text-on-surface-variant">Ngày tạo</label>
+                    <input class="w-full form-input-minimal py-2 font-body-md text-on-surface-variant/60 cursor-not-allowed border-dashed bg-surface-container-low" 
+                           th:value="*{createdAt != null ? #temporals.format(createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}" readonly type="text">
+                </div>
+
+                <div class="space-y-2 mt-4">
+                    <label class="font-label-md text-label-md text-on-surface-variant">Đăng nhập lần cuối</label>
+                    <input class="w-full form-input-minimal py-2 font-body-md text-on-surface-variant/60 cursor-not-allowed border-dashed bg-surface-container-low" 
+                           th:value="*{lastLogin != null ? #temporals.format(lastLogin, 'dd/MM/yyyy HH:mm') : 'Chưa có'}" readonly type="text">
+                </div>
+
+                <div class="pt-6">
+                    <button type="button" onclick="document.getElementById('password-form-container').classList.toggle('hidden')"
+                            class="border border-secondary text-secondary px-6 py-2 rounded font-label-md text-sm tracking-wide hover:bg-secondary/5 transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">lock_reset</span>
+                        ĐỔI MẬT KHẨU
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Change Password Form -->
+        <div id="password-form-container" class="space-y-stack-lg transition-all duration-300"
+             th:object="${changePasswordDto}"
+             th:classappend="${#fields.hasAnyErrors() or error != null} ? '' : 'hidden'">
+            <div class="border-b border-outline-variant pb-stack-sm flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary">lock_reset</span>
+                <h2 class="font-headline-sm text-headline-sm text-secondary">Đổi Mật khẩu</h2>
+            </div>
+
+            <form th:action="@{/profile/change-password}" method="POST" class="space-y-stack-md">
+                
+                <div class="space-y-2">
+                    <label class="font-label-md text-label-md text-on-surface-variant" for="currentPassword">Mật khẩu hiện tại</label>
+                    <input class="w-full form-input-minimal py-2 font-body-md" id="currentPassword" th:field="*{currentPassword}" required type="password" placeholder="Nhập mật khẩu hiện tại">
+                    <p class="text-error font-label-md mt-1" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></p>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="font-label-md text-label-md text-on-surface-variant" for="newPassword">Mật khẩu mới</label>
+                    <input class="w-full form-input-minimal py-2 font-body-md" id="newPassword" th:field="*{newPassword}" required type="password" placeholder="Ít nhất 8 ký tự, có chữ, số và ký tự đặc biệt">
+                    <p class="text-error font-label-md mt-1" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></p>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="font-label-md text-label-md text-on-surface-variant" for="confirmPassword">Xác nhận mật khẩu mới</label>
+                    <input class="w-full form-input-minimal py-2 font-body-md" id="confirmPassword" th:field="*{confirmPassword}" required type="password" placeholder="Nhập lại mật khẩu mới">
+                    <p class="text-error font-label-md mt-1" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></p>
+                </div>
+
+                <div class="pt-stack-md">
+                    <button class="w-full bg-tertiary text-on-tertiary px-6 py-4 rounded font-label-md text-label-md tracking-widest hover:brightness-110 transition-all shadow-lg shadow-tertiary/20"
+                            type="submit">
+                        LƯU MẬT KHẨU
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="w-full mt-section-gap bg-surface-container dark:bg-surface-container-high border-t border-outline-variant/20">
+    <div class="flex flex-col md:flex-row justify-between items-center py-stack-lg max-w-[1280px] mx-auto px-margin-desktop">
+        <div class="mb-stack-md md:mb-0">
+            <span class="font-headline-sm text-headline-sm text-primary font-bold">AuraMoon Retreat</span>
+            <p class="font-label-md text-label-md text-on-surface-variant mt-2 opacity-80">© 2024 AuraMoon Retreats. Tranquility in every breath.</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-6">
+            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all underline underline-offset-4"
+               href="#">Privacy Policy</a>
+            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all"
+               href="#">Health &amp; Safety</a>
+            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all"
+               href="#">Terms of Service</a>
+            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all"
+               href="#">Contact Us</a>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
