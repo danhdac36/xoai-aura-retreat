@@ -25,7 +25,7 @@ public class RetreatPackageController {
             @RequestParam(value = "maxDays", required = false) Integer maxDays,
             @RequestParam(value = "minPrice", required = false) Double minPrice,
             @RequestParam(value = "maxPrice", required = false) Double maxPrice,
-            Model model){
+            Model model) {
 
         List<RetreatPackageDTO> packages = retreatPackageService.searchPackages(
                 type,

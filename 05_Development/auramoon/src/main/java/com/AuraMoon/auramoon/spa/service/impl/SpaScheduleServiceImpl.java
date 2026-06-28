@@ -112,7 +112,7 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
         if (availableTherapists.isEmpty()) {
             throw new SpaBusinessException("SPA-010", "No available Therapist or Therapy Room could be found.");
         }
-        
+
         // Cân bằng công việc: Lựa chọn Therapist có số ca làm việc ít nhất trong ngày
         Therapist selectedTherapist = availableTherapists.get(0);
         long minWorkload = Long.MAX_VALUE;
@@ -152,18 +152,19 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
         response.setStartTime(schedule.getStartTime());
         response.setEndTime(schedule.getEndTime());
 
-        // 4.5. Gửi email nhắc lịch hẹn cho khách (Bọc trong try-catch để tránh rollback giao dịch nếu lỗi mail)
+        // 4.5. Gửi email nhắc lịch hẹn cho khách (Bọc trong try-catch để tránh rollback
+        // giao dịch nếu lỗi mail)
         try {
             User guest = userRepository.findById(guestBooking.getGuestId()).orElse(null);
             if (guest != null && guest.getEmail() != null) {
-                String formattedTime = startTime.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy"));
+                String formattedTime = startTime
+                        .format(java.time.format.DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy"));
                 emailNotificationService.sendSpaBookingReminderEmail(
                         guest.getEmail(),
                         guest.getFullName() != null ? guest.getFullName() : "Guest",
                         service.getServiceName(),
                         selectedRoom.getRoomName(),
-                        formattedTime
-                );
+                        formattedTime);
             }
         } catch (Exception e) {
             System.err.println("[WARNING] Không thể gửi email nhắc lịch Spa: " + e.getMessage());
