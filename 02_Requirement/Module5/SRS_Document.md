@@ -1871,7 +1871,7 @@ reviews after completing their retreat experience.</td>
 </tr>
 <tr>
 <td style="text-align: right;">Description:</td>
-<td colspan="3">Cho phép quản lý xem tổng hợp các đánh giá, điểm số và phản hồi của khách hàng gắn liền với từng Booking ID để theo dõi chất lượng dịch vụ.</td>
+<td colspan="3">Cho phép quản lý xem tổng hợp các đánh giá, điểm số và phản hồi của khách hàng gắn liền với từng Booking ID để theo dõi chất lượng dịch vụ. Quản trị viên (Admin) có quyền ẩn (Soft Delete) các đánh giá vi phạm.</td>
 </tr>
 <tr>
 <td style="text-align: right;">Trigger:</td>
@@ -1897,7 +1897,9 @@ reviews after completing their retreat experience.</td>
 <tr>
 <td style="text-align: right;">Alternative Flows:</td>
 <td colspan="3">- A1. Manager filters reviews by rating or date.<br />
-→ System updates the data grid to match criteria.</td>
+→ System updates the data grid to match criteria.<br />
+- A2. Administrator clicks 'Hide' on a review.<br />
+→ System performs a Soft Delete and hides the review from the data grid.</td>
 </tr>
 <tr>
 <td style="text-align: right;">Exceptions:</td>
@@ -4395,7 +4397,7 @@ forth.\]*
 |    BR-20    |           Night Audit Consolidation                   |                                         The system shall automatically or manually consolidate all completed Spa (COMPLETED) and delivered F&B (DELIVERED) charges into the Guest Folio as Folio Items at midnight (00:00) daily. Once audited, these records shall be locked and cannot be modified or deleted.                                         |              UC26              |
 |    BR-21    |          Invoice Formatting Standard                  |                                         File PDF Hóa đơn Gộp được tạo ra bắt buộc phải tuân thủ chuẩn biểu mẫu hóa đơn cơ bản theo quy định của Bộ Tài chính Việt Nam (Bao gồm tên công ty, Mã số thuế, Thuế suất VAT 10% tách riêng, tổng tiền bằng chữ). Không lưu file vật lý.                                         |              UC27              |
 |    BR-22    |     Housekeeping Status Constraint                    | Only Housekeeping Managers can change a Villa status from DIRTY to CLEAN. Receptionists can only change from CLEAN to OCCUPIED. Villas marked OUT_OF_ORDER cannot be assigned to any Booking until Maintenance resolves the issue. | UC28 |
-|    BR-23    |     Review Immutability                               | Customer reviews reflect objective feedback. Managers shall NOT be allowed to edit or delete any review content. The Reviews Dashboard provides Read-only access. | UC29 |
+|    BR-23    |     Review Immutability                               | Customer reviews reflect objective feedback. Managers shall NOT be allowed to edit or hard-delete any review content. However, Administrators can perform a Soft Delete (Hide) to remove inappropriate reviews from public view. | UC29 |
 |    BR-24    |     Audit Log Integrity                               | Audit logs are strictly confidential and used for system monitoring. No user (including Administrators) shall have the right to modify or delete records from the AUDIT_LOG table. | UC30 |
 |    BR-25    |     Automated Logging                                 | The system shall automatically trigger the Audit Logging Service to record events whenever a sensitive operation (e.g., Check-out, Payment, Night Audit, Data Erasure) is successfully completed. | UC30 |
 |    BR-26    |     Guest Booking History Access Control              | Guests shall only be able to view their own booking history. Managers/Admins are allowed to view the booking history of any Guest via the Guest Profile, but sensitive health information within itineraries must remain hidden. | UC34 |
