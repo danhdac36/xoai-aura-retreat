@@ -31,6 +31,9 @@ public class StaffProfileAggregatorTest {
     private TreatmentBookingRepository treatmentBookingRepository;
 
     @Mock
+    private com.AuraMoon.auramoon.spa.repository.ScheduleRepository scheduleRepository;
+
+    @Mock
     private AuditLogRepository auditLogRepository;
 
     @InjectMocks
@@ -54,8 +57,12 @@ public class StaffProfileAggregatorTest {
 
         when(userRepository.findById(1)).thenReturn(Optional.of(user));
         when(therapistRepository.findById(1)).thenReturn(Optional.of(therapist));
+        when(auditLogRepository.findByActorIdOrderByTimestampDesc(eq(1), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(org.springframework.data.domain.Page.empty());
+        when(scheduleRepository.findByTherapistIdOrderByStartTimeDesc(eq(1), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(org.springframework.data.domain.Page.empty());
 
-        FullStaffProfileDTO result = aggregator.getAggregatedProfile(1L);
+        FullStaffProfileDTO result = aggregator.getAggregatedProfile(1L, 0, 10, null);
 
         assertNotNull(result);
         assertEquals("THERAPIST", result.getRoleName());
@@ -72,8 +79,10 @@ public class StaffProfileAggregatorTest {
         user.setRole(role);
         
         when(userRepository.findById(2)).thenReturn(Optional.of(user));
+        when(auditLogRepository.findByActorIdOrderByTimestampDesc(eq(2), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(org.springframework.data.domain.Page.empty());
 
-        FullStaffProfileDTO result = aggregator.getAggregatedProfile(2L);
+        FullStaffProfileDTO result = aggregator.getAggregatedProfile(2L, 0, 10, null);
 
         assertNotNull(result);
         assertEquals("RECEPTIONIST", result.getRoleName());
@@ -91,8 +100,10 @@ public class StaffProfileAggregatorTest {
         user.setPasswordHash("super_secret_hash");
         
         when(userRepository.findById(3)).thenReturn(Optional.of(user));
+        when(auditLogRepository.findByActorIdOrderByTimestampDesc(eq(3), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(org.springframework.data.domain.Page.empty());
 
-        FullStaffProfileDTO result = aggregator.getAggregatedProfile(3L);
+        FullStaffProfileDTO result = aggregator.getAggregatedProfile(3L, 0, 10, null);
 
         assertNotNull(result);
         assertNull(result.getPassword(), "Password must be redacted");

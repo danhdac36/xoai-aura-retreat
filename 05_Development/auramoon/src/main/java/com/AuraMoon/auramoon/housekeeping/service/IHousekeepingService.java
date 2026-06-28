@@ -28,4 +28,16 @@ public interface IHousekeepingService {
      * Chuyển cleaning_status: CLEANING → DIRTY.
      */
     void rejectCleaning(Integer villaId, Integer actorId);
+
+    /**
+     * Báo cáo hỏng hóc, cần bảo trì.
+     * Chuyển villa_status → OUT_OF_ORDER và lưu maintenanceNote.
+     */
+    void reportMaintenance(Integer villaId, String maintenanceNote, Integer actorId);
+
+    /**
+     * Kỹ thuật viên xác nhận đã sửa xong.
+     * Chuyển villa_status: OUT_OF_ORDER → AVAILABLE và xóa maintenanceNote.
+     */
+    void resolveMaintenance(Integer villaId, Integer actorId);
 }

@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 public class ManagerReviewControllerTest {
 
     @Autowired
@@ -24,12 +24,16 @@ public class ManagerReviewControllerTest {
     private IManagerReviewService reviewService;
 
     @Test
-    @WithMockUser(roles = {"MANAGER", "ADMIN"})
     public void shouldRenderDashboardForManager() throws Exception {
         when(reviewService.getMetrics()).thenReturn(null);
         when(reviewService.getVisibleReviews()).thenReturn(java.util.Collections.emptyList());
 
-        mockMvc.perform(get("/manager/reviews"))
+        com.AuraMoon.auramoon.auth.entity.User managerUser = com.AuraMoon.auramoon.auth.entity.User.builder()
+                .id(99).fullName("Manager").role(new com.AuraMoon.auramoon.auth.entity.Role(2, "MANAGER")).build();
+        com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse mockManagerDetails = new com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse(managerUser);
+
+        mockMvc.perform(get("/manager/reviews")
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(mockManagerDetails)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("manager/reviews"))
                 .andExpect(model().attributeExists("metrics"))
@@ -37,9 +41,13 @@ public class ManagerReviewControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "RECEPTIONIST")
     public void shouldDenyAccessToReceptionist() throws Exception {
-        mockMvc.perform(get("/manager/reviews"))
+        com.AuraMoon.auramoon.auth.entity.User recUser = com.AuraMoon.auramoon.auth.entity.User.builder()
+                .id(99).fullName("Receptionist").role(new com.AuraMoon.auramoon.auth.entity.Role(3, "RECEPTIONIST")).build();
+        com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse mockRecDetails = new com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse(recUser);
+
+        mockMvc.perform(get("/manager/reviews")
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(mockRecDetails)))
                 .andExpect(status().isForbidden());
     }
 }

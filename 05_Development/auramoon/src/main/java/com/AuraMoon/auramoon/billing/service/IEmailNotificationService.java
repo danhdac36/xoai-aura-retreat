@@ -5,9 +5,10 @@ public interface IEmailNotificationService {
      * Gửi email đính kèm file PDF dưới dạng ByteArrayResource.
      * 
      * @param toEmail       Địa chỉ email khách hàng
+     * @param folioId       ID của hóa đơn (GuestFolio)
      * @param pdfAttachment Mảng byte chứa nội dung PDF
      */
-    void sendInvoiceEmail(String toEmail, byte[] pdfAttachment) throws Exception;
+    void sendInvoiceEmail(String toEmail, Integer folioId, byte[] pdfAttachment) throws Exception;
 
     /**
      * Gửi email nhắc lịch hẹn Spa thành công cho khách hàng.

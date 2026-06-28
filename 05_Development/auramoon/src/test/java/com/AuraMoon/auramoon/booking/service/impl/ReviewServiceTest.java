@@ -41,7 +41,7 @@ class ReviewServiceTest {
         String comment = "Good!";
         Booking booking = new Booking();
         booking.setId(bookingId);
-        booking.setBookingStatus("COMPLETED");
+        booking.setBookingStatus("CHECKED_OUT");
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(reviewRepository.existsByBookingId(bookingId)).thenReturn(false);
@@ -80,7 +80,7 @@ class ReviewServiceTest {
             reviewService.canSubmitReview(bookingId);
         });
 
-        assertEquals("Chỉ có thể đánh giá khi đơn hàng đã hoàn tất (COMPLETED).", exception.getMessage());
+        assertEquals("Chỉ có thể đánh giá khi đơn hàng đã check-out (CHECKED_OUT).", exception.getMessage());
         verify(reviewRepository, never()).existsByBookingId(anyInt());
     }
 
@@ -91,7 +91,7 @@ class ReviewServiceTest {
         Integer bookingId = 1;
         Booking booking = new Booking();
         booking.setId(bookingId);
-        booking.setBookingStatus("COMPLETED");
+        booking.setBookingStatus("CHECKED_OUT");
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(reviewRepository.existsByBookingId(bookingId)).thenReturn(true);
@@ -113,7 +113,7 @@ class ReviewServiceTest {
         String maliciousComment = "<script>alert(1)</script>";
         Booking booking = new Booking();
         booking.setId(bookingId);
-        booking.setBookingStatus("COMPLETED");
+        booking.setBookingStatus("CHECKED_OUT");
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(reviewRepository.existsByBookingId(bookingId)).thenReturn(false);

@@ -109,6 +109,7 @@ CREATE TABLE VILLA (
     limit_person INT,
     villa_status VARCHAR(20) CHECK (villa_status IN ('AVAILABLE', 'OCCUPIED', 'MAINTENANCE')),
     cleaning_status VARCHAR(10) CHECK (cleaning_status IN ('CLEAN', 'DIRTY', 'CLEANING')),
+    maintenance_note NVARCHAR(500),
     is_delete BIT DEFAULT 0,
     CONSTRAINT FK_VILLA_TYPE FOREIGN KEY (villa_type) REFERENCES VILLA_TYPE(type_id)
 );
