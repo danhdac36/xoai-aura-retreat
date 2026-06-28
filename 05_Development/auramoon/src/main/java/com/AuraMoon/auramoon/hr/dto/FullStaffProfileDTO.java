@@ -2,6 +2,7 @@ package com.AuraMoon.auramoon.hr.dto;
 
 import lombok.Data;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import com.AuraMoon.auramoon.billing.dto.AuditLogDTO;
 
 @Data
@@ -25,5 +26,5 @@ public class FullStaffProfileDTO {
     private String password;
     private String passwordHash;
     
-    private List<AuditLogDTO> recentActivities;
+    private Page<AuditLogDTO> recentActivitiesPage;
 }

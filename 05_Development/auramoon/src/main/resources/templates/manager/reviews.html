@@ -1,107 +1,163 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/admin-layout :: layout(~{::section})">
 <head>
-    <title>Guest Feedback | Xoai Aura</title>
+    <title>Customer Reviews Dashboard | Lumina Wellness</title>
 </head>
 <body>
-    <div class="w-full">
-        <!-- Load specific CSS and JS -->
-        <link rel="stylesheet" th:href="@{/css/booking/reviews.css}" />
-
+    <section class="max-w-7xl mx-auto py-12 space-y-12 w-full">
         <!-- Header Section -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-stack-lg">
-            <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-primary dark:text-primary-fixed text-[32px]" data-icon="spa">spa</span>
-                <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Guest Feedback</h2>
-            </div>
-            <button class="hover:opacity-80 transition-opacity bg-surface-container-highest p-2.5 rounded-lg">
-                <span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
-            </button>
+        <div class="space-y-2">
+            <h2 class="font-headline-md text-headline-md text-primary">Customer Reviews</h2>
+            <p class="font-body-md text-body-md text-earth-beige max-w-2xl">
+                Oversee and curate guest experiences. Monitor feedback across all wellness retreats to maintain our sanctuary's standards of quiet luxury and restorative excellence.
+            </p>
         </div>
 
-        <!-- Summary Cards Section -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-12">
-            <div class="bg-secondary-container/30 rounded-xl p-6 flex flex-col justify-between h-40 shadow-[0_10px_40px_rgba(45,90,39,0.03)] border border-outline-variant/20">
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            <!-- Stat Card 1 -->
+            <div class="bg-surface rounded-lg p-8 shadow-sm shadow-primary/5 border border-outline-variant/10 flex flex-col justify-between group hover:shadow-md transition-all">
                 <div>
-                    <span class="font-label-caps text-[12px] uppercase tracking-wider text-on-secondary-container">Total Reviews</span>
-                    <h2 class="font-headline-lg text-headline-lg text-primary mt-2" th:text="${metrics.totalReviews}">320</h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="font-label-caps text-label-caps text-earth-beige">Total Reviews</span>
+                        <span class="material-symbols-outlined text-primary opacity-40 group-hover:opacity-100 transition-opacity">reviews</span>
+                    </div>
+                    <div class="font-headline-md text-headline-md text-primary" th:text="${metrics.totalReviews}">1,248</div>
                 </div>
-                <div class="flex items-center text-primary/60">
-                    <span class="material-symbols-outlined text-sm mr-1" data-icon="trending_up">trending_up</span>
-                    <span class="text-[12px] uppercase tracking-wider">+12% this month</span>
+                <div class="mt-4 flex items-center gap-2 text-sage-success">
+                    <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                    <span class="font-label-sm text-label-sm">+12% from last month</span>
                 </div>
             </div>
-            <div class="bg-secondary-container/30 rounded-xl p-6 flex flex-col justify-between h-40 shadow-[0_10px_40px_rgba(45,90,39,0.03)] border border-outline-variant/20">
+
+            <!-- Stat Card 2 -->
+            <div class="bg-surface rounded-lg p-8 shadow-sm shadow-primary/5 border border-outline-variant/10 flex flex-col justify-between group hover:shadow-md transition-all">
                 <div>
-                    <span class="font-label-caps text-[12px] uppercase tracking-wider text-on-secondary-container">Average Rating</span>
-                    <div class="flex items-baseline gap-2 mt-2">
-                        <h2 class="font-headline-lg text-headline-lg text-primary" th:text="${metrics.averageRating}">4.9</h2>
-                        <span class="text-primary-container font-headline-sm">/ 5.0</span>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="font-label-caps text-label-caps text-earth-beige">Average Rating</span>
+                        <span class="material-symbols-outlined text-primary opacity-40 group-hover:opacity-100 transition-opacity">star</span>
+                    </div>
+                    <div class="flex items-baseline gap-1">
+                        <span class="font-headline-md text-headline-md text-primary" th:text="${metrics.averageRating}">4.8</span>
+                        <span class="font-body-md text-earth-beige opacity-50">/ 5.0</span>
                     </div>
                 </div>
-                <div class="flex gap-0.5 text-primary">
-                    <span class="material-symbols-outlined text-lg" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined text-lg" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined text-lg" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined text-lg" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
-                    <span class="material-symbols-outlined text-lg" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+                <div class="mt-4 flex gap-1">
+                    <span class="material-symbols-outlined star-fill text-primary text-[18px]">grade</span>
+                    <span class="material-symbols-outlined star-fill text-primary text-[18px]">grade</span>
+                    <span class="material-symbols-outlined star-fill text-primary text-[18px]">grade</span>
+                    <span class="material-symbols-outlined star-fill text-primary text-[18px]">grade</span>
+                    <span class="material-symbols-outlined star-fill text-primary text-[18px] opacity-40">grade</span>
                 </div>
             </div>
-        </section>
 
-        <!-- Main Section: Data Table -->
-        <section class="space-y-6">
-            <div class="flex items-center justify-between mb-2">
-                <h3 class="font-headline-sm text-headline-sm text-primary">Recent Experiences</h3>
-                <button class="font-label-caps text-[12px] uppercase tracking-wider text-primary border-b border-primary/20 pb-0.5">Filter by Date</button>
-            </div>
-            
-            <!-- Table Header (Hidden on Mobile, Flex on MD) -->
-            <div class="hidden md:flex px-6 py-4 bg-surface-container-low rounded-t-xl border-b border-outline-variant/30 text-on-surface-variant font-label-caps text-[12px] uppercase tracking-wider">
-                <div class="w-1/6">Booking ID</div>
-                <div class="w-1/6">Guest Name</div>
-                <div class="w-1/6">Star Rating</div>
-                <div class="w-2/6">Comment</div>
-                <div class="w-1/6 text-right">Action</div>
-            </div>
-            
-            <!-- Responsive List/Table -->
-            <div class="space-y-4 md:space-y-0">
-                <th:block th:each="review : ${reviews}">
-                    <div class="review-row bg-white md:bg-transparent p-6 md:px-6 md:py-8 rounded-xl md:rounded-none md:border-b border-outline-variant/10 flex flex-col md:flex-row md:items-start transition-all hover:bg-secondary-container/10">
-                        <div class="md:w-1/6 mb-2 md:mb-0">
-                            <span class="md:hidden font-label-caps text-[10px] text-on-surface-variant block">Booking ID</span>
-                            <a class="text-primary font-semibold hover:underline" href="#" th:text="${review.bookingId}">9283</a>
-                        </div>
-                        <div class="md:w-1/6 mb-4 md:mb-0">
-                            <span class="md:hidden font-label-caps text-[10px] text-on-surface-variant block">Guest</span>
-                            <a th:if="${review.guestId != null}" class="text-primary font-semibold hover:underline" th:href="@{/manager/staff/profile/{id}(id=${review.guestId})}" th:text="${review.guestName}">Nguyen Lan Anh</a>
-                            <span th:if="${review.guestId == null}" class="text-on-surface-variant font-semibold" th:text="${review.guestName}">Nguyen Lan Anh</span>
-                        </div>
-                        <div class="md:w-1/6 mb-4 md:mb-0">
-                            <div class="flex text-primary">
-                                <span th:each="i : ${#numbers.sequence(1, review.rating)}" class="material-symbols-outlined text-[16px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
-                                <span th:if="${review.rating < 5}" th:each="i : ${#numbers.sequence(review.rating + 1, 5)}" class="material-symbols-outlined text-[16px]" data-icon="star">star</span>
-                            </div>
-                        </div>
-                        <div class="md:w-2/6 mb-6 md:mb-0">
-                            <span class="md:hidden font-label-caps text-[10px] text-on-surface-variant block">Feedback</span>
-                            <p class="italic text-on-surface-variant font-headline-sm text-sm leading-relaxed" th:text="${review.comment}">"An absolutely transformative experience."</p>
-                        </div>
-                        <div class="md:w-1/6 text-right">
-                            <form th:action="@{/manager/reviews/hide/{id}(id=${review.id})}" method="post" class="hide-review-form m-0 inline">
-                                <button type="submit" class="bg-primary-container text-on-primary-container px-5 py-2 rounded-full font-label-caps text-[10px] uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all">
-                                    Hide
-                                </button>
-                            </form>
-                        </div>
+            <!-- Stat Card 3 -->
+            <div class="bg-surface rounded-lg p-8 shadow-sm shadow-primary/5 border border-outline-variant/10 flex flex-col justify-between group hover:shadow-md transition-all">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="font-label-caps text-label-caps text-earth-beige">Satisfaction Rate</span>
+                        <span class="material-symbols-outlined text-primary opacity-40 group-hover:opacity-100 transition-opacity">sentiment_very_satisfied</span>
                     </div>
-                </th:block>
+                    <div class="font-headline-md text-headline-md text-primary">96%</div>
+                </div>
+                <div class="mt-4 w-full bg-secondary-container h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-primary h-full w-[96%] transition-all duration-1000"></div>
+                </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Micro-interactions Script -->
-        <!-- Script removed for standard form submission -->
-    </div>
+        <!-- Table Section -->
+        <div class="bg-surface rounded-xl shadow-sm shadow-primary/5 border border-outline-variant/10 overflow-hidden">
+            <div class="px-8 py-6 border-b border-outline-variant/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <h3 class="font-headline-sm text-headline-sm text-primary">Recent Feedback</h3>
+                <div class="flex items-center gap-3">
+                    <button class="px-4 py-2 rounded-lg border border-outline-variant/50 text-earth-beige font-label-caps text-label-caps hover:bg-earth-beige/5 transition-colors flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filter
+                    </button>
+                    <button class="px-4 py-2 rounded-lg border border-outline-variant/50 text-earth-beige font-label-caps text-label-caps hover:bg-earth-beige/5 transition-colors flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">download</span>
+                        Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-sand-surface/50">
+                            <th class="px-8 py-4 font-label-caps text-label-caps text-earth-beige font-semibold uppercase tracking-wider">Booking ID</th>
+                            <th class="px-8 py-4 font-label-caps text-label-caps text-earth-beige font-semibold uppercase tracking-wider">Guest Name</th>
+                            <th class="px-8 py-4 font-label-caps text-label-caps text-earth-beige font-semibold uppercase tracking-wider">Star Rating</th>
+                            <th class="px-8 py-4 font-label-caps text-label-caps text-earth-beige font-semibold uppercase tracking-wider">Comment</th>
+                            <th class="px-8 py-4 font-label-caps text-label-caps text-earth-beige font-semibold uppercase tracking-wider text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/10">
+                        <tr th:if="${#lists.isEmpty(reviews)}">
+                            <td colspan="5" class="px-8 py-6 text-center text-earth-beige font-body-md">No reviews available.</td>
+                        </tr>
+                        
+                        <tr th:each="review : ${reviews}" class="hover:bg-earth-beige/[0.02] transition-colors group">
+                            <td class="px-8 py-6 font-label-caps text-label-caps text-primary" th:text="'#AW-' + ${review.bookingId}">#AW-9021</td>
+                            <td class="px-8 py-6">
+                                <a th:if="${review.guestId != null}" th:href="@{/manager/staff/profile/{id}(id=${review.guestId})}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                                    <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center font-bold text-primary text-[12px]" 
+                                         th:text="${review.guestName != null && review.guestName.length() >= 2 ? review.guestName.substring(0,2).toUpperCase() : 'GU'}">SJ</div>
+                                    <span class="font-body-md font-medium text-primary underline underline-offset-2" th:text="${review.guestName}">Sienna Johansson</span>
+                                </a>
+                                <div th:unless="${review.guestId != null}" class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center font-bold text-primary text-[12px]" 
+                                         th:text="${review.guestName != null && review.guestName.length() >= 2 ? review.guestName.substring(0,2).toUpperCase() : 'GU'}">SJ</div>
+                                    <span class="font-body-md font-medium" th:text="${review.guestName}">Sienna Johansson</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex gap-0.5 text-primary">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                          class="material-symbols-outlined text-[16px]"
+                                          th:classappend="${i <= review.rating} ? 'star-fill' : 'opacity-20'">grade</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6 max-w-xs xl:max-w-md">
+                                <p class="font-body-sm text-on-surface truncate italic" th:text="${review.comment}">"The aromatherapy session was absolute bliss..."</p>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <div class="flex items-center justify-end gap-3">
+                                    <a th:href="${review.guestId != null ? '/manager/staff/profile/' + review.guestId : '#'}" class="bg-primary text-white px-5 py-2.5 rounded-lg font-label-caps text-label-caps hover:bg-primary/90 active:scale-95 transition-all inline-block">View Details</a>
+                                    <form th:action="@{/manager/reviews/hide/{id}(id=${review.id})}" method="post" class="inline">
+                                        <button type="submit" class="border border-primary text-primary px-5 py-2.5 rounded-lg font-label-caps text-label-caps hover:bg-primary/5 active:scale-95 transition-all">Hide</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="px-8 py-6 border-t border-outline-variant/10 flex items-center justify-between">
+                <p class="font-label-sm text-label-sm text-earth-beige" th:text="'Showing ' + ${reviews.size()} + ' of ' + ${metrics.totalReviews} + ' reviews'">Showing 1-4 of 1,248 reviews</p>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 rounded-lg border border-outline-variant/30 text-earth-beige hover:bg-earth-beige/5 disabled:opacity-30" disabled="">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <button class="px-4 py-2 rounded-lg bg-primary text-white font-label-caps text-label-caps">1</button>
+                    <button class="p-2 rounded-lg border border-outline-variant/30 text-earth-beige hover:bg-earth-beige/5">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Floating Graphic / Quote -->
+        <div class="pt-margin-desktop text-center max-w-3xl mx-auto space-y-8">
+            <div class="w-16 h-1 bg-primary mx-auto rounded-full opacity-20"></div>
+            <blockquote class="font-headline-md text-headline-md italic text-primary leading-relaxed px-4">
+                "True wellness is the harmony of self and surroundings."
+            </blockquote>
+            <p class="font-label-caps text-label-caps tracking-widest text-earth-beige">â€” Lumina Philosophy â€”</p>
+        </div>
+    </section>
 </body>
 </html>

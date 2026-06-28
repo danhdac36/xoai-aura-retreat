@@ -1,225 +1,242 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::div})}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/admin-layout :: layout(~{::section})">
 <head>
-    <title>System Audit Log | Serenity Admin</title>
+    <title>System Audit Log</title>
 </head>
 <body>
-    <div class="w-full">
-        <!-- Load specific CSS and JS -->
-        <script th:src="@{/js/billing/audit-tailwind.js}"></script>
-        <link rel="stylesheet" th:href="@{/css/billing/audit.css}" />
+<section class="max-w-7xl mx-auto py-12 space-y-8 w-full">
+    <!-- Header Section -->
+    <header class="mb-section-gap flex justify-between items-end">
+        <div>
+            <h2 class="font-headline-md text-headline-md text-primary mb-2">System Audit Log</h2>
+            <p class="font-body-lg text-body-lg text-secondary/70">Secure, immutable record of all resort management actions.</p>
+        </div>
+        <div class="flex gap-4">
+            <button class="p-3 bg-surface-container-highest rounded-full flex items-center justify-center text-primary hover:opacity-70 transition-opacity">
+                <span class="material-symbols-outlined">download</span>
+            </button>
+            <button class="p-3 bg-surface-container-highest rounded-full flex items-center justify-center text-primary hover:opacity-70 transition-opacity">
+                <span class="material-symbols-outlined">print</span>
+            </button>
+        </div>
+    </header>
 
-        <!-- Page Heading -->
-        <div class="mb-12">
-            <h2 class="font-headline-md text-display-lg text-primary mb-4">System Audit Log</h2>
-            <p class="font-body-lg text-on-surface-variant max-w-2xl">Secure, immutable record of administrative actions and system events within the Aura Retreat ecosystem.</p>
+    <!-- Search and Filter Bar -->
+    <form th:action="@{/admin/audit}" method="get" class="mb-12 flex gap-4 items-center bg-white p-4 rounded-2xl shadow-[0_4px_20px_rgba(21,66,18,0.03)] border border-outline-variant/10">
+        <div class="relative flex-1 group">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary/40 group-focus-within:text-primary transition-colors">search</span>
+            <input name="search" th:value="${currentSearch}" class="w-full pl-12 pr-4 py-3 bg-sand-surface/50 border-none rounded-xl font-body-md focus:ring-1 focus:ring-primary/20 placeholder:text-secondary/40 transition-all" placeholder="Search logs by user or type..." type="text"/>
+        </div>
+        <button type="submit" class="flex items-center gap-2 px-6 py-3 bg-sand-surface hover:bg-surface-container-highest rounded-xl text-secondary font-label-caps text-label-caps transition-all border border-outline-variant/20">
+            <span class="material-symbols-outlined text-sm">filter_list</span>
+            FILTERS
+        </button>
+        <div class="h-8 w-px bg-outline-variant/30 mx-2"></div>
+        <div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-lg">
+            <span class="w-2 h-2 rounded-full bg-sage-success animate-pulse"></span>
+            <span class="font-label-sm text-label-sm text-secondary/60">LIVE UPDATING</span>
+        </div>
+    </form>
+
+    <!-- Data Table Section -->
+    <div class="bg-white rounded-[32px] overflow-hidden shadow-[0_8px_32px_rgba(21,66,18,0.04)] border border-outline-variant/10">
+        <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-surface-container-low/50">
+                        <th class="px-8 py-6 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Log ID</th>
+                        <th class="px-8 py-6 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Action Type</th>
+                        <th class="px-8 py-6 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Actor Name</th>
+                        <th class="px-8 py-6 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Target ID</th>
+                        <th class="px-8 py-6 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Timestamp</th>
+                        <th class="px-8 py-6 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/10">
+                    <tr th:if="${logsPage == null || logsPage.empty}">
+                        <td colspan="6" class="px-8 py-6 text-center text-secondary/60 font-body-md">No audit logs found.</td>
+                    </tr>
+                    <tr th:each="log : ${logsPage.content}" class="group hover:bg-sand-surface/40 transition-colors duration-200">
+                        <td class="px-8 py-6 font-body-md text-primary font-semibold" th:text="'#LOG-' + ${log.logId}">#LOG-89210</td>
+                        <td class="px-8 py-6">
+                            <span class="px-3 py-1 bg-sage-success/10 text-sage-success rounded-full font-label-caps text-[10px] tracking-wider border border-sage-success/20"
+                                  th:if="${log.actionType != null && log.actionType.contains('SUCCESS')}" th:text="${log.actionType}">SEC_LOGIN_SUCCESS</span>
+                            <span class="px-3 py-1 bg-terracotta-error/10 text-terracotta-error rounded-full font-label-caps text-[10px] tracking-wider border border-terracotta-error/20"
+                                  th:if="${log.actionType != null && log.actionType.contains('FAILED')}" th:text="${log.actionType}">SEC_LOGIN_FAILED</span>
+                            <span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-caps text-[10px] tracking-wider border border-on-secondary-container/10"
+                                  th:if="${log.actionType != null && !log.actionType.contains('SUCCESS') && !log.actionType.contains('FAILED')}" th:text="${log.actionType}">USER_UPDATE</span>
+                        </td>
+                        <td class="px-8 py-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed-variant font-bold text-xs"
+                                     th:text="${log.actorName != null && log.actorName.length() >= 2 ? log.actorName.substring(0,2).toUpperCase() : 'SY'}">JT</div>
+                                <span class="font-body-md text-on-surface" th:text="${log.actorName}">Julian Thorne</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6 font-body-sm text-secondary/70" th:text="${log.targetId != null ? '#' + log.targetId : 'N/A'}">#USR-004</td>
+                        <td class="px-8 py-6 font-body-sm text-secondary/70" th:text="${log.timestamp}">2023-10-24 14:22:01</td>
+                        <td class="px-8 py-6 text-right">
+                            <button class="px-4 py-2 border border-outline-variant text-primary rounded-lg font-label-caps text-[10px] hover:bg-primary hover:text-white transition-all tracking-widest"
+                                    th:data-id="${log.logId}"
+                                    onclick="openAuditDetailsModal(this.getAttribute('data-id'))">INSPECT</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <!-- Filter Bar Section -->
-        <section class="glass-card rounded-2xl p-6 mb-10 flex flex-wrap items-center justify-between gap-6">
-            <div class="flex items-center gap-4 flex-1 min-w-[300px]">
-                <div class="relative flex-1">
-                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/60">search</span>
-                    <input class="w-full bg-surface-container-low border-none rounded-full py-3 pl-12 pr-6 focus:ring-2 focus:ring-primary-container text-body-md font-body-md transition-all" placeholder="Search by Actor, Log ID or Target..." type="text"/>
-                </div>
-                <div class="relative">
-                    <select class="appearance-none bg-surface-container-low border-none rounded-full py-3 pl-6 pr-12 focus:ring-2 focus:ring-primary-container text-label-caps font-label-caps text-on-surface cursor-pointer">
-                        <option>All Actions</option>
-                        <option>Security</option>
-                        <option>Reviews</option>
-                        <option>Financial</option>
-                        <option>System</option>
-                    </select>
-                    <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
-                </div>
-                <div class="relative">
-                    <button class="bg-surface-container-low px-6 py-3 rounded-full flex items-center gap-3 text-label-caps font-label-caps text-on-surface hover:bg-secondary-container/20 transition-all">
-                        <span class="material-symbols-outlined text-[20px]">calendar_today</span>
-                        Oct 01 - Oct 31, 2023
-                        <span class="material-symbols-outlined text-[18px]">expand_more</span>
-                    </button>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <button class="p-3 rounded-full bg-surface-container-low text-on-surface-variant hover:text-primary transition-all shadow-sm">
-                    <span class="material-symbols-outlined">filter_list</span>
-                </button>
-                <button class="p-3 rounded-full bg-surface-container-low text-on-surface-variant hover:text-primary transition-all shadow-sm">
-                    <span class="material-symbols-outlined">download</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Data Table Section -->
-        <section class="bg-white rounded-3xl shadow-[0_10px_40px_rgba(45,90,39,0.05)] overflow-hidden">
-            <div class="overflow-x-auto custom-scrollbar">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-surface-container-low/50">
-                            <th class="px-8 py-5 font-label-caps text-[12px] uppercase tracking-wider text-on-surface-variant border-b border-outline-variant/10">Log ID</th>
-                            <th class="px-6 py-5 font-label-caps text-[12px] uppercase tracking-wider text-on-surface-variant border-b border-outline-variant/10">Action Type</th>
-                            <th class="px-6 py-5 font-label-caps text-[12px] uppercase tracking-wider text-on-surface-variant border-b border-outline-variant/10">Actor Name</th>
-                            <th class="px-6 py-5 font-label-caps text-[12px] uppercase tracking-wider text-on-surface-variant border-b border-outline-variant/10">Target ID</th>
-                            <th class="px-6 py-5 font-label-caps text-[12px] uppercase tracking-wider text-on-surface-variant border-b border-outline-variant/10">Timestamp</th>
-                            <th class="px-8 py-5 font-label-caps text-[12px] uppercase tracking-wider text-on-surface-variant border-b border-outline-variant/10 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-outline-variant/10">
-                        <th:block th:each="log : ${logsPage.content}">
-                            <tr class="data-table-row group hover:bg-secondary-container/10 transition-colors">
-                                <td class="px-8 py-6 font-mono text-[13px] text-on-surface-variant" th:text="${log.logId}">8924</td>
-                                <td class="px-6 py-6">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-error-container/20 text-error font-label-caps text-[10px] tracking-widest font-bold" th:text="${log.actionType}">HIDE_REVIEW</span>
-                                </td>
-                                <td class="px-6 py-6">
-                                    <a class="font-body-md text-primary font-semibold hover:underline" th:href="@{/manager/staff/profile/{id}(id=${log.actorId})}" th:text="${log.actorName}">Admin_Eleanor</a>
-                                </td>
-                                <td class="px-6 py-6">
-                                    <a class="text-primary-container border-b border-primary-container/30 hover:border-primary-container transition-all" href="#" th:text="${log.targetId}">REV-4492-B</a>
-                                </td>
-                                <td class="px-6 py-6 text-on-surface-variant/80 text-body-md" th:text="${log.timestamp}">Oct 31, 2023, 14:30</td>
-                                <td class="px-8 py-6 text-right">
-                                    <button class="inspect-btn py-2 px-5 rounded-full border border-primary-container text-primary-container font-label-caps text-[11px] hover:bg-primary-container hover:text-on-primary transition-all duration-300" th:data-details="${log.details}" th:data-id="${log.logId}">INSPECT</button>
-                                </td>
-                            </tr>
-                        </th:block>
-                        <tr th:if="${logsPage.empty}">
-                            <td colspan="6" class="px-8 py-10 text-center text-on-surface-variant">No audit logs found.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Pagination Footer -->
-            <div th:if="${!logsPage.empty}" class="px-8 py-6 flex items-center justify-between border-t border-outline-variant/10 bg-surface-container-low/20">
-                <p class="font-label-caps text-[11px] text-on-surface-variant tracking-wide" th:text="'Showing page ' + ${logsPage.number + 1} + ' of ' + ${logsPage.totalPages}">Showing 1 of 1</p>
-                <div class="flex items-center gap-2">
-                    <a th:if="${logsPage.hasPrevious()}" th:href="@{/admin/audit(page=${logsPage.number - 1})}" class="w-10 h-10 flex items-center justify-center rounded-full border border-outline-variant/30 text-on-surface-variant hover:border-primary transition-all">
-                        <span class="material-symbols-outlined text-[20px]">chevron_left</span>
-                    </a>
-                    <span th:unless="${logsPage.hasPrevious()}" class="w-10 h-10 flex items-center justify-center rounded-full border border-outline-variant/30 text-outline-variant">
-                        <span class="material-symbols-outlined text-[20px]">chevron_left</span>
-                    </span>
-                    
-                    <button class="w-10 h-10 flex items-center justify-center rounded-full bg-primary-container text-on-primary font-bold text-[12px]" th:text="${logsPage.number + 1}">1</button>
-                    
-                    <a th:if="${logsPage.hasNext()}" th:href="@{/admin/audit(page=${logsPage.number + 1})}" class="w-10 h-10 flex items-center justify-center rounded-full border border-outline-variant/30 text-on-surface-variant hover:border-primary transition-all">
-                        <span class="material-symbols-outlined text-[20px]">chevron_right</span>
-                    </a>
-                    <span th:unless="${logsPage.hasNext()}" class="w-10 h-10 flex items-center justify-center rounded-full border border-outline-variant/30 text-outline-variant">
-                        <span class="material-symbols-outlined text-[20px]">chevron_right</span>
-                    </span>
-                </div>
-            </div>
-        </section>
-
-
-
-        <!-- Inspect Modal -->
-        <div id="inspectModal" class="fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-400">
-            <!-- Blur overlay -->
-            <div class="absolute inset-0 bg-[#000000]/40 backdrop-blur-md transition-opacity" onclick="closeModal()"></div>
-            
-            <!-- Modal Content -->
-            <div class="bg-surface border border-outline-variant/20 shadow-[0_24px_80px_rgba(45,90,39,0.15)] rounded-[32px] p-8 md:p-10 relative z-10 w-full max-w-lg transform scale-95 transition-all duration-400 ease-out" id="modalCard">
-                <button onclick="closeModal()" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest hover:bg-surface-container-highest transition-colors text-on-surface-variant hover:text-on-surface">
-                    <span class="material-symbols-outlined text-[20px]">close</span>
-                </button>
+        <!-- Table Footer / Pagination -->
+        <div class="px-8 py-6 bg-surface-container-low/30 flex justify-between items-center border-t border-outline-variant/10" th:if="${logsPage != null && !logsPage.empty}">
+            <span class="font-body-sm text-secondary/60" th:text="'Showing page ' + (${logsPage.number} + 1) + ' of ' + ${logsPage.totalPages}">Showing 1 of 1</span>
+            <div class="flex gap-2">
+                <a th:if="${logsPage.hasPrevious()}" th:href="@{/admin/audit(page=${logsPage.number - 1}, search=${currentSearch})}" class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant/30 text-secondary hover:bg-sand-surface transition-all">
+                    <span class="material-symbols-outlined text-xl">chevron_left</span>
+                </a>
+                <span th:unless="${logsPage.hasPrevious()}" class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant/30 text-secondary/30 cursor-not-allowed">
+                    <span class="material-symbols-outlined text-xl">chevron_left</span>
+                </span>
                 
-                <div class="flex items-center gap-5 mb-8">
-                    <div class="w-14 h-14 rounded-full bg-primary-container/30 flex items-center justify-center text-primary border border-primary/10">
-                        <span class="material-symbols-outlined text-[28px]" data-icon="manage_search">manage_search</span>
-                    </div>
-                    <div>
-                        <h3 class="font-headline-sm text-on-surface">System Action Details</h3>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="w-2 h-2 rounded-full bg-primary"></span>
-                            <p class="font-label-caps text-[10px] tracking-widest text-on-surface-variant uppercase" id="modalLogId">ID</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="font-mono text-sm bg-surface-container-lowest rounded-[24px] p-6 border border-outline-variant/10 shadow-inner" id="modalDetailsContent">
-                    <!-- Dynamic details go here -->
-                </div>
+                <span class="px-4 h-10 flex items-center justify-center rounded-lg bg-primary text-on-primary font-bold" th:text="${logsPage.number + 1}">1</span>
                 
-                <div class="mt-8 flex justify-end">
-                    <button onclick="closeModal()" class="bg-primary text-on-primary px-8 py-3.5 rounded-full font-label-caps text-[11px] tracking-[0.15em] hover:shadow-xl hover:shadow-primary/30 transition-all hover:-translate-y-1 active:translate-y-0">
-                        ACKNOWLEDGE
-                    </button>
+                <a th:if="${logsPage.hasNext()}" th:href="@{/admin/audit(page=${logsPage.number + 1}, search=${currentSearch})}" class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant/30 text-secondary hover:bg-sand-surface transition-all">
+                    <span class="material-symbols-outlined text-xl">chevron_right</span>
+                </a>
+                <span th:unless="${logsPage.hasNext()}" class="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant/30 text-secondary/30 cursor-not-allowed">
+                    <span class="material-symbols-outlined text-xl">chevron_right</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Visualization (Quick Overview) -->
+    <div class="mt-section-gap grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="p-8 bg-white rounded-3xl shadow-[0_4px_20px_rgba(21,66,18,0.02)] border border-outline-variant/10">
+            <p class="font-label-caps text-label-caps text-secondary/60 mb-4">Total Security Events</p>
+            <div class="flex items-end justify-between">
+                <h3 class="font-display-lg text-[40px] leading-none text-primary" th:text="${logsPage != null ? logsPage.totalElements : '0'}">1,402</h3>
+                <span class="font-body-sm text-sage-success flex items-center gap-1 mb-1">
+                    <span class="material-symbols-outlined text-sm">trending_up</span> Live
+                </span>
+            </div>
+        </div>
+        <div class="p-8 bg-white rounded-3xl shadow-[0_4px_20px_rgba(21,66,18,0.02)] border border-outline-variant/10">
+            <p class="font-label-caps text-label-caps text-secondary/60 mb-4">Storage Consumption</p>
+            <div class="flex items-end justify-between">
+                <h3 class="font-display-lg text-[40px] leading-none text-primary">12.4 GB</h3>
+                <span class="font-body-sm text-secondary/40 mb-1">90 days retention</span>
+            </div>
+        </div>
+        <div class="p-8 bg-white rounded-3xl shadow-[0_4px_20px_rgba(21,66,18,0.02)] border border-outline-variant/10">
+            <p class="font-label-caps text-label-caps text-secondary/60 mb-4">Uptime Integrity</p>
+            <div class="flex items-end justify-between">
+                <h3 class="font-display-lg text-[40px] leading-none text-primary">99.9%</h3>
+                <div class="flex gap-1 mb-1">
+                    <div class="w-1 h-4 bg-sage-success rounded-full"></div>
+                    <div class="w-1 h-4 bg-sage-success rounded-full"></div>
+                    <div class="w-1 h-4 bg-sage-success rounded-full"></div>
+                    <div class="w-1 h-4 bg-sage-success rounded-full"></div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Script -->
-        <script>
-            let modal, modalCard, modalDetails, modalLogId;
+    <!-- Aesthetic Quote Section -->
+    <div class="mt-section-gap py-12 text-center max-w-2xl mx-auto opacity-40">
+        <blockquote class="font-headline-sm italic text-primary mb-6">
+            "Integrity is doing the right thing, even when no one is watching."
+        </blockquote>
+        <cite class="font-label-caps text-label-caps text-secondary tracking-[0.2em]">— SECURITY COMPLIANCE OFFICE</cite>
+    </div>
 
-            function openModal(logId, detailsRaw) {
-                if(!modal) return;
-                let formatted = '';
-                try {
-                    if (detailsRaw && detailsRaw.includes(':')) {
-                        const pairs = detailsRaw.split(',').map(s => s.trim());
-                        formatted = pairs.map(p => {
-                            const splitIdx = p.indexOf(':');
-                            if (splitIdx === -1) return `<div class="py-1">${p}</div>`;
-                            const rawK = p.substring(0, splitIdx).trim();
-                            // Convert camelCase to Title Case: totalActiveFolios -> Total Active Folios
-                            const k = rawK.replace(/([A-Z])/g, ' $1').trim();
-                            const v = p.substring(splitIdx + 1).trim();
+    <!-- Modal for JSON Details -->
+    <div id="auditDetailsModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-primary/20 backdrop-blur-sm transition-all duration-300 opacity-0 pointer-events-none">
+        <div class="bg-white rounded-[32px] shadow-2xl border border-outline-variant/10 w-[90%] max-w-2xl overflow-hidden flex flex-col max-h-[80vh] transform scale-95 transition-transform duration-300">
+            <div class="px-8 py-6 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low/30">
+                <h3 class="font-headline-sm text-primary">System Action Details</h3>
+                <button onclick="closeAuditDetailsModal()" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:bg-error/10 hover:text-error transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="px-8 py-4 bg-primary-container/30 border-b border-outline-variant/10 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                <p class="font-label-caps text-[10px] tracking-widest text-secondary uppercase">LOG ID: <span id="auditDetailsLogId">#</span></p>
+            </div>
+            <div class="p-8 overflow-y-auto custom-scrollbar flex-1 bg-surface-container-lowest" id="auditDetailsContent">
+                <!-- Data goes here -->
+            </div>
+            <div class="px-8 py-6 border-t border-outline-variant/10 flex justify-end bg-surface-container-lowest">
+                <button onclick="closeAuditDetailsModal()" class="bg-primary text-on-primary px-8 py-3 rounded-full font-label-caps text-[11px] tracking-[0.15em] hover:opacity-90 transition-all">
+                    ACKNOWLEDGE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('auditDetailsModal');
+        const contentPre = document.getElementById('auditDetailsContent');
+        const modalLogId = document.getElementById('auditDetailsLogId');
+
+        function openAuditDetailsModal(id) {
+            if(!modal) return;
+            // Show modal with flex display and animation
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // trigger reflow for animation
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.children[0].classList.remove('scale-95');
+
+            modalLogId.innerText = id;
+            contentPre.innerHTML = '<div class="py-3 text-secondary text-center"><span class="material-symbols-outlined animate-spin text-[24px]">sync</span><p class="mt-2 text-sm">Loading details...</p></div>';
+
+            fetch('/admin/audit/details/' + id, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json' }
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('Network error: ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    let formatted = '';
+                    if (Object.keys(data).length > 0) {
+                        formatted = Object.keys(data).map(k => {
+                            // Convert camelCase to Title Case
+                            const titleK = k.replace(/([A-Z])/g, ' $1').trim().replace(/^./, str => str.toUpperCase());
+                            const v = data[k];
                             return `<div class="flex justify-between items-center py-3 border-b border-outline-variant/10 last:border-0">
-                                <span class="text-on-surface-variant/70 font-label-caps text-[11px] uppercase tracking-wider">${k}</span>
-                                <span class="text-on-surface font-semibold text-[13px]">${v}</span>
+                                <span class="text-secondary/70 font-label-caps text-[11px] uppercase tracking-wider">${titleK}</span>
+                                <span class="text-primary font-semibold text-[13px] break-words text-right max-w-[60%]">${v}</span>
                             </div>`;
                         }).join('');
                     } else {
-                        formatted = `<div class="py-3 text-on-surface-variant leading-relaxed">${detailsRaw || 'No details provided.'}</div>`;
+                        formatted = `<div class="py-3 text-secondary leading-relaxed text-center">No additional details provided.</div>`;
                     }
-                } catch(e) {
-                    formatted = `<div class="py-3">${detailsRaw}</div>`;
-                }
-
-                modalLogId.innerText = logId;
-                modalDetails.innerHTML = formatted;
-
-                modal.classList.remove('opacity-0', 'pointer-events-none');
-                modalCard.classList.remove('scale-95');
-                modalCard.classList.add('scale-100');
-            }
-
-            function closeModal() {
-                if(!modal) return;
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                modalCard.classList.remove('scale-100');
-                modalCard.classList.add('scale-95');
-            }
-
-            document.addEventListener('DOMContentLoaded', () => {
-                document.querySelectorAll('button').forEach(btn => {
-                    if(!btn.classList.contains('inspect-btn') && !btn.hasAttribute('onclick')) {
-                        btn.addEventListener('mousedown', function() {
-                            this.style.transform = 'scale(0.97)';
-                        });
-                        btn.addEventListener('mouseup', function() {
-                            this.style.transform = 'scale(1)';
-                        });
-                    }
+                    contentPre.innerHTML = formatted;
+                })
+                .catch(err => {
+                    console.error('Error fetching details:', err);
+                    contentPre.innerHTML = `<div class="py-3 text-error text-center">Failed to load details. Please try again.</div>`;
                 });
+        }
 
-                // Initialize modal elements safely
-                modal = document.getElementById('inspectModal');
-                modalCard = document.getElementById('modalCard');
-                modalDetails = document.getElementById('modalDetailsContent');
-                modalLogId = document.getElementById('modalLogId');
+        function closeAuditDetailsModal() {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.children[0].classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
 
-                document.querySelectorAll('.inspect-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        openModal(this.getAttribute('data-id'), this.getAttribute('data-details'));
-                    });
-                });
-            });
-        </script>
-    </div>
+        // Close on click outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeAuditDetailsModal();
+        });
+    </script>
+</section>
 </body>
 </html>

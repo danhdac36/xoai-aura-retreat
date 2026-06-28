@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import org.springframework.data.domain.Page;
 import java.util.List;
 
 @Controller
@@ -20,6 +21,9 @@ public class BookingHistoryController {
 
     @GetMapping("/booking/history")
     public String viewHistory(@RequestParam(value = "guestId", required = false) Integer guestId,
+                              @RequestParam(value = "page", defaultValue = "0") int page,
+                              @RequestParam(value = "size", defaultValue = "5") int size,
+                              @RequestParam(value = "status", required = false) String status,
                               @AuthenticationPrincipal UserDetailsResponse currentUser,
                               Model model) {
         if (currentUser == null) {
@@ -39,8 +43,11 @@ public class BookingHistoryController {
             }
         }
 
-        List<BookingHistoryDTO> bookings = itineraryService.getBookingHistory(targetGuestId);
-        model.addAttribute("bookings", bookings);
+        Page<BookingHistoryDTO> bookingsPage = itineraryService.getBookingHistory(targetGuestId, status, page, size);
+        model.addAttribute("bookingsPage", bookingsPage);
+        model.addAttribute("currentStatus", status);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("targetGuestId", targetGuestId);
         return "guest/itinerary_history";
     }
 }

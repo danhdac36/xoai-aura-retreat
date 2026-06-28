@@ -18,6 +18,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -146,13 +150,19 @@ public class ItineraryServiceImpl implements ItineraryService {
 
     @Override
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> getBookingHistory(Integer guestId) {
-        List<Booking> bookings = bookingRepository.findByGuestId(guestId);
-        List<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> history = new ArrayList<>();
-        for (Booking b : bookings) {
-            String packageName = b.getRetreatPackage() != null ? b.getRetreatPackage().getPackageName() : "Chưa đăng ký gói";
-            String villaName = b.getAssignedVilla() != null ? b.getAssignedVilla().getVillaCode() : "Chưa xếp phòng";
-            history.add(com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO.builder()
+    public Page<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> getBookingHistory(Integer guestId, String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<Booking> bookingsPage;
+        if (status != null && !status.isEmpty() && !status.equalsIgnoreCase("ALL")) {
+            bookingsPage = bookingRepository.findByGuestIdAndBookingStatus(guestId, status, pageable);
+        } else {
+            bookingsPage = bookingRepository.findByGuestId(guestId, pageable);
+        }
+
+        return bookingsPage.map(b -> {
+            String packageName = b.getRetreatPackage() != null ? b.getRetreatPackage().getPackageName() : "Chua dang ky goi";
+            String villaName = b.getAssignedVilla() != null ? b.getAssignedVilla().getVillaCode() : "Chua xep phong";
+            return com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO.builder()
                     .bookingId(b.getId())
                     .packageName(packageName)
                     .villaName(villaName)
@@ -160,9 +170,8 @@ public class ItineraryServiceImpl implements ItineraryService {
                     .checkOutDate(b.getCheckoutDate())
                     .totalAmount(b.getRetreatPackage() != null && b.getRetreatPackage().getPrice() != null ? b.getRetreatPackage().getPrice().doubleValue() : 0.0)
                     .status(b.getBookingStatus())
-                    .build());
-        }
-        return history;
+                    .build();
+        });
     }
 
     @Override

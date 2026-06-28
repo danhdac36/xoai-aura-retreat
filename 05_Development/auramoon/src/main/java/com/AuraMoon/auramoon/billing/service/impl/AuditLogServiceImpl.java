@@ -25,8 +25,21 @@ public class AuditLogServiceImpl implements IAuditLogService {
     }
 
     @Override
-    public Page<AuditLogDTO> getLogs(String actionType, int page, int size) {
-        Page<com.AuraMoon.auramoon.billing.entity.AuditLog> logs = auditLogRepository.findAll(PageRequest.of(page, size));
+    public Page<AuditLogDTO> getLogs(String keyword, int page, int size) {
+        Page<com.AuraMoon.auramoon.billing.entity.AuditLog> logs;
+        org.springframework.data.domain.Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "timestamp"));
+        
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            java.util.List<Integer> userIds = userRepository.findByFullNameContainingIgnoreCase(keyword.trim())
+                    .stream().map(User::getId).collect(java.util.stream.Collectors.toList());
+            if (userIds.isEmpty()) {
+                userIds.add(-1); // dummy ID so query doesn't fail
+            }
+            logs = auditLogRepository.findByActionTypeContainingIgnoreCaseOrActorIdIn(keyword.trim(), userIds, pageable);
+        } else {
+            logs = auditLogRepository.findAll(pageable);
+        }
+        
         return logs.map(log -> {
             String actorName = userRepository.findById(log.getActorId())
                     .map(User::getFullName) // assuming User has getFullName() or getUsername(). I will use getFullName() and if it doesn't exist, I'll fallback. Wait, let me check User entity first!
@@ -45,6 +58,8 @@ public class AuditLogServiceImpl implements IAuditLogService {
 
     @Override
     public String getDetailsById(int id) {
-        return "{}";
+        return auditLogRepository.findById(id)
+                .map(com.AuraMoon.auramoon.billing.entity.AuditLog::getDetails)
+                .orElse("{}");
     }
 }

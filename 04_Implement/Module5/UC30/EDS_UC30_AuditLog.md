@@ -357,8 +357,8 @@ public interface IAuditLogService {
     /** Ghi log — System call nội bộ, @Async */
     void logActivity(String actionType, Integer actorId, Integer targetId);
 
-    /** BỔ SUNG: Truy vấn log kèm bộ lọc và phân trang */
-    Page<AuditLogDTO> getLogs(String actionType, int page, int size);
+    /** BỔ SUNG: Truy vấn log kèm bộ lọc từ khóa và phân trang */
+    Page<AuditLogDTO> getLogs(String keyword, int page, int size);
 
     /** BỔ SUNG: Lấy chi tiết JSON của 1 log — dùng cho Modal Popup */
     String getDetailsById(int id);
@@ -434,7 +434,7 @@ public class AuditLogDTO {
 
 **Controller Method (Trang chính)**:
 ```java
-// File: billing/controller/AuditLogController.java — CẦN TẠO MỚI
+// File: billing/controller/AuditLogController.java
 @Controller
 @RequestMapping("/admin/audit")
 @RequiredArgsConstructor
@@ -442,12 +442,14 @@ public class AuditLogController {
     private final IAuditLogService auditLogService;
 
     @GetMapping
-    public String dashboard(@RequestParam(required = false) String type,
-                            @RequestParam(defaultValue = "1") int page,
-                            Model model) {
-        Page<AuditLogDTO> logs = auditLogService.getLogs(type, page, 20);
-        model.addAttribute("logs", logs);
-        model.addAttribute("selectedType", type);
+    @PreAuthorize("hasRole('ADMIN')")
+    public String renderDashboard(
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            Model model) {
+        Page<AuditLogDTO> logs = auditLogService.getLogs(search, page, 10);
+        model.addAttribute("logsPage", logs);
+        model.addAttribute("currentSearch", search);
         return "admin/audit";  // Thymeleaf view
     }
 

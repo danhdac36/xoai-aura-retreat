@@ -26,6 +26,7 @@
 | :--- | :--- | :--- |
 | 2026-06-26 | Phùng Giang Hải | Tạo tài liệu lần đầu. |
 | 2026-06-26 | Phùng Giang Hải | **v2.0**: Đối chiếu toàn bộ với DB.sql, Entity files (`User.java`, `Therapist.java`), Enums (`UserStatus`, `TherapistStatus`, `TreatmentBookingStatus`), SecurityConfig. Sửa cách lấy `completedSessions` từ `TreatmentBookingRepository`. Xác nhận module HR chưa tồn tại — cần tạo mới. Thêm quy định CSS/JS module. |
+| 2026-06-28 | Phùng Giang Hải | **v2.1**: Nâng cấp thuật toán lấy dữ liệu Activity History. Bổ sung việc phân loại role (GUEST, THERAPIST, MANAGER) để trả về AuditLog phù hợp (Booking History cho Guest, Treatment Sessions cho Therapist). |
 
 ---
 
@@ -384,10 +385,21 @@ public class StaffProfileAggregator implements IStaffProfileAggregator {
             dto.setCompletedSessions(completed);
         }
 
-        // 3. Lấy 10 hoạt động gần nhất từ Audit Log
-        List<AuditLog> activities = auditLogRepository
-                .findTop10ByActorIdOrderByTimestampDesc(staffId);
-        // Convert to DTO list...
+        // 3. Xây dựng Activity History tùy theo Role
+        List<AuditLogDTO> activities = new ArrayList<>();
+        if ("GUEST".equalsIgnoreCase(user.getRole().getRoleName())) {
+            // Logic lấy danh sách Booking History của Guest và map sang AuditLogDTO
+            // Ví dụ: ActionType = "ĐẶT GÓI NGHỈ DƯỠNG"
+        } else if ("THERAPIST".equalsIgnoreCase(user.getRole().getRoleName())) {
+            // Logic lấy danh sách Treatment Booking hoàn thành và map sang AuditLogDTO
+            // Ví dụ: ActionType = "THỰC HIỆN TRỊ LIỆU"
+        } else {
+            // Quản lý / System Admin: Lấy từ bảng AuditLog
+            List<AuditLog> dbLogs = auditLogRepository
+                    .findTop10ByActorIdOrderByTimestampDesc(staffId);
+            // Convert to DTO list...
+        }
+        dto.setRecentActivities(activities);
 
         return dto;
     }

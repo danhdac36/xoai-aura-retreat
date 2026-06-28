@@ -8,7 +8,7 @@ import java.util.List;
 public interface ItineraryService {
     ItineraryTimelineDTO getTimelineForGuest(Integer guestId);
 
-    List<BookingHistoryDTO> getBookingHistory(Integer guestId);
+    org.springframework.data.domain.Page<BookingHistoryDTO> getBookingHistory(Integer guestId, String status, int page, int size);
 
     ItineraryTimelineDTO getTimelineForBooking(Integer bookingId);
 }
