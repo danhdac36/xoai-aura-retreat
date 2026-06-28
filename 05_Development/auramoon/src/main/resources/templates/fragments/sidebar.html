@@ -96,6 +96,15 @@
                         <span class="text-[13px] tracking-wide font-medium">Dashboard</span>
                     </a>
                 </li>
+                <!--Account manage-->
+                <li sec:authorize="hasAnyRole('ADMIN')">
+                    <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/manager/account}">
+                        <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
+                        <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">group</span>
+                        <span class="text-[13px] tracking-wide font-medium">User Accounts</span>
+                    </a>
+                </li>
+                <!--Report export -->
                 <li sec:authorize="hasAnyRole('MANAGER','ADMIN')">
                     <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/manager/report}">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
@@ -117,7 +126,7 @@
                         <span class="text-[13px] tracking-wide font-medium">Night Audit</span>
                     </a>
                 </li>
-                <li sec:authorize="hasAnyRole('MANAGER','ADMIN')">
+                <li sec:authorize="hasAnyRole('MANAGER','ADMIN','GUEST')">
                     <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/packages}">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
                         <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">layers</span>
