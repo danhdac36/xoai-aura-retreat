@@ -23,8 +23,7 @@ public class HousekeepingServiceImpl implements IHousekeepingService {
 
     @Override
     public List<Villa> getDirtyAndCleaningVillas() {
-        return villaRepository.findByCleaningStatusInAndIsDeleteFalse(
-                Arrays.asList("DIRTY", "CLEANING"));
+        return villaRepository.findHousekeepingVillas(Arrays.asList("DIRTY", "CLEANING"), "MAINTENANCE");
     }
 
     @Override
@@ -74,5 +73,37 @@ public class HousekeepingServiceImpl implements IHousekeepingService {
 
         auditLogRepository.saveAuditLog("HOUSEKEEPING_REJECT", actorId,
                 "Villa " + villa.getVillaCode() + " rejected. Re-clean required.");
+    }
+
+    @Override
+    @Transactional
+    public void reportMaintenance(Integer villaId, String maintenanceNote, Integer actorId) {
+        Villa villa = villaRepository.findById(villaId)
+                .orElseThrow(() -> new RuntimeException("Villa not found with id: " + villaId));
+
+        villa.setVillaStatus("MAINTENANCE");
+        villa.setMaintenanceNote(maintenanceNote);
+        villaRepository.save(villa);
+
+        auditLogRepository.saveAuditLog("HOUSEKEEPING_MAINTENANCE_REPORT", actorId,
+                "Villa " + villa.getVillaCode() + " reported for maintenance. Note: " + maintenanceNote);
+    }
+
+    @Override
+    @Transactional
+    public void resolveMaintenance(Integer villaId, Integer actorId) {
+        Villa villa = villaRepository.findById(villaId)
+                .orElseThrow(() -> new RuntimeException("Villa not found with id: " + villaId));
+
+        if (!"MAINTENANCE".equals(villa.getVillaStatus())) {
+            throw new IllegalStateException("Villa is not in MAINTENANCE status.");
+        }
+
+        villa.setVillaStatus("AVAILABLE");
+        villa.setMaintenanceNote(null);
+        villaRepository.save(villa);
+
+        auditLogRepository.saveAuditLog("HOUSEKEEPING_MAINTENANCE_RESOLVED", actorId,
+                "Villa " + villa.getVillaCode() + " maintenance resolved.");
     }
 }

@@ -13,3 +13,13 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
+function promptReportMaintenance(villaId) {
+    document.getElementById('modalVillaId').value = villaId;
+    document.getElementById('modalMaintenanceNote').value = '';
+    document.getElementById('maintenanceModal').classList.remove('hidden');
+}
+
+function closeMaintenanceModal() {
+    document.getElementById('maintenanceModal').classList.add('hidden');
+}

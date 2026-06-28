@@ -83,4 +83,35 @@ public class HousekeepingController {
         }
         return "redirect:/manager/housekeeping";
     }
+
+    @PostMapping("/report-maintenance")
+    public String reportMaintenance(
+            @RequestParam("villaId") Integer villaId,
+            @RequestParam("maintenanceNote") String maintenanceNote,
+            @AuthenticationPrincipal User actor,
+            RedirectAttributes redirectAttributes) {
+        try {
+            Integer actorId = (actor != null && actor.getId() != null) ? actor.getId() : 1;
+            housekeepingService.reportMaintenance(villaId, maintenanceNote, actorId);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã báo bảo trì và khóa phòng (MAINTENANCE).");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi báo bảo trì: " + e.getMessage());
+        }
+        return "redirect:/manager/housekeeping";
+    }
+
+    @PostMapping("/resolve-maintenance")
+    public String resolveMaintenance(
+            @RequestParam("villaId") Integer villaId,
+            @AuthenticationPrincipal User actor,
+            RedirectAttributes redirectAttributes) {
+        try {
+            Integer actorId = (actor != null && actor.getId() != null) ? actor.getId() : 1;
+            housekeepingService.resolveMaintenance(villaId, actorId);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xác nhận sửa xong, phòng sẵn sàng.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi xác nhận sửa xong: " + e.getMessage());
+        }
+        return "redirect:/manager/housekeeping";
+    }
 }

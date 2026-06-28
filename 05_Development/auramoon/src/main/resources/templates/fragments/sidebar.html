@@ -86,7 +86,7 @@
                 <li sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
                     <div class="text-[9px] uppercase tracking-[0.25em] text-outline/40 mb-3 px-6 font-semibold mt-8">Management</div>
                 </li>
-                <li sec:authorize="hasAnyRole('ADMIN')">
+                <li sec:authorize="hasAnyRole('ADMIN', 'MANAGER')">
                     <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/manager/dashboard}">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
                         <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">dashboard</span>

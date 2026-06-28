@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 public class AuditLogControllerTest {
 
     @Autowired
@@ -23,17 +23,25 @@ public class AuditLogControllerTest {
     private IAuditLogService auditLogService;
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     public void shouldRenderDashboardForAdmin() throws Exception {
-        mockMvc.perform(get("/admin/audit"))
+        com.AuraMoon.auramoon.auth.entity.User adminUser = com.AuraMoon.auramoon.auth.entity.User.builder()
+                .id(1).fullName("Admin").role(new com.AuraMoon.auramoon.auth.entity.Role(1, "ADMIN")).build();
+        com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse mockAdminDetails = new com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse(adminUser);
+
+        mockMvc.perform(get("/admin/audit")
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(mockAdminDetails)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/audit"));
     }
 
     @Test
-    @WithMockUser(roles = "MANAGER")
     public void shouldDenyAccessToManager() throws Exception {
-        mockMvc.perform(get("/admin/audit"))
+        com.AuraMoon.auramoon.auth.entity.User managerUser = com.AuraMoon.auramoon.auth.entity.User.builder()
+                .id(2).fullName("Manager").role(new com.AuraMoon.auramoon.auth.entity.Role(2, "MANAGER")).build();
+        com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse mockManagerDetails = new com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse(managerUser);
+
+        mockMvc.perform(get("/admin/audit")
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(mockManagerDetails)))
                 .andExpect(status().isForbidden());
     }
 }
