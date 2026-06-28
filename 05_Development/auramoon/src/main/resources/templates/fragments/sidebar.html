@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 
 <body>
     <aside th:fragment="sidebar" sec:authorize="isAuthenticated()"
@@ -29,7 +30,7 @@
         <nav class="flex-1 overflow-y-auto sidebar-scroll pb-10">
             <ul class="space-y-1">
                 
-                <!-- GENERAL -->
+                <!-- GENERAL - HOME FOR EACH ROLE -->
                 <li><div class="text-[9px] uppercase tracking-[0.25em] text-outline/40 mb-3 px-6 font-semibold mt-2">General</div></li>
                 
                 <li sec:authorize="hasRole('ADMIN')">
@@ -57,7 +58,7 @@
                     <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/therapist/home}">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
                         <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">home</span>
-                        <span class="text-[13px] tracking-wide font-medium">Home (Therapist)</span>
+                        <span class="text-[13px] tracking-wide font-medium">Home (Treatment staff)</span>
                     </a>
                 </li>
                 <li sec:authorize="hasRole('CHEFF')">
@@ -74,6 +75,8 @@
                         <span class="text-[13px] tracking-wide font-medium">Home (Guest)</span>
                     </a>
                 </li>
+                <!-- END HOME -->
+
                 <li sec:authorize="hasRole('GUEST')">
                     <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/booking/itinerary}">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>

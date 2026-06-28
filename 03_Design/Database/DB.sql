@@ -98,7 +98,8 @@ CREATE TABLE VILLA_TYPE (
     type_name NVARCHAR(50) NOT NULL,
     image NVARCHAR(MAX),
     price_per_day DECIMAL(18, 2),
-    is_delete BIT DEFAULT 0
+    is_delete BIT DEFAULT 0,
+    CONSTRAINT FK_BOOKING_VILLATYPE FOREIGN KEY (requested_villa_type_id) REFERENCES VILLA_TYPE(type_id);
 );
 
 -- 10. Table VILLA
@@ -141,6 +142,7 @@ CREATE TABLE BOOKING (
     update_at DATETIME DEFAULT GETDATE(),
     booking_status VARCHAR(20) CHECK (booking_status IN ('PENDING', 'CONFIRMED', 'CHECKED_IN', 'CHECKED_OUT', 'CANCELLED')),
     payment_status VARCHAR(20) CHECK (payment_status IN ('UNPAID', 'PARTIAL', 'PAID', 'REFUNDED')),
+     requested_villa_type_id INT NULL,
     is_delete BIT DEFAULT 0,
     CONSTRAINT FK_BOOKING_GUEST FOREIGN KEY (guest_id) REFERENCES [USER](user_id),
     CONSTRAINT FK_BOOKING_PACKAGE FOREIGN KEY (package_id) REFERENCES RETREAT_PACKAGE(package_id),
