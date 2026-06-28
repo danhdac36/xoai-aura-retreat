@@ -1,7 +1,7 @@
 package com.AuraMoon.auramoon.auth.service.impl;
 
-import com.AuraMoon.auramoon.auth.dto.SensitiveProfileDto;
 import com.AuraMoon.auramoon.auth.dto.PersonalProfileDto;
+import com.AuraMoon.auramoon.auth.dto.SensitiveProfileDto;
 import com.AuraMoon.auramoon.auth.entity.Consent;
 import com.AuraMoon.auramoon.auth.entity.User;
 import com.AuraMoon.auramoon.auth.repository.ConsentRepository;
@@ -95,13 +95,13 @@ public class ProfileServiceImpl implements IProfileService {
     public void savePersonalProfile(PersonalProfileDto dto, Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        
+
         user.setGender(dto.getGender());
         user.setPhone(dto.getPhone());
         user.setIdentifyCode(dto.getIdentifyCode());
         user.setDateOfBirth(dto.getDateOfBirth());
         user.setUpdatedAt(LocalDateTime.now());
-        
+
         userRepository.save(user);
 
         AuditLog log = AuditLog.builder()
