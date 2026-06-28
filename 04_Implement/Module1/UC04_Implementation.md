@@ -9,7 +9,7 @@
 | **Date**           | 2026-06-25                                                                                         |
 | **Status**         | Approve                                                                                            |
 | **Document Owner** | System Administrator                                                                               |
-| **Author**         | Antigravity AI (Senior Software Engineer)                                                          |
+| **Author**         | NgocNM (Senior Software Engineer)                                                                  |
 | **Reviewed by**    | Tech Lead                                                                                          |
 | **DPO Sign-off**   | N/A (Dữ liệu danh mục không chứa PII của khách hàng, chỉ chứa thông tin Staff nội bộ) |
 | **Approved by**    | Principal Architect                                                                                |
