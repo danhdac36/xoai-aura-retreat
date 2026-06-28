@@ -65,3 +65,7 @@ Khi tiếp cận một Module mới, nếu thấy nhãn **`PII`** hoặc **`Sens
 
 ### 11. NGUYÊN TẮC "TÔN TRỌNG TDD" (TDD Fidelity)
 - **Cấm sửa lén Test:** Trong giai đoạn Implement (GREEN Phase), nếu phát hiện các hàm Getter/Setter hoặc tên biến trong file Test (do viết trước) bị sai lệch so với DB/Entity thực tế, tôi TUYỆT ĐỐI KHÔNG ĐƯỢC tự ý sửa lại file Test gốc (hoặc tài liệu gốc) để "ép" cho khớp với Code. Mọi sự lệch pha đều phải được ưu tiên sửa phía Code/Entity (hoặc thảo luận lại với Tech Lead) thay vì lén lút sửa test để vượt qua bước compile. Lỗi lệch pha do viết test trước là hợp lệ.
+
+### 12. NGUYÊN TẮC "KIẾN TRÚC SPRING BOOT MVC" (Spring Boot MVC Architecture)
+- **Mô hình MVC truyền thống:** Dự án được xây dựng hoàn toàn bằng **Java Spring Boot MVC (JDK 21)** và giao diện View **Thymeleaf**. Tuyệt đối KHÔNG viết đặc tả theo hướng RESTful API (trả về cục dữ liệu JSON) ngoại trừ các API bắt buộc.
+- **Đặc tả Controller:** Các Endpoints trong tài liệu EDS phần lớn phải là các Spring `@Controller` xử lý request và trả về giao diện HTML (ví dụ: `return "admin/audit-log";`) thay vì trả về JSON array như SPA. Trang web theo chuẩn SSR (Server-Side Rendering).

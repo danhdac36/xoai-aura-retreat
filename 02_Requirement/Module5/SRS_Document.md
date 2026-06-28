@@ -538,8 +538,12 @@ table form as below\]*
 |      26      | Execute Night Audit Process                               | Night Audit                   | The Manager or System executes the Night Audit to consolidate daily POS charges (Spa, F&B) into Guest Folios and lock audited records. |
 |      27      | Generate and Email Consolidated PDF Invoice               | Billing & Communication       | The System automatically generates a PDF version of the Consolidated Invoice in memory and emails it to the guest immediately after Check-out, adhering to Ministry of Finance formatting standards. |
 |      28      | Manage Housekeeping Tasks                                 | Housekeeping Management       | The Housekeeping Manager views dirty villas, assigns tasks, inspects them, and updates the status to clean after the guest checks out.                                                                 |
-|      29      | Record Time Attendance                                    | HR Management                 | Staff members (Receptionist, Therapist, Chef) check-in and check-out to record their daily working hours into the timesheet.                                                                           |
-|      30      | Calculate Commission Payroll                              | HR & Analytics                | The Manager calculates the monthly payroll for Spa Therapists based on base salary from timesheets and commissions from completed spa sessions.                                                        |
+|      29      | Manage Customer Reviews                                   | Feedback & Quality Assurance  | The Manager views aggregated ratings and customer feedback linked to specific Booking IDs to monitor service quality.                                                                                  |
+|      30      | Manage Audit Logs                                         | System Auditing & Compliance  | The Manager views system audit logs tracking sensitive operations (Checkout, Payment, Master Data changes) to ensure traceability.                                                                     |
+|      31      | Record Time Attendance                                    | HR Management                 | Staff members (Receptionist, Therapist, Chef) check-in and check-out to record their daily working hours into the timesheet.                                                                           |
+|      32      | Calculate Commission Payroll                              | HR & Analytics                | The Manager calculates the monthly payroll for Spa Therapists based on base salary from timesheets and commissions from completed spa sessions.                                                        |
+|      33      | View Staff Profile Details                                | HR Management                 | The Manager or Administrator views the detailed profile of a staff member including personal information and employment history.                                                                       |
+|      34      | View Booking History & Itinerary                          | Booking Tracking              | Khách hàng hoặc Quản lý xem toàn bộ lịch sử các gói nghỉ dưỡng và chi tiết lịch trình của khách hàng.                                                                                              |
 
 #### 1.3.2 Use Case Diagrams
 
@@ -645,7 +649,8 @@ specific system user role names\]*
 | Payment                         |        X        |                        |                    |                      |                |
 | Success Page                    |        X        |                        |                    |                      |                |
 | Guest Dashboard                 |        X        |                        |                    |                      |                |
-| Itinerary Timeline              |        X        |                        |                    |                      |                |
+| Booking History List            |        X        |                        |                    |                      |        X        |
+| Itinerary Timeline              |        X        |                        |                    |                      |        X        |
 | Spa Scheduling                  |        X        |                        |                    |                      |                |
 | A la-carte Menu                 |        X        |                        |                    |                      |                |
 | Dietary Menu                    |        X        |                        |                    |                      |                |
@@ -688,6 +693,8 @@ specific system user role names\]*
 | Night Audit Dashboard           |                |                        |                    |                      |        X        |
 | Housekeeping Dashboard          |                |                        |                    |                      |        X        |
 | Inspect & Update Status[Action] |                |                        |                    |                      |        X        |
+| Customer Reviews Dashboard      |                |                        |                    |                      |        X        |
+| Audit Log Dashboard             |                |                        |                    |                      |        X        |
 | Time Attendance Screen          |                |           X            |          X         |          X           |        X        |
 | Payroll Dashboard               |                |                        |                    |                      |        X        |
 
@@ -1808,7 +1815,9 @@ reviews after completing their retreat experience.</td>
 <tr>
 <td style="text-align: right;">Alternative Flows:</td>
 <td colspan="3">- A1. Room fails inspection.<br />
-→ Manager rejects and assigns it back to the Housekeeper for recleaning. Status remains DIRTY.</td>
+→ Manager rejects and assigns it back to the Housekeeper for recleaning. Status remains DIRTY.<br />
+- A2. Room requires maintenance.<br />
+→ Manager clicks "Report Maintenance", system prompts for issue details (text). System updates Villa status to OUT_OF_ORDER and locks it from Receptionists until resolved by Maintenance Technician.</td>
 </tr>
 <tr>
 <td style="text-align: right;">Exceptions:</td>
@@ -1835,6 +1844,423 @@ reviews after completing their retreat experience.</td>
 <td style="text-align: right;">Assumptions:</td>
 <td colspan="3">- Housekeepers communicate completion verbally or via radio to the Manager.</td>
 </tr>
+</tbody>
+</table>
+
+### 2.8 Customer Reviews Management
+
+#### 2.8.1 UC29 – Manage Customer Reviews
+
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr>
+<td style="text-align: right;">ID and Name:</td>
+<td colspan="3"><strong>UC29 – Manage Customer Reviews</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">Primary Actor:</td>
+<td>Manager / Administrator</td>
+<td style="text-align: right;">Secondary Actors:</td>
+<td>None</td>
+</tr>
+<tr>
+<td style="text-align: right;">Description:</td>
+<td colspan="3">Cho phép quản lý xem tổng hợp các đánh giá, điểm số và phản hồi của khách hàng gắn liền với từng Booking ID để theo dõi chất lượng dịch vụ. Quản trị viên (Admin) có quyền ẩn (Soft Delete) các đánh giá vi phạm.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Trigger:</td>
+<td colspan="3">Manager opens the Customer Reviews Dashboard.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Preconditions:</td>
+<td colspan="3">- Manager is logged in.<br />- System has recorded reviews from checked-out guests.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Postconditions:</td>
+<td colspan="3">- Dashboard displaying aggregate review metrics and detailed comments is rendered.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Normal Flow:</td>
+<td colspan="3"><ol type="1">
+<li>Manager navigates to Customer Reviews Dashboard.</li>
+<li>System retrieves all Review records joined with Booking and Guest information.</li>
+<li>System calculates total review count and average star rating.</li>
+<li>System displays the summary metrics and detailed data grid.</li>
+</ol></td>
+</tr>
+<tr>
+<td style="text-align: right;">Alternative Flows:</td>
+<td colspan="3">- A1. Manager filters reviews by rating or date.<br />
+→ System updates the data grid to match criteria.<br />
+- A2. Administrator clicks 'Hide' on a review.<br />
+→ System performs a Soft Delete and hides the review from the data grid.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Exceptions:</td>
+<td colspan="3">- E1. Database connection error.<br />
+→ System displays MSG-19.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Priority:</td>
+<td colspan="3">Medium</td>
+</tr>
+<tr>
+<td style="text-align: right;">Frequency of Use:</td>
+<td colspan="3">Weekly</td>
+</tr>
+<tr>
+<td style="text-align: right;">Business Rules:</td>
+<td colspan="3">BR-24 – Review Immutability.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Other Information:</td>
+<td colspan="3">- Reviews cannot be modified by staff to ensure authentic feedback.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Assumptions:</td>
+<td colspan="3">- Guests have submitted reviews via UC23.</td>
+</tr>
+</tbody>
+</table>
+
+### 2.9 System Auditing & Compliance
+
+#### 2.9.1 UC30 – Manage Audit Logs
+
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr>
+<td style="text-align: right;">ID and Name:</td>
+<td colspan="3"><strong>UC30 – Manage Audit Logs</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">Primary Actor:</td>
+<td>Manager / Administrator</td>
+<td style="text-align: right;">Secondary Actors:</td>
+<td>None</td>
+</tr>
+<tr>
+<td style="text-align: right;">Description:</td>
+<td colspan="3">Theo dõi và giám sát mọi hành động, sửa đổi dữ liệu quan trọng trên hệ thống (Check-out, Thanh toán, Night Audit) nhằm đảm bảo tuân thủ bảo mật và dễ dàng truy vết.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Trigger:</td>
+<td colspan="3">Manager opens the Audit Log Dashboard.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Preconditions:</td>
+<td colspan="3">- Manager is logged in.<br />- System has recorded audit logs.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Postconditions:</td>
+<td colspan="3">- Chronological list of sensitive system events is displayed.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Normal Flow:</td>
+<td colspan="3"><ol type="1">
+<li>Manager navigates to Audit Log Dashboard.</li>
+<li>System retrieves recent logs from AUDIT_LOG table, ordered by newest first.</li>
+<li>System maps Actor ID to the corresponding user/system component.</li>
+<li>System renders the Data Grid with log details.</li>
+</ol></td>
+</tr>
+<tr>
+<td style="text-align: right;">Alternative Flows:</td>
+<td colspan="3">- A1. Manager filters logs by Action Type or Date Range.<br />
+→ System updates the data grid based on filter parameters.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Exceptions:</td>
+<td colspan="3">- E1. Unauthorized access attempt.<br />
+→ System blocks access and logs the security violation.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Priority:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Frequency of Use:</td>
+<td colspan="3">Daily/As needed for compliance checks</td>
+</tr>
+<tr>
+<td style="text-align: right;">Business Rules:</td>
+<td colspan="3">BR-25 – Audit Log Integrity.<br />BR-26 – Automated Logging.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Other Information:</td>
+<td colspan="3">- Logs are kept in Hot Storage (Database) for a specific retention period before being archived (Cold Storage).</td>
+</tr>
+<tr>
+<td style="text-align: right;">Assumptions:</td>
+<td colspan="3">- Automated background services correctly dispatch events to the Audit Logging Service.</td>
+</tr>
+</tbody>
+</table>
+
+### 2.10 HR Management
+
+#### 2.10.1 UC33 – View Staff Profile Details
+
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr>
+<td style="text-align: right;">ID and Name:</td>
+<td colspan="3"><strong>UC33 – View Staff Profile Details</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">Primary Actor:</td>
+<td>Manager / Administrator</td>
+<td style="text-align: right;">Secondary Actors:</td>
+<td>None</td>
+</tr>
+<tr>
+<td style="text-align: right;">Description:</td>
+<td colspan="3">Cho phép quản lý hoặc admin xem hồ sơ chi tiết của nhân viên. Tính năng này phục vụ như trang đích (destination page) khi người dùng bấm vào Deep Link Actor ID từ các màn hình khác như Audit Log.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Trigger:</td>
+<td colspan="3">Manager clicks on a Staff Name or Actor ID link.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Preconditions:</td>
+<td colspan="3">- Manager is logged in.<br />- Target staff account exists in the system.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Postconditions:</td>
+<td colspan="3">- Staff profile details are displayed successfully.<br />- Sensitive credentials remain hidden.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Normal Flow:</td>
+<td colspan="3"><ol type="1">
+<li>Manager clicks on the Deep Link containing the Staff ID.</li>
+<li>System receives the request and validates the Manager's access rights.</li>
+<li>System retrieves the Staff profile from the database.</li>
+<li>System actively redacts sensitive information like Password Hashes and Security Tokens (BR-07).</li>
+<li>System renders the Staff Profile Details Screen.</li>
+</ol></td>
+</tr>
+<tr>
+<td style="text-align: right;">Alternative Flows:</td>
+<td colspan="3">- A1. Manager accesses via Staff Directory list.<br />
+→ Flow continues from step 2.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Exceptions:</td>
+<td colspan="3">- E1. Staff ID not found.<br />
+→ System displays a 404 Not Found message.<br />- E2. Unauthorized access attempt.<br />
+→ System rejects access and displays MSG-18.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Priority:</td>
+<td colspan="3">Medium</td>
+</tr>
+<tr>
+<td style="text-align: right;">Frequency of Use:</td>
+<td colspan="3">Medium</td>
+</tr>
+<tr>
+<td style="text-align: right;">Business Rules:</td>
+<td colspan="3">BR-07 – Role-Based Access Control (RBAC) and Data Minimization.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Other Information:</td>
+<td colspan="3">- This is a read-only view in this context. Profile editing is handled in a separate administrative UC.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Assumptions:</td>
+<td colspan="3">- The deep linking routing mechanism is supported by the frontend framework.</td>
+</tr>
+</tbody>
+</table>
+
+#### 2.10.2 UC34 – View Booking History & Itinerary
+
+<table>
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 29%" />
+<col style="width: 22%" />
+<col style="width: 27%" />
+</colgroup>
+<tbody>
+<tr>
+<td style="text-align: right;">ID and Name:</td>
+<td colspan="3"><strong>UC34 – View Booking History & Itinerary</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">Primary Actor:</td>
+<td>Guest, Manager</td>
+<td style="text-align: right;">Secondary Actors:</td>
+<td>None</td>
+</tr>
+<tr>
+<td style="text-align: right;">Description:</td>
+<td colspan="3">Cho phép Khách hàng xem lịch sử đặt phòng của mình, hoặc Quản lý xem lịch sử đặt phòng của khách. Từ đó bấm vào từng lịch sử để xem Timeline lịch trình cụ thể của gói đó.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Trigger:</td>
+<td colspan="3">Guest clicks "Booking History" on sidebar OR Manager clicks "LỊCH SỬ ĐẶT PHÒNG" from Guest Profile.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Preconditions:</td>
+<td colspan="3">- User is logged in as Guest or Manager.<br/>- Guest account has existing booking records.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Postconditions:</td>
+<td colspan="3">- Booking history and detailed itinerary timeline are displayed.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Normal Flow:</td>
+<td colspan="3"><ol type="1">
+<li>User requests to view booking history (via URL /booking/history).</li>
+<li>System checks role. If Guest, system fetches their own history. If Manager, system fetches history for the specified guestId.</li>
+<li>System renders the Booking History List.</li>
+<li>User clicks "View Itinerary" on a specific booking.</li>
+<li>System retrieves timeline events for that specific bookingId.</li>
+<li>System renders the Itinerary Timeline screen.</li>
+</ol></td>
+</tr>
+<tr>
+<td style="text-align: right;">Alternative Flows:</td>
+<td colspan="3">None.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Exceptions:</td>
+<td colspan="3">- E1. No booking history found.<br/>
+→ System displays MSG-24.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Priority:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Frequency of Use:</td>
+<td colspan="3">High</td>
+</tr>
+<tr>
+<td style="text-align: right;">Business Rules:</td>
+<td colspan="3">BR-27 – Guest Booking History Access Control.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Other Information:</td>
+<td colspan="3">- Timeline only shows service events, not sensitive health data.</td>
+</tr>
+<tr>
+<td style="text-align: right;">Assumptions:</td>
+<td colspan="3">None.</td>
+</tr>
+</tbody>
+</table>
+
+### 2.11 Inventory Management
+
+#### 2.11.1 UC31 – Spa Inventory Auto-Tracking
+
+<table>
+<colgroup><col style="width: 19%" /><col style="width: 29%" /><col style="width: 22%" /><col style="width: 27%" /></colgroup>
+<tbody>
+<tr><td style="text-align: right;">ID and Name:</td><td colspan="3"><strong>UC31 – Spa Inventory Auto-Tracking</strong></td></tr>
+<tr><td style="text-align: right;">Primary Actor:</td><td>System (Automated)</td><td style="text-align: right;">Secondary Actors:</td><td>Spa Manager</td></tr>
+<tr><td style="text-align: right;">Description:</td><td colspan="3">Hệ thống tự động trừ số lượng vật tư tiêu hao (tinh dầu, kem massage) trong kho Spa mỗi khi Chuyên viên đánh dấu một phiên trị liệu là "Đã hoàn thành". Quản lý có thể xem cảnh báo sắp hết hàng.</td></tr>
+<tr><td style="text-align: right;">Trigger:</td><td colspan="3">Spa Therapist marks a Spa Session as COMPLETED.</td></tr>
+<tr><td style="text-align: right;">Preconditions:</td><td colspan="3">- The Spa Session is valid.<br/>- The system has an active mapping of required materials for the specific therapy type.</td></tr>
+<tr><td style="text-align: right;">Postconditions:</td><td colspan="3">- Inventory quantity is deducted.<br/>- Low-stock alert is generated if quantity falls below threshold.</td></tr>
+<tr><td style="text-align: right;">Normal Flow:</td><td colspan="3"><ol type="1"><li>Therapist updates Spa Session status to COMPLETED.</li><li>System retrieves the Material Bill of Materials (BOM) for the completed therapy.</li><li>System deducts the exact amount from the Inventory table.</li><li>System checks if the remaining amount is below the safety threshold.</li><li>If below threshold, System generates a Low-Stock Alert on the Manager Dashboard.</li></ol></td></tr>
+<tr><td style="text-align: right;">Alternative Flows:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Exceptions:</td><td colspan="3">- E1. Insufficient virtual inventory (data mismatch).<br/>→ System forces deduction (negative balance) and sends a Critical Alert to the Manager for manual reconciliation.</td></tr>
+<tr><td style="text-align: right;">Priority:</td><td colspan="3">High</td></tr>
+<tr><td style="text-align: right;">Frequency of Use:</td><td colspan="3">High (Every completed spa session)</td></tr>
+<tr><td style="text-align: right;">Business Rules:</td><td colspan="3">BR-28 – Inventory Transaction Integrity.</td></tr>
+<tr><td style="text-align: right;">Other Information:</td><td colspan="3">- Executes asynchronously but guarantees transactional integrity.</td></tr>
+<tr><td style="text-align: right;">Assumptions:</td><td colspan="3">None.</td></tr>
+</tbody>
+</table>
+
+### 2.12 Loyalty Management
+
+#### 2.12.1 UC32 – Loyalty & Tier Program
+
+<table>
+<colgroup><col style="width: 19%" /><col style="width: 29%" /><col style="width: 22%" /><col style="width: 27%" /></colgroup>
+<tbody>
+<tr><td style="text-align: right;">ID and Name:</td><td colspan="3"><strong>UC32 – Loyalty & Tier Program</strong></td></tr>
+<tr><td style="text-align: right;">Primary Actor:</td><td>System (Automated)</td><td style="text-align: right;">Secondary Actors:</td><td>Guest</td></tr>
+<tr><td style="text-align: right;">Description:</td><td colspan="3">Tự động cộng điểm "Aura Points" cho khách sau khi thanh toán xong hóa đơn. Tự động thăng hạng khách hàng dựa trên tổng điểm và sinh mã giảm giá.</td></tr>
+<tr><td style="text-align: right;">Trigger:</td><td colspan="3">Guest Folio payment is completed (Balance = 0).</td></tr>
+<tr><td style="text-align: right;">Preconditions:</td><td colspan="3">- Checkout is complete and payment is successful.</td></tr>
+<tr><td style="text-align: right;">Postconditions:</td><td colspan="3">- Guest's Aura Points are increased.<br/>- Tier status is upgraded if points exceed the threshold.</td></tr>
+<tr><td style="text-align: right;">Normal Flow:</td><td colspan="3"><ol type="1"><li>System listens for Folio Payment Completed event.</li><li>System calculates points based on Total Paid Amount.</li><li>System adds points to the Guest's Loyalty Profile.</li><li>System evaluates the total lifetime points against Tier Thresholds.</li><li>If eligible, System upgrades Guest Tier (e.g., Member -> Silver).</li><li>System automatically issues a specific Discount Code to the Guest's account.</li></ol></td></tr>
+<tr><td style="text-align: right;">Alternative Flows:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Exceptions:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Priority:</td><td colspan="3">Medium</td></tr>
+<tr><td style="text-align: right;">Frequency of Use:</td><td colspan="3">Medium (Once per checkout)</td></tr>
+<tr><td style="text-align: right;">Business Rules:</td><td colspan="3">BR-29 – Loyalty Points Issuance.</td></tr>
+<tr><td style="text-align: right;">Other Information:</td><td colspan="3">- Admin can configure the points-to-currency conversion rate.</td></tr>
+<tr><td style="text-align: right;">Assumptions:</td><td colspan="3">None.</td></tr>
+</tbody>
+</table>
+
+### 2.13 Guest Experience
+
+#### 2.13.1 UC35 – Post-Retreat Wellness Assessment
+
+<table>
+<colgroup><col style="width: 19%" /><col style="width: 29%" /><col style="width: 22%" /><col style="width: 27%" /></colgroup>
+<tbody>
+<tr><td style="text-align: right;">ID and Name:</td><td colspan="3"><strong>UC35 – Post-Retreat Wellness Assessment</strong></td></tr>
+<tr><td style="text-align: right;">Primary Actor:</td><td>Guest</td><td style="text-align: right;">Secondary Actors:</td><td>None</td></tr>
+<tr><td style="text-align: right;">Description:</td><td colspan="3">Khách hàng thực hiện bài kiểm tra sức khỏe đầu vào và đầu ra. Hệ thống vẽ biểu đồ Radar thể hiện sự thay đổi sức khỏe.</td></tr>
+<tr><td style="text-align: right;">Trigger:</td><td colspan="3">Guest accesses the "Wellness Assessment" module.</td></tr>
+<tr><td style="text-align: right;">Preconditions:</td><td colspan="3">- Guest is logged in.</td></tr>
+<tr><td style="text-align: right;">Postconditions:</td><td colspan="3">- Assessment scores are saved.<br/>- Radar chart is updated and displayed.</td></tr>
+<tr><td style="text-align: right;">Normal Flow:</td><td colspan="3"><ol type="1"><li>Guest clicks "Take Assessment".</li><li>System displays a form with scale 1-10 for dimensions (Stress, Sleep, Muscle Pain).</li><li>Guest fills out the form and clicks "Submit".</li><li>System saves the data with a timestamp (Pre-retreat or Post-retreat).</li><li>System generates and renders a Radar Chart overlaying Pre and Post scores.</li></ol></td></tr>
+<tr><td style="text-align: right;">Alternative Flows:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Exceptions:</td><td colspan="3">- E1. Incomplete form submission.<br/>→ System prompts Guest to complete all required fields.</td></tr>
+<tr><td style="text-align: right;">Priority:</td><td colspan="3">Medium</td></tr>
+<tr><td style="text-align: right;">Frequency of Use:</td><td colspan="3">Low (Twice per retreat)</td></tr>
+<tr><td style="text-align: right;">Business Rules:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Other Information:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Assumptions:</td><td colspan="3">Frontend charting library (e.g. Chart.js) is available.</td></tr>
+</tbody>
+</table>
+
+#### 2.13.2 UC36 – Incident & Service Recovery Management
+
+<table>
+<colgroup><col style="width: 19%" /><col style="width: 29%" /><col style="width: 22%" /><col style="width: 27%" /></colgroup>
+<tbody>
+<tr><td style="text-align: right;">ID and Name:</td><td colspan="3"><strong>UC36 – Incident & Service Recovery Management</strong></td></tr>
+<tr><td style="text-align: right;">Primary Actor:</td><td>Manager</td><td style="text-align: right;">Secondary Actors:</td><td>Receptionist, Guest</td></tr>
+<tr><td style="text-align: right;">Description:</td><td colspan="3">Quản lý nhận diện sự cố từ đánh giá in-stay của khách, tạo Ticket và xử lý vòng đời Ticket từ OPEN -> IN_PROGRESS -> RESOLVED.</td></tr>
+<tr><td style="text-align: right;">Trigger:</td><td colspan="3">Guest submits poor in-stay feedback OR Staff manually creates a Ticket.</td></tr>
+<tr><td style="text-align: right;">Preconditions:</td><td colspan="3">- Manager is logged in.</td></tr>
+<tr><td style="text-align: right;">Postconditions:</td><td colspan="3">- Incident status is updated.</td></tr>
+<tr><td style="text-align: right;">Normal Flow:</td><td colspan="3"><ol type="1"><li>Manager views the Incident Dashboard.</li><li>System displays all OPEN tickets.</li><li>Manager assigns a ticket to a specific department (e.g., Maintenance, Spa) and changes status to IN_PROGRESS.</li><li>Staff resolves the issue offline.</li><li>Manager updates ticket status to RESOLVED and records the resolution action.</li></ol></td></tr>
+<tr><td style="text-align: right;">Alternative Flows:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Exceptions:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Priority:</td><td colspan="3">High</td></tr>
+<tr><td style="text-align: right;">Frequency of Use:</td><td colspan="3">Medium</td></tr>
+<tr><td style="text-align: right;">Business Rules:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Other Information:</td><td colspan="3">None.</td></tr>
+<tr><td style="text-align: right;">Assumptions:</td><td colspan="3">None.</td></tr>
 </tbody>
 </table>
 
@@ -3498,16 +3924,242 @@ location (e.g., "Page 1 / 8").</td>
   - Attaches the stream directly to an email dispatched to the guest.
   - Instantly destroys the byte array post-dispatch to ensure absolute data minimization and prevent disk-level data breaches.
 
-### 3.7 Housekeeping & HR Management
+### 3.7 Housekeeping, Maintenance & Operations
 
 #### 3.7.1 Housekeeping Operations
-- **Description**: A dedicated interface for the Housekeeping Manager to oversee villa statuses. Automatically flags villas as DIRTY upon guest check-out (UC22). Managers assign staff, conduct QA inspections, and update statuses to CLEAN/AVAILABLE to re-enter the booking pool (UC28).
+- **Description**: A dedicated interface for the Housekeeping Manager to oversee villa statuses. Automatically flags villas as DIRTY upon guest check-out (UC22). Managers assign staff, conduct QA inspections, and update statuses to CLEAN/AVAILABLE. Additionally, managers can report maintenance issues, locking the villa as OUT_OF_ORDER and preventing receptionist assignments until resolved (UC28).
 
-#### 3.7.2 Time Attendance (Timesheet)
-- **Description**: A module for staff (Receptionist, Therapist, Chef) to clock in and out (UC29). Records timestamps into the `timesheet` table to track daily working hours, directly linked to their user profiles.
+#### 3.7.2 Spa Inventory Auto-Tracking
+- **Description**: An automated inventory control system for Spa supplies. Deducts material quantities automatically when therapists mark Spa Sessions as completed. Features a Low-stock alert dashboard for Managers to proactively restock items (UC31).
 
-#### 3.7.3 Commission & Payroll Calculation
-- **Description**: An automated dashboard for managers to generate monthly payroll for Spa Therapists (UC30). Combines base salary (from `timesheet` data) with performance commission (from completed Spa Sessions tracked in Module 3) to output a finalized salary sheet.
+### 3.8 Customer Reviews Management
+
+#### 3.8.1 Customer Reviews Dashboard Screen
+
+**[Content #1]**
+- The UI layout consists of a top Header area featuring Summary Cards displaying "Total Reviews" and "Average Rating".
+- Below the summary, a full-width Data Table lists detailed customer feedback, including columns for Booking ID, Guest Name, Star Rating, and Comment.
+
+**[Content #2]**
+- **Description**: This screen provides Managers with actionable insights into service quality by aggregating post-stay guest reviews. The interface is strictly Read-only to preserve the authenticity of feedback.
+- **Mapped Use Case**: UC29 - Manage Customer Reviews.
+
+**[Content #3]**
+<table style="width:97%;">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 76%" />
+</colgroup>
+<tbody>
+<tr>
+<td><strong>Field Name</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr>
+<td colspan="2"><strong>Field Group: Summary Metrics</strong></td>
+</tr>
+<tr>
+<td>(1) Total Reviews & Average Rating</td>
+<td>Read-only metrics aggregated dynamically from the database. Average rating is calculated up to 1 decimal place.</td>
+</tr>
+<tr>
+<td colspan="2"><strong>Field Group: Data Table</strong></td>
+</tr>
+<tr>
+<td>(2) Booking ID</td>
+<td>Data type: Integer. Unique identifier linking the review to a specific stay.<br /><strong>UX Note:</strong> Implemented as a Clickable Hyperlink (Deep Link) that navigates the Manager directly to the <strong>Completed Itinerary</strong> (Lịch trình đã kết thúc) detail screen.</td>
+</tr>
+<tr>
+<td>(3) Guest Name</td>
+<td>Data type: String. Displayed by joining the Booking ID with User records.<br /><strong>UX Note:</strong> Implemented as a Clickable Hyperlink. Clicking it navigates the Manager to the <strong>Manager's Guest Profile Screen</strong>, which displays full customer history, past itineraries, and transaction history.</td>
+</tr>
+<tr>
+<td>(4) Star Rating</td>
+<td>Data type: Integer (1-5). Rendered visually as a 5-star UI component.</td>
+</tr>
+<tr>
+<td>(5) Comment</td>
+<td>Data type: Text. The verbatim feedback provided by the guest.</td>
+</tr>
+</tbody>
+</table>
+
+### 3.9 System Auditing & Compliance
+
+#### 3.9.1 Audit Log Dashboard Screen
+
+**[Content #1]**
+- The UI features a top Toolbar with a Date Picker and an "Action Type" dropdown filter.
+- The main content area contains a chronological Data Grid designed as a professional console, with optional color-coded badging to distinguish between action types (e.g., PAYMENT, CHECKOUT, DELETE_PROFILE).
+
+**[Content #2]**
+- **Description**: An operational security interface allowing Administrators to trace and monitor sensitive data modifications or financial operations, ensuring accountability and compliance.
+- **Mapped Use Case**: UC30 - Manage Audit Logs.
+
+**[Content #3]**
+<table style="width:97%;">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 76%" />
+</colgroup>
+<tbody>
+<tr>
+<td><strong>Field Name</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr>
+<td colspan="2"><strong>Field Group: Filters</strong></td>
+</tr>
+<tr>
+<td>(1) Action Type Filter</td>
+<td>Data type: Dropdown list. Filters logs by category (e.g., CHECKOUT, NIGHT_AUDIT).</td>
+</tr>
+<tr>
+<td colspan="2"><strong>Field Group: Data Table</strong></td>
+</tr>
+<tr>
+<td>(2) Log ID</td>
+<td>Data type: Integer. Primary Key identifier. Read-only.</td>
+</tr>
+<tr>
+<td>(3) Action Type</td>
+<td>Data type: String. The name/category of the audited event.</td>
+</tr>
+<tr>
+<td>(4) Actor ID</td>
+<td>Data type: Integer. ID of the user or system component that triggered the action.<br /><strong>UX Note:</strong> Implemented as a Clickable Hyperlink. Clicking it navigates to the User/Staff Profile screen. If returning from the profile back to Audit Log, the filter auto-fills this Actor ID.</td>
+</tr>
+<tr>
+<td>(5) Target ID</td>
+<td>Data type: Integer. ID of the affected resource (e.g., Booking ID).<br /><strong>UX Note:</strong> Implemented as a Clickable Hyperlink to the target resource's detail page (e.g., navigating to Transaction History or Invoice Details for a PAYMENT/CHECKOUT log).</td>
+</tr>
+<tr>
+<td>(6) Timestamp</td>
+<td>Data type: DateTime. Exact time the event occurred (Format: dd/MM/yyyy HH:mm:ss).</td>
+</tr>
+<tr>
+<td>(7) Details</td>
+<td>Data type: JSON/Text. Additional context parameters stored during the event.<br /><strong>UX Note:</strong> Implemented with an expandable row or a "View Details" Modal Popup button. This allows viewing complex Before/After JSON states without leaving the current screen or creating a new Use Case.</td>
+</tr>
+</tbody>
+</table>
+
+### 3.10 HR Management
+
+#### 3.10.1 Staff Profile Details Screen
+
+**[Content #1]**
+- The layout is divided into a profile summary section on the top (Avatar, Name, Role) and a detailed information section structured in panels or tabs (Contact info, Employment History) below.
+- The UI contains strict RBAC validation; if an unauthorized user attempts to view the profile, they are presented with an error boundary.
+
+**[Content #2]**
+- **Description**: This screen displays the detailed profile of a specific staff member. It serves as the destination for deep links originating from the Audit Log or Staff Management dashboard. Sensitive credentials (e.g., password hashes) are strictly redacted.
+- **Mapped Use Case**: UC33 - View Staff Profile Details.
+
+**[Content #3]**
+<table style="width:97%;">
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 76%" />
+</colgroup>
+<tbody>
+<tr>
+<td><strong>Field Name</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr>
+<td colspan="2"><strong>Field Group: Basic Information</strong></td>
+</tr>
+<tr>
+<td>(1) Staff Avatar</td>
+<td>Image asset representing the staff member.</td>
+</tr>
+<tr>
+<td>(2) Full Name & Role</td>
+<td>Data type: String. Displays the full name and current job title/role (e.g., Spa Therapist, Chef).</td>
+</tr>
+<tr>
+<td colspan="2"><strong>Field Group: Contact Details</strong></td>
+</tr>
+<tr>
+<td>(3) Email & Phone</td>
+<td>Data type: String. Internal contact information for the staff member.</td>
+</tr>
+<tr>
+<td colspan="2"><strong>Field Group: System Information</strong></td>
+</tr>
+<tr>
+<td>(4) Status Badge</td>
+<td>Data type: Boolean/Enum. Visual indicator of the staff account status (e.g., Active, Inactive).</td>
+</tr>
+<tr>
+<td>(5) Recent Activity</td>
+<td>Read-only Data Grid. A summary view of recent tasks or logs associated with this staff member.</td>
+</tr>
+<tr>
+<td colspan="2"><strong>Field Group: Actions</strong></td>
+</tr>
+<tr>
+<td>(6) "Back" Button</td>
+<td>Action: Navigates the user back to the previous screen (e.g., Audit Log or Staff Directory).</td>
+</tr>
+</tbody>
+</table>
+
+### 3.11 Booking History & Itinerary Viewer
+
+#### 3.11.1 Booking History List Screen
+**[Content #1]**
+- The UI contains a list or table of past and current bookings.
+- Each record includes: Booking ID, Package Name, Dates, Total Amount, Status, and an action button "View Itinerary".
+
+**[Content #2]**
+- **Description**: This screen shows the complete history of a guest's bookings. It adapts based on user role (Guest sees own, Manager sees target guest's).
+- **Mapped Use Case**: UC34 - View Booking History & Itinerary.
+
+**[Content #3]**
+<table style="width:97%;">
+<colgroup><col style="width: 21%" /><col style="width: 76%" /></colgroup>
+<tbody>
+<tr><td><strong>Field Name</strong></td><td><strong>Description</strong></td></tr>
+<tr><td>(1) Booking List Grid</td><td>Displays booking summary fields.</td></tr>
+<tr><td>(2) View Itinerary Button</td><td>Action: Navigates to the Itinerary Timeline screen with the specific bookingId.</td></tr>
+</tbody>
+</table>
+
+#### 3.11.2 Itinerary Detail by Booking Screen
+**[Content #1]**
+- Reuses the existing Timeline layout but fetches data specifically for the selected `bookingId` rather than just the latest one.
+
+**[Content #2]**
+- **Description**: Displays the exact scheduled events for the selected booking.
+- **Mapped Use Case**: UC34 - View Booking History & Itinerary.
+
+**[Content #3]**
+<table style="width:97%;">
+<colgroup><col style="width: 21%" /><col style="width: 76%" /></colgroup>
+<tbody>
+<tr><td><strong>Field Name</strong></td><td><strong>Description</strong></td></tr>
+<tr><td>(1) Timeline Events</td><td>Displays time, location, and service name.</td></tr>
+<tr><td>(2) Back to History Button</td><td>Action: Returns to the Booking History List.</td></tr>
+</tbody>
+</table>
+
+### 3.12 Loyalty & Tier Program
+
+#### 3.12.1 Loyalty Points Generation
+- **Description**: Automatically processes the Guest Folio total upon check-out (UC32). Converts the total paid amount into Aura Points based on the active conversion rate and updates the Guest's profile. Also evaluates tier thresholds to determine if the guest qualifies for a tier upgrade.
+
+### 3.13 Post-Retreat Wellness Assessment
+
+#### 3.13.1 Wellness Assessment Form & Radar Chart
+- **Description**: An interface for guests to input their self-assessment scores (1-10) for stress, sleep quality, and muscle tension. The system dynamically generates a comparative Radar Chart showing the pre-retreat and post-retreat improvement levels (UC35).
+
+### 3.14 Incident & Service Recovery Management
+
+#### 3.14.1 Incident Ticket Dashboard
+- **Description**: A management dashboard that aggregates low-rated in-stay feedback into trackable Incident Tickets. Managers can assign tickets to specific departments and track resolution status from OPEN to IN_PROGRESS to RESOLVED (UC36).
+
 
 ## 4. Non-Functional Requirements - ??c
 
@@ -3744,8 +4396,13 @@ forth.\]*
 |    BR-19    |                 Zero Balance Bypass                   |                                         If a guest's total balance due is exactly 0 VND (e.g., fully pre-paid), the checkout process shall automatically bypass the payment gateway selection and complete the checkout immediately without generating a pending payment transaction.                                         |              UC22              |
 |    BR-20    |           Night Audit Consolidation                   |                                         The system shall automatically or manually consolidate all completed Spa (COMPLETED) and delivered F&B (DELIVERED) charges into the Guest Folio as Folio Items at midnight (00:00) daily. Once audited, these records shall be locked and cannot be modified or deleted.                                         |              UC26              |
 |    BR-21    |          Invoice Formatting Standard                  |                                         File PDF Hóa đơn Gộp được tạo ra bắt buộc phải tuân thủ chuẩn biểu mẫu hóa đơn cơ bản theo quy định của Bộ Tài chính Việt Nam (Bao gồm tên công ty, Mã số thuế, Thuế suất VAT 10% tách riêng, tổng tiền bằng chữ). Không lưu file vật lý.                                         |              UC27              |
-|    BR-22    |     Housekeeping Status Constraint                    |                                         Only users with the Housekeeping Manager (or equivalent Admin) role may change a Villa status from DIRTY to CLEAN. Receptionists are restricted to changing status from CLEAN to OCCUPIED.                                         |              UC28              |
-|    BR-23    |     Payroll Commission Logic                          |                                         The monthly payroll calculation for Therapists must strictly use the number of COMPLETED spa sessions multiplied by the commission rate, in addition to base pay determined by valid Timesheet entries.                                         |              UC30              |
+|    BR-22    |     Housekeeping Status Constraint                    | Only Housekeeping Managers can change a Villa status from DIRTY to CLEAN. Receptionists can only change from CLEAN to OCCUPIED. Villas marked OUT_OF_ORDER cannot be assigned to any Booking until Maintenance resolves the issue. | UC28 |
+|    BR-23    |     Review Immutability                               | Customer reviews reflect objective feedback. Managers shall NOT be allowed to edit or hard-delete any review content. However, Administrators can perform a Soft Delete (Hide) to remove inappropriate reviews from public view. | UC29 |
+|    BR-24    |     Audit Log Integrity                               | Audit logs are strictly confidential and used for system monitoring. No user (including Administrators) shall have the right to modify or delete records from the AUDIT_LOG table. | UC30 |
+|    BR-25    |     Automated Logging                                 | The system shall automatically trigger the Audit Logging Service to record events whenever a sensitive operation (e.g., Check-out, Payment, Night Audit, Data Erasure) is successfully completed. | UC30 |
+|    BR-26    |     Guest Booking History Access Control              | Guests shall only be able to view their own booking history. Managers/Admins are allowed to view the booking history of any Guest via the Guest Profile, but sensitive health information within itineraries must remain hidden. | UC34 |
+|    BR-27    |     Inventory Transaction Integrity                   | Deducting spa inventory materials must occur within the same Database Transaction as marking the Spa Session as COMPLETED. | UC31 |
+|    BR-28    |     Loyalty Points Issuance                           | Loyalty points are only issued when the Folio payment reaches exactly 0 VND balance. Points conversion rates are configured by Admin. | UC32 |
 
 ### 5.2 System Messages
 
@@ -3775,6 +4432,6 @@ forth.\]*
 |      21      |     MSG-21     |     Error     |      Night Audit execution failed     |    Night Audit process failed. Please review the error log and retry manually. |
 |      22      |     MSG-22     |    Warning    |       Missing Email address           |    Khách hàng không có địa chỉ email hợp lệ. Vui lòng in hóa đơn giấy tại quầy. |
 |      23      |     MSG-23     |     Error     |       SMTP / Email dispatch error     |    Lỗi hệ thống: Không thể gửi email hóa đơn. Dữ liệu đã được đưa vào hàng đợi gửi lại. |
-
+|      24      |     MSG-24     |     Info      |       No booking history              |    Không tìm thấy lịch sử đặt phòng nào cho khách hàng này. |
 
 

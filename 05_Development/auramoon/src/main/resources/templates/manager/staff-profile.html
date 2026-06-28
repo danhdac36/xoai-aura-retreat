@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/admin-layout :: layout(~{::section})">
+<head>
+    <title>Staff Profile Details</title>
+</head>
+<body>
+<section class="max-w-container-max mx-auto py-12 w-full">
+    <!-- Back Link -->
+    <a class="inline-flex items-center gap-2 text-earth-beige hover:text-primary transition-colors mb-12 group" th:href="@{/manager/staff}">
+        <span class="material-symbols-outlined text-[20px] group-hover:-translate-x-1 transition-transform">chevron_left</span>
+        <span class="font-label-caps text-label-caps">Back to Staff List</span>
+    </a>
+
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row items-center md:items-start gap-12 mb-section-gap">
+        <div class="relative">
+            <div class="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden organic-shadow border-4 border-white">
+                <img class="w-full h-full object-cover" 
+                     th:src="${profile.avatar != null ? profile.avatar : 'https://ui-avatars.com/api/?name=' + profile.fullName + '&background=e5e2dd&color=5f5e5b'}" 
+                     alt="Staff Avatar" />
+            </div>
+        </div>
+        <div class="flex-1 text-center md:text-left">
+            <div class="inline-block px-4 py-1.5 rounded-full bg-secondary-container text-on-secondary-fixed-variant font-label-caps text-[10px] tracking-widest mb-4"
+                 th:text="${profile.roleName}">
+                SPA THERAPIST
+            </div>
+            <h1 class="font-headline-md text-headline-md text-primary mb-4" th:text="${profile.fullName}">Elena Vance</h1>
+            <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-8 leading-relaxed">
+                Dedicated staff member at Aura Wellness Resort.
+                <th:block th:if="${profile.therapistCode != null}">
+                    <br/><br/>
+                    <strong>Therapist Code:</strong> <span th:text="${profile.therapistCode}">Code</span><br/>
+                    <strong>Status:</strong> <span th:text="${profile.therapistStatus}">Status</span><br/>
+                    <strong>Completed Sessions:</strong> <span th:text="${profile.completedSessions}">0</span>
+                </th:block>
+            </p>
+            <a th:if="${#strings.equalsIgnoreCase(profile.roleName, 'GUEST')}" 
+               th:href="@{/booking/history(guestId=${profile.id})}"
+               class="bg-primary text-white px-10 py-4 rounded-lg font-label-caps text-label-caps hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98] organic-shadow inline-block">
+                VIEW BOOKING HISTORY
+            </a>
+            <button th:unless="${#strings.equalsIgnoreCase(profile.roleName, 'GUEST')}" 
+                    class="bg-primary text-white px-10 py-4 rounded-lg font-label-caps text-label-caps hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98] organic-shadow">
+                SCHEDULE SESSION
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter items-start">
+        <!-- Left Column: Personal Information -->
+        <aside class="lg:col-span-1 space-y-gutter">
+            <div class="bg-surface-container-low p-8 rounded-xl organic-shadow">
+                <h2 class="font-label-caps text-label-caps text-earth-beige mb-8 border-b border-outline-variant/30 pb-4">PERSONAL INFORMATION</h2>
+                <div class="space-y-6">
+                    <div class="flex flex-col">
+                        <span class="font-label-caps text-[10px] text-earth-beige/60 mb-1">EMAIL</span>
+                        <span class="font-body-md text-on-surface" th:text="${profile.email}">evance@aurawellness.com</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-label-caps text-[10px] text-earth-beige/60 mb-1">PHONE</span>
+                        <span class="font-body-md text-on-surface" th:text="${profile.phoneNumber}">+84 235 123 4567</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-label-caps text-[10px] text-earth-beige/60 mb-1">GENDER</span>
+                        <span class="font-body-md text-on-surface" th:text="${profile.gender != null ? profile.gender : 'N/A'}">Female</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <p class="font-label-caps text-[10px] text-earth-beige tracking-widest mb-1 uppercase">DATE OF BIRTH</p>
+                        <span class="font-body-md text-on-surface" th:text="${profile.dateOfBirth != null ? #temporals.format(profile.dateOfBirth, 'dd/MM/yyyy') : 'N/A'}">1990-01-01</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-label-caps text-[10px] text-earth-beige/60 mb-1">STATUS</span>
+                        <span class="font-body-md text-on-surface" th:text="${profile.status != null ? profile.status : 'N/A'}">ACTIVE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quote Box -->
+            <div class="p-10 bg-white italic organic-shadow rounded-xl relative overflow-hidden">
+                <div class="absolute -top-4 -left-2 text-primary/5 font-display-lg text-[120px] select-none">â€œ</div>
+                <p class="font-headline-sm text-headline-sm text-primary relative z-10 leading-snug">
+                    'The path to wellness is a journey of returning to one's natural rhythm.'
+                </p>
+            </div>
+        </aside>
+
+        <!-- Right Column: Activity History -->
+        <div class="lg:col-span-2">
+            <div class="bg-white p-8 md:p-12 rounded-xl organic-shadow h-full">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 border-b border-outline-variant/30 pb-4 gap-4">
+                    <h2 class="font-label-caps text-label-caps text-earth-beige">ACTIVITY HISTORY</h2>
+                    
+                    <div class="flex items-center gap-4">
+                        <form th:action="@{/manager/staff/profile/{id}(id=${profile.id})}" method="get" class="flex items-center gap-2">
+                            <select name="filter" onchange="this.form.submit()" class="bg-surface-container-low text-on-surface text-[12px] font-label-caps rounded-md px-3 py-1.5 border border-outline-variant/30 focus:outline-none focus:border-primary">
+                                <option value="ALL" th:selected="${currentFilter == null || currentFilter == 'ALL'}">All Status</option>
+                                <th:block th:if="${#strings.equalsIgnoreCase(profile.roleName, 'GUEST')}">
+                                    <option value="PENDING" th:selected="${currentFilter == 'PENDING'}">PENDING</option>
+                                    <option value="CONFIRMED" th:selected="${currentFilter == 'CONFIRMED'}">CONFIRMED</option>
+                                    <option value="CHECKED_IN" th:selected="${currentFilter == 'CHECKED_IN'}">CHECKED_IN</option>
+                                    <option value="CHECKED_OUT" th:selected="${currentFilter == 'CHECKED_OUT'}">CHECKED_OUT</option>
+                                    <option value="CANCELLED" th:selected="${currentFilter == 'CANCELLED'}">CANCELLED</option>
+                                </th:block>
+                                <th:block th:if="${#strings.equalsIgnoreCase(profile.roleName, 'THERAPIST')}">
+                                    <option value="SCHEDULED" th:selected="${currentFilter == 'SCHEDULED'}">SCHEDULED</option>
+                                    <option value="PENDING" th:selected="${currentFilter == 'PENDING'}">PENDING</option>
+                                    <option value="COMPLETED" th:selected="${currentFilter == 'COMPLETED'}">COMPLETED</option>
+                                    <option value="CANCELLED" th:selected="${currentFilter == 'CANCELLED'}">CANCELLED</option>
+                                </th:block>
+                                <th:block th:if="${not #strings.equalsIgnoreCase(profile.roleName, 'GUEST') and not #strings.equalsIgnoreCase(profile.roleName, 'THERAPIST')}">
+                                    <option value="LOGIN" th:selected="${currentFilter == 'LOGIN'}">LOGIN</option>
+                                    <option value="CREATE" th:selected="${currentFilter == 'CREATE'}">CREATE</option>
+                                    <option value="UPDATE" th:selected="${currentFilter == 'UPDATE'}">UPDATE</option>
+                                    <option value="DELETE" th:selected="${currentFilter == 'DELETE'}">DELETE</option>
+                                </th:block>
+                            </select>
+                            <input type="hidden" name="page" value="0"/>
+                        </form>
+                        <a th:href="@{/admin/audit(search=${profile.fullName})}" class="text-earth-beige hover:text-primary font-label-caps text-[11px] transition-colors underline underline-offset-4 hidden md:inline">VIEW FULL LOG</a>
+                    </div>
+                </div>
+                
+                <div class="space-y-0">
+                    <div th:if="${profile.recentActivitiesPage == null or #lists.isEmpty(profile.recentActivitiesPage.content)}" class="text-earth-beige font-body-md italic py-4">
+                        No recent activities recorded for this staff member.
+                    </div>
+                    
+                    <div th:if="${profile.recentActivitiesPage != null}" th:each="activity, iterStat : ${profile.recentActivitiesPage.content}" class="relative pl-10 pb-12 timeline-item" th:classappend="${iterStat.last ? '!pb-0' : ''}">
+                        <div class="timeline-line absolute left-[7px] top-4 bottom-[-16px] w-[2px] bg-outline-variant/30" th:if="${!iterStat.last}"></div>
+                        <div class="absolute left-0 top-0 w-4 h-4 rounded-full border-4 ring-4 ring-background"
+                             th:classappend="${activity.actionType.contains('SUCCESS') ? 'bg-primary border-primary-fixed' : (activity.actionType.contains('FAILED') ? 'bg-terracotta-error border-error-container' : 'bg-secondary border-secondary-fixed')}"></div>
+                        <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-2">
+                            <div>
+                                <h3 class="font-body-lg text-on-surface font-semibold" th:text="${activity.actionType}">Completed Session</h3>
+                                <p class="text-on-surface-variant font-body-md mt-1" th:text="${activity.details}">Guest details</p>
+                            </div>
+                            <span class="font-label-caps text-[10px] text-earth-beige bg-surface-container-low px-3 py-1 rounded-full whitespace-nowrap" th:text="${activity.timestamp}">2 HOURS AGO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div th:if="${profile.recentActivitiesPage != null and profile.recentActivitiesPage.totalPages > 0}" class="mt-8 flex justify-between items-center border-t border-outline-variant/30 pt-4">
+                    <a th:if="${profile.recentActivitiesPage.hasPrevious()}"
+                       th:href="@{/manager/staff/profile/{id}(id=${profile.id}, page=${currentPage - 1}, filter=${currentFilter})}"
+                       class="text-earth-beige hover:text-primary font-label-caps text-[11px] transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">chevron_left</span> PREV
+                    </a>
+                    <span th:unless="${profile.recentActivitiesPage.hasPrevious()}" class="text-earth-beige/50 font-label-caps text-[11px] flex items-center gap-1 cursor-not-allowed">
+                        <span class="material-symbols-outlined text-[16px]">chevron_left</span> PREV
+                    </span>
+
+                    <span class="font-label-caps text-[11px] text-earth-beige">
+                        PAGE <span th:text="${currentPage + 1}">1</span> OF <span th:text="${profile.recentActivitiesPage.totalPages}">1</span>
+                    </span>
+
+                    <a th:if="${profile.recentActivitiesPage.hasNext()}"
+                       th:href="@{/manager/staff/profile/{id}(id=${profile.id}, page=${currentPage + 1}, filter=${currentFilter})}"
+                       class="text-earth-beige hover:text-primary font-label-caps text-[11px] transition-colors flex items-center gap-1">
+                        NEXT <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                    </a>
+                    <span th:unless="${profile.recentActivitiesPage.hasNext()}" class="text-earth-beige/50 font-label-caps text-[11px] flex items-center gap-1 cursor-not-allowed">
+                        NEXT <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                    </span>
+                </div>
+
+                <!-- Decorative Graphic -->
+                <div class="mt-16 pt-12 border-t border-outline-variant/10 flex justify-center">
+                    <div class="opacity-20 hover:opacity-40 transition-opacity duration-700 cursor-default">
+                        <span class="material-symbols-outlined text-[64px] text-primary">spa</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Micro-interactions for hovering cards
+    document.querySelectorAll('.organic-shadow').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-4px)';
+            card.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
+    });
+</script>
+</body>
+</html>

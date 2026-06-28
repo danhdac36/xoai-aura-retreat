@@ -16,8 +16,8 @@ import jakarta.validation.constraints.Pattern;
 @Builder
 public class CheckInRequestDTO {
     private Integer bookingId;
-    @NotBlank(message = "Số CCCD không được để trống")
-    @Pattern(regexp = "^\\d{12}$", message = "Số CCCD/Passport phải bao gồm chính xác 12 chữ số")
+    @NotBlank(message = "Số CCCD/Hộ chiếu không được để trống")
+    @Pattern(regexp = "^(\\d{12}|[A-Za-z0-9]{8,12})$", message = "Số CCCD phải bao gồm đúng 12 chữ số, hoặc số Hộ chiếu từ 8-12 ký tự chữ và số")
     private String identifyCode;
     private Integer villaId;
     private Boolean privacyConsent;

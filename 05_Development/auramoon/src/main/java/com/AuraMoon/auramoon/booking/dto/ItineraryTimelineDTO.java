@@ -19,6 +19,7 @@ public class ItineraryTimelineDTO {
     private LocalDateTime checkinDate;
     private LocalDateTime checkoutDate;
     private String bookingStatus;
+    private boolean hasReviewed;
     private List<TimelineEvent> events;
 
     @Data
