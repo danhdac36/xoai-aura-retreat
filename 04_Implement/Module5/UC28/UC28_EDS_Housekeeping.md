@@ -74,10 +74,12 @@
 | Requirement ID | Loại (BR/ADR/US) | Mô tả yêu cầu                                                    | Thành phần Code                                         | Compliance Target | ADR liên quan |
 | -------------- | ----------------- | -------------------------------------------------------------------- | --------------------------------------------------------- | ----------------- | -------------- |
 | BR-22          | Business Rule     | Housekeeping Status Constraint — Chỉ Housekeeping Manager (hoặc Admin) mới được chuyển `cleaning_status` từ `DIRTY` sang `CLEAN`. Lễ tân chỉ được chuyển `villa_status` từ `AVAILABLE` sang `OCCUPIED`. | `HousekeepingService.approveAndUpdateToClean()` | RBAC | ADR-028 |
+| BR-23          | Business Rule     | Maintenance Constraint — Lễ tân KHÔNG THỂ gán khách mới (Check-in) khi Villa đang ở trạng thái `MAINTENANCE`. Chỉ kỹ thuật viên/quản lý mới được xác nhận sửa xong để mở lại phòng. | `HousekeepingService.reportMaintenance()` | — | — |
 | BR-15          | Business Rule     | Audit Trail Management — Lưu log mọi thao tác thay đổi trạng thái Villa. | `AuditLogService.logActivity()`                         | NFR Security | — |
-| UC28           | User Story        | Housekeeping Manager xem danh sách Villa DIRTY, phân công, nghiệm thu, cập nhật trạng thái. | `HousekeepingController`, `HousekeepingServiceImpl` | — | ADR-028 |
+| UC28           | User Story        | Housekeeping Manager xem danh sách Villa DIRTY, phân công, nghiệm thu, cập nhật trạng thái. Báo bảo trì và quản lý trạng thái MAINTENANCE. | `HousekeepingController`, `HousekeepingServiceImpl` | — | ADR-028 |
 | UC22 (Post)    | Trigger           | Sau khi Checkout thành công, Villa.cleaning_status tự động chuyển sang DIRTY. | `CheckoutService` (Module có sẵn)                       | — | — |
 | A1 (SRS)       | Alternative Flow  | Phòng không đạt nghiệm thu → Reject, gán lại cho nhân viên dọn. Status giữ nguyên DIRTY. | `HousekeepingService.rejectCleaning()` | — | — |
+| A2 (SRS)       | Alternative Flow  | Phát hiện hỏng hóc → Báo bảo trì. `villa_status` đổi thành `MAINTENANCE`. Cần lưu `maintenanceNote`. | `HousekeepingService.reportMaintenance()` | — | — |
 | E1 (SRS)       | Exception Flow    | Database error khi cập nhật trạng thái → Hiển thị lỗi, yêu cầu thử lại. | `@Transactional` rollback, `FlashAttribute` error | — | — |
 
 ---
@@ -150,6 +152,8 @@ classDiagram
       +assignHousekeeper(villaId: Integer, keeperName: String, redirect: RedirectAttributes): String
       +approveClean(villaId: Integer, redirect: RedirectAttributes): String
       +rejectCleaning(villaId: Integer, redirect: RedirectAttributes): String
+      +reportMaintenance(villaId: Integer, maintenanceNote: String, redirect: RedirectAttributes): String
+      +resolveMaintenance(villaId: Integer, redirect: RedirectAttributes): String
     }
 
     class IHousekeepingService {
@@ -158,6 +162,8 @@ classDiagram
       +assignHousekeeper(villaId: Integer, keeperName: String, actorId: Integer): void
       +approveAndUpdateToClean(villaId: Integer, actorId: Integer): void
       +rejectCleaning(villaId: Integer, actorId: Integer): void
+      +reportMaintenance(villaId: Integer, maintenanceNote: String, actorId: Integer): void
+      +resolveMaintenance(villaId: Integer, actorId: Integer): void
     }
 
     class HousekeepingServiceImpl {
@@ -167,6 +173,8 @@ classDiagram
       +assignHousekeeper(villaId: Integer, keeperName: String, actorId: Integer): void
       +approveAndUpdateToClean(villaId: Integer, actorId: Integer): void
       +rejectCleaning(villaId: Integer, actorId: Integer): void
+      +reportMaintenance(villaId: Integer, maintenanceNote: String, actorId: Integer): void
+      +resolveMaintenance(villaId: Integer, actorId: Integer): void
     }
 
     class VillaRepository {
@@ -193,7 +201,7 @@ classDiagram
 > Bảng `VILLA` đã tồn tại trong DB gốc (`DB.sql`). UC28 sử dụng trực tiếp cột `cleaning_status` đã được thiết kế sẵn.
 
 ```sql
--- Bảng VILLA (Đã tồn tại — UC28 sử dụng cột cleaning_status)
+-- Bảng VILLA (Đã tồn tại — UC28 sử dụng cột cleaning_status và cập nhật villa_status)
 CREATE TABLE VILLA (
     villa_id INT IDENTITY(1,1) PRIMARY KEY,
     villa_type INT NOT NULL,
@@ -201,6 +209,7 @@ CREATE TABLE VILLA (
     limit_person INT,
     villa_status VARCHAR(20) CHECK (villa_status IN ('AVAILABLE', 'OCCUPIED', 'MAINTENANCE')),
     cleaning_status VARCHAR(10) CHECK (cleaning_status IN ('CLEAN', 'DIRTY', 'CLEANING')),
+    maintenance_note NVARCHAR(500),
     is_delete BIT DEFAULT 0,
     CONSTRAINT FK_VILLA_TYPE FOREIGN KEY (villa_type) REFERENCES VILLA_TYPE(type_id)
 );
@@ -330,21 +339,24 @@ sequenceDiagram
 
 ```mermaid
 stateDiagram-v2
-    [*] --> AVAILABLE : Villa mới tạo / Sau khi dọn sạch
+    [*] --> AVAILABLE : Villa mới tạo / Sau khi dọn sạch / Sửa xong
 
     AVAILABLE --> OCCUPIED : Lễ tân Check-in gán khách (UC08)
-
     OCCUPIED --> DIRTY : Lễ tân Checkout (UC22) — tự động
 
     DIRTY --> CLEANING : HK Manager phân công nhân viên dọn (Assign)
+    DIRTY --> MAINTENANCE : HK Manager báo bảo trì (Report Maintenance)
 
     CLEANING --> CLEAN_AVAILABLE : HK Manager nghiệm thu OK (Approve) — BR-22
     CLEANING --> DIRTY : HK Manager từ chối (Reject) — Dọn lại
+    CLEANING --> MAINTENANCE : HK Manager báo bảo trì (Report Maintenance)
 
     state CLEAN_AVAILABLE {
         [*] --> CLEAN : cleaning_status = CLEAN
         CLEAN --> AVAILABLE_STATE : villa_status = AVAILABLE
     }
+    
+    MAINTENANCE --> AVAILABLE : Kỹ thuật viên xác nhận sửa xong (Resolve)
 
     note right of DIRTY
         Trạng thái sau Checkout.
@@ -355,6 +367,12 @@ stateDiagram-v2
         Invariant (BR-22): Chỉ HK Manager
         hoặc Admin mới được chuyển
         DIRTY/CLEANING → CLEAN.
+    end note
+    
+    note right of MAINTENANCE
+        ⛔ Villa bị KHÓA.
+        Lễ tân KHÔNG THỂ gán khách.
+        Yêu cầu nhập chi tiết lỗi.
     end note
 ```
 
@@ -427,6 +445,23 @@ public interface IHousekeepingService {
      * @throws VillaNotFoundException Khi villaId không tồn tại.
      */
     void rejectCleaning(Integer villaId, Integer actorId);
+
+    /**
+     * Báo cáo hỏng hóc, cần bảo trì.
+     * Chuyển villa_status → MAINTENANCE và lưu maintenanceNote.
+     * @param villaId ID của Villa.
+     * @param maintenanceNote Ghi chú chi tiết lỗi.
+     * @param actorId ID của Manager thực hiện.
+     */
+    void reportMaintenance(Integer villaId, String maintenanceNote, Integer actorId);
+
+    /**
+     * Kỹ thuật viên xác nhận đã sửa xong.
+     * Chuyển villa_status: MAINTENANCE → AVAILABLE và xóa maintenanceNote.
+     * @param villaId ID của Villa.
+     * @param actorId ID của Manager/Kỹ thuật viên thực hiện.
+     */
+    void resolveMaintenance(Integer villaId, Integer actorId);
 }
 ```
 
@@ -457,6 +492,8 @@ public interface VillaRepository extends JpaRepository<Villa, Integer> {
 | POST | `/housekeeping/assign` | Session | `MANAGER`, `ADMIN` | Xử lý phân công nhân viên. Params: `villaId`, `keeperName`. Redirect về `/housekeeping`. |
 | POST | `/housekeeping/approve` | Session | `MANAGER`, `ADMIN` | Xử lý duyệt sạch (Approve). Params: `villaId`. Redirect về `/housekeeping`. |
 | POST | `/housekeeping/reject` | Session | `MANAGER`, `ADMIN` | Xử lý từ chối (Reject). Params: `villaId`. Redirect về `/housekeeping`. |
+| POST | `/housekeeping/report-maintenance` | Session | `MANAGER`, `ADMIN` | Xử lý báo bảo trì. Params: `villaId`, `maintenanceNote`. Đổi trạng thái sang MAINTENANCE. |
+| POST | `/housekeeping/resolve-maintenance` | Session | `MANAGER`, `ADMIN` | Xác nhận sửa xong. Params: `villaId`. Đổi trạng thái sang AVAILABLE. |
 
 ## 9.2. Data Transfer (Model & Forms)
 

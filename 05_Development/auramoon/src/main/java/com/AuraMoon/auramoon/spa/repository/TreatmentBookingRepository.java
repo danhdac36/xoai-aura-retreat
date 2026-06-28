@@ -19,4 +19,7 @@ public interface TreatmentBookingRepository extends JpaRepository<TreatmentBooki
             "JOIN BOOKING b ON tb.booking_id = b.booking_id " +
             "WHERE b.guest_id = :guestId AND tb.status != 'Scheduled' AND tb.is_delete = 0", nativeQuery = true)
     List<TreatmentBooking> findUnscheduledBookingsByGuestId(@Param("guestId") Integer guestId);
+    
+    @Query("SELECT COUNT(tb) FROM TreatmentBooking tb JOIN Schedule s ON s.treatmentBooking = tb WHERE s.therapist.id = :therapistId AND tb.status = :status")
+    Long countByTherapistIdAndStatus(@Param("therapistId") Integer therapistId, @Param("status") String status);
 }

@@ -54,4 +54,11 @@ public class Booking extends BaseEntity {
 
     @Column(name = "payment_status", length = 10)
     private String paymentStatus;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.guestId == null) {
+            this.guestId = 1;
+        }
+    }
 }

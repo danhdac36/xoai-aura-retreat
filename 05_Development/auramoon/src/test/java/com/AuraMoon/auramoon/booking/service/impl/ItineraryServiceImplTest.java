@@ -215,4 +215,40 @@ class ItineraryServiceImplTest {
         assertEquals("Phòng tập A", yogaEvent.getLocation());
         assertTrue(yogaEvent.getDescription().contains("GV Học viên Yoga GV"));
     }
+
+    @Test
+    @DisplayName("BKG-SVC-001 - Lấy danh sách lịch sử đặt phòng thành công")
+    void getBookingHistory_Success() {
+        // Arrange
+        Integer guestId = 1;
+        RetreatPackage retreatPackage = RetreatPackage.builder()
+                .packageName("Gói Tĩnh Dưỡng Cuối Tuần")
+                .price(java.math.BigDecimal.valueOf(5000000))
+                .build();
+
+        Booking booking1 = Booking.builder()
+                .id(101)
+                .guestId(guestId)
+                .checkinDate(LocalDateTime.of(2026, 5, 1, 14, 0))
+                .checkoutDate(LocalDateTime.of(2026, 5, 3, 12, 0))
+                .bookingStatus("CHECKED_OUT")
+                .retreatPackage(retreatPackage)
+                .build();
+
+        when(bookingRepository.findByGuestId(eq(guestId), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(Collections.singletonList(booking1)));
+
+        // Act
+        org.springframework.data.domain.Page<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> dtoPage = itineraryService.getBookingHistory(guestId, null, 0, 10);
+        java.util.List<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> dtos = dtoPage.getContent();
+
+        // Assert
+        assertNotNull(dtos);
+        assertEquals(1, dtos.size());
+        com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO dto = dtos.get(0);
+        assertEquals(101, dto.getBookingId());
+        assertEquals("Gói Tĩnh Dưỡng Cuối Tuần", dto.getPackageName());
+        assertEquals("CHECKED_OUT", dto.getStatus());
+        assertEquals(5000000.0, dto.getTotalAmount());
+    }
 }

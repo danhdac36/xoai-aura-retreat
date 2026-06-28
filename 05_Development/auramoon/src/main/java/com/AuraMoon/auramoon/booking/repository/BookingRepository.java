@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findByGuestId(Integer guestId);
+    org.springframework.data.domain.Page<Booking> findByGuestId(Integer guestId, org.springframework.data.domain.Pageable pageable);
+    org.springframework.data.domain.Page<Booking> findByGuestIdAndBookingStatus(Integer guestId, String status, org.springframework.data.domain.Pageable pageable);
     List<Booking> findByBookingStatusInAndCheckinDateBetween(List<String> statuses, LocalDateTime start, LocalDateTime end);
     boolean existsByGuestIdAndBookingStatusIn(Integer guestId, List<String> statuses);
 }

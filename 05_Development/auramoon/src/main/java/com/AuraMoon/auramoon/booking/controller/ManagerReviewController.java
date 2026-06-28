@@ -1,41 +1,31 @@
 package com.AuraMoon.auramoon.booking.controller;
 
-import com.AuraMoon.auramoon.auth.entity.User;
-import com.AuraMoon.auramoon.auth.repository.UserRepository;
-import com.AuraMoon.auramoon.booking.entity.Review;
-import com.AuraMoon.auramoon.booking.repository.ReviewRepository;
-import lombok.RequiredArgsConstructor;
+import com.AuraMoon.auramoon.booking.service.IManagerReviewService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @Controller
-@RequiredArgsConstructor
 public class ManagerReviewController {
 
-    private final ReviewRepository reviewRepository;
-    private final UserRepository userRepository;
+    @Autowired
+    private IManagerReviewService managerReviewService;
 
     @GetMapping("/manager/reviews")
-    public String viewReviews(Model model) {
-        List<Review> reviews = reviewRepository.findAll();
-        
-        Map<Integer, String> guestNames = new HashMap<>();
-        for (Review r : reviews) {
-            Integer guestId = r.getBooking().getGuestId();
-            if (guestId != null && !guestNames.containsKey(guestId)) {
-                userRepository.findById(guestId).ifPresent(user -> {
-                    guestNames.put(guestId, user.getFullName());
-                });
-            }
-        }
-        
-        model.addAttribute("reviews", reviews);
-        model.addAttribute("guestNames", guestNames);
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    public String renderReviewDashboard(Model model) {
+        model.addAttribute("reviews", managerReviewService.getVisibleReviews());
+        Object metrics = managerReviewService.getMetrics();
+        model.addAttribute("metrics", metrics != null ? metrics : java.util.Map.of("totalReviews", 0, "averageRating", "0.0"));
         return "manager/reviews";
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/manager/reviews/hide/{id}")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    public String hideReview(@org.springframework.web.bind.annotation.PathVariable long id) {
+        managerReviewService.hideReview(id);
+        return "redirect:/manager/reviews";
     }
 }

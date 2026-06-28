@@ -14,4 +14,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findByIsDeleteTrue();
     List<User> findByIsDeleteTrueAndEmailContainingIgnoreCase(String email);
     java.util.Optional<User> findByEmail(String email);
+    List<User> findByFullNameContainingIgnoreCase(String fullName);
 }

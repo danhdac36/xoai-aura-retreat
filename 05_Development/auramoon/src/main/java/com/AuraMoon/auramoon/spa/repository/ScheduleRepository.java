@@ -11,6 +11,9 @@ import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
        List<Schedule> findByStartTimeBetweenAndIsDeleteFalse(LocalDateTime start, LocalDateTime end);
+       List<Schedule> findTop10ByTherapistIdOrderByStartTimeDesc(Integer therapistId);
+       org.springframework.data.domain.Page<Schedule> findByTherapistIdOrderByStartTimeDesc(Integer therapistId, org.springframework.data.domain.Pageable pageable);
+       org.springframework.data.domain.Page<Schedule> findByTherapistIdAndTreatmentBookingStatusOrderByStartTimeDesc(Integer therapistId, String status, org.springframework.data.domain.Pageable pageable);
 
        @Query("SELECT s FROM Schedule s " +
                      "JOIN FETCH s.treatmentBooking tb " +

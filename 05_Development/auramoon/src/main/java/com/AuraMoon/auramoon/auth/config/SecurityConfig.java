@@ -10,8 +10,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
         @Autowired
@@ -48,6 +51,11 @@ public class SecurityConfig {
                         "/packges/**"
         };
 
+        private static final String[] SHARED_BOOKING_ENDPOINTS = {
+                        "/booking/itinerary/**",
+                        "/booking/history/**"
+        };
+
         private static final String[] ADMIN_ENDPOINTS = {
                         "/admin/**",
                         "/manager/dashboard/**",
@@ -77,6 +85,7 @@ public class SecurityConfig {
         };
 
         private static final String[] MANAGER_ADMIN_ENDPOINTS = {
+                        "/manager/dashboard/**",
                         "/manager/report/**",
                         "/packages/**",
                         "/manager/reviews/**"
@@ -96,6 +105,7 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                                                 .requestMatchers(GUEST_ENDPOINTS).hasRole("GUEST")
+                                                .requestMatchers(SHARED_BOOKING_ENDPOINTS).hasAnyRole("GUEST", "MANAGER", "RECEPTIONIST", "ADMIN")
                                                 .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
                                                 .requestMatchers(RECEPTIONIST_ENDPOINTS).hasRole("RECEPTIONIST")
                                                 .requestMatchers(THERAPIST_ENDPOINTS).hasRole("THERAPIST")

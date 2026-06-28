@@ -18,7 +18,8 @@ public interface VillaRepository extends JpaRepository<Villa, Integer> {
         long countByVillaStatusAndIsDeleteFalse(String status);
 
         // UC28 - Housekeeping Management
-        List<Villa> findByCleaningStatusInAndIsDeleteFalse(List<String> cleaningStatuses);
+        @Query("SELECT v FROM Villa v WHERE v.isDelete = false AND (v.cleaningStatus IN :cleaningStatuses OR v.villaStatus = :villaStatus)")
+        List<Villa> findHousekeepingVillas(@Param("cleaningStatuses") List<String> cleaningStatuses, @Param("villaStatus") String villaStatus);
 
         List<Villa> findByVillaStatusAndIsDeleteFalse(String status);
 

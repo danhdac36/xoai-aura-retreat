@@ -35,7 +35,7 @@ public class InvoiceEmailListenerTest {
 
         listener.handleCheckoutEvent(event);
 
-        verify(emailNotificationService, never()).sendInvoiceEmail(any(), any());
+        verify(emailNotificationService, never()).sendInvoiceEmail(any(), anyInt(), any());
         verify(auditLogRepository, times(1))
                 .save(argThat(log -> "MSG-22: No Email".equals(log.getDetails()) && log.getTargetId().equals(1001)));
     }
@@ -47,8 +47,7 @@ public class InvoiceEmailListenerTest {
         byte[] dummyPdf = new byte[] { 1, 2 };
 
         when(pdfGeneratorService.generateConsolidatedInvoice(2001)).thenReturn(dummyPdf);
-        doThrow(new RuntimeException("SMTP Failure")).when(emailNotificationService).sendInvoiceEmail("test@qa.com",
-                dummyPdf);
+        doThrow(new RuntimeException("SMTP Failure")).when(emailNotificationService).sendInvoiceEmail("test@qa.com", 2001, dummyPdf);
 
         listener.handleCheckoutEvent(event);
 

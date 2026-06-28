@@ -32,6 +32,9 @@ public class Villa {
     @Column(name = "cleaning_status", length = 10)
     private String cleaningStatus;
 
+    @Column(name = "maintenance_note", length = 500)
+    private String maintenanceNote;
+
     @Column(name = "is_delete")
     @Builder.Default
     private Boolean isDelete = false;

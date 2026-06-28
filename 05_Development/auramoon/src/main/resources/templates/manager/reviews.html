@@ -1,107 +1,163 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/admin-layout :: layout(~{::div})}">
-
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/admin-layout :: layout(~{::section})">
 <head>
-    <title>Quản lý Đánh giá Khách hàng</title>
+    <title>Customer Reviews Dashboard | Lumina Wellness</title>
 </head>
-
 <body>
-    <div class="w-full">
-        <div class="max-w-7xl mx-auto">
-            <!-- Page Header Section -->
-            <section class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-stack-lg">
-                <div>
-                    <h2 class="font-headline-lg text-headline-lg text-on-background mb-2">Đánh giá của khách hàng</h2>
-                    <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
-                        Xem và lắng nghe ý kiến phản hồi từ các khách hàng sau khi hoàn tất kỳ nghỉ dưỡng. Trải nghiệm dịch vụ xuất sắc luôn là ưu tiên hàng đầu tại Xoai Aura Retreat.
-                    </p>
-                </div>
-            </section>
-
-            <!-- Summary Statistics (Optional but looks highly premium!) -->
-            <section class="grid grid-cols-1 sm:grid-cols-3 gap-gutter mb-stack-lg">
-                <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex flex-col">
-                    <span class="font-label-md text-label-md text-on-surface-variant mb-2">Tổng số lượt đánh giá</span>
-                    <span class="font-headline-md text-headline-md text-primary font-bold" th:text="${#lists.size(reviews)}">0</span>
-                </div>
-                <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex flex-col">
-                    <span class="font-label-md text-label-md text-on-surface-variant mb-2">Điểm đánh giá trung bình</span>
-                    <span class="font-headline-md text-headline-md text-[#92400e] font-bold" 
-                          th:text="${reviews.isEmpty() ? '0.0' : #numbers.formatDecimal(reviews.stream().mapToDouble(r -> r.rating).average().orElse(0.0), 1, 1)} + ' / 5.0'">
-                        4.5 / 5.0
-                    </span>
-                </div>
-                <div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg shadow-sm flex flex-col justify-center">
-                    <span class="font-label-md text-label-md text-on-surface-variant mb-1">Mức độ hài lòng</span>
-                    <div class="flex items-center gap-2">
-                        <span class="font-headline-sm text-headline-sm text-green-700 font-bold">100%</span>
-                        <span class="text-on-surface-variant text-[12px] opacity-80">(Điểm 4-5 sao)</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Detailed Data Table Section -->
-            <section class="mb-stack-lg">
-                <div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden shadow-sm">
-                    <div class="px-8 py-6 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">
-                        <h3 class="font-headline-sm text-headline-sm text-primary">Danh sách nhận xét phản hồi</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-surface-container-low">
-                                <tr>
-                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider">Khách hàng</th>
-                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">Villa</th>
-                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">Thời gian ở</th>
-                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider text-center">Điểm số</th>
-                                    <th class="px-8 py-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant uppercase tracking-wider">Nhận xét chi tiết</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-outline-variant">
-                                <tr th:each="review : ${reviews}" class="hover:bg-surface-bright transition-colors">
-                                    <!-- Guest Name -->
-                                    <td class="px-8 py-5 font-body-md text-body-md text-primary font-bold" 
-                                        th:text="${guestNames.get(review.booking.guestId) != null ? guestNames.get(review.booking.guestId) : 'Khách hàng ẩn danh'}">
-                                        Nguyễn Văn A
-                                    </td>
-                                    <!-- Villa -->
-                                    <td class="px-8 py-5 text-center font-body-md text-body-md font-semibold text-primary" 
-                                        th:text="${review.booking.assignedVilla != null ? review.booking.assignedVilla.villaCode : 'N/A'}">
-                                        V101
-                                    </td>
-                                    <!-- Time Period -->
-                                    <td class="px-8 py-5 text-center font-body-md text-body-md text-on-surface-variant" 
-                                        th:text="${#temporals.format(review.booking.checkinDate, 'dd/MM/yyyy')} + ' - ' + ${#temporals.format(review.booking.checkoutDate, 'dd/MM/yyyy')}">
-                                        01/06/2026 - 05/06/2026
-                                    </td>
-                                    <!-- Star Rating -->
-                                    <td class="px-8 py-5 text-center font-body-md text-body-md">
-                                        <div class="flex items-center justify-center gap-1 text-[#f59e0b]">
-                                            <span th:each="star : ${#numbers.sequence(1, 5)}" 
-                                                  th:text="${star <= review.rating ? '★' : '☆'}"
-                                                  class="text-lg">
-                                                ★
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <!-- Comment -->
-                                    <td class="px-8 py-5 font-body-md text-body-md text-on-surface-variant" 
-                                        th:text="${review.comment != null and !review.comment.isEmpty() ? review.comment : 'Không có bình luận.'}">
-                                        Dịch vụ chăm sóc sức khỏe tuyệt vời!
-                                    </td>
-                                </tr>
-                                <tr th:if="${reviews.isEmpty()}">
-                                    <td colspan="5" class="px-8 py-6 text-center text-on-surface-variant font-body-md text-body-md">
-                                        Chưa có lượt đánh giá nào được ghi nhận.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
+    <section class="max-w-7xl mx-auto py-12 space-y-12 w-full">
+        <!-- Header Section -->
+        <div class="space-y-2">
+            <h2 class="font-headline-md text-headline-md text-primary">Customer Reviews</h2>
+            <p class="font-body-md text-body-md text-earth-beige max-w-2xl">
+                Oversee and curate guest experiences. Monitor feedback across all wellness retreats to maintain our sanctuary's standards of quiet luxury and restorative excellence.
+            </p>
         </div>
-    </div>
-</body>
 
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            <!-- Stat Card 1 -->
+            <div class="bg-surface rounded-lg p-8 shadow-sm shadow-primary/5 border border-outline-variant/10 flex flex-col justify-between group hover:shadow-md transition-all">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="font-label-caps text-label-caps text-earth-beige">Total Reviews</span>
+                        <span class="material-symbols-outlined text-primary opacity-40 group-hover:opacity-100 transition-opacity">reviews</span>
+                    </div>
+                    <div class="font-headline-md text-headline-md text-primary" th:text="${metrics.totalReviews}">1,248</div>
+                </div>
+                <div class="mt-4 flex items-center gap-2 text-sage-success">
+                    <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                    <span class="font-label-sm text-label-sm">+12% from last month</span>
+                </div>
+            </div>
+
+            <!-- Stat Card 2 -->
+            <div class="bg-surface rounded-lg p-8 shadow-sm shadow-primary/5 border border-outline-variant/10 flex flex-col justify-between group hover:shadow-md transition-all">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="font-label-caps text-label-caps text-earth-beige">Average Rating</span>
+                        <span class="material-symbols-outlined text-primary opacity-40 group-hover:opacity-100 transition-opacity">star</span>
+                    </div>
+                    <div class="flex items-baseline gap-1">
+                        <span class="font-headline-md text-headline-md text-primary" th:text="${metrics.averageRating}">4.8</span>
+                        <span class="font-body-md text-earth-beige opacity-50">/ 5.0</span>
+                    </div>
+                </div>
+                <div class="mt-4 flex gap-1">
+                    <span class="material-symbols-outlined star-fill text-primary text-[18px]">grade</span>
+                    <span class="material-symbols-outlined star-fill text-primary text-[18px]">grade</span>
+                    <span class="material-symbols-outlined star-fill text-primary text-[18px]">grade</span>
+                    <span class="material-symbols-outlined star-fill text-primary text-[18px]">grade</span>
+                    <span class="material-symbols-outlined star-fill text-primary text-[18px] opacity-40">grade</span>
+                </div>
+            </div>
+
+            <!-- Stat Card 3 -->
+            <div class="bg-surface rounded-lg p-8 shadow-sm shadow-primary/5 border border-outline-variant/10 flex flex-col justify-between group hover:shadow-md transition-all">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="font-label-caps text-label-caps text-earth-beige">Satisfaction Rate</span>
+                        <span class="material-symbols-outlined text-primary opacity-40 group-hover:opacity-100 transition-opacity">sentiment_very_satisfied</span>
+                    </div>
+                    <div class="font-headline-md text-headline-md text-primary">96%</div>
+                </div>
+                <div class="mt-4 w-full bg-secondary-container h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-primary h-full w-[96%] transition-all duration-1000"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="bg-surface rounded-xl shadow-sm shadow-primary/5 border border-outline-variant/10 overflow-hidden">
+            <div class="px-8 py-6 border-b border-outline-variant/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <h3 class="font-headline-sm text-headline-sm text-primary">Recent Feedback</h3>
+                <div class="flex items-center gap-3">
+                    <button class="px-4 py-2 rounded-lg border border-outline-variant/50 text-earth-beige font-label-caps text-label-caps hover:bg-earth-beige/5 transition-colors flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filter
+                    </button>
+                    <button class="px-4 py-2 rounded-lg border border-outline-variant/50 text-earth-beige font-label-caps text-label-caps hover:bg-earth-beige/5 transition-colors flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">download</span>
+                        Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-sand-surface/50">
+                            <th class="px-8 py-4 font-label-caps text-label-caps text-earth-beige font-semibold uppercase tracking-wider">Booking ID</th>
+                            <th class="px-8 py-4 font-label-caps text-label-caps text-earth-beige font-semibold uppercase tracking-wider">Guest Name</th>
+                            <th class="px-8 py-4 font-label-caps text-label-caps text-earth-beige font-semibold uppercase tracking-wider">Star Rating</th>
+                            <th class="px-8 py-4 font-label-caps text-label-caps text-earth-beige font-semibold uppercase tracking-wider">Comment</th>
+                            <th class="px-8 py-4 font-label-caps text-label-caps text-earth-beige font-semibold uppercase tracking-wider text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/10">
+                        <tr th:if="${#lists.isEmpty(reviews)}">
+                            <td colspan="5" class="px-8 py-6 text-center text-earth-beige font-body-md">No reviews available.</td>
+                        </tr>
+                        
+                        <tr th:each="review : ${reviews}" class="hover:bg-earth-beige/[0.02] transition-colors group">
+                            <td class="px-8 py-6 font-label-caps text-label-caps text-primary" th:text="'#AW-' + ${review.bookingId}">#AW-9021</td>
+                            <td class="px-8 py-6">
+                                <a th:if="${review.guestId != null}" th:href="@{/manager/staff/profile/{id}(id=${review.guestId})}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                                    <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center font-bold text-primary text-[12px]" 
+                                         th:text="${review.guestName != null && review.guestName.length() >= 2 ? review.guestName.substring(0,2).toUpperCase() : 'GU'}">SJ</div>
+                                    <span class="font-body-md font-medium text-primary underline underline-offset-2" th:text="${review.guestName}">Sienna Johansson</span>
+                                </a>
+                                <div th:unless="${review.guestId != null}" class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center font-bold text-primary text-[12px]" 
+                                         th:text="${review.guestName != null && review.guestName.length() >= 2 ? review.guestName.substring(0,2).toUpperCase() : 'GU'}">SJ</div>
+                                    <span class="font-body-md font-medium" th:text="${review.guestName}">Sienna Johansson</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex gap-0.5 text-primary">
+                                    <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                          class="material-symbols-outlined text-[16px]"
+                                          th:classappend="${i <= review.rating} ? 'star-fill' : 'opacity-20'">grade</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6 max-w-xs xl:max-w-md">
+                                <p class="font-body-sm text-on-surface truncate italic" th:text="${review.comment}">"The aromatherapy session was absolute bliss..."</p>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <div class="flex items-center justify-end gap-3">
+                                    <a th:href="${review.guestId != null ? '/manager/staff/profile/' + review.guestId : '#'}" class="bg-primary text-white px-5 py-2.5 rounded-lg font-label-caps text-label-caps hover:bg-primary/90 active:scale-95 transition-all inline-block">View Details</a>
+                                    <form th:action="@{/manager/reviews/hide/{id}(id=${review.id})}" method="post" class="inline">
+                                        <button type="submit" class="border border-primary text-primary px-5 py-2.5 rounded-lg font-label-caps text-label-caps hover:bg-primary/5 active:scale-95 transition-all">Hide</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="px-8 py-6 border-t border-outline-variant/10 flex items-center justify-between">
+                <p class="font-label-sm text-label-sm text-earth-beige" th:text="'Showing ' + ${reviews.size()} + ' of ' + ${metrics.totalReviews} + ' reviews'">Showing 1-4 of 1,248 reviews</p>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 rounded-lg border border-outline-variant/30 text-earth-beige hover:bg-earth-beige/5 disabled:opacity-30" disabled="">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <button class="px-4 py-2 rounded-lg bg-primary text-white font-label-caps text-label-caps">1</button>
+                    <button class="p-2 rounded-lg border border-outline-variant/30 text-earth-beige hover:bg-earth-beige/5">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Floating Graphic / Quote -->
+        <div class="pt-margin-desktop text-center max-w-3xl mx-auto space-y-8">
+            <div class="w-16 h-1 bg-primary mx-auto rounded-full opacity-20"></div>
+            <blockquote class="font-headline-md text-headline-md italic text-primary leading-relaxed px-4">
+                "True wellness is the harmony of self and surroundings."
+            </blockquote>
+            <p class="font-label-caps text-label-caps tracking-widest text-earth-beige">â€” Lumina Philosophy â€”</p>
+        </div>
+    </section>
+</body>
 </html>
