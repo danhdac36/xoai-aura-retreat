@@ -113,6 +113,7 @@ class SpaManualBookingServiceTest {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(treatmentServiceRepository.findById(serviceId)).thenReturn(Optional.of(service));
         when(billingService.findFolioIdByBookingId(bookingId)).thenReturn(Optional.of(folioId));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(bookingId)).thenReturn(Collections.emptyList());
         when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(room));
         when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(List.of(therapist));
         when(treatmentBookingRepository.save(any(TreatmentBooking.class))).thenReturn(treatmentBooking);
@@ -213,6 +214,7 @@ class SpaManualBookingServiceTest {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(treatmentServiceRepository.findById(serviceId)).thenReturn(Optional.of(service));
         when(billingService.findFolioIdByBookingId(bookingId)).thenReturn(Optional.of(folioId));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(bookingId)).thenReturn(Collections.emptyList());
         when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(room));
         when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(Collections.emptyList()); // Hết therapist
 
@@ -270,6 +272,7 @@ class SpaManualBookingServiceTest {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(treatmentServiceRepository.findById(serviceId)).thenReturn(Optional.of(service));
         when(billingService.findFolioIdByBookingId(bookingId)).thenReturn(Optional.of(folioId));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(bookingId)).thenReturn(Collections.emptyList());
         when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(room));
         when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(List.of(therapist));
         when(treatmentBookingRepository.save(any(TreatmentBooking.class))).thenReturn(treatmentBooking);
@@ -331,6 +334,7 @@ class SpaManualBookingServiceTest {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
         when(treatmentServiceRepository.findById(serviceId)).thenReturn(Optional.of(service));
         when(billingService.findFolioIdByBookingId(bookingId)).thenReturn(Optional.of(folioId));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(bookingId)).thenReturn(Collections.emptyList());
         when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(room));
         when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(List.of(t1, t2));
         when(treatmentBookingRepository.save(any(TreatmentBooking.class))).thenReturn(treatmentBooking);
@@ -354,5 +358,184 @@ class SpaManualBookingServiceTest {
         assertNotNull(response);
         assertEquals("TH02", response.getTherapistCode()); // Verify that t2 was chosen
         verify(scheduleRepository).save(org.mockito.ArgumentMatchers.argThat(s -> s.getTherapist().getId().equals(102)));
+    }
+
+    @Test
+    @DisplayName("SPA-TC-006-Manual: Đơn 1 người đặt ca spa thứ 2 ngoài gói trùng giờ → thất bại")
+    void bookAdditionalService_singleGuest_overlap_throwsSpaBusinessException() {
+        // Arrange
+        Integer bookingId = 10;
+        Integer serviceId = 5;
+        Integer receptionistUserId = 2;
+        LocalDateTime startTime = LocalDateTime.of(2026, 6, 15, 14, 0);
+
+        Booking booking = Booking.builder()
+                .bookingStatus("Checked-In")
+                .totalGuests(1) // 1 guest
+                .build();
+        booking.setId(bookingId);
+
+        TreatmentService service = TreatmentService.builder()
+                .serviceName("Swedish Massage")
+                .durationMinutes(60)
+                .price(BigDecimal.valueOf(500000))
+                .build();
+        service.setId(serviceId);
+
+        TreatmentRoom room = TreatmentRoom.builder().status("AVAILABLE").build();
+        room.setId(1);
+
+        SpaScheduleRequest request = new SpaScheduleRequest();
+        request.setBookingId(bookingId);
+        request.setServiceId(serviceId);
+        request.setStartTime(startTime);
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+        when(treatmentServiceRepository.findById(serviceId)).thenReturn(Optional.of(service));
+        when(billingService.findFolioIdByBookingId(bookingId)).thenReturn(Optional.of(100));
+        when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(room));
+
+        // Mock overlapping schedule
+        Schedule existingSchedule = new Schedule();
+        existingSchedule.setStartTime(startTime);
+        existingSchedule.setEndTime(startTime.plusMinutes(60));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(bookingId))
+                .thenReturn(List.of(existingSchedule));
+
+        // Act & Assert
+        SpaBusinessException exception = assertThrows(SpaBusinessException.class, () ->
+                spaManualBookingService.bookAdditionalService(request, receptionistUserId)
+        );
+
+        assertEquals("SPA-013", exception.getErrorCode());
+        assertEquals("Quý khách không thể đặt 2 ca spa cùng một thời điểm.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("SPA-TC-007-Manual: Đơn nhiều người đặt ca spa thứ 2 ngoài gói trùng giờ → thành công nếu chưa vượt quá số khách")
+    void bookAdditionalService_multiGuest_overlapWithinLimit_succeeds() {
+        // Arrange
+        Integer bookingId = 10;
+        Integer serviceId = 5;
+        Integer receptionistUserId = 2;
+        Integer folioId = 100;
+        LocalDateTime startTime = LocalDateTime.of(2026, 6, 15, 14, 0);
+
+        Booking booking = Booking.builder()
+                .bookingStatus("Checked-In")
+                .totalGuests(2) // 2 guests
+                .build();
+        booking.setId(bookingId);
+
+        TreatmentService service = TreatmentService.builder()
+                .serviceName("Swedish Massage")
+                .durationMinutes(60)
+                .price(BigDecimal.valueOf(500000))
+                .build();
+        service.setId(serviceId);
+
+        TreatmentRoom room = TreatmentRoom.builder().status("AVAILABLE").build();
+        room.setId(1);
+
+        Therapist therapist = Therapist.builder().therapistCode("T002").status("AVAILABLE").build();
+
+        TreatmentBooking treatmentBooking = TreatmentBooking.builder()
+                .bookingId(bookingId)
+                .folioId(folioId)
+                .treatmentService(service)
+                .status("Scheduled")
+                .build();
+        treatmentBooking.setId(50);
+
+        Schedule schedule = Schedule.builder()
+                .treatmentBooking(treatmentBooking)
+                .therapist(therapist)
+                .room(room)
+                .startTime(startTime)
+                .endTime(startTime.plusMinutes(60))
+                .isDelete(false)
+                .build();
+        schedule.setId(1);
+
+        SpaScheduleRequest request = new SpaScheduleRequest();
+        request.setBookingId(bookingId);
+        request.setServiceId(serviceId);
+        request.setStartTime(startTime);
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+        when(treatmentServiceRepository.findById(serviceId)).thenReturn(Optional.of(service));
+        when(billingService.findFolioIdByBookingId(bookingId)).thenReturn(Optional.of(folioId));
+        when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(room));
+        when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(List.of(therapist));
+        when(treatmentBookingRepository.save(any(TreatmentBooking.class))).thenReturn(treatmentBooking);
+        when(scheduleRepository.save(any(Schedule.class))).thenReturn(schedule);
+
+        // Mock 1 overlapping schedule (overlapping count 1 < 2, so it should succeed)
+        Schedule existingSchedule = new Schedule();
+        existingSchedule.setStartTime(startTime);
+        existingSchedule.setEndTime(startTime.plusMinutes(60));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(bookingId))
+                .thenReturn(List.of(existingSchedule));
+
+        // Act
+        SpaScheduleResponse response = spaManualBookingService.bookAdditionalService(request, receptionistUserId);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(1, response.getScheduleId());
+    }
+
+    @Test
+    @DisplayName("SPA-TC-008-Manual: Đơn nhiều người đặt ca spa ngoài gói trùng giờ → thất bại nếu vượt quá số khách")
+    void bookAdditionalService_multiGuest_overlapExceedsLimit_throwsSpaBusinessException() {
+        // Arrange
+        Integer bookingId = 10;
+        Integer serviceId = 5;
+        Integer receptionistUserId = 2;
+        LocalDateTime startTime = LocalDateTime.of(2026, 6, 15, 14, 0);
+
+        Booking booking = Booking.builder()
+                .bookingStatus("Checked-In")
+                .totalGuests(2) // 2 guests
+                .build();
+        booking.setId(bookingId);
+
+        TreatmentService service = TreatmentService.builder()
+                .serviceName("Swedish Massage")
+                .durationMinutes(60)
+                .price(BigDecimal.valueOf(500000))
+                .build();
+        service.setId(serviceId);
+
+        TreatmentRoom room = TreatmentRoom.builder().status("AVAILABLE").build();
+        room.setId(1);
+
+        SpaScheduleRequest request = new SpaScheduleRequest();
+        request.setBookingId(bookingId);
+        request.setServiceId(serviceId);
+        request.setStartTime(startTime);
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+        when(treatmentServiceRepository.findById(serviceId)).thenReturn(Optional.of(service));
+        when(billingService.findFolioIdByBookingId(bookingId)).thenReturn(Optional.of(100));
+        when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(room));
+
+        // Mock 2 overlapping schedules (overlapping count 2 >= 2, so it should fail)
+        Schedule existingSchedule1 = new Schedule();
+        existingSchedule1.setStartTime(startTime);
+        existingSchedule1.setEndTime(startTime.plusMinutes(60));
+        Schedule existingSchedule2 = new Schedule();
+        existingSchedule2.setStartTime(startTime.plusMinutes(10));
+        existingSchedule2.setEndTime(startTime.plusMinutes(70));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(bookingId))
+                .thenReturn(List.of(existingSchedule1, existingSchedule2));
+
+        // Act & Assert
+        SpaBusinessException exception = assertThrows(SpaBusinessException.class, () ->
+                spaManualBookingService.bookAdditionalService(request, receptionistUserId)
+        );
+
+        assertEquals("SPA-013", exception.getErrorCode());
+        assertEquals("Số lượng ca spa trùng thời điểm vượt quá số lượng khách trong đơn đặt phòng (tối đa 2 người).", exception.getMessage());
     }
 }

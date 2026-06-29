@@ -83,6 +83,7 @@ class SpaScheduleServiceImplTest {
         guestBooking.setBookingStatus("Checked-In");
         guestBooking.setGuestId(5);
         when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(1)).thenReturn(Collections.emptyList());
 
         TreatmentRoom room = new TreatmentRoom();
         room.setId(5);
@@ -148,6 +149,7 @@ class SpaScheduleServiceImplTest {
         guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
         guestBooking.setBookingStatus("Checked-In");
         when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(1)).thenReturn(Collections.emptyList());
 
         when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(Collections.emptyList());
 
@@ -182,6 +184,7 @@ class SpaScheduleServiceImplTest {
         guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
         guestBooking.setBookingStatus("Checked-In");
         when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(1)).thenReturn(Collections.emptyList());
 
         when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(new TreatmentRoom()));
         when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(Collections.emptyList());
@@ -242,6 +245,7 @@ class SpaScheduleServiceImplTest {
         guestBooking.setBookingStatus("Checked-In");
         guestBooking.setGuestId(5);
         when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(1)).thenReturn(Collections.emptyList());
 
         TreatmentRoom room = new TreatmentRoom();
         room.setId(5);
@@ -291,5 +295,152 @@ class SpaScheduleServiceImplTest {
                 eq("VIP Room 1"),
                 any()
         );
+    }
+
+    @Test
+    @DisplayName("SPA-TC-006: Đơn 1 người đặt ca spa thứ 2 trùng giờ → thất bại")
+    void scheduleSession_singleGuest_overlap_shouldThrowSpaBusinessException() {
+        // Arrange
+        SpaScheduleRequest request = new SpaScheduleRequest();
+        request.setBookingId(1);
+        request.setServiceId(10);
+        request.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
+
+        TreatmentBooking booking = new TreatmentBooking();
+        booking.setId(100);
+        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10)).thenReturn(List.of(booking));
+
+        TreatmentService service = new TreatmentService();
+        service.setDurationMinutes(60);
+        when(treatmentServiceRepository.findById(10)).thenReturn(Optional.of(service));
+
+        Booking guestBooking = new Booking();
+        guestBooking.setTotalGuests(1); // 1 guest
+        guestBooking.setBookingStatus("Checked-In");
+        guestBooking.setCheckinDate(LocalDateTime.of(2024, 6, 19, 14, 0));
+        guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
+        when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
+
+        // Mock 1 existing overlapping schedule
+        Schedule existingSchedule = new Schedule();
+        existingSchedule.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
+        existingSchedule.setEndTime(LocalDateTime.of(2024, 6, 20, 11, 0));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(1))
+                .thenReturn(List.of(existingSchedule));
+
+        // Act & Assert
+        SpaBusinessException exception = assertThrows(SpaBusinessException.class, () -> {
+            spaScheduleService.scheduleSession(request);
+        });
+
+        assertEquals("SPA-013", exception.getErrorCode());
+        assertEquals("Quý khách không thể đặt 2 ca spa cùng một thời điểm.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("SPA-TC-007: Đơn nhiều người đặt ca spa trùng giờ → thành công nếu chưa vượt quá số khách")
+    void scheduleSession_multiGuest_overlapWithinLimit_shouldSucceed() throws Exception {
+        // Arrange
+        SpaScheduleRequest request = new SpaScheduleRequest();
+        request.setBookingId(1);
+        request.setServiceId(10);
+        request.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
+
+        TreatmentBooking booking = new TreatmentBooking();
+        booking.setId(100);
+        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10)).thenReturn(List.of(booking));
+
+        TreatmentService service = new TreatmentService();
+        service.setDurationMinutes(60);
+        service.setServiceName("Body Massage");
+        when(treatmentServiceRepository.findById(10)).thenReturn(Optional.of(service));
+
+        Booking guestBooking = new Booking();
+        guestBooking.setTotalGuests(2); // 2 guests
+        guestBooking.setBookingStatus("Checked-In");
+        guestBooking.setCheckinDate(LocalDateTime.of(2024, 6, 19, 14, 0));
+        guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
+        guestBooking.setGuestId(5);
+        when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
+
+        // Mock 1 existing overlapping schedule (overlapping count 1 < 2, so it should be allowed)
+        Schedule existingSchedule = new Schedule();
+        existingSchedule.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
+        existingSchedule.setEndTime(LocalDateTime.of(2024, 6, 20, 11, 0));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(1))
+                .thenReturn(List.of(existingSchedule));
+
+        TreatmentRoom room = new TreatmentRoom();
+        room.setId(5);
+        room.setRoomName("VIP Room 1");
+        when(roomRepository.findAvailableRoomsWithLock(any(), any())).thenReturn(List.of(room));
+
+        Therapist therapist = new Therapist();
+        therapist.setTherapistCode("TH01");
+        when(therapistRepository.findAvailableTherapistsWithLock(any(), any())).thenReturn(List.of(therapist));
+
+        User guest = new User();
+        guest.setId(5);
+        guest.setEmail("guest@example.com");
+        guest.setFullName("Nguyen Van A");
+        when(userRepository.findById(5)).thenReturn(Optional.of(guest));
+
+        Schedule savedSchedule = new Schedule();
+        savedSchedule.setId(999);
+        savedSchedule.setRoom(room);
+        savedSchedule.setTherapist(therapist);
+        savedSchedule.setStartTime(request.getStartTime());
+        savedSchedule.setEndTime(request.getStartTime().plusMinutes(60));
+        when(scheduleRepository.save(any(Schedule.class))).thenReturn(savedSchedule);
+
+        // Act
+        SpaScheduleResponse response = spaScheduleService.scheduleSession(request);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(999, response.getScheduleId());
+    }
+
+    @Test
+    @DisplayName("SPA-TC-008: Đơn nhiều người đặt ca spa trùng giờ → thất bại nếu vượt quá số khách")
+    void scheduleSession_multiGuest_overlapExceedsLimit_shouldThrowSpaBusinessException() {
+        // Arrange
+        SpaScheduleRequest request = new SpaScheduleRequest();
+        request.setBookingId(1);
+        request.setServiceId(10);
+        request.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
+
+        TreatmentBooking booking = new TreatmentBooking();
+        booking.setId(100);
+        when(treatmentBookingRepository.findByBookingIdAndTreatmentService_Id(1, 10)).thenReturn(List.of(booking));
+
+        TreatmentService service = new TreatmentService();
+        service.setDurationMinutes(60);
+        when(treatmentServiceRepository.findById(10)).thenReturn(Optional.of(service));
+
+        Booking guestBooking = new Booking();
+        guestBooking.setTotalGuests(2); // 2 guests
+        guestBooking.setBookingStatus("Checked-In");
+        guestBooking.setCheckinDate(LocalDateTime.of(2024, 6, 19, 14, 0));
+        guestBooking.setCheckoutDate(LocalDateTime.of(2024, 6, 21, 12, 0));
+        when(bookingRepository.findById(1)).thenReturn(Optional.of(guestBooking));
+
+        // Mock 2 existing overlapping schedules (overlapping count 2 >= 2, so it should fail)
+        Schedule existingSchedule1 = new Schedule();
+        existingSchedule1.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 0));
+        existingSchedule1.setEndTime(LocalDateTime.of(2024, 6, 20, 11, 0));
+        Schedule existingSchedule2 = new Schedule();
+        existingSchedule2.setStartTime(LocalDateTime.of(2024, 6, 20, 10, 30));
+        existingSchedule2.setEndTime(LocalDateTime.of(2024, 6, 20, 11, 30));
+        when(scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(1))
+                .thenReturn(List.of(existingSchedule1, existingSchedule2));
+
+        // Act & Assert
+        SpaBusinessException exception = assertThrows(SpaBusinessException.class, () -> {
+            spaScheduleService.scheduleSession(request);
+        });
+
+        assertEquals("SPA-013", exception.getErrorCode());
+        assertEquals("Số lượng ca spa trùng thời điểm vượt quá số lượng khách trong đơn đặt phòng (tối đa 2 người).", exception.getMessage());
     }
 }

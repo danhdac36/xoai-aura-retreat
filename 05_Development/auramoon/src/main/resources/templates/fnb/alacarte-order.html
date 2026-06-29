@@ -18,13 +18,20 @@
             corePlugins: { preflight: false }
         }
     </script>
+    <style>
+        @media (min-width: 768px) {
+            aside.md\:flex {
+                display: flex !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
 <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 
     <!-- Header -->
-    <header class="header-container md:ml-64">
+    <header class="header-container md:ml-[280px]">
         <h1>Thực đơn gọi món ngoài (A-La-Carte)</h1>
         <p>Thưởng thức các món ngon ẩm thực cao cấp, chi phí sẽ được tự động ghi nhận vào hóa đơn phòng của bạn.</p>
     </header>
@@ -32,7 +39,7 @@
 
 
     <!-- Main Container -->
-    <main class="main-content md:ml-64">
+    <main class="main-content md:ml-[280px]">
         <!-- Left Column: Menu Items -->
         <section aria-label="Danh sách món gọi ngoài">
             <!-- Category Tabs -->
@@ -158,6 +165,23 @@
 
     <!-- Scripts -->
     <script src="/js/fnb/alacarte-order.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Highlight Sidebar active link for A-La-Carte Order
+            const alacarteLink = document.querySelector('aside a[href="/fnb/alacarte-order"]');
+            if (alacarteLink) {
+                alacarteLink.classList.remove('text-[#d2c5af]/70');
+                alacarteLink.classList.add('text-[#d2c5af]', 'bg-[#3a4536]/80', 'border-l-4', 'border-[#d2c5af]');
+                const indicator = alacarteLink.querySelector('div');
+                if (indicator) {
+                    indicator.classList.remove('h-0', 'opacity-0');
+                    indicator.classList.add('h-[60%]', 'opacity-100', 'bg-[#d2c5af]');
+                }
+                const icon = alacarteLink.querySelector('span.material-symbols-outlined');
+                if (icon) icon.classList.remove('opacity-60');
+            }
+        });
+    </script>
 </body>
 
 </html>

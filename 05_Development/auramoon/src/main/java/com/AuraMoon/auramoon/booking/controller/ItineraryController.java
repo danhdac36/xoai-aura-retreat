@@ -54,8 +54,8 @@ public class ItineraryController {
             model.addAttribute("timeline", timeline);
             return "guest/itinerary";
         } catch (IllegalArgumentException e) {
-            // Chuẩn hóa Redirect theo EDS sang trang dashboard thực tế (/profile/home)
-            return "redirect:/profile/home?error=no_booking";
+            // Chuẩn hóa Redirect theo EDS sang trang lịch sử đặt lịch (/booking/history)
+            return "redirect:/booking/history?error=no_booking";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "error";

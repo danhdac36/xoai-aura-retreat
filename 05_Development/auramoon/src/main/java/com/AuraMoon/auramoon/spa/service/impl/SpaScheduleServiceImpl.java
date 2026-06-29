@@ -101,6 +101,23 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
             }
         }
 
+        // 2.5. Kiểm tra trùng lịch Spa dựa trên số lượng khách (totalGuests)
+        List<Schedule> existingSchedules = scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(request.getBookingId());
+        long overlappingCount = existingSchedules.stream()
+                .filter(s -> s.getStartTime().isBefore(endTime) && s.getEndTime().isAfter(startTime))
+                .count();
+
+        int maxAllowedOverlapping = (guestBooking.getTotalGuests() != null) ? guestBooking.getTotalGuests() : 1;
+        if (overlappingCount >= maxAllowedOverlapping) {
+            if (maxAllowedOverlapping <= 1) {
+                throw new SpaBusinessException("SPA-013",
+                        "Quý khách không thể đặt 2 ca spa cùng một thời điểm.");
+            } else {
+                throw new SpaBusinessException("SPA-013",
+                        "Số lượng ca spa trùng thời điểm vượt quá số lượng khách trong đơn đặt phòng (tối đa " + maxAllowedOverlapping + " người).");
+            }
+        }
+
         // 3. Tìm Phòng và Chuyên viên rảnh bằng Pessimistic Lock (BR-04)
         List<TreatmentRoom> availableRooms = roomRepository.findAvailableRoomsWithLock(startTime, endTime);
         if (availableRooms.isEmpty()) {
@@ -112,7 +129,7 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
         if (availableTherapists.isEmpty()) {
             throw new SpaBusinessException("SPA-010", "No available Therapist or Therapy Room could be found.");
         }
-        
+
         // Cân bằng công việc: Lựa chọn Therapist có số ca làm việc ít nhất trong ngày
         Therapist selectedTherapist = availableTherapists.get(0);
         long minWorkload = Long.MAX_VALUE;
@@ -152,18 +169,19 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
         response.setStartTime(schedule.getStartTime());
         response.setEndTime(schedule.getEndTime());
 
-        // 4.5. Gửi email nhắc lịch hẹn cho khách (Bọc trong try-catch để tránh rollback giao dịch nếu lỗi mail)
+        // 4.5. Gửi email nhắc lịch hẹn cho khách (Bọc trong try-catch để tránh rollback
+        // giao dịch nếu lỗi mail)
         try {
             User guest = userRepository.findById(guestBooking.getGuestId()).orElse(null);
             if (guest != null && guest.getEmail() != null) {
-                String formattedTime = startTime.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy"));
+                String formattedTime = startTime
+                        .format(java.time.format.DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy"));
                 emailNotificationService.sendSpaBookingReminderEmail(
                         guest.getEmail(),
                         guest.getFullName() != null ? guest.getFullName() : "Guest",
                         service.getServiceName(),
                         selectedRoom.getRoomName(),
-                        formattedTime
-                );
+                        formattedTime);
             }
         } catch (Exception e) {
             System.err.println("[WARNING] Không thể gửi email nhắc lịch Spa: " + e.getMessage());

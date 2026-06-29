@@ -53,10 +53,13 @@ public class BookingServiceImpl implements BookingService {
                 }
 
                 if (guestId != null) {
-                        java.util.List<String> activeStatuses = java.util.Arrays.asList("PENDING", "CONFIRMED", "CHECKED_IN", "CHECKED-IN");
-                        boolean hasActive = bookingRepository.existsByGuestIdAndBookingStatusIn(guestId, activeStatuses);
+                        java.util.List<String> activeStatuses = java.util.Arrays.asList("PENDING", "CONFIRMED",
+                                        "CHECKED_IN", "CHECKED-IN");
+                        boolean hasActive = bookingRepository.existsByGuestIdAndBookingStatusIn(guestId,
+                                        activeStatuses);
                         if (hasActive) {
-                                throw new IllegalStateException("Bạn đang có một kỳ nghỉ chưa hoàn tất. Không thể đặt thêm gói mới!");
+                                throw new IllegalStateException(
+                                                "Bạn đang có một kỳ nghỉ chưa hoàn tất. Không thể đặt thêm gói mới!");
                         }
                 }
 
@@ -95,7 +98,8 @@ public class BookingServiceImpl implements BookingService {
                 // Save privacy consent if provided during booking
                 if (guestId != null && Boolean.TRUE.equals(request.getPrivacyConsent())) {
                         User guest = userRepository.findById(guestId)
-                                        .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin khách hàng với ID: " + guestId));
+                                        .orElseThrow(() -> new IllegalArgumentException(
+                                                        "Không tìm thấy thông tin khách hàng với ID: " + guestId));
                         Consent consent = Consent.builder()
                                         .user(guest)
                                         .consentStatus(true)
@@ -145,7 +149,8 @@ public class BookingServiceImpl implements BookingService {
                                 .orElseThrow(() -> new BookingNotFoundException(
                                                 "Không tìm thấy đơn đặt phòng với ID: " + bookingId));
 
-                if ("CONFIRMED".equals(booking.getBookingStatus())) return;
+                if ("CONFIRMED".equals(booking.getBookingStatus()))
+                        return;
 
                 booking.setBookingStatus("CONFIRMED");
                 booking.setPaymentStatus("PARTIAL");
@@ -158,29 +163,34 @@ public class BookingServiceImpl implements BookingService {
                 guestFolio.setStatus("OPEN");
                 guestFolioRepository.save(guestFolio);
 
-                // Auto create TreatmentBooking (Spa Ticket) for the guest with default active service
-                int durationDays = booking.getRetreatPackage().getDurationDays() != null 
-                        ? booking.getRetreatPackage().getDurationDays() : 1;
-                
+                // Auto create TreatmentBooking (Spa Ticket) for the guest with default active
+                // service
+                int durationDays = booking.getRetreatPackage().getDurationDays() != null
+                                ? booking.getRetreatPackage().getDurationDays()
+                                : 1;
+
                 treatmentServiceRepository.findAll().stream()
-                        .filter(s -> Boolean.TRUE.equals(s.getIsAvailable()) && Boolean.FALSE.equals(s.getIsDelete()))
-                        .findFirst()
-                        .ifPresent(service -> {
-                            for (int i = 0; i < durationDays; i++) {
-                                TreatmentBooking tb = new TreatmentBooking();
-                                tb.setBookingId(bookingId);
-                                tb.setTreatmentService(service);
-                                tb.setStatus("PENDING");
-                                tb.setIsDelete(false);
-                                treatmentBookingRepository.save(tb);
-                            }
-                        });
+                                .filter(s -> Boolean.TRUE.equals(s.getIsAvailable())
+                                                && Boolean.FALSE.equals(s.getIsDelete()))
+                                .findFirst()
+                                .ifPresent(service -> {
+                                        for (int i = 0; i < durationDays; i++) {
+                                                TreatmentBooking tb = new TreatmentBooking();
+                                                tb.setBookingId(bookingId);
+                                                tb.setTreatmentService(service);
+                                                tb.setStatus("PENDING");
+                                                tb.setIsDelete(false);
+                                                treatmentBookingRepository.save(tb);
+                                        }
+                                });
         }
 
         @Override
         public boolean hasActiveBooking(Integer guestId) {
-                if (guestId == null) return false;
-                java.util.List<String> activeStatuses = java.util.Arrays.asList("PENDING", "CONFIRMED", "CHECKED_IN", "CHECKED-IN");
+                if (guestId == null)
+                        return false;
+                java.util.List<String> activeStatuses = java.util.Arrays.asList("PENDING", "CONFIRMED", "CHECKED_IN",
+                                "CHECKED-IN");
                 return bookingRepository.existsByGuestIdAndBookingStatusIn(guestId, activeStatuses);
         }
 }
