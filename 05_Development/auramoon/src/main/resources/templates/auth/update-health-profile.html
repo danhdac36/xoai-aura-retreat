@@ -130,7 +130,7 @@
 <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 <!-- TopNavBar -->
 <nav class="w-full md:w-[calc(100%-16rem)] md:ml-64 top-0 sticky z-50 bg-background dark:bg-on-background">
-    
+
 </nav>
 <main class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg md:ml-64">
     <!-- Hero Section -->
@@ -152,17 +152,33 @@
     </section>
 
     <!-- Error/Success Alerts -->
-    <div th:if="${error}" class="mb-6 p-4 bg-error-container text-on-error-container rounded-xl border border-error/20 flex items-center gap-3">
+    <div class="mb-6 p-4 bg-error-container text-on-error-container rounded-xl border border-error/20 flex items-center gap-3"
+         th:if="${error}">
         <span class="material-symbols-outlined text-error">error</span>
         <span class="font-body-md" th:text="${error}"></span>
     </div>
-    <div th:if="${successMessage}" class="mb-6 p-4 bg-tertiary-container text-on-tertiary-container rounded-xl border border-tertiary/20 flex items-center gap-3">
+    <div class="mb-6 p-4 bg-tertiary-container text-on-tertiary-container rounded-xl border border-tertiary/20 flex items-center gap-3"
+         th:if="${successMessage}">
         <span class="material-symbols-outlined text-tertiary">check_circle</span>
         <span class="font-body-md" th:text="${successMessage}"></span>
     </div>
-
+    <div class="pt-stack-lg opacity-40" style="color: #db7c66">
+        <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-outline to-transparent"></div>
+        <p class="text-center font-label-md mt-4 italic">Bạn có quyền yêu cầu xoá vĩnh viễn dữ liệu sức khoẻ và dị ứng
+            khỏi hệ thống của chúng tôi. Hành động này
+            không thể hoàn tác.</p>
+    </div>
+    <form method="POST"
+          onsubmit="return confirm('Bạn có chắc chắn muốn xoá vĩnh viễn toàn bộ dữ liệu sức khoẻ và dị ứng không? Hành động này không thể hoàn tác.');"
+          th:action="@{/profile/health/delete}">
+        <button style="color:#8c2a1a" type="submit">
+            <span class="material-symbols-outlined text-[15px]">delete_forever</span>
+            XÓA DỮ LIỆU
+        </button>
+    </form>
     <!-- Form Section -->
-    <form class="grid grid-cols-1 md:grid-cols-2 gap-section-gap" id="wellness-form" th:action="@{/profile/update}" th:object="${profileDto}" method="POST">
+    <form class="grid grid-cols-1 md:grid-cols-2 gap-section-gap" id="wellness-form" method="POST"
+          th:action="@{/profile/update}" th:object="${profileDto}">
         <!-- Left Column: Dietary Preferences -->
         <div class="space-y-stack-lg">
             <div class="border-b border-outline-variant pb-stack-sm flex items-center gap-2">
@@ -170,8 +186,8 @@
                 <h2 class="font-headline-sm text-headline-sm text-secondary">Chế độ Ăn uống &amp; Dị ứng</h2>
             </div>
             <!-- Hidden inputs bound to DTO -->
-            <input type="hidden" id="foodAllergies" th:field="*{foodAllergies}">
-            <input type="hidden" id="dietaryPreference" th:field="*{dietaryPreference}">
+            <input id="foodAllergies" th:field="*{foodAllergies}" type="hidden">
+            <input id="dietaryPreference" th:field="*{dietaryPreference}" type="hidden">
 
             <!-- Allergies -->
             <div class="space-y-stack-md">
@@ -233,7 +249,8 @@
             <div class="space-y-stack-sm">
                 <label class="font-label-md text-label-md text-on-surface-variant">Ghi chú bổ sung</label>
                 <textarea class="w-full form-input-minimal py-2 font-body-md resize-none"
-                          id="diet_notes" placeholder="Sở thích riêng hoặc yêu cầu đặc biệt về khẩu vị..." rows="3"></textarea>
+                          id="diet_notes" placeholder="Sở thích riêng hoặc yêu cầu đặc biệt về khẩu vị..."
+                          rows="3"></textarea>
             </div>
         </div>
         <!-- Right Column: Physical Health -->
@@ -245,22 +262,28 @@
             </div>
             <!-- Medical Conditions -->
             <div class="space-y-stack-sm">
-                <label class="font-label-md text-label-md text-on-surface-variant" for="medicalConditions">Tình trạng Y tế Hiện tại</label>
-                <textarea class="w-full form-input-minimal py-2 font-body-md" id="medicalConditions" th:field="*{medicalConditions}"
-                          placeholder="Ví dụ: Cao huyết áp, tiểu đường, hen suyễn..." rows="2"></textarea>
+                <label class="font-label-md text-label-md text-on-surface-variant" for="medicalConditions">Tình trạng Y
+                    tế Hiện tại</label>
+                <textarea class="w-full form-input-minimal py-2 font-body-md" id="medicalConditions"
+                          placeholder="Ví dụ: Cao huyết áp, tiểu đường, hen suyễn..."
+                          rows="2" th:field="*{medicalConditions}"></textarea>
             </div>
             <!-- Injuries -->
             <div class="space-y-stack-sm">
-                <label class="font-label-md text-label-md text-on-surface-variant" for="injuries">Chấn thương hoặc Vấn đề gần đây</label>
-                <textarea class="w-full form-input-minimal py-2 font-body-md" id="injuries" th:field="*{injuries}"
+                <label class="font-label-md text-label-md text-on-surface-variant" for="injuries">Chấn thương hoặc Vấn
+                    đề gần đây</label>
+                <textarea class="w-full form-input-minimal py-2 font-body-md" id="injuries"
                           placeholder="Đau lưng, khớp, hoặc các vùng nhạy cảm cần lưu ý khi massage..."
-                          rows="2"></textarea>
+                          rows="2"
+                          th:field="*{injuries}"></textarea>
             </div>
             <!-- Atmospheric Detail: Subtle Decor -->
             <div class="pt-stack-lg opacity-40">
                 <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-outline to-transparent"></div>
-                <p class="text-center font-label-md mt-4 italic">Sức khỏe của bạn là ưu tiên hàng đầu của AuraMoon Wellness.</p>
+                <p class="text-center font-label-md mt-4 italic">Sức khỏe của bạn là ưu tiên hàng đầu của AuraMoon
+                    Wellness.</p>
             </div>
+
         </div>
         <!-- Form Bottom / Action Area -->
         <div class="col-span-1 md:col-span-2 pt-stack-lg">
@@ -277,49 +300,20 @@
                             type="submit">
                         LƯU HỒ SƠ SỨC KHỎE
                     </button>
-                    <a th:href="@{/packages}" class="border border-tertiary text-tertiary px-12 py-4 rounded font-label-md text-label-md tracking-widest hover:bg-tertiary/5 transition-all text-center flex items-center justify-center">
+                    <a class="border border-tertiary text-tertiary px-12 py-4 rounded font-label-md text-label-md tracking-widest hover:bg-tertiary/5 transition-all text-center flex items-center justify-center"
+                       th:href="@{/packages}">
                         QUAY LẠI
                     </a>
                 </div>
             </div>
         </div>
     </form>
-
-    <!-- Delete Health Data Section -->
-    <div class="mt-stack-lg border-t border-error/20 pt-stack-lg flex flex-col items-center">
-        <h3 class="font-headline-sm text-error mb-2">Quản lý Quyền riêng tư</h3>
-        <p class="font-body-md text-on-surface-variant opacity-80 mb-6 text-center max-w-2xl">
-            Bạn có quyền yêu cầu xoá vĩnh viễn dữ liệu sức khoẻ và dị ứng khỏi hệ thống của chúng tôi. Hành động này không thể hoàn tác.
-        </p>
-        <form th:action="@{/profile/health/delete}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xoá vĩnh viễn toàn bộ dữ liệu sức khoẻ và dị ứng không? Hành động này không thể hoàn tác.');">
-            <button type="submit" class="border border-error text-error px-8 py-3 rounded font-label-md hover:bg-error/10 transition-all flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">delete_forever</span>
-                XÓA DỮ LIỆU NHẠY CẢM
-            </button>
-        </form>
     </div>
 </main>
 <!-- Footer -->
-<footer class="w-full mt-section-gap bg-surface-container dark:bg-surface-container-high border-t border-outline-variant/20">
-    <div class="flex flex-col md:flex-row justify-between items-center py-stack-lg max-w-[1280px] mx-auto px-margin-desktop">
-        <div class="mb-stack-md md:mb-0">
-            <span class="font-headline-sm text-headline-sm text-primary font-bold">AuraMoon Retreat</span>
-            <p class="font-label-md text-label-md text-on-surface-variant mt-2 opacity-80">© 2024 AuraMoon Retreats. Tranquility in every breath.</p>
-        </div>
-        <div class="flex flex-wrap justify-center gap-6">
-            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all underline underline-offset-4"
-               href="#">Privacy Policy</a>
-            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all"
-               href="#">Health &amp; Safety</a>
-            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all"
-               href="#">Terms of Service</a>
-            <a class="font-label-md text-label-md text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-all"
-               href="#">Contact Us</a>
-        </div>
-    </div>
-</footer>
+<div th:replace="fragments/footer :: footer"></div>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         // --- 1. FOOD ALLERGIES SYNC ---
         const hiddenAllergies = document.getElementById('foodAllergies');
         const checkNuts = document.getElementById('allergy_nuts');

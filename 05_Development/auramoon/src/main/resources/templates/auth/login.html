@@ -60,7 +60,7 @@
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <label class="font-label-md text-xs text-on-surface-variant uppercase tracking-[0.15em]" for="password">Mật khẩu</label>
-                        <a class="font-label-md text-xs text-secondary hover:underline underline-offset-4 transition-all" href="/auth/forgot-password">Quên mật khẩu?</a>
+                        <a class="font-label-md text-xs text-secondary hover:underline underline-offset-4 transition-all" th:href="@{/auth/forgot-password}">Quên mật khẩu?</a>
                     </div>
                     <input class="w-full bg-surface-container-low border-t-0 border-l-0 border-r-0 border-b-2 border-outline-variant focus:border-secondary focus:ring-0 transition-colors px-2 py-3 input-minimal font-body-md text-sm text-on-surface placeholder-outline-variant/60"
                            id="password" name="password" placeholder="••••••••" required type="password">
@@ -76,6 +76,7 @@
             <div class="mt-4">
                 <p class="text-red-500 text-sm" th:if="${param.error}">Email hoặc Mật khẩu chưa đúng, hoặc tài khoản chưa kích hoạt.</p>
                 <p class="text-green-600 text-sm" th:if="${param.logout}">Bạn đã đăng xuất thành công.</p>
+                <p class="text-green-600 text-sm" th:if="${param.resetSuccess}">Mật khẩu mới đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.</p>
             </div>
 
             <!-- Divider -->

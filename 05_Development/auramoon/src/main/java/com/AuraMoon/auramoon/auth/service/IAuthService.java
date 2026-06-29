@@ -8,4 +8,5 @@ public interface IAuthService {
     boolean verifyEmail(String token);
     User findByEmail(String email);
     User createGoogleUser(String email, String fullName);
+    void resetPassword(String email);
 }

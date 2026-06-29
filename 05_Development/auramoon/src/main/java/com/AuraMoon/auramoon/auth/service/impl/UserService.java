@@ -28,16 +28,6 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("Tài khoản chưa kích hoạt. Vui lòng kiểm tra email.");
         }
 
-        String roleName = user.getRole().getRoleName();
-        if (!roleName.startsWith("ROLE_")) {
-            roleName = "ROLE_" + roleName;
-        }
-
-//        return new org.springframework.security.core.userdetails.User(
-//                user.getEmail(),
-//                user.getPasswordHash(),
-//                Collections.singletonList(new SimpleGrantedAuthority(roleName)));
-
         return new UserDetailsResponse(user);
 
     }
