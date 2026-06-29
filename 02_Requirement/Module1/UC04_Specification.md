@@ -12,7 +12,7 @@
 | **Tên Use Case**                 | Manage Master Data (Quản lý Dữ liệu Danh mục gốc)                                                                                                                                                                                                                                                                                                                                                                                               |
 | **Actor chính (Primary Actor)**  | Administrator (Quản trị viên)                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | **Actor phụ (Secondary Actors)** | System (Hệ thống), Database (Cơ sở dữ liệu)                                                                                                                                                                                                                                                                                                                                                                                               |
-| **Mô tả ngắn gọn**            | Use case này cho phép Administrator thực hiện các thao tác quản lý dữ liệu danh mục gốc bao gồm Hạng Villa (Villa Categories), Dịch vụ Trị liệu (Spa Services), Gói Nghỉ dưỡng (Retreat Packages) và Hồ sơ Nhân viên (Staff Records) để phục vụ cho các hoạt động vận hành, đặt phòng, đặt lịch trị liệu và thanh toán của resort. Mọi thay đổi về dữ liệu danh mục này phải được lưu vết lịch sử (Audit Log) và áp dụng Soft Delete để bảo vệ tính toàn vẹn của dữ liệu lịch sử đặt chỗ. |
+| **Mô tả ngắn gọn**            | Use case này cho phép Administrator thực hiện các thao tác quản lý dữ liệu danh mục gốc bao gồm Gói Nghỉ dưỡng (Retreat Packages), Villa & Hạng Villa (Villas & Villa Types), Thực đơn (Menu Items), Lớp Yoga (Yoga Classes) và Dịch vụ Trị liệu (Spa Services) để phục vụ cho các hoạt động vận hành, đặt phòng, đặt lịch trị liệu, dịch vụ ăn uống và thanh toán của resort. Mọi thay đổi về dữ liệu danh mục này phải được lưu vết lịch sử (Audit Log) và áp dụng Soft Delete để bảo vệ tính toàn vẹn của dữ liệu lịch sử đặt chỗ. |
 
 ---
 
@@ -25,7 +25,7 @@
 
 #### 2.2 Điều kiện sau (Postconditions)
 
-* Các thông tin thêm mới, cập nhật hoặc xóa mềm đối với Hạng Villa, Dịch vụ Trị liệu, Gói Nghỉ dưỡng và Hồ sơ Nhân viên được lưu trữ thành công vào Database.
+* Các thông tin thêm mới, cập nhật hoặc xóa mềm đối với Gói Nghỉ dưỡng, Villa & Hạng Villa, Thực đơn, Lớp Yoga và Dịch vụ Trị liệu được lưu trữ thành công vào Database.
 * Thuộc tính `update_at` (nếu có) của bản ghi tương ứng được tự động cập nhật thời gian thay đổi.
 * Hệ thống tạo bản ghi log trong bảng `AUDIT_LOG` để ghi nhận thông tin tài khoản admin thực hiện và chi tiết thay đổi.
 * Dữ liệu danh mục mới cập nhật được đồng bộ tức thì lên giao diện đặt phòng (Module 2), đặt lịch Spa (Module 3) và menu bữa ăn (Module 4).
@@ -38,10 +38,11 @@
 
 1. Administrator chọn menu **"Master Data Management"** trên Admin Portal.
 2. Hệ thống hiển thị các tùy chọn danh mục cần quản trị:
-   * **Villa Categories (Hạng Villa)**
-   * **Spa Services (Dịch vụ Trị liệu)**
    * **Retreat Packages (Gói Nghỉ dưỡng)**
-   * **Staff Records (Hồ sơ Nhân viên)**
+   * **Villas & Villa Types (Villa & Hạng Villa)**
+   * **Menu Items (Thực đơn)**
+   * **Yoga Classes (Lớp Yoga)**
+   * **Spa Services (Dịch vụ Trị liệu)**
 3. Administrator chọn một danh mục cụ thể (ví dụ: *Spa Services*).
 4. Hệ thống truy xuất cơ sở dữ liệu và hiển thị danh sách các bản ghi hiện tại của danh mục đó có trạng thái chưa xóa (`is_delete = 0`).
 5. Administrator có thể thực hiện một trong các thao tác: **Thêm mới (Create)**, **Cập nhật (Update)**, hoặc **Xóa mềm (Soft Delete)**.
@@ -49,10 +50,11 @@
 ##### 3.1.1 Thao tác Thêm mới (Create)
 1. Administrator click chọn **"Add New"**.
 2. Hệ thống hiển thị Form nhập thông tin tương ứng:
-   * **Đối với Hạng Villa:** Tên hạng villa, ảnh đại diện, giá phòng mỗi ngày.
+   * **Đối với Gói Nghỉ dưỡng:** Tên gói, loại gói, số ngày nghỉ, giá trọn gói, mô tả chi tiết (quy ước nhập chuỗi `[DAY]`).
+   * **Đối với Villa & Hạng Villa:** Tên hạng villa, ảnh đại diện, giá phòng mỗi ngày, giới hạn người (sức chứa), mã villa.
+   * **Đối với Thực đơn:** Tên món, đơn giá, danh mục, hình ảnh, thành phần, trạng thái.
+   * **Đối với Lớp Yoga:** Tên lớp, mô tả, thời lượng (phút), hình ảnh đại diện.
    * **Đối với Dịch vụ Trị liệu:** Mã dịch vụ (Unique Code), tên dịch vụ, thời lượng (phút), đơn giá, trạng thái khả dụng.
-   * **Đối với Gói Nghỉ dưỡng:** Tên gói, loại gói, số ngày nghỉ, mô tả chi tiết, giá trọn gói, danh sách dịch vụ đi kèm (tuân thủ tiêu chuẩn GWI).
-   * **Đối với Hồ sơ Nhân viên:** Mã nhân viên, họ tên, vai trò (Therapist, Chef, Receptionist), trạng thái làm việc.
 3. Administrator điền đầy đủ thông tin và nhấn **"Save"**.
 4. Hệ thống kiểm tra tính hợp lệ của dữ liệu đầu vào (Validation).
 5. Hệ thống lưu bản ghi mới vào Database với giá trị mặc định của `is_delete = 0`.
@@ -102,7 +104,7 @@
 
 ### 4. Quy tắc nghiệp vụ (Business Rules)
 
-* **BR-13 (Soft Delete Integration):** Tuyệt đối không sử dụng lệnh `DELETE` vật lý trên cơ sở dữ liệu đối với ba bảng `VILLA_TYPE`, `TREATMENT_SERVICE`, và `RETREAT_PACKAGE`. Bắt buộc dùng cờ `is_delete = 1` để đảm bảo báo cáo doanh thu lịch sử (Module 5) và hóa đơn cũ (Guest Folio) không bị mất liên kết dữ liệu.
+* **BR-13 (Soft Delete Integration):** Tuyệt đối không sử dụng lệnh `DELETE` vật lý trên cơ sở dữ liệu đối với các bảng Master Data (`RETREAT_PACKAGE`, `VILLA_TYPE`, `VILLA`, `MENU_ITEM`, `YOGA_CLASS`, `TREATMENT_SERVICE`). Bắt buộc dùng cờ `is_delete = 1` để đảm bảo báo cáo doanh thu lịch sử (Module 5) và hóa đơn cũ (Guest Folio) không bị mất liên kết dữ liệu.
 * **BR-15 (Audit Trail Management):** Mọi hành động thêm, sửa, xóa trên Master Data đều phải được ghi vết hoạt động vào bảng `AUDIT_LOG`. Log phải ghi rõ ai thực hiện, loại hành động và mốc thời gian thực hiện.
 * **BR-16 (Master Data Validation):**
   * Đơn giá dịch vụ và giá gói phải lớn hơn hoặc bằng 0.
@@ -123,8 +125,9 @@
 
 ### 6. Cấu trúc Database liên quan
 
-* `VILLA_TYPE`: Quản lý các thuộc tính `type_name`, `image`, `price_per_day`, `is_delete`.
-* `TREATMENT_SERVICE`: Quản lý các thuộc tính `treatment_code`, `service_name`, `duration_minutes`, `price`, `is_available`, `is_delete`.
-* `RETREAT_PACKAGE`: Quản lý các thuộc tính `type_package`, `package_name`, `duration_days`, `services`, `description`, `is_active`, `is_delete`, `price`, `create_at`, `update_at`.
-* `[USER]` / `THERAPIST`: Quản lý hồ sơ nhân viên và trạng thái làm việc.
+* `RETREAT_PACKAGE`: Quản lý Gói nghỉ dưỡng (`type_package`, `package_name`, `duration_days`, `price`, `description`, `is_active`, `is_delete`).
+* `VILLA_TYPE` & `VILLA`: Quản lý Hạng Villa (`type_name`, `price_per_day`) và các phòng cụ thể (`villa_code`, `limit_person`, `villa_status`).
+* `MENU_ITEM`: Quản lý danh sách món ăn, thực đơn (`item_name`, `price`, `category`, `ingredient`).
+* `YOGA_CLASS`: Quản lý danh mục các lớp Yoga (`class_name`, `description`, `duration_minutes`).
+* `TREATMENT_SERVICE`: Quản lý các dịch vụ Trị liệu (`treatment_code`, `service_name`, `duration_minutes`, `price`).
 * `AUDIT_LOG`: Ghi vết các hành động quản trị hệ thống.

@@ -3,10 +3,14 @@ package com.AuraMoon.auramoon.booking.entity;
 import com.AuraMoon.auramoon.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "RETREAT_PACKAGE")
+@SQLRestriction("is_delete = 0")
+@SQLDelete(sql = "UPDATE retreat_package SET is_delete = 1 WHERE package_id = ?")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor

@@ -2,12 +2,16 @@ package com.AuraMoon.auramoon.fnb.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "MENU_ITEM")
+@SQLRestriction("is_delete = 0")
+@SQLDelete(sql = "UPDATE menu_item SET is_delete = 1 WHERE menu_item_id = ?")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,9 +44,12 @@ public class MenuItem {
     private String category;
 
     @Column(name = "create_at", insertable = false, updatable = false)
-
     private LocalDateTime createAt;
 
     @Column(name = "update_at")
     private LocalDateTime updateAt;
+
+    @Column(name = "is_delete")
+    @Builder.Default
+    private Boolean isDelete = false;
 }

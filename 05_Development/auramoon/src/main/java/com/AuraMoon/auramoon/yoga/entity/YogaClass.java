@@ -3,8 +3,13 @@ package com.AuraMoon.auramoon.yoga.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 @Entity
 @Table(name = "YOGA_CLASS")
+@SQLRestriction("is_delete = 0")
+@SQLDelete(sql = "UPDATE yoga_class SET is_delete = 1 WHERE class_id = ?")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
