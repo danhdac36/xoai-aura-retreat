@@ -202,8 +202,7 @@ CREATE TABLE MENU_ITEM (
     category VARCHAR(50),
     ingredient NVARCHAR(MAX),
     is_available BIT DEFAULT 1,
-    image_url VARCHAR(255),
-    category VARCHAR(50),
+    is_delete BIT DEFAULT 0,
     create_at DATETIME DEFAULT GETDATE(),
     update_at DATETIME DEFAULT GETDATE()
 );

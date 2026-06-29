@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+
+    <!-- Main Tab Content Fragment -->
+    <div th:fragment="tabContent" id="main-content" class="space-y-6">
+        
+        <!-- Toast Notification -->
+        <div th:if="${successMsg}" class="p-4 mb-4 bg-secondary-container text-on-secondary-container rounded-xl flex items-center gap-3 border border-secondary/20 shadow-sm animate-fadeIn">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span class="font-body-md" th:text="${successMsg}">Thành công</span>
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-[0_4px_20px_rgba(21,66,18,0.02)] border border-outline-variant/10">
+            <h3 class="font-headline-sm text-primary text-xl" 
+                th:text="${activeTab == 'retreat-packages' ? 'Danh sách Gói Nghỉ dưỡng' : 
+                          (activeTab == 'spa-services' ? 'Danh sách Dịch vụ Spa' : 
+                          (activeTab == 'villa-types' ? 'Danh sách Hạng Villa' : 
+                          (activeTab == 'villas' ? 'Danh sách Villa' : 
+                          (activeTab == 'yoga-classes' ? 'Danh sách Lớp Yoga' : 'Danh sách Thực đơn'))))}">
+                Danh sách
+            </h3>
+            <button onclick="openCreateModal()" class="flex items-center gap-2 px-6 py-3 bg-secondary hover:bg-secondary/90 text-white font-label-md rounded-xl shadow-md transition-all">
+                <span class="material-symbols-outlined text-lg">add</span>
+                <span th:text="${activeTab == 'retreat-packages' ? 'Thêm gói mới' : 
+                               (activeTab == 'spa-services' ? 'Thêm dịch vụ mới' : 
+                               (activeTab == 'villa-types' ? 'Thêm hạng mới' : 
+                               (activeTab == 'villas' ? 'Thêm Villa mới' : 
+                               (activeTab == 'yoga-classes' ? 'Thêm lớp mới' : 'Thêm món mới'))))}">
+                    Thêm mới
+                </span>
+            </button>
+        </div>
+
+        <!-- Data Table -->
+        <div class="bg-white rounded-3xl overflow-hidden shadow-[0_8px_32px_rgba(21,66,18,0.03)] border border-outline-variant/10">
+            <div class="overflow-x-auto">
+                
+                <!-- 1. RETREAT PACKAGES TABLE -->
+                <table th:if="${activeTab == 'retreat-packages'}" class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-surface-container-low/50">
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">ID</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Tên gói</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Phân loại</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Thời gian</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Đơn giá</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Trạng thái</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/10">
+                        <tr th:if="${packages == null || packages.empty}">
+                            <td colspan="7" class="px-8 py-10 text-center text-secondary/60 font-body-md">Không có dữ liệu gói nghỉ dưỡng nào.</td>
+                        </tr>
+                        <tr th:each="pkg : ${packages}" class="hover:bg-surface-container-low/30 transition-colors">
+                            <td class="px-8 py-5 font-semibold text-primary" th:text="'#RP-' + ${pkg.id}">#RP-1</td>
+                            <td class="px-8 py-5">
+                                <div class="font-body-md text-on-surface font-medium" th:text="${pkg.packageName}">Detox Retreat</div>
+                            </td>
+                            <td class="px-8 py-5 font-body-sm text-secondary/70" th:text="${pkg.typePackage}">Mindfulness</td>
+                            <td class="px-8 py-5 font-body-sm text-secondary/70" th:text="${pkg.durationDays} + ' Ngày'">3 Ngày</td>
+                            <td class="px-8 py-5 font-body-md text-on-surface font-semibold" 
+                                th:text="${pkg.price != null} ? ${#numbers.formatDecimal(pkg.price, 1, 'COMMA', 0, 'POINT')} + ' VND' : '0 VND'">5,000,000 VND</td>
+                            <td class="px-8 py-5">
+                                <button th:onclick="'toggleStatus(' + ${pkg.id} + ')'" 
+                                        class="px-3 py-1 rounded-full font-label-caps text-[10px] tracking-wider border transition-all"
+                                        th:classappend="${pkg.isActive} ? 'bg-secondary/10 text-secondary border-secondary/20 hover:bg-secondary/20' : 'bg-error/10 text-error border-error/20 hover:bg-error/20'">
+                                    <span th:text="${pkg.isActive} ? 'ACTIVE' : 'INACTIVE'">ACTIVE</span>
+                                </button>
+                            </td>
+                            <td class="px-8 py-5 text-right flex justify-end gap-3">
+                                <button th:data-id="${pkg.id}"
+                                        th:data-category="'retreat-packages'"
+                                        th:data-package-name="${pkg.packageName}"
+                                        th:data-type-package="${pkg.typePackage}"
+                                        th:data-duration-days="${pkg.durationDays}"
+                                        th:data-price="${pkg.price}"
+                                        th:data-is-active="${pkg.isActive}"
+                                        th:data-services="${pkg.services}"
+                                        th:data-description="${pkg.description}"
+                                        onclick="openEditModalFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-secondary/20 hover:text-secondary flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">edit</span>
+                                </button>
+                                <button th:data-id="${pkg.id}" th:data-category="'retreat-packages'"
+                                        onclick="confirmDeleteFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-error/25 hover:text-error flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 2. SPA SERVICES TABLE -->
+                <table th:if="${activeTab == 'spa-services'}" class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-surface-container-low/50">
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Mã</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Tên dịch vụ</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Thời lượng</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Đơn giá</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Khả dụng</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/10">
+                        <tr th:if="${spaServices == null || spaServices.empty}">
+                            <td colspan="6" class="px-8 py-10 text-center text-secondary/60 font-body-md">Không có dữ liệu dịch vụ Spa nào.</td>
+                        </tr>
+                        <tr th:each="svc : ${spaServices}" class="hover:bg-surface-container-low/30 transition-colors">
+                            <td class="px-8 py-5 font-semibold text-primary" th:text="${svc.treatmentCode}">SPA-01</td>
+                            <td class="px-8 py-5 font-body-md text-on-surface font-medium" th:text="${svc.serviceName}">Massage Thảo Dược</td>
+                            <td class="px-8 py-5 font-body-sm text-secondary/70" th:text="${svc.durationMinutes} + ' Phút'">60 Phút</td>
+                            <td class="px-8 py-5 font-body-md text-on-surface font-semibold" 
+                                th:text="${svc.price != null} ? ${#numbers.formatDecimal(svc.price, 1, 'COMMA', 0, 'POINT')} + ' VND' : '0 VND'">1,000,000 VND</td>
+                            <td class="px-8 py-5">
+                                <button th:onclick="'toggleStatus(' + ${svc.id} + ')'" 
+                                        class="px-3 py-1 rounded-full font-label-caps text-[10px] tracking-wider border transition-all"
+                                        th:classappend="${svc.isAvailable} ? 'bg-secondary/10 text-secondary border-secondary/20 hover:bg-secondary/20' : 'bg-error/10 text-error border-error/20 hover:bg-error/20'">
+                                    <span th:text="${svc.isAvailable} ? 'AVAILABLE' : 'UNAVAILABLE'">AVAILABLE</span>
+                                </button>
+                            </td>
+                            <td class="px-8 py-5 text-right flex justify-end gap-3">
+                                <button th:data-id="${svc.id}"
+                                        th:data-category="'spa-services'"
+                                        th:data-treatment-code="${svc.treatmentCode}"
+                                        th:data-service-name="${svc.serviceName}"
+                                        th:data-duration-minutes="${svc.durationMinutes}"
+                                        th:data-price="${svc.price}"
+                                        th:data-is-available="${svc.isAvailable}"
+                                        onclick="openEditModalFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-secondary/20 hover:text-secondary flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">edit</span>
+                                </button>
+                                <button th:data-id="${svc.id}" th:data-category="'spa-services'"
+                                        onclick="confirmDeleteFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-error/25 hover:text-error flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 3. VILLA TYPES TABLE -->
+                <table th:if="${activeTab == 'villa-types'}" class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-surface-container-low/50">
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">ID</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Tên hạng</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Giá ngày</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Ảnh</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/10">
+                        <tr th:if="${villaTypes == null || villaTypes.empty}">
+                            <td colspan="5" class="px-8 py-10 text-center text-secondary/60 font-body-md">Không có dữ liệu hạng Villa nào.</td>
+                        </tr>
+                        <tr th:each="type : ${villaTypes}" class="hover:bg-surface-container-low/30 transition-colors">
+                            <td class="px-8 py-5 font-semibold text-primary" th:text="'#VT-' + ${type.id}">#VT-1</td>
+                            <td class="px-8 py-5 font-body-md text-on-surface font-medium" th:text="${type.typeName}">Standard Villa</td>
+                            <td class="px-8 py-5 font-body-md text-on-surface font-semibold" 
+                                th:text="${type.pricePerDay != null} ? ${#numbers.formatDecimal(type.pricePerDay, 1, 'COMMA', 0, 'POINT')} + ' VND' : '0 VND'">2,000,000 VND</td>
+                            <td class="px-8 py-5">
+                                <img th:if="${type.image}" th:src="${type.image}" class="w-12 h-12 object-cover rounded-xl border" alt="Villa img"/>
+                                <span th:unless="${type.image}" class="text-secondary/40 font-body-sm">Không có ảnh</span>
+                            </td>
+                            <td class="px-8 py-5 text-right flex justify-end gap-3">
+                                <button th:data-id="${type.id}"
+                                        th:data-category="'villa-types'"
+                                        th:data-type-name="${type.typeName}"
+                                        th:data-price-per-day="${type.pricePerDay}"
+                                        th:data-image="${type.image}"
+                                        onclick="openEditModalFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-secondary/20 hover:text-secondary flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">edit</span>
+                                </button>
+                                <button th:data-id="${type.id}" th:data-category="'villa-types'"
+                                        onclick="confirmDeleteFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-error/25 hover:text-error flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 4. VILLAS TABLE -->
+                <table th:if="${activeTab == 'villas'}" class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-surface-container-low/50">
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Mã Villa</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Hạng Villa</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Giới hạn</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Vận hành</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Dọn dẹp</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Ghi chú</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/10">
+                        <tr th:if="${villas == null || villas.empty}">
+                            <td colspan="7" class="px-8 py-10 text-center text-secondary/60 font-body-md">Không có dữ liệu căn Villa nào.</td>
+                        </tr>
+                        <tr th:each="v : ${villas}" class="hover:bg-surface-container-low/30 transition-colors">
+                            <td class="px-8 py-5 font-semibold text-primary" th:text="${v.villaCode}">V-101</td>
+                            <td class="px-8 py-5 font-body-md text-on-surface font-medium" th:text="${v.villaType != null ? v.villaType.typeName : 'Hạng Villa đã bị xóa'}">Standard Villa</td>
+                            <td class="px-8 py-5 font-body-sm text-secondary/70" th:text="${v.limitPerson} + ' Người'">4 Người</td>
+                            <td class="px-8 py-5">
+                                <span class="px-2.5 py-1 rounded-full font-label-caps text-[10px] tracking-wider border"
+                                      th:classappend="${v.villaStatus == 'AVAILABLE'} ? 'bg-secondary/10 text-secondary border-secondary/20' : 
+                                                     (${v.villaStatus == 'OCCUPIED'} ? 'bg-primary/10 text-primary border-primary/20' : 'bg-error/10 text-error border-error/20')"
+                                      th:text="${v.villaStatus}">AVAILABLE</span>
+                            </td>
+                            <td class="px-8 py-5">
+                                <span class="px-2.5 py-1 rounded-full font-label-caps text-[10px] tracking-wider border"
+                                      th:classappend="${v.cleaningStatus == 'CLEAN'} ? 'bg-secondary/10 text-secondary border-secondary/20' : 
+                                                     (${v.cleaningStatus == 'DIRTY'} ? 'bg-error/10 text-error border-error/20' : 'bg-warning/10 text-warning border-warning/20')"
+                                      th:text="${v.cleaningStatus}">CLEAN</span>
+                            </td>
+                            <td class="px-8 py-5 font-body-sm text-secondary/70 max-w-[150px] truncate" th:text="${v.maintenanceNote}">N/A</td>
+                            <td class="px-8 py-5 text-right flex justify-end gap-3">
+                                <button th:data-id="${v.id}"
+                                        th:data-category="'villas'"
+                                        th:data-villa-code="${v.villaCode}"
+                                        th:data-villa-type-id="${v.villaType != null ? v.villaType.id : ''}"
+                                        th:data-limit-person="${v.limitPerson}"
+                                        th:data-villa-status="${v.villaStatus}"
+                                        th:data-cleaning-status="${v.cleaningStatus}"
+                                        th:data-maintenance-note="${v.maintenanceNote}"
+                                        onclick="openEditModalFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-secondary/20 hover:text-secondary flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">edit</span>
+                                </button>
+                                <button th:data-id="${v.id}" th:data-category="'villas'"
+                                        onclick="confirmDeleteFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-error/25 hover:text-error flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 5. YOGA CLASSES TABLE -->
+                <table th:if="${activeTab == 'yoga-classes'}" class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-surface-container-low/50">
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">ID</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Tên lớp</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Thời lượng</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Mô tả</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/10">
+                        <tr th:if="${yogaClasses == null || yogaClasses.empty}">
+                            <td colspan="5" class="px-8 py-10 text-center text-secondary/60 font-body-md">Không có dữ liệu lớp Yoga nào.</td>
+                        </tr>
+                        <tr th:each="yc : ${yogaClasses}" class="hover:bg-surface-container-low/30 transition-colors">
+                            <td class="px-8 py-5 font-semibold text-primary" th:text="'#YC-' + ${yc.id}">#YC-1</td>
+                            <td class="px-8 py-5 font-body-md text-on-surface font-medium" th:text="${yc.className}">Hatha Yoga Basic</td>
+                            <td class="px-8 py-5 font-body-sm text-secondary/70" th:text="${yc.durationMinutes} + ' Phút'">60 Phút</td>
+                            <td class="px-8 py-5 font-body-sm text-secondary/70 max-w-[200px] truncate" th:text="${yc.description}">Thư giãn cơ bản</td>
+                            <td class="px-8 py-5 text-right flex justify-end gap-3">
+                                <button th:data-id="${yc.id}"
+                                        th:data-category="'yoga-classes'"
+                                        th:data-class-name="${yc.className}"
+                                        th:data-duration-minutes="${yc.durationMinutes}"
+                                        th:data-image-url="${yc.imageUrl}"
+                                        th:data-description="${yc.description}"
+                                        onclick="openEditModalFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-secondary/20 hover:text-secondary flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">edit</span>
+                                </button>
+                                <button th:data-id="${yc.id}" th:data-category="'yoga-classes'"
+                                        onclick="confirmDeleteFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-error/25 hover:text-error flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- 6. MENU ITEMS TABLE -->
+                <table th:if="${activeTab == 'menu-items'}" class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-surface-container-low/50">
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Tên món</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Phân loại</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Đơn giá</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Nguyên liệu</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10">Khả dụng</th>
+                            <th class="px-8 py-5 font-label-caps text-label-caps text-secondary/60 border-b border-outline-variant/10 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/10">
+                        <tr th:if="${menuItems == null || menuItems.empty}">
+                            <td colspan="6" class="px-8 py-10 text-center text-secondary/60 font-body-md">Không có dữ liệu món ăn nào.</td>
+                        </tr>
+                        <tr th:each="item : ${menuItems}" class="hover:bg-surface-container-low/30 transition-colors">
+                            <td class="px-8 py-5 font-body-md text-on-surface font-medium" th:text="${item.itemName}">Salad Trái Cây</td>
+                            <td class="px-8 py-5 font-body-sm text-secondary/70" th:text="${item.category}">Khai Vị</td>
+                            <td class="px-8 py-5 font-body-md text-on-surface font-semibold" 
+                                th:text="${item.price != null} ? ${#numbers.formatDecimal(item.price, 1, 'COMMA', 0, 'POINT')} + ' VND' : '0 VND'">150,000 VND</td>
+                            <td class="px-8 py-5 font-body-sm text-secondary/70 max-w-[150px] truncate" th:text="${item.ingredient}">Táo, Lê, Sữa chua</td>
+                            <td class="px-8 py-5">
+                                <button th:onclick="'toggleStatus(' + ${item.id} + ')'" 
+                                        class="px-3 py-1 rounded-full font-label-caps text-[10px] tracking-wider border transition-all"
+                                        th:classappend="${item.isAvailable} ? 'bg-secondary/10 text-secondary border-secondary/20 hover:bg-secondary/20' : 'bg-error/10 text-error border-error/20 hover:bg-error/20'">
+                                    <span th:text="${item.isAvailable} ? 'AVAILABLE' : 'UNAVAILABLE'">AVAILABLE</span>
+                                </button>
+                            </td>
+                            <td class="px-8 py-5 text-right flex justify-end gap-3">
+                                <button th:data-id="${item.id}"
+                                        th:data-category="'menu-items'"
+                                        th:data-item-name="${item.itemName}"
+                                        th:data-category-value="${item.category}"
+                                        th:data-price="${item.price}"
+                                        th:data-ingredient="${item.ingredient}"
+                                        th:data-image-url="${item.imageUrl}"
+                                        th:data-is-available="${item.isAvailable}"
+                                        onclick="openEditModalFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-secondary/20 hover:text-secondary flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">edit</span>
+                                </button>
+                                <button th:data-id="${item.id}" th:data-category="'menu-items'"
+                                        onclick="confirmDeleteFromButton(this)"
+                                        class="w-8 h-8 rounded-full bg-surface-container hover:bg-error/25 hover:text-error flex items-center justify-center text-primary transition-all">
+                                    <span class="material-symbols-outlined text-lg">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <!-- ==========================================
+        1. CREATE MODAL SECTION
+        ========================================== -->
+        <div id="createModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all duration-300"
+             th:classappend="${showCreateModal} ? '' : 'hidden opacity-0 pointer-events-none'">
+            <div class="bg-white rounded-[32px] shadow-2xl border border-outline-variant/10 w-[90%] max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
+                <div class="px-8 py-5 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low/30">
+                    <h3 class="font-headline-sm text-primary text-lg"
+                        th:text="${activeTab == 'retreat-packages' ? 'Thêm Gói Nghỉ Dưỡng Mới' : 
+                                  (activeTab == 'spa-services' ? 'Thêm Dịch Vụ Spa Mới' : 
+                                  (activeTab == 'villa-types' ? 'Thêm Hạng Villa Mới' : 
+                                  (activeTab == 'villas' ? 'Thêm Villa Mới' : 
+                                  (activeTab == 'yoga-classes' ? 'Thêm Lớp Yoga Mới' : 'Thêm Món Ăn Mới'))))}">
+                        Thêm mới
+                    </h3>
+                    <button onclick="closeCreateModal()" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:bg-error/10 hover:text-error transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                
+                <!-- 1.1. Retreat Package Create Form -->
+                <form th:if="${activeTab == 'retreat-packages'}" th:action="@{/admin/master-data/retreat-packages/create}" th:object="${newPackage}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Tên gói nghỉ dưỡng <span class="text-error">*</span></label>
+                        <input name="packageName" th:value="${newPackage?.packageName}" required
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                               placeholder="Ví dụ: Ayurveda Rejuvenation Retreat"/>
+                        <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('packageName')}" th:errors="*{packageName}"></p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Loại gói <span class="text-error">*</span></label>
+                            <input name="typePackage" th:value="${newPackage?.typePackage}" required
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                                   placeholder="Ví dụ: Detoxification"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('typePackage')}" th:errors="*{typePackage}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Thời gian (Ngày) <span class="text-error">*</span></label>
+                            <input type="number" name="durationDays" th:value="${newPackage?.durationDays}" required min="1"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('durationDays')}" th:errors="*{durationDays}"></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Đơn giá (VND) <span class="text-error">*</span></label>
+                            <input type="number" name="price" th:value="${newPackage?.price}" required min="0"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Kích hoạt ngay</label>
+                            <div class="flex items-center h-12">
+                                <input type="checkbox" name="isActive" th:checked="${newPackage == null || newPackage.isActive}"
+                                       class="h-5 w-5 text-secondary border-outline-variant/50 rounded focus:ring-secondary"/>
+                                <span class="ml-2 font-body-md text-secondary">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Dịch vụ đi kèm (Ví dụ: Spa, Yoga)</label>
+                        <input name="services" th:value="${newPackage?.services}"
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                               placeholder="Nhập Spa hoặc Yoga..."/>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Mô tả lịch trình (Phân cách bằng tag <code>[DAY]</code>)</label>
+                        <textarea name="description" th:text="${newPackage?.description}" rows="5"
+                                  class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                                  placeholder="Mô tả lịch trình..."></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeCreateModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Lưu gói</button>
+                    </div>
+                </form>
+
+                <!-- 1.2. Spa Service Create Form -->
+                <form th:if="${activeTab == 'spa-services'}" th:action="@{/admin/master-data/spa-services/create}" th:object="${newSpaService}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Mã dịch vụ <span class="text-error">*</span></label>
+                            <input name="treatmentCode" th:value="${newSpaService?.treatmentCode}" required maxLength="10"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                                   placeholder="Ví dụ: SPA-01"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('treatmentCode')}" th:errors="*{treatmentCode}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Tên dịch vụ <span class="text-error">*</span></label>
+                            <input name="serviceName" th:value="${newSpaService?.serviceName}" required
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                                   placeholder="Ví dụ: Massage body"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('serviceName')}" th:errors="*{serviceName}"></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Thời lượng (Phút) <span class="text-error">*</span></label>
+                            <input type="number" name="durationMinutes" th:value="${newSpaService?.durationMinutes}" required min="1"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('durationMinutes')}" th:errors="*{durationMinutes}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Đơn giá (VND) <span class="text-error">*</span></label>
+                            <input type="number" name="price" th:value="${newSpaService?.price}" required min="0"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Trạng thái khả dụng</label>
+                        <div class="flex items-center h-12">
+                            <input type="checkbox" name="isAvailable" th:checked="${newSpaService == null || newSpaService.isAvailable}"
+                                   class="h-5 w-5 text-secondary border-outline-variant/50 rounded focus:ring-secondary"/>
+                            <span class="ml-2 font-body-md text-secondary">Available</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeCreateModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Lưu</button>
+                    </div>
+                </form>
+
+                <!-- 1.3. Villa Type Create Form -->
+                <form th:if="${activeTab == 'villa-types'}" th:action="@{/admin/master-data/villa-types/create}" th:object="${newVillaType}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Tên hạng Villa <span class="text-error">*</span></label>
+                        <input name="typeName" th:value="${newVillaType?.typeName}" required
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                               placeholder="Ví dụ: Beachfront Villa"/>
+                        <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('typeName')}" th:errors="*{typeName}"></p>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Giá ngày (VND) <span class="text-error">*</span></label>
+                        <input type="number" name="pricePerDay" th:value="${newVillaType?.pricePerDay}" required min="0"
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                        <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('pricePerDay')}" th:errors="*{pricePerDay}"></p>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Đường dẫn ảnh</label>
+                        <input name="image" th:value="${newVillaType?.image}"
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                               placeholder="/images/..."/>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeCreateModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Lưu</button>
+                    </div>
+                </form>
+
+                <!-- 1.4. Villa Create Form -->
+                <form th:if="${activeTab == 'villas'}" th:action="@{/admin/master-data/villas/create}" th:object="${newVilla}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Mã căn Villa <span class="text-error">*</span></label>
+                            <input name="villaCode" th:value="${newVilla?.villaCode}" required maxLength="10"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                                   placeholder="Ví dụ: V-101"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('villaCode')}" th:errors="*{villaCode}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Hạng Villa <span class="text-error">*</span></label>
+                            <select name="villaType.id" required class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary">
+                                <option value="" disabled selected>Chọn hạng Villa</option>
+                                <option th:each="type : ${villaTypes}" th:value="${type.id}" th:text="${type.typeName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Giới hạn số người <span class="text-error">*</span></label>
+                            <input type="number" name="limitPerson" th:value="${newVilla?.limitPerson}" required min="1"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('limitPerson')}" th:errors="*{limitPerson}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Trạng thái vận hành</label>
+                            <select name="villaStatus" class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary">
+                                <option value="AVAILABLE">AVAILABLE</option>
+                                <option value="OCCUPIED">OCCUPIED</option>
+                                <option value="MAINTENANCE">MAINTENANCE</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Trạng thái dọn dẹp</label>
+                        <select name="cleaningStatus" class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary">
+                            <option value="CLEAN">CLEAN</option>
+                            <option value="DIRTY">DIRTY</option>
+                            <option value="CLEANING">CLEANING</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Ghi chú bảo trì</label>
+                        <textarea name="maintenanceNote" th:text="${newVilla?.maintenanceNote}" rows="3"
+                                  class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeCreateModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Lưu</button>
+                    </div>
+                </form>
+
+                <!-- 1.5. Yoga Class Create Form -->
+                <form th:if="${activeTab == 'yoga-classes'}" th:action="@{/admin/master-data/yoga-classes/create}" th:object="${newYogaClass}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Tên lớp Yoga <span class="text-error">*</span></label>
+                            <input name="className" th:value="${newYogaClass?.className}" required
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                                   placeholder="Ví dụ: Hatha Yoga Flow"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('className')}" th:errors="*{className}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Thời lượng (Phút) <span class="text-error">*</span></label>
+                            <input type="number" name="durationMinutes" th:value="${newYogaClass?.durationMinutes}" required min="1"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('durationMinutes')}" th:errors="*{durationMinutes}"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Đường dẫn ảnh</label>
+                        <input name="imageUrl" th:value="${newYogaClass?.imageUrl}"
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                               placeholder="/images/..."/>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Mô tả lớp học</label>
+                        <textarea name="description" th:text="${newYogaClass?.description}" rows="3"
+                                  class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeCreateModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Lưu</button>
+                    </div>
+                </form>
+
+                <!-- 1.6. Menu Item Create Form -->
+                <form th:if="${activeTab == 'menu-items'}" th:action="@{/admin/master-data/menu-items/create}" th:object="${newMenuItem}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Tên món ăn <span class="text-error">*</span></label>
+                            <input name="itemName" th:value="${newMenuItem?.itemName}" required maxLength="20"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                                   placeholder="Ví dụ: Salad cá hồi"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('itemName')}" th:errors="*{itemName}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Phân loại món</label>
+                            <input name="category" th:value="${newMenuItem?.category}"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                                   placeholder="Ví dụ: Khai vị, Món chính..."/>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Đơn giá (VND) <span class="text-error">*</span></label>
+                            <input type="number" name="price" th:value="${newMenuItem?.price}" required min="0"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Khả dụng</label>
+                            <div class="flex items-center h-12">
+                                <input type="checkbox" name="isAvailable" th:checked="${newMenuItem == null || newMenuItem.isAvailable}"
+                                       class="h-5 w-5 text-secondary border-outline-variant/50 rounded focus:ring-secondary"/>
+                                <span class="ml-2 font-body-md text-secondary">Available</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Đường dẫn ảnh</label>
+                        <input name="imageUrl" th:value="${newMenuItem?.imageUrl}"
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"
+                               placeholder="/images/..."/>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Nguyên liệu chế biến</label>
+                        <textarea name="ingredient" th:text="${newMenuItem?.ingredient}" rows="3"
+                                  class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeCreateModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Lưu</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+        <!-- ==========================================
+        2. EDIT MODAL SECTION
+        ========================================== -->
+        <div id="editModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all duration-300"
+             th:classappend="${showEditModal} ? '' : 'hidden opacity-0 pointer-events-none'">
+            <div class="bg-white rounded-[32px] shadow-2xl border border-outline-variant/10 w-[90%] max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
+                <div class="px-8 py-5 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low/30">
+                    <h3 class="font-headline-sm text-primary text-lg"
+                        th:text="${activeTab == 'retreat-packages' ? 'Chỉnh Sửa Gói Nghỉ Dưỡng' : 
+                                  (activeTab == 'spa-services' ? 'Chỉnh Sửa Dịch Vụ Spa' : 
+                                  (activeTab == 'villa-types' ? 'Chỉnh Sửa Hạng Villa' : 
+                                  (activeTab == 'villas' ? 'Chỉnh Sửa Villa' : 
+                                  (activeTab == 'yoga-classes' ? 'Chỉnh Sửa Lớp Yoga' : 'Chỉnh Sửa Món Ăn'))))}">
+                        Chỉnh sửa
+                    </h3>
+                    <button onclick="closeEditModal()" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:bg-error/10 hover:text-error transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                
+                <!-- 2.1. Retreat Package Edit Form -->
+                <form th:if="${activeTab == 'retreat-packages'}" th:action="@{'/admin/master-data/retreat-packages/' + ${editId} + '/update'}" th:object="${editPackage}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Tên gói nghỉ dưỡng <span class="text-error">*</span></label>
+                        <input name="packageName" th:value="${editPackage?.packageName}" required
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                        <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('packageName')}" th:errors="*{packageName}"></p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Loại gói <span class="text-error">*</span></label>
+                            <input name="typePackage" th:value="${editPackage?.typePackage}" required
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('typePackage')}" th:errors="*{typePackage}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Thời gian (Ngày) <span class="text-error">*</span></label>
+                            <input type="number" name="durationDays" th:value="${editPackage?.durationDays}" required min="1"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('durationDays')}" th:errors="*{durationDays}"></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Đơn giá (VND) <span class="text-error">*</span></label>
+                            <input type="number" name="price" th:value="${editPackage?.price}" required min="0"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Trạng thái hoạt động</label>
+                            <div class="flex items-center h-12">
+                                <input type="checkbox" name="isActive" th:checked="${editPackage?.isActive}"
+                                       class="h-5 w-5 text-secondary border-outline-variant/50 rounded focus:ring-secondary"/>
+                                <span class="ml-2 font-body-md text-secondary">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Dịch vụ đi kèm (Ví dụ: Spa, Yoga)</label>
+                        <input name="services" th:value="${editPackage?.services}"
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Mô tả lịch trình (Phân cách bằng tag <code>[DAY]</code>)</label>
+                        <textarea name="description" th:text="${editPackage?.description}" rows="5"
+                                  class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeEditModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Cập nhật</button>
+                    </div>
+                </form>
+
+                <!-- 2.2. Spa Service Edit Form -->
+                <form th:if="${activeTab == 'spa-services'}" th:action="@{'/admin/master-data/spa-services/' + ${editId} + '/update'}" th:object="${editSpaService}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Mã dịch vụ <span class="text-error">*</span></label>
+                            <input name="treatmentCode" th:value="${editSpaService?.treatmentCode}" required maxLength="10"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('treatmentCode')}" th:errors="*{treatmentCode}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Tên dịch vụ <span class="text-error">*</span></label>
+                            <input name="serviceName" th:value="${editSpaService?.serviceName}" required
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('serviceName')}" th:errors="*{serviceName}"></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Thời lượng (Phút) <span class="text-error">*</span></label>
+                            <input type="number" name="durationMinutes" th:value="${editSpaService?.durationMinutes}" required min="1"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('durationMinutes')}" th:errors="*{durationMinutes}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Đơn giá (VND) <span class="text-error">*</span></label>
+                            <input type="number" name="price" th:value="${editSpaService?.price}" required min="0"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Trạng thái khả dụng</label>
+                        <div class="flex items-center h-12">
+                            <input type="checkbox" name="isAvailable" th:checked="${editSpaService?.isAvailable}"
+                                   class="h-5 w-5 text-secondary border-outline-variant/50 rounded focus:ring-secondary"/>
+                            <span class="ml-2 font-body-md text-secondary">Available</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeEditModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Cập nhật</button>
+                    </div>
+                </form>
+
+                <!-- 2.3. Villa Type Edit Form -->
+                <form th:if="${activeTab == 'villa-types'}" th:action="@{'/admin/master-data/villa-types/' + ${editId} + '/update'}" th:object="${editVillaType}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Tên hạng Villa <span class="text-error">*</span></label>
+                        <input name="typeName" th:value="${editVillaType?.typeName}" required
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                        <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('typeName')}" th:errors="*{typeName}"></p>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Giá ngày (VND) <span class="text-error">*</span></label>
+                        <input type="number" name="pricePerDay" th:value="${editVillaType?.pricePerDay}" required min="0"
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                        <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('pricePerDay')}" th:errors="*{pricePerDay}"></p>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Đường dẫn ảnh</label>
+                        <input name="image" th:value="${editVillaType?.image}"
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeEditModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Cập nhật</button>
+                    </div>
+                </form>
+
+                <!-- 2.4. Villa Edit Form -->
+                <form th:if="${activeTab == 'villas'}" th:action="@{'/admin/master-data/villas/' + ${editId} + '/update'}" th:object="${editVilla}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Mã căn Villa <span class="text-error">*</span></label>
+                            <input name="villaCode" th:value="${editVilla?.villaCode}" required maxLength="10"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('villaCode')}" th:errors="*{villaCode}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Hạng Villa <span class="text-error">*</span></label>
+                            <select name="villaType.id" required class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary">
+                                <option th:each="type : ${villaTypes}" th:value="${type.id}" th:text="${type.typeName}" th:selected="${type.id == editVilla?.villaType?.id}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Giới hạn số người <span class="text-error">*</span></label>
+                            <input type="number" name="limitPerson" th:value="${editVilla?.limitPerson}" required min="1"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('limitPerson')}" th:errors="*{limitPerson}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Trạng thái vận hành</label>
+                            <select name="villaStatus" class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary">
+                                <option value="AVAILABLE" th:selected="${editVilla?.villaStatus == 'AVAILABLE'}">AVAILABLE</option>
+                                <option value="OCCUPIED" th:selected="${editVilla?.villaStatus == 'OCCUPIED'}">OCCUPIED</option>
+                                <option value="MAINTENANCE" th:selected="${editVilla?.villaStatus == 'MAINTENANCE'}">MAINTENANCE</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Trạng thái dọn dẹp</label>
+                        <select name="cleaningStatus" class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary">
+                            <option value="CLEAN" th:selected="${editVilla?.cleaningStatus == 'CLEAN'}">CLEAN</option>
+                            <option value="DIRTY" th:selected="${editVilla?.cleaningStatus == 'DIRTY'}">DIRTY</option>
+                            <option value="CLEANING" th:selected="${editVilla?.cleaningStatus == 'CLEANING'}">CLEANING</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Ghi chú bảo trì</label>
+                        <textarea name="maintenanceNote" th:text="${editVilla?.maintenanceNote}" rows="3"
+                                  class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeEditModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Cập nhật</button>
+                    </div>
+                </form>
+
+                <!-- 2.5. Yoga Class Edit Form -->
+                <form th:if="${activeTab == 'yoga-classes'}" th:action="@{'/admin/master-data/yoga-classes/' + ${editId} + '/update'}" th:object="${editYogaClass}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Tên lớp Yoga <span class="text-error">*</span></label>
+                            <input name="className" th:value="${editYogaClass?.className}" required
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('className')}" th:errors="*{className}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Thời lượng (Phút) <span class="text-error">*</span></label>
+                            <input type="number" name="durationMinutes" th:value="${editYogaClass?.durationMinutes}" required min="1"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('durationMinutes')}" th:errors="*{durationMinutes}"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Đường dẫn ảnh</label>
+                        <input name="imageUrl" th:value="${editYogaClass?.imageUrl}"
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Mô tả lớp học</label>
+                        <textarea name="description" th:text="${editYogaClass?.description}" rows="3"
+                                  class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeEditModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Cập nhật</button>
+                    </div>
+                </form>
+
+                <!-- 2.6. Menu Item Edit Form -->
+                <form th:if="${activeTab == 'menu-items'}" th:action="@{'/admin/master-data/menu-items/' + ${editId} + '/update'}" th:object="${editMenuItem}" method="post" data-ajax="true" class="p-8 overflow-y-auto space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Tên món ăn <span class="text-error">*</span></label>
+                            <input name="itemName" th:value="${editMenuItem?.itemName}" required maxLength="20"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('itemName')}" th:errors="*{itemName}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Phân loại món</label>
+                            <input name="category" th:value="${editMenuItem?.category}"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Đơn giá (VND) <span class="text-error">*</span></label>
+                            <input type="number" name="price" th:value="${editMenuItem?.price}" required min="0"
+                                   class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                            <p class="text-error text-xs mt-1" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></p>
+                        </div>
+                        <div>
+                            <label class="block font-label-md text-secondary/70 mb-2">Khả dụng</label>
+                            <div class="flex items-center h-12">
+                                <input type="checkbox" name="isAvailable" th:checked="${editMenuItem?.isAvailable}"
+                                       class="h-5 w-5 text-secondary border-outline-variant/50 rounded focus:ring-secondary"/>
+                                <span class="ml-2 font-body-md text-secondary">Available</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Đường dẫn ảnh</label>
+                        <input name="imageUrl" th:value="${editMenuItem?.imageUrl}"
+                               class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"/>
+                    </div>
+                    <div>
+                        <label class="block font-label-md text-secondary/70 mb-2">Nguyên liệu chế biến</label>
+                        <textarea name="ingredient" th:text="${editMenuItem?.ingredient}" rows="3"
+                                  class="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/50 rounded-xl font-body-md focus:outline-none focus:ring-1 focus:ring-secondary"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/10">
+                        <button type="button" onclick="closeEditModal()" class="px-6 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">Hủy bỏ</button>
+                        <button type="submit" class="px-6 py-3 bg-secondary hover:bg-secondary/90 text-white rounded-xl font-label-md shadow-md transition-all">Cập nhật</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+        <!-- ==========================================
+        3. DELETE CONFIRM MODAL
+        ========================================== -->
+        <div id="deleteModal" class="fixed inset-0 z-50 hidden opacity-0 pointer-events-none flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all duration-300">
+            <div class="bg-white rounded-[32px] shadow-2xl border border-outline-variant/10 w-[90%] max-w-md overflow-hidden flex flex-col">
+                <div class="p-8 text-center space-y-4">
+                    <div class="w-16 h-16 bg-error/10 text-error rounded-full flex items-center justify-center mx-auto">
+                        <span class="material-symbols-outlined text-3xl">warning</span>
+                    </div>
+                    <h3 class="font-headline-sm text-primary text-lg">Xác nhận xóa danh mục này?</h3>
+                    <p class="font-body-md text-secondary/70">Hành động này sẽ ẩn danh mục khỏi các trang hoạt động tương ứng của khu nghỉ dưỡng nhưng dữ liệu lịch sử đặt chỗ cũ vẫn được bảo toàn.</p>
+                </div>
+                
+                <form id="deleteForm" method="post" data-ajax="true" class="px-8 pb-8 flex gap-3">
+                    <!-- CSRF Token -->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
+                    <button type="button" onclick="closeDeleteModal()" class="flex-1 py-3 border border-outline-variant text-primary rounded-xl font-label-md hover:bg-surface-container transition-all">
+                        Không, quay lại
+                    </button>
+                    <button type="submit" class="flex-1 py-3 bg-error hover:bg-error/95 text-white rounded-xl font-label-md shadow-md transition-all">
+                        Có, đồng ý xóa
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Empty/Default Response Fragment -->
+    <div th:fragment="emptyResponse" class="py-12 text-center text-secondary/60">
+        <span class="material-symbols-outlined text-4xl block mb-2">hourglass_empty</span>
+        Tính năng đang được phát triển...
+    </div>
+
+</body>
+</html>

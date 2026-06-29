@@ -2,10 +2,14 @@ package com.AuraMoon.auramoon.spa.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "TREATMENT_SERVICE")
+@SQLRestriction("is_delete = 0")
+@SQLDelete(sql = "UPDATE treatment_service SET is_delete = 1 WHERE service_id = ?")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

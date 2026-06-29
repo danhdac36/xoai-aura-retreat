@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/admin-layout :: layout(~{::section})">
+<head>
+    <title>Master Data Management</title>
+</head>
+<body>
+<section class="max-w-7xl mx-auto py-12 space-y-8 w-full">
+    <!-- Header Section -->
+    <header class="mb-6 flex justify-between items-end">
+        <div>
+            <h2 class="font-headline-md text-headline-md text-primary mb-2">Master Data Management</h2>
+            <p class="font-body-lg text-body-lg text-secondary/70">Configure resort-wide services, packages, and accommodations.</p>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-outline-variant/30 mb-8 gap-6 overflow-x-auto" id="master-data-tabs">
+        <button onclick="switchTab('retreat-packages', this)" 
+           class="tab-link px-4 py-3 border-b-2 font-label-md text-label-md border-primary text-primary transition-all whitespace-nowrap">
+           Retreat Packages
+        </button>
+        <button onclick="switchTab('villa-types', this)" 
+           class="tab-link px-4 py-3 border-b-2 font-label-md text-label-md border-transparent text-secondary/70 hover:text-primary transition-all whitespace-nowrap">
+           Villa Types
+        </button>
+        <button onclick="switchTab('villas', this)" 
+           class="tab-link px-4 py-3 border-b-2 font-label-md text-label-md border-transparent text-secondary/70 hover:text-primary transition-all whitespace-nowrap">
+           Villas
+        </button>
+        <button onclick="switchTab('menu-items', this)" 
+           class="tab-link px-4 py-3 border-b-2 font-label-md text-label-md border-transparent text-secondary/70 hover:text-primary transition-all whitespace-nowrap">
+           Menu Items
+        </button>
+        <button onclick="switchTab('yoga-classes', this)" 
+           class="tab-link px-4 py-3 border-b-2 font-label-md text-label-md border-transparent text-secondary/70 hover:text-primary transition-all whitespace-nowrap">
+           Yoga Classes
+        </button>
+        <button onclick="switchTab('spa-services', this)" 
+           class="tab-link px-4 py-3 border-b-2 font-label-md text-label-md border-transparent text-secondary/70 hover:text-primary transition-all whitespace-nowrap">
+           Spa Services
+        </button>
+    </div>
+
+    <!-- Main Content AJAX Area -->
+    <div th:replace="~{admin/master-data/fragments :: tabContent}"></div>
+
+    <!-- Page Specific Script -->
+    <script th:src="@{/js/module1/master-data.js}"></script>
+</section>
+</body>
+</html>
