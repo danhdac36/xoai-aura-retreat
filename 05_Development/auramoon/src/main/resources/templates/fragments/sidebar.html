@@ -75,9 +75,7 @@
                         <span class="text-[13px] tracking-wide font-medium">Home (Guest)</span>
                     </a>
                 </li>
-                <!-- END HOME -->
-
-                <li sec:authorize="hasRole('GUEST')">
+                <li sec:authorize="hasRole('GUEST')" th:if="${hasActiveBooking}">
                     <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/booking/itinerary}">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
                         <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">timeline</span>
@@ -222,31 +220,31 @@
                 </li>
 
                 <!-- GUEST SERVICES -->
-                <li sec:authorize="hasAnyRole('GUEST', 'ADMIN')">
+                <li sec:authorize="hasAnyRole('GUEST', 'ADMIN')" th:if="${hasActiveBooking || #authorization.expression('hasRole(''ADMIN'')')}">
                     <div class="text-[9px] uppercase tracking-[0.25em] text-outline/40 mb-3 px-6 font-semibold mt-8">Services</div>
                 </li>
-                <li sec:authorize="hasRole('GUEST')">
+                <li sec:authorize="hasRole('GUEST')" th:if="${hasActiveBooking}">
                     <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/guest/booking-spa}">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
                         <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">spa</span>
                         <span class="text-[13px] tracking-wide font-medium">Spa Booking</span>
                     </a>
                 </li>
-                <li sec:authorize="hasAnyRole('GUEST','ADMIN')">
+                <li sec:authorize="hasAnyRole('GUEST','ADMIN')" th:if="${hasActiveBooking || #authorization.expression('hasRole(''ADMIN'')')}">
                     <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/guest/booking-yoga}">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
                         <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">self_improvement</span>
                         <span class="text-[13px] tracking-wide font-medium">Yoga Booking</span>
                     </a>
                 </li>
-                <li sec:authorize="hasAnyRole('GUEST')">
+                <li sec:authorize="hasAnyRole('GUEST')" th:if="${hasActiveBooking}">
                     <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/fnb/meal-selection}">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
                         <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">restaurant</span>
                         <span class="text-[13px] tracking-wide font-medium">Meal Selection</span>
                     </a>
                 </li>
-                <li sec:authorize="hasAnyRole('GUEST')">
+                <li sec:authorize="hasAnyRole('GUEST')" th:if="${hasActiveBooking}">
                     <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/fnb/alacarte-order}">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
                         <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">room_service</span>
@@ -258,7 +256,7 @@
                 <li>
                     <div class="text-[9px] uppercase tracking-[0.25em] text-outline/40 mb-3 px-6 font-semibold mt-8">Account</div>
                 </li>
-                <li sec:authorize="hasRole('GUEST')">
+                <li sec:authorize="hasRole('GUEST')" th:if="${hasBookings}">
                     <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1" th:href="@{/booking/history}">
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
                         <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">history</span>

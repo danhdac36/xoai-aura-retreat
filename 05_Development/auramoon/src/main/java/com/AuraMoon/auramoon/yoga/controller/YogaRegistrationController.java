@@ -1,4 +1,3 @@
-
 package com.AuraMoon.auramoon.yoga.controller;
 
 import com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse;
@@ -10,6 +9,7 @@ import com.AuraMoon.auramoon.yoga.entity.YogaSchedule;
 import com.AuraMoon.auramoon.yoga.exception.HealthWarningException;
 import com.AuraMoon.auramoon.yoga.exception.YogaBusinessException;
 import com.AuraMoon.auramoon.yoga.service.IYogaRegistrationService;
+import com.AuraMoon.auramoon.yoga.repository.YogaRegistrationRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +30,15 @@ public class YogaRegistrationController {
 
     private final IYogaRegistrationService yogaRegistrationService;
     private final BookingRepository bookingRepository;
+    private final YogaRegistrationRepository yogaRegistrationRepository;
 
     public YogaRegistrationController(
             IYogaRegistrationService yogaRegistrationService,
-            BookingRepository bookingRepository) {
+            BookingRepository bookingRepository,
+            YogaRegistrationRepository yogaRegistrationRepository) {
         this.yogaRegistrationService = yogaRegistrationService;
         this.bookingRepository = bookingRepository;
+        this.yogaRegistrationRepository = yogaRegistrationRepository;
     }
 
     @GetMapping
@@ -83,6 +86,11 @@ public class YogaRegistrationController {
                 map.put("startTime", s.getStartTime().toString());
                 map.put("endTime", s.getEndTime().toString());
                 map.put("maxCapacity", s.getMaxCapacity());
+                
+                long registeredCount = yogaRegistrationRepository.countBySchedule_IdAndStatus(s.getId(), "REGISTERED");
+                long remainingSpots = s.getMaxCapacity() - registeredCount;
+                map.put("remainingSpots", Math.max(0, remainingSpots));
+                
                 result.add(map);
             }
             return ResponseEntity.ok(result);

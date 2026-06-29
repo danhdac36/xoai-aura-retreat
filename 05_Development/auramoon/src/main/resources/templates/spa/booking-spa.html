@@ -1,18 +1,20 @@
-<!DOCTYPE html><html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org"><head>
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<meta name="_csrf" th:content="${_csrf.token}"/>
-<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-<title>Đặt lịch Trị liệu Spa | Aura Wellness</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<script id="tailwind-config">
+<!DOCTYPE html>
+<html class="light" lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Đặt lịch Trị liệu Spa | Aura Wellness</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
-                    "colors": {
+                    colors: {
                         "on-background": "#1b1c1c",
                         "primary-fixed-dim": "#c9c6c2",
                         "surface-dim": "#dcd9d9",
@@ -61,13 +63,13 @@
                         "error-container": "#ffdad6",
                         "tertiary-fixed": "#c1eebc"
                     },
-                    "borderRadius": {
+                    borderRadius: {
                         "DEFAULT": "0.125rem",
                         "lg": "0.25rem",
                         "xl": "0.5rem",
                         "full": "0.75rem"
                     },
-                    "spacing": {
+                    spacing: {
                         "gutter": "24px",
                         "section-gap": "120px",
                         "margin-mobile": "20px",
@@ -76,7 +78,7 @@
                         "stack-sm": "8px",
                         "stack-lg": "32px"
                     },
-                    "fontFamily": {
+                    fontFamily: {
                         "headline-sm": ["Playfair Display"],
                         "display-lg-mobile": ["Playfair Display"],
                         "display-lg": ["Playfair Display"],
@@ -85,7 +87,7 @@
                         "headline-lg": ["Playfair Display"],
                         "body-md": ["Inter"]
                     },
-                    "fontSize": {
+                    fontSize: {
                         "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
                         "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
                         "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
@@ -98,37 +100,31 @@
             },
         }
     </script>
-<style>
-        body { font-family: 'Inter', sans-serif; }
-        .calendar-day-active {
-            background-color: #566342;
-            color: white;
-        }
-        .time-slot-active {
-            border-color: #566342;
-            background-color: #f5f2ed;
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
         }
         
         /* Toast Notification Styles */
         #toast {
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-in-out;
+            transform: translate(-50%, 20px);
             opacity: 0;
             z-index: 1000;
         }
         #toast.show {
-            transform: translateY(0);
+            transform: translate(-50%, 0);
             opacity: 1;
         }
         
-        /* New Animations for UI Lively feel */
+        /* Premium Animations */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         @keyframes kenBurns {
             0% { transform: scale(1.0); }
-            100% { transform: scale(1.05); }
+            100% { transform: scale(1.04); }
         }
         .bg-animated-image {
             position: fixed;
@@ -140,167 +136,234 @@
             background-size: cover;
             background-position: center;
             z-index: -2;
-            animation: kenBurns 30s ease-in-out infinite alternate;
+            animation: kenBurns 40s ease-in-out infinite alternate;
             pointer-events: none;
         }
         .bg-overlay {
             position: fixed;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(252, 251, 249, 0.8), rgba(252, 251, 249, 0.95));
+            background: linear-gradient(to bottom, rgba(250, 248, 245, 0.88), rgba(250, 248, 245, 0.95));
             z-index: -1;
             pointer-events: none;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         
         @keyframes blob {
             0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
+            33% { transform: translate(30px, -40px) scale(1.03); }
+            66% { transform: translate(-20px, 20px) scale(0.97); }
             100% { transform: translate(0px, 0px) scale(1); }
         }
         .animate-fade-in-up {
-            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         .animate-blob {
-            animation: blob 15s infinite alternate;
+            animation: blob 25s infinite alternate;
         }
-        .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
+        .animation-delay-2000 { animation-delay: 2.5s; }
+        .animation-delay-4000 { animation-delay: 5s; }
+        .delay-100 { animation-delay: 120ms; }
         
+        /* Soft luxury shadows and border outlines */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px -10px rgba(28, 35, 24, 0.04);
+        }
+        
+        @keyframes shine {
+            100% {
+                transform: translateX(100%) skewX(-12deg);
+            }
+        }
+        .animate-shine-hover:hover .group-hover\:animate-shine {
+            animation: shine 0.8s ease-out;
+        }
+
+        @keyframes pulse-soft {
+            0%, 100% { box-shadow: 0 4px 14px 0 rgba(43, 51, 39, 0.35); }
+            50% { box-shadow: 0 6px 22px 0 rgba(43, 51, 39, 0.55); }
+        }
+        .btn-pulse {
+            animation: pulse-soft 3s infinite ease-in-out;
+        }
+
+        /* Hide Webkit Scrollbars for a super clean UI look */
+        .scrollbar-hidden::-webkit-scrollbar {
+            width: 4px;
+        }
+        .scrollbar-hidden::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scrollbar-hidden::-webkit-scrollbar-thumb {
+            background: rgba(43, 51, 39, 0.15);
+            border-radius: 99px;
         }
     </style>
 </head>
-<body class="text-on-surface relative overflow-x-hidden min-h-screen">
-<th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
-<!-- Animated Photo Background -->
-<div class="bg-animated-image"></div>
-<div class="bg-overlay"></div>
+<body class="text-stone-800 relative overflow-hidden h-screen bg-[#faf8f5]">
+    <!-- Shared Sidebar -->
+    <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
+    
+    <!-- Animated Photo Background & Premium Blurs -->
+    <div class="bg-animated-image"></div>
+    <div class="bg-overlay"></div>
+    
+    <div class="fixed top-0 left-0 w-96 h-96 bg-[#869273]/8 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob pointer-events-none z-[-1]"></div>
+    <div class="fixed top-0 right-0 w-96 h-96 bg-[#c5c1b6]/15 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000 pointer-events-none z-[-1]"></div>
+    
+    <!-- Premium Notification Toast -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3.5 rounded-xl shadow-xl font-sans text-xs font-semibold text-white pointer-events-none transition-all duration-300">
+        <span class="material-symbols-outlined text-[18px]" id="toastIcon">info</span>
+        <span id="toastMessage">Thông báo</span>
+    </div>
+    
+    <!-- Main Content Container constrained to 100vh viewport -->
+    <main class="max-w-[1400px] mx-auto px-8 py-8 h-screen overflow-hidden flex flex-col relative md:ml-[280px]">
+        
+        <!-- Page Header (Breathable) -->
+        <section class="mb-6 animate-fade-in-up opacity-0 relative z-10 flex-shrink-0">
+            <h1 class="font-serif text-3xl sm:text-4xl text-[#2b3327] mb-1.5 leading-none tracking-tight">Đặt lịch Trị liệu Spa</h1>
+            <p class="font-sans text-sm text-stone-500">Trải nghiệm sự tĩnh lặng và tái tạo năng lượng trong không gian thiền định của Aura Wellness.</p>
+        </section>
+        
+        <!-- Two-Column Grid Layout (Optimized Viewport with Internal Scrolling) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch flex-1 min-h-0 animate-fade-in-up delay-100 opacity-0 relative z-10">
+            
+            <!-- Left Column (col-span-7) - Scrollable naturally internally -->
+            <div class="lg:col-span-7 h-full flex flex-col gap-6 overflow-y-auto scrollbar-hidden pr-1 pb-8">
+                
+                <!-- Selected Service Card (Editorial Style) -->
+                <div class="bg-white/95 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-[#e5dcd3]/60 shadow-md flex flex-col sm:flex-row items-center gap-8 relative overflow-hidden flex-shrink-0">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-[#3a4536]"></div>
+                    <div class="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-md border border-stone-100 bg-stone-100">
+                        <img id="ui-service-image" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=2070&auto=format&fit=crop" alt="Hình ảnh dịch vụ">
+                    </div>
+                    <div class="flex-1 text-center sm:text-left w-full">
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                            <div>
+                                <span class="text-xs font-semibold tracking-[0.2em] text-[#a28e72] uppercase">Liệu trình đã chọn</span>
+                                <h3 id="ui-service-name" class="font-serif text-xl sm:text-2xl text-[#2b3327] mt-1 mb-1 leading-snug font-medium">Đang tải dữ liệu...</h3>
+                                <p id="ui-service-price" class="text-sm text-stone-500 font-sans tracking-wide leading-relaxed">Vui lòng đợi...</p>
+                            </div>
+                            <div class="flex justify-center sm:justify-start flex-shrink-0">
+                                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-[#3a4536]/10 text-[#3a4536] border border-[#3a4536]/20">
+                                    <span class="w-2 h-2 rounded-full bg-[#3a4536]"></span>
+                                    Đã bao gồm trong Gói
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Calendar Date Selection -->
+                <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-stone-200/60 shadow-sm flex-shrink-0">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="w-7 h-7 rounded-full bg-[#3a4536] text-[#d2c5af] flex items-center justify-center font-sans text-xs font-bold shadow-sm">1</span>
+                        <h3 class="font-serif text-lg text-[#2b3327] tracking-wide">Chọn ngày trị liệu</h3>
+                    </div>
+                    
+                    <div class="bg-[#faf8f5]/60 rounded-xl p-4 sm:p-5 border border-stone-200/40">
+                        <div class="flex justify-between items-center mb-4 px-2">
+                            <span id="calendar-month-year" class="font-serif text-base font-semibold text-[#2b3327]">Đang tải...</span>
+                            <div class="flex gap-2">
+                                <button id="prev-month-btn" class="material-symbols-outlined text-stone-500 hover:text-[#2b3327] transition-colors p-2 rounded-full hover:bg-stone-200/50">chevron_left</button>
+                                <button id="next-month-btn" class="material-symbols-outlined text-stone-500 hover:text-[#2b3327] transition-colors p-2 rounded-full hover:bg-stone-200/50">chevron_right</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-7 text-center mb-2">
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T2</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T3</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T4</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T5</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T6</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T7</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">CN</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-y-2 gap-x-1 text-center items-center" id="calendar-grid">
+                            <!-- Rendered dynamically by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column (col-span-5) - Scrollable naturally internally -->
+            <div class="lg:col-span-5 h-full flex flex-col gap-6 overflow-y-auto scrollbar-hidden pr-1 pb-8">
+                <!-- Step 2: Time Slots Card -->
+                <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-stone-200/60 shadow-sm flex-shrink-0">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="w-7 h-7 rounded-full bg-[#3a4536] text-[#d2c5af] flex items-center justify-center font-sans text-xs font-bold shadow-sm">2</span>
+                        <h3 class="font-serif text-lg text-[#2b3327] tracking-wide">Chọn khung giờ</h3>
+                    </div>
+                    
+                    <!-- Segmented Tabs for Morning, Afternoon, Evening -->
+                    <div class="flex gap-1 mb-5 bg-stone-100 p-1 rounded-xl border border-stone-200/50">
+                        <button id="tab-morning" class="flex-1 py-2 text-xs font-bold tracking-wider uppercase rounded-lg transition-all bg-[#3a4536] text-[#d2c5af] shadow-md" onclick="switchTimeTab('morning')">Sáng</button>
+                        <button id="tab-afternoon" class="flex-1 py-2 text-xs font-semibold tracking-wider uppercase rounded-lg transition-all text-stone-400 hover:text-[#3a4536]" onclick="switchTimeTab('afternoon')">Chiều</button>
+                        <button id="tab-evening" class="flex-1 py-2 text-xs font-semibold tracking-wider uppercase rounded-lg transition-all text-stone-400 hover:text-[#3a4536]" onclick="switchTimeTab('evening')">Tối</button>
+                    </div>
+                    
+                    <div id="time-slots-container" class="relative min-h-[140px]">
+                        <div class="grid grid-cols-2 gap-3" id="time-slots-morning"></div>
+                        <div class="grid grid-cols-2 gap-3 hidden" id="time-slots-afternoon"></div>
+                        <div class="grid grid-cols-2 gap-3 hidden" id="time-slots-evening"></div>
+                        <div id="time-slots-loading" class="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[1px] rounded-xl hidden">
+                            <div class="flex flex-col items-center gap-2">
+                                <svg class="animate-spin h-5 w-5 text-[#2b3327]" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span class="text-xs text-stone-500 font-medium">Đang tải...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Booking Summary Sticky Card -->
+                <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-stone-200/60 shadow-md flex-shrink-0">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="w-7 h-7 rounded-full bg-[#3a4536] text-[#d2c5af] flex items-center justify-center font-sans text-xs font-bold shadow-sm">3</span>
+                        <h3 class="font-serif text-lg text-[#2b3327] tracking-wide">Tóm tắt đặt lịch</h3>
+                    </div>
+                    
+                    <div class="space-y-3 mb-5 bg-[#faf8f5]/80 rounded-xl p-4 border border-stone-200/40 shadow-inner">
+                        <div class="flex justify-between items-center border-b border-stone-200/40 pb-2.5">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-stone-400">Ngày trị liệu:</span>
+                            <span class="text-sm font-semibold text-stone-800" id="summary-date">Đang tải...</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-stone-200/40 pb-2.5">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-stone-400">Thời gian:</span>
+                            <span class="text-sm font-semibold text-stone-800"><span id="summary-time-val">10:00</span> (60 phút)</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-stone-400">Phòng trị liệu:</span>
+                            <span class="text-sm font-semibold text-stone-800">Sẽ được sắp xếp</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-5">
+                        <label for="note" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">Ghi chú cho Spa (Tùy chọn)</label>
+                        <textarea id="note" rows="2" class="w-full bg-[#faf8f5]/40 border border-stone-200 rounded-xl p-3 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-[#2b3327] focus:border-[#2b3327] transition-all resize-none" placeholder="Vd: Tôi muốn tập trung massage vai cổ gáy..."></textarea>
+                    </div>
+                    
+                    <button id="submitBtn" class="w-full bg-[#3a4536] hover:bg-[#2b3327] text-[#d2c5af] py-3.5 rounded-xl font-bold tracking-widest text-xs uppercase transition-all duration-300 shadow-md hover:shadow-lg active:scale-[0.99] flex items-center justify-center gap-2 group relative overflow-hidden btn-pulse">
+                        <span class="absolute inset-0 w-full h-full bg-white/10 transform -skew-x-12 -translate-x-full group-hover:animate-shine animate-shine-hover"></span>
+                        Xác nhận đặt lịch
+                        <svg id="loadingSpinner" class="animate-spin h-5 w-5 text-[#d2c5af] hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
 
-<!-- Decorative background blurs for lively UI -->
-<div class="fixed top-0 left-0 w-96 h-96 bg-[#869273]/20 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob pointer-events-none z-[-1]"></div>
-<div class="fixed top-0 right-0 w-96 h-96 bg-[#c5c1b6]/40 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-2000 pointer-events-none z-[-1]"></div>
-<div class="fixed -bottom-32 left-20 w-96 h-96 bg-[#869273]/30 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-4000 pointer-events-none z-[-1]"></div>
-
-<!-- Toast Notification -->
-<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg font-label-md text-white pointer-events-none">
-    <span class="material-symbols-outlined" id="toastIcon">info</span>
-    <span id="toastMessage">Message</span>
-</div>
-
-<main class="max-w-[1440px] mx-auto px-margin-desktop py-12 relative md:ml-64">
-<!-- Back Button -->
-<div class="absolute left-margin-desktop top-12">
-    <a href="#" onclick="history.back(); return false;" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md group">
-        <span class="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
-        Quay lại
-    </a>
-</div>
-
-<!-- Header Section -->
-<section class="mb-16 text-center max-w-2xl mx-auto animate-fade-in-up opacity-0 relative z-10">
-<h1 class="font-headline-lg text-headline-lg mb-4 text-primary">Đặt lịch Trị liệu Spa</h1>
-<p class="font-body-md text-body-md text-on-surface-variant">Trải nghiệm sự tĩnh lặng và tái tạo năng lượng trong không gian thiền định của Aura Wellness.</p>
-</section>
-<!-- Booking Interface -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
-<!-- Left: Service Summary & Calendar -->
-<div class="lg:col-span-7 glass-panel p-stack-lg rounded-2xl animate-fade-in-up delay-100 opacity-0 relative z-10 transition-transform duration-500 hover:-translate-y-1">
-<!-- Service Summary -->
-<div class="mb-10 flex items-center gap-stack-md p-stack-md bg-primary-container rounded-lg">
-<div class="w-16 h-16 rounded overflow-hidden flex-shrink-0">
-<img class="w-full h-full object-cover" data-alt="Close up of a relaxing Swedish massage session with warm aromatic oils being applied to a person's back in a soft-lit, luxurious spa environment. The scene is bathed in tranquil sage green and earth beige tones, reflecting the high-end minimalist design system of Aura Wellness. The atmosphere is deeply serene, sophisticated, and focused on physical rejuvenation and mental clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEnP2E6FcAgC7aG1hKKpRuxPGOMzETt-Ss_4Bcw9F5TV6u67NsotMt9oTTEPHtTnBRBvO2uCK_X3TEpWtqtBeHq8_bIJ3cCd6wcwVHf8qPAp2M3ihml7xn4aGmuDFuNiekExyp9hDUxewVlGagt-wAmv5xjJ_QsWPFLvs658JcTWOl2otwHuJ9bsYE6y_6v2jrKunBHDLxGqX6wcjnTv5oCssZ5Tm9MDTXMgXn7cULOnnu0pzKBUJYAReExWCE7SctjHCOYu4-NJ4">
-</div>
-<div>
-<h3 class="font-label-md text-label-md text-on-primary-fixed-variant">Dịch vụ đã chọn</h3>
-<p id="ui-service-name" class="font-headline-sm text-headline-sm text-primary">Đang tải dữ liệu...</p>
-<p id="ui-service-price" class="font-body-md text-body-md text-on-surface-variant">Vui lòng đợi...</p>
-</div>
-</div>
-<h3 class="font-label-md text-label-md mb-6 uppercase tracking-wider text-outline">1. Chọn ngày</h3>
-<!-- Calendar (Interactive Placeholder) -->
-<div class="bg-white/80 rounded-xl p-6 border border-white/50 shadow-sm backdrop-blur-sm">
-<div class="flex justify-between items-center mb-8 px-2">
-<span id="calendar-month-year" class="font-headline-sm text-headline-sm">Đang tải...</span>
-<div class="flex gap-4">
-<button id="prev-month-btn" class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2 rounded hover:bg-surface-container-low">chevron_left</button>
-<button id="next-month-btn" class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2 rounded hover:bg-surface-container-low">chevron_right</button>
-</div>
-</div>
-<div class="grid grid-cols-7 text-center mb-4">
-<div class="font-label-md text-label-md text-outline py-2">T2</div>
-<div class="font-label-md text-label-md text-outline py-2">T3</div>
-<div class="font-label-md text-label-md text-outline py-2">T4</div>
-<div class="font-label-md text-label-md text-outline py-2">T5</div>
-<div class="font-label-md text-label-md text-outline py-2">T6</div>
-<div class="font-label-md text-label-md text-outline py-2">T7</div>
-<div class="font-label-md text-label-md text-outline py-2">CN</div>
-</div>
-<div class="grid grid-cols-7 gap-y-2 text-center" id="calendar-grid">
-    <!-- Rendered dynamically by JS -->
-</div>
-</div>
-</div>
-<!-- Right: Time Slots & Confirmation -->
-<div class="lg:col-span-5 flex flex-col gap-gutter">
-<div class="glass-panel p-stack-lg rounded-2xl animate-fade-in-up delay-200 opacity-0 relative z-10 transition-transform duration-500 hover:-translate-y-1">
-<h3 class="font-label-md text-label-md mb-4 uppercase tracking-wider text-outline">2. Chọn giờ</h3>
-<div class="flex gap-2 mb-6 bg-surface-container-low p-1 rounded-lg">
-    <button id="tab-morning" class="flex-1 py-2 text-label-md font-label-md rounded-md transition-colors bg-white shadow-sm text-primary" onclick="switchTimeTab('morning')">Sáng</button>
-    <button id="tab-afternoon" class="flex-1 py-2 text-label-md font-label-md rounded-md transition-colors text-outline-variant hover:text-primary" onclick="switchTimeTab('afternoon')">Chiều</button>
-    <button id="tab-evening" class="flex-1 py-2 text-label-md font-label-md rounded-md transition-colors text-outline-variant hover:text-primary" onclick="switchTimeTab('evening')">Tối</button>
-</div>
-<div id="time-slots-container" class="relative min-h-[200px]">
-    <div class="grid grid-cols-2 gap-4" id="time-slots-morning"></div>
-    <div class="grid grid-cols-2 gap-4 hidden" id="time-slots-afternoon"></div>
-    <div class="grid grid-cols-2 gap-4 hidden" id="time-slots-evening"></div>
-    <p id="time-slots-loading" class="text-center text-outline-variant py-4">Đang tải khung giờ...</p>
-</div>
-</div>
-<div class="glass-panel p-stack-lg rounded-2xl animate-fade-in-up delay-300 opacity-0 relative z-10 transition-transform duration-500 hover:-translate-y-1">
-<h3 class="font-label-md text-label-md mb-6 uppercase tracking-wider text-outline">Tóm tắt đặt lịch</h3>
-<div class="space-y-4 mb-6">
-<div class="flex justify-between items-center">
-<span class="font-body-md text-on-surface-variant">Ngày:</span>
-<span class="font-label-md text-label-md" id="summary-date">Đang tải...</span>
-</div>
-<div class="flex justify-between items-center">
-<span class="font-body-md text-on-surface-variant">Thời gian:</span>
-<span class="font-label-md text-label-md"><span id="summary-time">10:00</span> (60 phút)</span>
-</div>
-<div class="flex justify-between items-center">
-<span class="font-body-md text-on-surface-variant">Phòng:</span>
-<span class="font-label-md text-label-md">Sẽ được sắp xếp</span>
-</div>
-</div>
-
-<div class="mb-8">
-    <label for="note" class="block font-body-md text-on-surface-variant mb-2">Ghi chú cho Spa (Tuỳ chọn)</label>
-    <textarea id="note" rows="2" class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-3 font-body-md text-on-surface focus:outline-none focus:border-secondary transition-colors" placeholder="Vd: Tôi muốn massage nhẹ nhàng..."></textarea>
-</div>
-
-<button id="submitBtn" class="w-full bg-secondary text-on-secondary py-4 rounded-lg font-label-md text-label-md hover:scale-[0.99] transition-transform shadow-lg flex items-center justify-center gap-2">
-    Xác nhận đặt lịch
-    <svg id="loadingSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-    </svg>
-</button>
-</div>
-</div>
-</div>
-</main>
-<script>
-        // Data variables
+    <script>
+        // High-level State Variables
         const todayReal = new Date();
         const yy = todayReal.getFullYear();
         const mm = String(todayReal.getMonth() + 1).padStart(2, '0');
@@ -316,8 +379,22 @@
 
         document.getElementById('summary-date').innerText = `${todayReal.getDate()} Tháng ${todayReal.getMonth() + 1}, ${todayReal.getFullYear()}`;
 
-        // Fetch Package Data from Backend on Load
+        // Fetch active package data on load
         document.addEventListener('DOMContentLoaded', async () => {
+            // Highlight Sidebar active link for Spa Booking
+            const spaBookingLink = document.querySelector('aside a[href="/guest/booking-spa"]');
+            if (spaBookingLink) {
+                spaBookingLink.classList.remove('text-[#d2c5af]/70');
+                spaBookingLink.classList.add('text-[#d2c5af]', 'bg-[#3a4536]/80', 'border-l-4', 'border-[#d2c5af]');
+                const indicator = spaBookingLink.querySelector('div');
+                if (indicator) {
+                    indicator.classList.remove('h-0', 'opacity-0');
+                    indicator.classList.add('h-[60%]', 'opacity-100', 'bg-[#d2c5af]');
+                }
+                const icon = spaBookingLink.querySelector('span.material-symbols-outlined');
+                if (icon) icon.classList.remove('opacity-60');
+            }
+
             try {
                 const res = await fetch('/guest/booking-spa/active-package');
                 const data = await res.json();
@@ -330,25 +407,50 @@
                     document.getElementById('ui-service-name').innerText = `${data.serviceName} - ${data.durationMinutes} phút`;
                     document.getElementById('ui-service-price').innerText = data.priceInfo;
                     
-                    // Update summary
-                    document.getElementById('summary-time').innerHTML = `<span id="summary-time-val">10:00</span> (${data.durationMinutes} phút)`;
+                    // Set service image if available
+                    if (data.imageUrl && data.imageUrl.trim() !== '') {
+                        document.getElementById('ui-service-image').src = data.imageUrl;
+                    }
                     
-                    // Now fetch available slots for the default date
+                    // Update summary
+                    document.getElementById('summary-time-val').innerText = selectedTime;
+                    const durationText = document.createElement('span');
+                    durationText.className = 'text-stone-400 font-normal ml-1 text-xs';
+                    durationText.innerText = `(${data.durationMinutes} phút)`;
+                    document.getElementById('summary-time-val').parentNode.appendChild(durationText);
+                    
+                    // Fetch available slots for today
                     fetchAvailableSlots(selectedDate);
                 } else {
+                    currentBookingId = null;
                     document.getElementById('ui-service-name').innerText = "Chưa có dữ liệu";
-                    document.getElementById('ui-service-price').innerText = data.error || "Không tìm thấy gói nào.";
-                    document.getElementById('summary-time').innerHTML = "Chưa xác định";
-                    document.getElementById('time-slots-loading').innerHTML = `<span class="text-error">${data.error || "Không tải được khung giờ"}</span>`;
+                    document.getElementById('ui-service-price').innerText = data.error || "Bạn chưa thực hiện đặt trước.";
+                    document.getElementById('summary-time-val').innerText = "Chưa xác định";
+
+                    // Display friendly warning message under Chọn giờ
+                    document.getElementById('time-slots-loading').innerHTML = `
+                        <div class="flex flex-col items-center gap-2 text-stone-500 text-center px-4 py-8">
+                            <span class="material-symbols-outlined text-stone-400 text-3xl">info</span>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-stone-400">Không thể tải khung giờ</p>
+                            <p class="text-xs text-stone-500 font-medium">${data.error || "Vui lòng Check-In tại quầy lễ tân."}</p>
+                        </div>
+                    `;
+                    document.getElementById('time-slots-loading').classList.remove('hidden');
+
+                    // Disable submit button
+                    const submitBtn = document.getElementById('submitBtn');
+                    submitBtn.disabled = true;
+                    submitBtn.classList.remove('bg-secondary', 'hover:scale-[0.99]');
+                    submitBtn.classList.add('bg-stone-200', 'text-stone-400', 'cursor-not-allowed');
                 }
             } catch (error) {
                 console.error("Failed to load active package", error);
-                document.getElementById('ui-service-name').innerText = "Lỗi kết nối Backend";
+                document.getElementById('ui-service-name').innerText = "Lỗi kết nối máy chủ";
                 document.getElementById('ui-service-price').innerText = "Không thể tải dịch vụ";
             }
         });
 
-        // Dynamic Calendar Logic
+        // Minimalist Date Picker Logic
         let displayDate = new Date();
 
         function renderCalendar() {
@@ -361,49 +463,45 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const daysInPrevMonth = new Date(year, month, 0).getDate();
             
-            // Adjust so Monday is 0, Sunday is 6
+            // Monday-first correction (0 is Monday, 6 is Sunday)
             let startOffset = firstDay - 1;
             if (startOffset === -1) startOffset = 6;
             
             const grid = document.getElementById('calendar-grid');
             grid.innerHTML = '';
             
-            // Previous month padding
+            // Previous month padding days
             for (let i = startOffset - 1; i >= 0; i--) {
                 const dayDiv = document.createElement('div');
-                dayDiv.className = 'py-4 text-outline-variant opacity-30';
+                dayDiv.className = 'w-11 h-11 mx-auto flex items-center justify-center font-sans text-sm text-stone-300 opacity-25';
                 dayDiv.innerText = daysInPrevMonth - i;
                 grid.appendChild(dayDiv);
             }
             
-            // Current month days
+            // Current month active days
             for (let i = 1; i <= daysInMonth; i++) {
                 const btn = document.createElement('button');
-                btn.className = 'py-4 font-body-md rounded-lg hover:bg-surface-container-low transition-colors';
                 btn.innerText = i;
                 
-                // Format the date string YYYY-MM-DD
                 const currentDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 
+                // Styling base on selection state (perfect square cells)
                 if (currentDateStr === selectedDate) {
-                    btn.classList.add('calendar-day-active');
-                }
-                
-                // Allow selecting only current or future dates
-                if (currentDateStr < todayStr) {
-                    btn.classList.add('opacity-30', 'cursor-not-allowed', 'pointer-events-none');
+                    btn.className = 'w-11 h-11 mx-auto flex items-center justify-center font-sans text-sm rounded-full transition-all bg-[#3a4536] text-[#d2c5af] font-semibold shadow-md';
+                } else if (currentDateStr < todayStr) {
+                    btn.className = 'w-11 h-11 mx-auto flex items-center justify-center font-sans text-sm rounded-full opacity-20 cursor-not-allowed pointer-events-none text-stone-400';
                 } else {
+                    btn.className = 'w-11 h-11 mx-auto flex items-center justify-center font-sans text-sm rounded-full transition-all hover:bg-stone-200/50 text-stone-800 font-semibold';
                     btn.addEventListener('click', () => {
-                        document.querySelectorAll('#calendar-grid button').forEach(b => b.classList.remove('calendar-day-active'));
-                        btn.classList.add('calendar-day-active');
-                        
                         selectedDate = currentDateStr;
+                        renderCalendar();
                         document.getElementById('summary-date').innerText = `${i} Tháng ${month + 1}, ${year}`;
                         
                         fetchAvailableSlots(selectedDate);
                     });
                 }
                 
+                btn.setAttribute('data-date', currentDateStr);
                 grid.appendChild(btn);
             }
         }
@@ -418,27 +516,30 @@
             renderCalendar();
         });
 
-        // Initial render
+        // Render calendar initially
         renderCalendar();
 
+        // Switch Time Tabs
         function switchTimeTab(tab) {
             activeTimeTab = tab;
             ['morning', 'afternoon', 'evening'].forEach(t => {
                 const btn = document.getElementById(`tab-${t}`);
                 const grid = document.getElementById(`time-slots-${t}`);
-                if(t === tab) {
-                    btn.classList.add('bg-white', 'shadow-sm', 'text-primary');
-                    btn.classList.remove('text-outline-variant', 'hover:text-primary');
+                if (t === tab) {
+                    btn.className = 'flex-1 py-2 text-xs font-bold tracking-wider uppercase rounded-lg transition-all bg-[#3a4536] text-[#d2c5af] shadow-md';
                     grid.classList.remove('hidden');
                 } else {
-                    btn.classList.remove('bg-white', 'shadow-sm', 'text-primary');
-                    btn.classList.add('text-outline-variant', 'hover:text-primary');
+                    btn.className = 'flex-1 py-2 text-xs font-semibold tracking-wider uppercase rounded-lg transition-all text-stone-400 hover:text-[#3a4536]';
                     grid.classList.add('hidden');
                 }
             });
         }
 
+        // Fetch slots dynamically
         async function fetchAvailableSlots(dateStr) {
+            if (!currentBookingId) {
+                return;
+            }
             document.getElementById('time-slots-loading').classList.remove('hidden');
             document.getElementById('time-slots-morning').innerHTML = '';
             document.getElementById('time-slots-afternoon').innerHTML = '';
@@ -462,17 +563,17 @@
                         const isAvailable = availableTimes.includes(time);
                         const btn = document.createElement('button');
                         if (isAvailable) {
-                            btn.className = 'flex flex-col items-center justify-center py-6 border border-outline-variant rounded-lg transition-all hover:bg-secondary-container/20 group';
+                            btn.className = 'flex flex-col items-center justify-center py-3 border border-stone-200 bg-white rounded-xl transition-all duration-300 hover:border-[#2b3327]/55 hover:bg-[#faf8f5] shadow-sm hover:shadow group';
                             btn.innerHTML = `
-                                <span class="font-headline-sm text-headline-sm text-primary group-hover:text-secondary">${time}</span>
-                                <span class="font-label-md text-label-md text-outline">${label}</span>
+                                <span class="font-sans text-base font-bold text-stone-800 group-hover:text-[#2b3327] transition-colors">${time}</span>
+                                <span class="text-[10px] uppercase tracking-wider font-semibold text-stone-400 group-hover:text-stone-500 transition-colors">${label}</span>
                             `;
                             btn.onclick = () => selectTime(btn, time);
                         } else {
-                            btn.className = 'flex flex-col items-center justify-center py-6 border border-outline-variant rounded-lg opacity-40 cursor-not-allowed bg-surface-container';
+                            btn.className = 'flex flex-col items-center justify-center py-3 border border-stone-100 border-dashed bg-stone-50/50 rounded-xl opacity-40 cursor-not-allowed text-stone-300';
                             btn.innerHTML = `
-                                <span class="font-headline-sm text-headline-sm text-outline">${time}</span>
-                                <span class="font-label-md text-label-md text-outline">Hết chỗ</span>
+                                <span class="font-sans text-base font-medium text-stone-300">${time}</span>
+                                <span class="text-[10px] uppercase tracking-wider font-semibold text-stone-300">Đầy</span>
                             `;
                         }
                         container.appendChild(btn);
@@ -483,44 +584,62 @@
                 renderGroup(allTimesAfternoon, 'time-slots-afternoon', 'Chiều');
                 renderGroup(allTimesEvening, 'time-slots-evening', 'Tối');
                 
-                // Automatically select the first available if current is invalid
+                // Select active slot or auto select
                 if (availableTimes.length > 0 && !availableTimes.includes(selectedTime)) {
-                    selectTime(document.querySelector('#time-slots-container button:not(.cursor-not-allowed)'), availableTimes[0]);
+                    const firstBtn = document.querySelector('#time-slots-container button:not(.cursor-not-allowed)');
+                    if (firstBtn) selectTime(firstBtn, availableTimes[0]);
                 } else if (availableTimes.includes(selectedTime)) {
-                    const btn = Array.from(document.querySelectorAll('#time-slots-container button')).find(b => b.querySelector('span').innerText === selectedTime);
-                    if(btn) selectTime(btn, selectedTime);
+                    const btn = Array.from(document.querySelectorAll('#time-slots-container button')).find(b => b.querySelector('span') && b.querySelector('span').innerText === selectedTime);
+                    if (btn) selectTime(btn, selectedTime);
                 } else {
                     selectedTime = null;
-                    if(document.getElementById('summary-time-val')) document.getElementById('summary-time-val').innerText = "Hết chỗ";
+                    document.getElementById('summary-time-val').innerText = "Hết chỗ";
                 }
                 
-            } catch(e) {
-                document.getElementById('time-slots-loading').innerHTML = '<span class="text-error">Lỗi tải dữ liệu</span>';
+            } catch (e) {
+                console.error(e);
+                document.getElementById('time-slots-loading').innerHTML = `
+                    <div class="flex flex-col items-center gap-1.5 text-rose-800">
+                        <span class="material-symbols-outlined">error</span>
+                        <span class="text-xs font-semibold">Lỗi tải dữ liệu khung giờ</span>
+                    </div>
+                `;
                 document.getElementById('time-slots-loading').classList.remove('hidden');
             }
         }
 
+        // Handle selecting time slots
+        // Handle selecting time slots
         function selectTime(btn, time) {
             document.querySelectorAll('#time-slots-container button').forEach(b => {
-                b.classList.remove('time-slot-active');
-                if(!b.classList.contains('cursor-not-allowed')) {
-                    b.querySelector('span:first-child').classList.remove('text-secondary');
-                    b.querySelector('span:first-child').classList.add('text-primary');
+                if (!b.classList.contains('cursor-not-allowed')) {
+                    b.className = 'flex flex-col items-center justify-center py-3 border border-stone-200 bg-white rounded-xl transition-all duration-300 hover:border-[#2b3327]/55 hover:bg-[#faf8f5] shadow-sm hover:shadow group';
+                    const timeSpan = b.querySelector('span:first-child');
+                    const labelSpan = b.querySelector('span:last-child');
+                    if (timeSpan) {
+                        timeSpan.className = 'font-sans text-base font-bold text-stone-800 group-hover:text-[#2b3327] transition-colors';
+                    }
+                    if (labelSpan) {
+                        labelSpan.className = 'text-[10px] uppercase tracking-wider font-semibold text-stone-400 group-hover:text-stone-500 transition-colors';
+                    }
                 }
             });
-            btn.classList.add('time-slot-active');
-            btn.querySelector('span:first-child').classList.remove('text-primary');
-            btn.querySelector('span:first-child').classList.add('text-secondary');
+            
+            btn.className = 'flex flex-col items-center justify-center py-3 border border-[#3a4536] bg-[#3a4536] rounded-xl transition-all duration-300 shadow-md group';
+            const timeSpan = btn.querySelector('span:first-child');
+            const labelSpan = btn.querySelector('span:last-child');
+            if (timeSpan) {
+                timeSpan.className = 'font-sans text-base font-bold text-[#d2c5af]';
+            }
+            if (labelSpan) {
+                labelSpan.className = 'text-[10px] uppercase tracking-wider font-semibold text-stone-300';
+            }
             
             selectedTime = time;
-            if(document.getElementById('summary-time-val')) {
-                document.getElementById('summary-time-val').innerText = selectedTime;
-            } else {
-                document.getElementById('summary-time').innerText = selectedTime;
-            }
+            document.getElementById('summary-time-val').innerText = selectedTime;
         }
 
-        // API Fetch Integration
+        // Handle form submit integration
         const submitBtn = document.getElementById('submitBtn');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const toast = document.getElementById('toast');
@@ -532,17 +651,16 @@
             clearTimeout(toastTimeout);
             toastMessage.textContent = message;
             
-            toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg font-label-md text-white pointer-events-none transition-all duration-300';
+            toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3.5 rounded-xl shadow-xl font-sans text-sm font-semibold text-white pointer-events-none transition-all duration-300';
             
-            if(type === 'success') {
-                toast.classList.add('bg-secondary');
+            if (type === 'success') {
+                toast.classList.add('bg-[#2b3327]', 'border', 'border-[#3a4536]');
                 toastIcon.textContent = 'check_circle';
             } else {
-                toast.classList.add('bg-error');
+                toast.classList.add('bg-rose-950', 'border', 'border-rose-900', 'text-rose-200');
                 toastIcon.textContent = 'error';
             }
             
-            // Force reflow
             void toast.offsetWidth;
             toast.classList.add('show');
 
@@ -562,13 +680,12 @@
             }
 
             const payload = {
-                bookingId: currentBookingId, // Fetched from Backend
-                serviceId: currentServiceId, // Fetched from Backend
+                bookingId: currentBookingId,
+                serviceId: currentServiceId,
                 startTime: `${selectedDate}T${selectedTime}:00`,
                 note: document.getElementById('note').value
             };
 
-            // Loading state
             submitBtn.disabled = true;
             loadingSpinner.classList.remove('hidden');
 
@@ -602,4 +719,5 @@
             }
         });
     </script>
-</body></html>
+</body>
+</html>

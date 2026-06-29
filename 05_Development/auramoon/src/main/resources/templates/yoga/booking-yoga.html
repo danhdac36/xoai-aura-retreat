@@ -14,7 +14,7 @@
             darkMode: "class",
             theme: {
                 extend: {
-                    "colors": {
+                    colors: {
                         "on-background": "#1b1c1c",
                         "primary-fixed-dim": "#c9c6c2",
                         "surface-dim": "#dcd9d9",
@@ -63,13 +63,13 @@
                         "error-container": "#ffdad6",
                         "tertiary-fixed": "#c1eebc"
                     },
-                    "borderRadius": {
+                    borderRadius: {
                         "DEFAULT": "0.125rem",
                         "lg": "0.25rem",
                         "xl": "0.5rem",
                         "full": "0.75rem"
                     },
-                    "spacing": {
+                    spacing: {
                         "gutter": "24px",
                         "section-gap": "120px",
                         "margin-mobile": "20px",
@@ -78,7 +78,7 @@
                         "stack-sm": "8px",
                         "stack-lg": "32px"
                     },
-                    "fontFamily": {
+                    fontFamily: {
                         "headline-sm": ["Playfair Display"],
                         "display-lg-mobile": ["Playfair Display"],
                         "display-lg": ["Playfair Display"],
@@ -87,7 +87,7 @@
                         "headline-lg": ["Playfair Display"],
                         "body-md": ["Inter"]
                     },
-                    "fontSize": {
+                    fontSize: {
                         "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
                         "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
                         "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
@@ -101,30 +101,30 @@
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .calendar-day-active {
-            background-color: #566342;
-            color: white;
+        body { 
+            font-family: 'Inter', sans-serif; 
         }
         
+        /* Toast Notification Styles */
         #toast {
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-            transform: translateY(100%) translateX(-50%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-in-out;
+            transform: translate(-50%, 20px);
             opacity: 0;
             z-index: 1000;
         }
         #toast.show {
-            transform: translateY(0) translateX(-50%);
+            transform: translate(-50%, 0);
             opacity: 1;
         }
         
+        /* Premium Animations */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         @keyframes kenBurns {
             0% { transform: scale(1.0); }
-            100% { transform: scale(1.05); }
+            100% { transform: scale(1.04); }
         }
         .bg-animated-image {
             position: fixed;
@@ -136,43 +136,83 @@
             background-size: cover;
             background-position: center;
             z-index: -2;
-            animation: kenBurns 30s ease-in-out infinite alternate;
+            animation: kenBurns 40s ease-in-out infinite alternate;
             pointer-events: none;
         }
         .bg-overlay {
             position: fixed;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(252, 251, 249, 0.82), rgba(252, 251, 249, 0.96));
+            background: linear-gradient(to bottom, rgba(250, 248, 245, 0.88), rgba(250, 248, 245, 0.95));
             z-index: -1;
             pointer-events: none;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -40px) scale(1.03); }
+            66% { transform: translate(-20px, 20px) scale(0.97); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
         .animate-fade-in-up {
-            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-blob {
+            animation: blob 25s infinite alternate;
+        }
+        .animation-delay-2000 { animation-delay: 2.5s; }
+        .animation-delay-4000 { animation-delay: 5s; }
+        .delay-100 { animation-delay: 120ms; }
+        
+        /* Soft luxury shadows and border outlines */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px -10px rgba(28, 35, 24, 0.04);
         }
         
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+        @keyframes shine {
+            100% {
+                transform: translateX(100%) skewX(-12deg);
+            }
+        }
+        .animate-shine-hover:hover .group-hover\:animate-shine {
+            animation: shine 0.8s ease-out;
+        }
+
+        /* Hide Webkit Scrollbars for a super clean UI look */
+        .scrollbar-hidden::-webkit-scrollbar {
+            width: 4px;
+        }
+        .scrollbar-hidden::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scrollbar-hidden::-webkit-scrollbar-thumb {
+            background: rgba(43, 51, 39, 0.15);
+            border-radius: 99px;
         }
     </style>
 </head>
-<body class="text-on-surface relative overflow-x-hidden min-h-screen">
+<body class="text-stone-800 relative overflow-hidden h-screen bg-[#faf8f5]">
+    <!-- Shared Sidebar -->
     <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
+    
+    <!-- Animated Photo Background & Premium Blurs -->
     <div class="bg-animated-image"></div>
     <div class="bg-overlay"></div>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg font-label-md text-white pointer-events-none transition-all duration-300">
-        <span class="material-symbols-outlined" id="toastIcon">info</span>
-        <span id="toastMessage">Message</span>
+    
+    <div class="fixed top-0 left-0 w-96 h-96 bg-[#869273]/8 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob pointer-events-none z-[-1]"></div>
+    <div class="fixed top-0 right-0 w-96 h-96 bg-[#c5c1b6]/15 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000 pointer-events-none z-[-1]"></div>
+    
+    <!-- Premium Notification Toast -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3.5 rounded-xl shadow-xl font-sans text-xs font-semibold text-white pointer-events-none transition-all duration-300">
+        <span class="material-symbols-outlined text-[18px]" id="toastIcon">info</span>
+        <span id="toastMessage">Thông báo</span>
     </div>
-
+    
     <!-- Health Warning Modal (Decree 356/2025) -->
     <div id="healthModal" class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center hidden backdrop-blur-sm transition-opacity duration-300">
         <div class="glass-panel max-w-md w-full mx-margin-mobile p-8 rounded-2xl animate-fade-in-up shadow-2xl border border-error/20">
@@ -184,79 +224,84 @@
                 Hệ thống ghi nhận bạn đang có tình trạng chấn thương/bệnh lý. Bạn có đồng ý tự chịu trách nhiệm về thể chất khi thực hiện bài tập lớp này không?
             </p>
             <div class="flex gap-4">
-                <button id="healthCancelBtn" class="flex-1 py-3 border border-outline hover:bg-surface-container-low transition-colors font-label-md rounded-xl text-on-surface">
+                <button id="healthCancelBtn" class="flex-1 py-3 border border-outline hover:bg-stone-100 transition-colors font-label-md rounded-xl text-on-surface">
                     Hủy bỏ
                 </button>
-                <button id="healthConfirmBtn" class="flex-1 py-3 bg-secondary hover:bg-secondary/90 transition-colors font-label-md rounded-xl text-white shadow-md">
+                <button id="healthConfirmBtn" class="flex-1 py-3 bg-[#3a4536] hover:bg-[#2b3327] transition-colors font-label-md rounded-xl text-[#d2c5af] shadow-md">
                     Xác nhận
                 </button>
             </div>
         </div>
     </div>
-
-    <main class="max-w-[1440px] mx-auto px-margin-desktop py-12 relative md:ml-64">
-        <!-- Back Button -->
-        <div class="absolute left-margin-desktop top-12">
-            <a href="#" onclick="history.back(); return false;" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md group">
-                <span class="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
-                Quay lại
-            </a>
-        </div>
-
-        <!-- Header Section -->
-        <section class="mb-16 text-center max-w-2xl mx-auto animate-fade-in-up opacity-0 relative z-10">
-            <h1 class="font-headline-lg text-headline-lg mb-4 text-primary">Đăng ký Lớp học Yoga</h1>
-            <p class="font-body-md text-body-md text-on-surface-variant">Lắng nghe cơ thể, hòa cùng hơi thở và tìm thấy sự tĩnh tại tại Xoài Aura Retreat.</p>
+    
+    <!-- Main Content Container constrained to 100vh viewport -->
+    <main class="max-w-[1400px] mx-auto px-8 py-8 h-screen overflow-hidden flex flex-col relative md:ml-[280px]">
+        
+        <!-- Page Header (Breathable) -->
+        <section class="mb-6 animate-fade-in-up opacity-0 relative z-10 flex-shrink-0">
+            <h1 class="font-serif text-3xl sm:text-4xl text-[#2b3327] mb-1.5 leading-none tracking-tight">Đăng ký Lớp học Yoga</h1>
+            <p class="font-sans text-sm text-stone-500">Lắng nghe cơ thể, hòa cùng hơi thở và tìm thấy sự tĩnh tại tại Xoài Aura Retreat.</p>
         </section>
-
-        <!-- Main Workspace -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+        
+        <!-- Two-Column Grid Layout (Optimized Viewport with Internal Scrolling) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch flex-1 min-h-0 animate-fade-in-up delay-100 opacity-0 relative z-10">
             
-            <!-- Left Panel: Calendar Selector -->
-            <div class="lg:col-span-6 glass-panel p-stack-lg rounded-2xl animate-fade-in-up delay-100 opacity-0 relative z-10 transition-transform duration-500">
-                <h3 class="font-label-md text-label-md mb-6 uppercase tracking-wider text-outline">1. Chọn ngày</h3>
-                <div class="bg-white/80 rounded-xl p-6 border border-white/50 shadow-sm">
-                    <div class="flex justify-between items-center mb-8 px-2">
-                        <span id="calendar-month-year" class="font-headline-sm text-headline-sm text-primary font-semibold">Tháng...</span>
-                        <div class="flex gap-3">
-                            <button id="prev-month-btn" class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2 rounded hover:bg-surface-container-low">chevron_left</button>
-                            <button id="next-month-btn" class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2 rounded hover:bg-surface-container-low">chevron_right</button>
+            <!-- Left Column (col-span-6) - Scrollable naturally internally -->
+            <div class="lg:col-span-6 h-full flex flex-col gap-6 overflow-y-auto scrollbar-hidden pr-1 pb-8">
+                <!-- Step 1: Calendar Date Selection -->
+                <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-stone-200/60 shadow-sm flex-1 flex flex-col">
+                    <div class="flex items-center gap-3 mb-5 flex-shrink-0">
+                        <span class="w-7 h-7 rounded-full bg-[#3a4536] text-[#d2c5af] flex items-center justify-center font-sans text-xs font-bold shadow-sm">1</span>
+                        <h3 class="font-serif text-lg text-[#2b3327] tracking-wide">Chọn ngày học</h3>
+                    </div>
+                    
+                    <div class="bg-[#faf8f5]/60 rounded-xl p-4 sm:p-5 border border-stone-200/40 flex-1 flex flex-col justify-between">
+                        <div class="flex justify-between items-center mb-4 px-2 flex-shrink-0">
+                            <span id="calendar-month-year" class="font-serif text-base font-semibold text-[#2b3327]">Đang tải...</span>
+                            <div class="flex gap-2">
+                                <button id="prev-month-btn" class="material-symbols-outlined text-stone-500 hover:text-[#2b3327] transition-colors p-2 rounded-full hover:bg-stone-200/50">chevron_left</button>
+                                <button id="next-month-btn" class="material-symbols-outlined text-stone-500 hover:text-[#2b3327] transition-colors p-2 rounded-full hover:bg-stone-200/50">chevron_right</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="grid grid-cols-7 text-center mb-4 font-semibold text-outline-variant">
-                        <div class="py-2">T2</div>
-                        <div class="py-2">T3</div>
-                        <div class="py-2">T4</div>
-                        <div class="py-2">T5</div>
-                        <div class="py-2">T6</div>
-                        <div class="py-2">T7</div>
-                        <div class="py-2">CN</div>
-                    </div>
-                    <div class="grid grid-cols-7 gap-y-2 text-center" id="calendar-grid">
-                        <!-- Loaded dynamically -->
+                        <div class="grid grid-cols-7 text-center mb-2 flex-shrink-0">
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T2</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T3</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T4</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T5</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T6</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">T7</div>
+                            <div class="text-xs font-semibold text-stone-400 py-1.5 uppercase tracking-wider">CN</div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-y-2 gap-x-1 text-center items-center flex-1" id="calendar-grid">
+                            <!-- Rendered dynamically by JavaScript -->
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Right Panel: Schedule Lists -->
-            <div class="lg:col-span-6 flex flex-col gap-gutter">
-                <div class="glass-panel p-stack-lg rounded-2xl animate-fade-in-up delay-200 opacity-0 relative z-10 min-h-[300px]">
-                    <h3 class="font-label-md text-label-md mb-6 uppercase tracking-wider text-outline">
-                        2. Danh sách lớp học ngày <span id="selected-date-title" class="text-primary font-semibold">...</span>
-                    </h3>
+            
+            <!-- Right Column (col-span-6) - Scrollable naturally internally -->
+            <div class="lg:col-span-6 h-full flex flex-col gap-6 overflow-y-auto scrollbar-hidden pr-1 pb-8">
+                <!-- Step 2: Class Schedules List -->
+                <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-stone-200/60 shadow-md flex-1 min-h-[300px] flex flex-col">
+                    <div class="flex items-center gap-3 mb-5 flex-shrink-0">
+                        <span class="w-7 h-7 rounded-full bg-[#3a4536] text-[#d2c5af] flex items-center justify-center font-sans text-xs font-bold shadow-sm">2</span>
+                        <h3 class="font-serif text-lg text-[#2b3327] tracking-wide">Danh sách lớp ngày <span id="selected-date-title" class="text-[#a28e72] font-semibold">...</span></h3>
+                    </div>
                     
-                    <div id="loadingSchedules" class="text-center text-outline-variant py-12 flex flex-col items-center gap-3">
-                        <span class="material-symbols-outlined animate-spin text-3xl">sync</span>
-                        <p class="font-body-md text-body-md">Đang tải lịch học...</p>
+                    <div id="loadingSchedules" class="flex-1 flex flex-col items-center justify-center text-stone-400 gap-2 py-12">
+                        <svg class="animate-spin h-6 w-6 text-[#3a4536]" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-xs font-medium">Đang tải lịch học...</span>
                     </div>
-
-                    <div id="emptySchedules" class="hidden text-center text-outline-variant py-12 flex flex-col items-center gap-3">
-                        <span class="material-symbols-outlined text-4xl">event_busy</span>
-                        <p class="font-body-md text-body-md">Không có lớp học Yoga nào vào ngày này.</p>
+                    
+                    <div id="emptySchedules" class="hidden flex-1 flex flex-col items-center justify-center text-stone-400 gap-2 py-12">
+                        <span class="material-symbols-outlined text-4xl text-stone-300">event_busy</span>
+                        <p class="text-xs font-medium">Không có lớp học Yoga nào vào ngày này.</p>
                     </div>
-
-                    <!-- List of Schedules -->
-                    <div id="schedules-list" class="space-y-4 hidden">
+                    
+                    <div id="schedules-list" class="flex-1 min-h-0 overflow-y-auto scrollbar-hidden pr-0.5 space-y-4 hidden">
                         <!-- Loaded dynamically -->
                     </div>
                 </div>
@@ -278,6 +323,20 @@
         ];
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Highlight Sidebar active link for Yoga Booking
+            const yogaBookingLink = document.querySelector('aside a[href="/guest/booking-yoga"]');
+            if (yogaBookingLink) {
+                yogaBookingLink.classList.remove('text-[#d2c5af]/70');
+                yogaBookingLink.classList.add('text-[#d2c5af]', 'bg-[#3a4536]/80', 'border-l-4', 'border-[#d2c5af]');
+                const indicator = yogaBookingLink.querySelector('div');
+                if (indicator) {
+                    indicator.classList.remove('h-0', 'opacity-0');
+                    indicator.classList.add('h-[60%]', 'opacity-100', 'bg-[#d2c5af]');
+                }
+                const icon = yogaBookingLink.querySelector('span.material-symbols-outlined');
+                if (icon) icon.classList.remove('opacity-60');
+            }
+
             await fetchActiveBooking();
             renderCalendar(currentYear, currentMonth);
             await loadSchedules();
@@ -291,12 +350,11 @@
                     const data = await response.json();
                     currentBookingId = data.bookingId;
                 } else {
-                    const data = await response.json();
-                    showToast(data.error || 'Vui lòng thực hiện Check-In để đăng ký lớp Yoga.', 'error');
+                    currentBookingId = null;
                 }
             } catch (err) {
                 console.error(err);
-                showToast('Không kết nối được thông tin check-in.', 'error');
+                currentBookingId = null;
             }
         }
 
@@ -308,13 +366,13 @@
             const toastIcon = document.getElementById('toastIcon');
 
             toastMessage.textContent = message;
-            toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg font-label-md text-white pointer-events-none transition-all duration-300';
+            toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3.5 rounded-xl shadow-xl font-sans text-sm font-semibold text-white pointer-events-none transition-all duration-300';
             
             if (type === 'success') {
-                toast.classList.add('bg-secondary');
+                toast.classList.add('bg-[#3a4536]', 'border', 'border-[#2b3327]');
                 toastIcon.textContent = 'check_circle';
             } else {
-                toast.classList.add('bg-error');
+                toast.classList.add('bg-rose-950', 'border', 'border-rose-900', 'text-rose-200');
                 toastIcon.textContent = 'error';
             }
             
@@ -343,7 +401,7 @@
             // Previous month overflow days
             for (let i = startOffset - 1; i >= 0; i--) {
                 const dayDiv = document.createElement('div');
-                dayDiv.className = 'py-3 text-outline-variant/30 text-body-md pointer-events-none';
+                dayDiv.className = 'w-11 h-11 mx-auto flex items-center justify-center font-sans text-sm text-stone-300 opacity-25';
                 dayDiv.innerText = prevTotalDays - i;
                 calendarGrid.appendChild(dayDiv);
             }
@@ -354,22 +412,21 @@
                 const dayBtn = document.createElement('button');
                 const currDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 
-                dayBtn.className = 'py-3 font-label-md text-label-md rounded-xl transition-all duration-200 hover:bg-primary-fixed/50 flex items-center justify-center';
                 dayBtn.innerText = day;
 
                 // Mark selected date
                 if (currDateStr === selectedDate) {
-                    dayBtn.classList.add('calendar-day-active');
+                    dayBtn.className = 'w-11 h-11 mx-auto flex items-center justify-center font-sans text-sm rounded-full transition-all bg-[#3a4536] text-[#d2c5af] font-semibold shadow-md';
                 } else if (currDateStr < todayStr) {
-                    dayBtn.className += ' text-outline-variant/40 cursor-not-allowed';
+                    dayBtn.className = 'w-11 h-11 mx-auto flex items-center justify-center font-sans text-sm rounded-full opacity-20 cursor-not-allowed pointer-events-none text-stone-400';
+                } else {
+                    dayBtn.className = 'w-11 h-11 mx-auto flex items-center justify-center font-sans text-sm rounded-full transition-all hover:bg-stone-200/50 text-stone-800 font-semibold';
+                    dayBtn.addEventListener('click', async () => {
+                        selectedDate = currDateStr;
+                        renderCalendar(year, month);
+                        await loadSchedules();
+                    });
                 }
-
-                dayBtn.addEventListener('click', async () => {
-                    if (currDateStr < todayStr) return;
-                    selectedDate = currDateStr;
-                    renderCalendar(year, month);
-                    await loadSchedules();
-                });
 
                 calendarGrid.appendChild(dayBtn);
             }
@@ -405,6 +462,21 @@
             loading.classList.remove('hidden');
             empty.classList.add('hidden');
 
+            if (!currentBookingId) {
+                loading.classList.add('hidden');
+                listContainer.innerHTML = `
+                    <div class="flex flex-col items-center gap-3 text-stone-500 text-center py-12 px-4">
+                        <span class="material-symbols-outlined text-stone-400 text-4xl">info</span>
+                        <p class="font-sans text-sm font-semibold uppercase tracking-wider text-stone-400">Chưa Check-In</p>
+                        <p class="text-xs text-stone-500 font-medium max-w-xs leading-relaxed">
+                            Bạn chỉ được phép đăng ký lớp học Yoga sau khi đã thực hiện Check-In tại quầy lễ tân.
+                        </p>
+                    </div>
+                `;
+                listContainer.classList.remove('hidden');
+                return;
+            }
+
             try {
                 const response = await fetch(`/guest/booking-yoga/available-schedules?date=${selectedDate}`);
                 const data = await response.json();
@@ -420,23 +492,34 @@
                 data.forEach(s => {
                     const startFormatted = s.startTime.split('T')[1].substring(0, 5);
                     const endFormatted = s.endTime.split('T')[1].substring(0, 5);
+                    const isFull = s.remainingSpots <= 0;
 
                     const card = document.createElement('div');
-                    card.className = 'glass-panel p-6 rounded-xl flex items-center justify-between gap-4 border border-outline-variant/30 hover:border-secondary transition-all duration-300';
+                    card.className = 'glass-panel p-6 rounded-xl flex items-center justify-between gap-4 border border-[#e5dcd3]/60 hover:border-[#3a4536]/80 transition-all duration-300 hover:shadow-md';
                     
+                    const buttonHtml = isFull 
+                        ? `<button class="px-5 py-2.5 bg-stone-200 text-stone-400 font-sans text-xs font-bold rounded-xl cursor-not-allowed uppercase tracking-wider" disabled>Đầy chỗ</button>`
+                        : `<button onclick="requestRegistration(${s.scheduleId})" class="px-5 py-2.5 bg-[#3a4536] hover:bg-[#2b3327] text-[#d2c5af] font-sans text-xs font-bold rounded-xl transition-all shadow-sm group relative overflow-hidden uppercase tracking-wider active:scale-[0.98]">
+                                <span class="absolute inset-0 w-full h-full bg-white/10 transform -skew-x-12 -translate-x-full group-hover:animate-shine animate-shine-hover"></span>
+                                Đăng ký
+                           </button>`;
+
                     card.innerHTML = `
-                        <div class="flex-1">
-                            <h4 class="font-headline-sm text-[20px] text-secondary font-semibold mb-1">${s.className}</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 text-on-surface-variant font-body-md text-sm">
-                                <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">schedule</span>${startFormatted} - ${endFormatted} (${s.durationMinutes} phút)</span>
-                                <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">location_on</span>${s.location}</span>
-                                <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">person</span>GV: ${s.instructorName}</span>
-                                <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">group</span>Tối đa: ${s.maxCapacity} người</span>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-serif text-lg text-[#2b3327] font-semibold mb-1.5 leading-tight">${s.className}</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5 text-stone-500 font-sans text-xs">
+                                <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-stone-400">schedule</span>${startFormatted} - ${endFormatted} (${s.durationMinutes} phút)</span>
+                                <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-stone-400">location_on</span>${s.location}</span>
+                                <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-stone-400">person</span>GV: ${s.instructorName}</span>
+                                <span class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[16px] text-stone-400">group</span>
+                                    <span class="${isFull ? 'text-rose-600 font-semibold' : 'text-stone-500'}">Chỗ trống: ${s.remainingSpots}/${s.maxCapacity}</span>
+                                </span>
                             </div>
                         </div>
-                        <button onclick="requestRegistration(${s.scheduleId})" class="px-6 py-2.5 bg-secondary text-white font-label-md rounded-xl hover:bg-secondary/90 transition-all shadow-sm">
-                            Đăng ký
-                        </button>
+                        <div class="flex-shrink-0">
+                            ${buttonHtml}
+                        </div>
                     `;
                     listContainer.appendChild(card);
                 });

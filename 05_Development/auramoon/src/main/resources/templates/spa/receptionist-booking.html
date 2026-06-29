@@ -5,14 +5,14 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Lễ tân đặt dịch vụ Spa | Aura Wellness</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
-                    "colors": {
+                    colors: {
                         "on-background": "#1b1c1c",
                         "primary-fixed-dim": "#c9c6c2",
                         "surface-dim": "#dcd9d9",
@@ -61,13 +61,13 @@
                         "error-container": "#ffdad6",
                         "tertiary-fixed": "#c1eebc"
                     },
-                    "borderRadius": {
+                    borderRadius: {
                         "DEFAULT": "0.125rem",
                         "lg": "0.25rem",
                         "xl": "0.5rem",
                         "full": "0.75rem"
                     },
-                    "spacing": {
+                    spacing: {
                         "gutter": "24px",
                         "section-gap": "120px",
                         "margin-mobile": "20px",
@@ -76,7 +76,7 @@
                         "stack-sm": "8px",
                         "stack-lg": "32px"
                     },
-                    "fontFamily": {
+                    fontFamily: {
                         "headline-sm": ["Playfair Display"],
                         "display-lg-mobile": ["Playfair Display"],
                         "display-lg": ["Playfair Display"],
@@ -84,6 +84,15 @@
                         "label-md": ["Inter"],
                         "headline-lg": ["Playfair Display"],
                         "body-md": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "display-lg-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
+                        "display-lg": ["64px", {"lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
                     }
                 }
             }
@@ -92,491 +101,485 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .time-slot-active {
-            border-color: #566342;
-            background-color: #f5f2ed;
-            font-weight: 600;
+            border-color: #3a4536 !important;
+            background-color: #3a4536 !important;
+            color: #d2c5af !important;
         }
-        
-        /* Toast Styles */
+        .time-slot-active span { color: #d2c5af !important; }
+
         #toast {
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-in-out;
+            transform: translate(-50%, 20px);
             opacity: 0;
             z-index: 1000;
         }
         #toast.show {
-            transform: translateY(0);
+            transform: translate(-50%, 0);
             opacity: 1;
         }
-        
+
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         @keyframes kenBurns {
             0% { transform: scale(1.0); }
-            100% { transform: scale(1.05); }
+            100% { transform: scale(1.04); }
         }
-        
         .bg-animated-image {
-            position: fixed;
-            top: -5%;
-            left: -5%;
-            width: 110%;
-            height: 110%;
+            position: fixed; top: -5%; left: -5%; width: 110%; height: 110%;
             background-image: url('https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            z-index: -2;
-            animation: kenBurns 35s ease-in-out infinite alternate;
-            pointer-events: none;
+            background-size: cover; background-position: center;
+            z-index: -2; animation: kenBurns 40s ease-in-out infinite alternate; pointer-events: none;
         }
         .bg-overlay {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(to bottom, rgba(252, 251, 249, 0.85), rgba(252, 251, 249, 0.98));
-            z-index: -1;
-            pointer-events: none;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            position: fixed; inset: 0;
+            background: linear-gradient(to bottom, rgba(250, 248, 245, 0.88), rgba(250, 248, 245, 0.95));
+            z-index: -1; pointer-events: none;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         }
-        
-        .animate-fade-in-up {
-            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -40px) scale(1.03); }
+            66% { transform: translate(-20px, 20px) scale(0.97); }
+            100% { transform: translate(0px, 0px) scale(1); }
         }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.06);
-        }
+        .animate-fade-in-up { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-blob { animation: blob 25s infinite alternate; }
+        .animation-delay-2000 { animation-delay: 2.5s; }
+        .delay-100 { animation-delay: 120ms; }
+
         .autocomplete-item:hover {
-            background-color: #f5f2ed;
-            color: #566342;
+            background-color: #3a4536;
+            color: #d2c5af;
         }
+
+        .scrollbar-hidden::-webkit-scrollbar { width: 4px; }
+        .scrollbar-hidden::-webkit-scrollbar-track { background: transparent; }
+        .scrollbar-hidden::-webkit-scrollbar-thumb { background: rgba(43, 51, 39, 0.15); border-radius: 99px; }
+
+        input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.5; transition: 0.3s; }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
     </style>
 </head>
-<body class="text-on-surface relative overflow-x-hidden min-h-screen">
-<th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
-<div class="bg-animated-image"></div>
-<div class="bg-overlay"></div>
+<body class="text-stone-800 relative overflow-hidden h-screen bg-[#faf8f5]">
+    <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
+    <div class="bg-animated-image"></div>
+    <div class="bg-overlay"></div>
+    <div class="fixed top-0 left-0 w-96 h-96 bg-[#869273]/8 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob pointer-events-none z-[-1]"></div>
+    <div class="fixed top-0 right-0 w-96 h-96 bg-[#c5c1b6]/15 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000 pointer-events-none z-[-1]"></div>
 
-<!-- Toast Notification -->
-<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg font-label-md text-white pointer-events-none transition-all duration-300">
-    <span class="material-symbols-outlined" id="toastIcon">info</span>
-    <span id="toastMessage">Message</span>
-</div>
-
-<main class="max-w-[1440px] mx-auto px-margin-desktop py-12 relative md:ml-64">
-    <!-- Back to Dashboard / Navigation -->
-    <div class="absolute left-margin-desktop top-12">
-        <a href="#" onclick="history.back(); return false;" class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md group">
-            <span class="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
-            Bàn Lễ Tân
-        </a>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-3.5 rounded-xl shadow-xl font-sans text-xs font-semibold text-white pointer-events-none transition-all duration-300">
+        <span class="material-symbols-outlined text-[18px]" id="toastIcon">info</span>
+        <span id="toastMessage">Thông báo</span>
     </div>
 
-    <!-- Header Section -->
-    <section class="mb-12 text-center max-w-2xl mx-auto animate-fade-in-up opacity-0 relative z-10">
-        <span class="text-xs font-semibold tracking-widest text-secondary uppercase bg-secondary-container/40 px-3 py-1 rounded-full">Aura Wellness Receptionist Portal</span>
-        <h1 class="font-headline-lg text-headline-lg mt-3 mb-2 text-primary">Đặt dịch vụ Spa ngoài gói</h1>
-        <p class="font-body-md text-body-md text-on-surface-variant">Lễ tân thực hiện ghi nhận dịch vụ Spa ngoài gói cho khách đang lưu trú và tự động ghi nợ vào Guest Folio.</p>
-    </section>
+    <main class="max-w-[1400px] mx-auto px-8 py-8 h-screen overflow-hidden flex flex-col relative md:ml-[280px]">
 
-    <!-- Success & Error Alert boxes (Spring MVC Flash attributes) -->
-    <div class="max-w-5xl mx-auto relative z-10 animate-fade-in-up opacity-0" style="animation-delay: 100ms">
-        <div th:if="${successMessage}" class="flex items-center gap-3 bg-secondary-container text-on-secondary-container border border-secondary/20 p-4 rounded-xl mb-6 shadow-sm">
-            <span class="material-symbols-outlined text-secondary text-2xl">check_circle</span>
-            <div>
-                <p class="font-semibold text-sm" th:text="${successMessage}"></p>
-                <p class="text-xs opacity-80" th:if="${scheduleData}">
-                    Phòng: <span class="font-medium" th:text="${scheduleData.roomId}"></span> | 
-                    Mã Therapist: <span class="font-medium" th:text="${scheduleData.therapistCode}"></span> |
-                    Thời gian: <span class="font-medium" th:text="${#strings.replace(scheduleData.startTime, 'T', ' ')}"></span>
-                </p>
-            </div>
-        </div>
-        <div th:if="${errorMessage}" class="flex items-center gap-3 bg-red-50 text-red-700 border border-red-200 p-4 rounded-xl mb-6 shadow-sm">
-            <span class="material-symbols-outlined text-red-600 text-2xl">error</span>
-            <p class="font-semibold text-sm" th:text="${errorMessage}"></p>
-        </div>
-    </div>
+        <!-- Page Header -->
+        <section class="mb-5 animate-fade-in-up opacity-0 relative z-10 flex-shrink-0">
+            <h1 class="font-serif text-3xl sm:text-4xl text-[#2b3327] mb-1 leading-none tracking-tight">Đặt dịch vụ Spa ngoài gói</h1>
+            <p class="font-sans text-sm text-stone-500">Lễ tân ghi nhận dịch vụ Spa ngoài gói cho khách đang lưu trú và tự động ghi nợ vào Guest Folio.</p>
+        </section>
 
-    <!-- Main Booking Form Grid -->
-    <form th:action="@{/receptionist/booking-spa/manual}" method="post" id="manualBookingForm" class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start relative z-10">
-        
-        <!-- Left panel: Selection & Info -->
-        <div class="lg:col-span-7 flex flex-col gap-gutter animate-fade-in-up opacity-0" style="animation-delay: 150ms">
-            <div class="glass-panel p-stack-lg rounded-2xl">
-                <h3 class="font-label-md text-label-md mb-6 uppercase tracking-wider text-outline border-b border-outline-variant/30 pb-2 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">person_search</span>
-                    1. Chọn khách hàng lưu trú (Checked-In)
-                </h3>
-                
-                <!-- Autocomplete Guest/Room Search -->
-                <div class="relative mb-6">
-                    <label for="guestSearch" class="block font-body-md text-on-surface-variant mb-2">Tìm kiếm khách hàng / Số phòng</label>
-                    <div class="relative">
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant">search</span>
-                        <input type="text" id="guestSearch" autocomplete="off" 
-                               class="w-full bg-white/80 border border-outline-variant rounded-lg pl-10 pr-4 py-3 font-body-md text-on-surface focus:outline-none focus:border-secondary transition-colors" 
-                               placeholder="Nhập tên khách hàng hoặc số phòng..." required>
-                    </div>
-                    <input type="hidden" name="bookingId" id="bookingId" required>
-                    <div id="autocompleteResults" class="absolute left-0 right-0 mt-1 bg-white border border-outline-variant rounded-lg shadow-xl max-h-60 overflow-y-auto hidden z-50">
-                        <!-- Matches loaded dynamically via AJAX -->
-                    </div>
-                </div>
-
-                <h3 class="font-label-md text-label-md mb-6 uppercase tracking-wider text-outline border-b border-outline-variant/30 pb-2 pt-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">spa</span>
-                    2. Chọn dịch vụ & Ngày đặt
-                </h3>
-                
-                <!-- Service Dropdown -->
-                <div class="mb-6">
-                    <label for="serviceId" class="block font-body-md text-on-surface-variant mb-2">Dịch vụ Spa ngoài gói</label>
-                    <select name="serviceId" id="serviceId" 
-                            class="w-full bg-white/80 border border-outline-variant rounded-lg p-3 font-body-md text-on-surface focus:outline-none focus:border-secondary transition-colors" required>
-                        <option value="" disabled selected>-- Chọn dịch vụ Spa --</option>
-                        <option th:each="svc : ${services}" 
-                                th:value="${svc.id}" 
-                                th:text="${svc.serviceName + ' (' + svc.durationMinutes + ' phút)'}"
-                                th:data-price="${svc.price}"
-                                th:data-duration="${svc.durationMinutes}"
-                                th:data-name="${svc.serviceName}">
-                        </option>
-                    </select>
-                </div>
-
-                <!-- Date Picker -->
+        <!-- Success & Error Alert boxes -->
+        <div class="relative z-10 flex-shrink-0 mb-4 animate-fade-in-up opacity-0" th:if="${successMessage != null or errorMessage != null}">
+            <div th:if="${successMessage}" class="flex items-center gap-3 bg-[#3a4536]/10 border border-[#3a4536]/20 p-4 rounded-xl shadow-sm">
+                <span class="material-symbols-outlined text-[#3a4536]">check_circle</span>
                 <div>
-                    <label for="bookingDate" class="block font-body-md text-on-surface-variant mb-2">Ngày đặt trị liệu</label>
-                    <input type="date" id="bookingDate" 
-                           class="w-full bg-white/80 border border-outline-variant rounded-lg p-3 font-body-md text-on-surface focus:outline-none focus:border-secondary transition-colors" required>
+                    <p class="font-sans text-sm text-[#2b3327] font-semibold" th:text="${successMessage}"></p>
+                    <p class="text-xs text-stone-500 mt-0.5" th:if="${scheduleData}">
+                        Phòng: <span class="font-medium" th:text="${scheduleData.roomId}"></span> |
+                        Mã Therapist: <span class="font-medium" th:text="${scheduleData.therapistCode}"></span> |
+                        Thời gian: <span class="font-medium" th:text="${#strings.replace(scheduleData.startTime, 'T', ' ')}"></span>
+                    </p>
                 </div>
             </div>
-
-            <!-- Time Slots Selection Panel -->
-            <div class="glass-panel p-stack-lg rounded-2xl">
-                <h3 class="font-label-md text-label-md mb-6 uppercase tracking-wider text-outline border-b border-outline-variant/30 pb-2 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">schedule</span>
-                    3. Chọn khung giờ (Dữ liệu rảnh 2 chiều)
-                </h3>
-                
-                <div class="flex gap-2 mb-6 bg-surface-container-low p-1 rounded-lg">
-                    <button type="button" id="tab-morning" class="flex-1 py-2 text-label-md font-label-md rounded-md transition-colors bg-white shadow-sm text-primary" onclick="switchTimeTab('morning')">Sáng</button>
-                    <button type="button" id="tab-afternoon" class="flex-1 py-2 text-label-md font-label-md rounded-md transition-colors text-outline-variant hover:text-primary" onclick="switchTimeTab('afternoon')">Chiều</button>
-                    <button type="button" id="tab-evening" class="flex-1 py-2 text-label-md font-label-md rounded-md transition-colors text-outline-variant hover:text-primary" onclick="switchTimeTab('evening')">Tối</button>
-                </div>
-                
-                <div id="time-slots-container" class="relative min-h-[160px]">
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="time-slots-morning"></div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 hidden" id="time-slots-afternoon"></div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 hidden" id="time-slots-evening"></div>
-                    <p id="time-slots-loading" class="text-center text-outline-variant py-8 font-body-md">Vui lòng chọn khách hàng, dịch vụ và ngày để xem khung giờ trống.</p>
-                </div>
-                
-                <!-- Hidden inputs for form submit -->
-                <input type="hidden" name="startTime" id="startTime" required>
+            <div th:if="${errorMessage}" class="flex items-center gap-3 bg-rose-50 border border-rose-200/60 p-4 rounded-xl shadow-sm">
+                <span class="material-symbols-outlined text-rose-600">error</span>
+                <p class="font-sans text-sm text-rose-700 font-semibold" th:text="${errorMessage}"></p>
             </div>
         </div>
 
-        <!-- Right panel: Summary & Confirm -->
-        <div class="lg:col-span-5 flex flex-col gap-gutter animate-fade-in-up opacity-0" style="animation-delay: 200ms">
-            <div class="glass-panel p-stack-lg rounded-2xl border-secondary-container/30">
-                <h3 class="font-label-md text-label-md mb-6 uppercase tracking-wider text-outline border-b border-outline-variant/30 pb-2 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">receipt_long</span>
-                    Tóm tắt giao dịch & Ghi nợ
-                </h3>
-                
-                <!-- Summary Details -->
-                <div class="space-y-4 mb-6 border-b border-outline-variant/30 pb-6">
-                    <div class="flex justify-between items-center">
-                        <span class="font-body-md text-on-surface-variant text-sm">Khách hàng:</span>
-                        <span class="font-label-md text-sm text-right" id="summary-guest">Chưa chọn</span>
+        <!-- Main Booking Form Grid (Flex-1 fills viewport) -->
+        <form th:action="@{/receptionist/booking-spa/manual}" method="post" id="manualBookingForm" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch flex-1 min-h-0 animate-fade-in-up delay-100 opacity-0 relative z-10">
+
+            <!-- Left Column (col-span-7) - Scrollable internally -->
+            <div class="lg:col-span-7 h-full flex flex-col gap-5 overflow-y-auto scrollbar-hidden pr-1 pb-4">
+
+                <!-- Step 1: Guest Selection -->
+                <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-stone-200/60 shadow-sm flex-shrink-0">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="w-7 h-7 rounded-full bg-[#3a4536] text-[#d2c5af] flex items-center justify-center font-sans text-xs font-bold shadow-sm">1</span>
+                        <h3 class="font-serif text-lg text-[#2b3327] tracking-wide">Chọn khách hàng lưu trú</h3>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="font-body-md text-on-surface-variant text-sm">Dịch vụ Spa:</span>
-                        <span class="font-label-md text-sm text-right" id="summary-service">Chưa chọn</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="font-body-md text-on-surface-variant text-sm">Thời gian:</span>
-                        <span class="font-label-md text-sm text-right" id="summary-time">Chưa chọn</span>
+                    <div class="relative">
+                        <label for="guestSearch" class="block font-sans text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2">Tìm kiếm khách hàng / Số phòng</label>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 text-[20px]">search</span>
+                            <input type="text" id="guestSearch" autocomplete="off"
+                                   class="w-full bg-[#faf8f5]/60 border border-stone-200/60 rounded-xl pl-11 pr-4 py-3 font-sans text-sm text-[#2b3327] focus:outline-none focus:ring-1 focus:ring-[#3a4536] focus:border-[#3a4536] transition-all placeholder-stone-400"
+                                   placeholder="Nhập tên khách hàng hoặc số phòng..." required>
+                        </div>
+                        <input type="hidden" name="bookingId" id="bookingId" required>
+                        <div id="autocompleteResults" class="absolute left-0 right-0 mt-1 bg-white border border-stone-200 rounded-xl shadow-xl max-h-52 overflow-y-auto hidden z-50"></div>
                     </div>
                 </div>
 
-                <!-- Billing Debt Calculations -->
-                <div class="space-y-3 mb-6 bg-surface-container-low/50 p-4 rounded-xl border border-outline-variant/20">
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-on-surface-variant">Giá dịch vụ (Gốc):</span>
-                        <span class="font-medium" id="calc-base">0đ</span>
+                <!-- Step 2: Service & Date -->
+                <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-stone-200/60 shadow-sm flex-shrink-0">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="w-7 h-7 rounded-full bg-[#3a4536] text-[#d2c5af] flex items-center justify-center font-sans text-xs font-bold shadow-sm">2</span>
+                        <h3 class="font-serif text-lg text-[#2b3327] tracking-wide">Chọn dịch vụ & Ngày đặt</h3>
                     </div>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-on-surface-variant">Phí dịch vụ & VAT (10%):</span>
-                        <span class="font-medium" id="calc-tax">0đ</span>
-                    </div>
-                    <div class="flex justify-between items-center border-t border-outline-variant/30 pt-3 text-base font-semibold text-primary">
-                        <span>Tổng ghi nợ Folio:</span>
-                        <span id="calc-total">0đ</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="serviceId" class="block font-sans text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2">Dịch vụ Spa ngoài gói</label>
+                            <select name="serviceId" id="serviceId"
+                                    class="w-full bg-[#faf8f5]/60 border border-stone-200/60 rounded-xl p-3 font-sans text-sm text-[#2b3327] focus:outline-none focus:ring-1 focus:ring-[#3a4536] focus:border-[#3a4536] transition-all" required>
+                                <option value="" disabled selected>-- Chọn dịch vụ Spa --</option>
+                                <option th:each="svc : ${services}"
+                                        th:value="${svc.id}"
+                                        th:text="${svc.serviceName + ' (' + svc.durationMinutes + ' phút)'}"
+                                        th:data-price="${svc.price}"
+                                        th:data-duration="${svc.durationMinutes}"
+                                        th:data-name="${svc.serviceName}">
+                                </option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="bookingDate" class="block font-sans text-xs font-semibold text-stone-400 uppercase tracking-wider mb-2">Ngày đặt trị liệu</label>
+                            <input type="date" id="bookingDate"
+                                   class="w-full bg-[#faf8f5]/60 border border-stone-200/60 rounded-xl p-3 font-sans text-sm text-[#2b3327] focus:outline-none focus:ring-1 focus:ring-[#3a4536] focus:border-[#3a4536] transition-all" required>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Notes for treatment -->
-                <div class="mb-6">
-                    <label for="note" class="block font-body-md text-on-surface-variant mb-2">Chỉ dẫn trị liệu / Ghi chú (Tùy chọn)</label>
-                    <textarea id="note" name="note" rows="3" 
-                              class="w-full bg-white/80 border border-outline-variant rounded-lg p-3 font-body-md text-on-surface focus:outline-none focus:border-secondary transition-colors" 
-                              placeholder="Nhập ghi chú chấn thương, yêu cầu chuyên viên..."></textarea>
-                </div>
+                <!-- Step 3: Time Slots -->
+                <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-stone-200/60 shadow-sm flex-shrink-0">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="w-7 h-7 rounded-full bg-[#3a4536] text-[#d2c5af] flex items-center justify-center font-sans text-xs font-bold shadow-sm">3</span>
+                        <h3 class="font-serif text-lg text-[#2b3327] tracking-wide">Chọn khung giờ trống</h3>
+                    </div>
 
-                <!-- Submit Button -->
-                <button type="submit" id="submitBtn" 
-                        class="w-full bg-secondary text-on-secondary py-4 rounded-xl font-label-md text-label-md hover:scale-[0.99] active:scale-[0.98] transition-transform shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    <span class="material-symbols-outlined text-base">credit_card</span>
-                    Xác nhận & Ghi nợ vào Folio
-                </button>
+                    <!-- Segmented Tabs -->
+                    <div class="flex gap-1 mb-5 bg-stone-100 p-1 rounded-xl border border-stone-200/50">
+                        <button type="button" id="tab-morning" class="flex-1 py-2 text-xs font-bold tracking-wider uppercase rounded-lg transition-all bg-[#3a4536] text-[#d2c5af] shadow-md" onclick="switchTimeTab('morning')">Sáng</button>
+                        <button type="button" id="tab-afternoon" class="flex-1 py-2 text-xs font-semibold tracking-wider uppercase rounded-lg transition-all text-stone-400 hover:text-[#3a4536]" onclick="switchTimeTab('afternoon')">Chiều</button>
+                        <button type="button" id="tab-evening" class="flex-1 py-2 text-xs font-semibold tracking-wider uppercase rounded-lg transition-all text-stone-400 hover:text-[#3a4536]" onclick="switchTimeTab('evening')">Tối</button>
+                    </div>
+
+                    <div id="time-slots-container" class="relative min-h-[120px]">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="time-slots-morning"></div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 hidden" id="time-slots-afternoon"></div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 hidden" id="time-slots-evening"></div>
+                        <p id="time-slots-loading" class="text-center text-stone-400 py-8 font-sans text-xs">Vui lòng chọn khách hàng, dịch vụ và ngày để xem khung giờ trống.</p>
+                    </div>
+                    <input type="hidden" name="startTime" id="startTime" required>
+                </div>
             </div>
-        </div>
-    </form>
-</main>
 
-<script>
-    // State management
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
-    document.getElementById('bookingDate').value = todayStr;
-    document.getElementById('bookingDate').min = todayStr;
+            <!-- Right Column (col-span-5) - Scrollable internally -->
+            <div class="lg:col-span-5 h-full flex flex-col gap-5 overflow-y-auto scrollbar-hidden pr-1 pb-4">
 
-    let checkedInBookings = [];
-    let selectedBooking = null;
-    let selectedDate = todayStr;
-    let selectedTime = null;
-    let serviceDuration = 60;
-    let activeTimeTab = 'morning';
+                <!-- Summary & Billing Card -->
+                <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-stone-200/60 shadow-md flex-shrink-0">
+                    <div class="flex items-center gap-3 mb-5">
+                        <span class="w-7 h-7 rounded-full bg-[#3a4536] text-[#d2c5af] flex items-center justify-center font-sans text-xs font-bold shadow-sm">4</span>
+                        <h3 class="font-serif text-lg text-[#2b3327] tracking-wide">Tóm tắt giao dịch</h3>
+                    </div>
 
-    // Fetch Checked-in Guests once on load
-    document.addEventListener('DOMContentLoaded', async () => {
-        try {
-            const res = await fetch('/receptionist/booking-spa/checked-in-bookings');
-            if (res.ok) {
-                checkedInBookings = await res.json();
-            } else {
-                console.error("Failed to load active bookings");
+                    <!-- Summary Details -->
+                    <div class="space-y-3 mb-5 bg-[#faf8f5]/80 rounded-xl p-4 border border-stone-200/40 shadow-inner">
+                        <div class="flex justify-between items-center border-b border-stone-200/40 pb-2.5">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-stone-400">Khách hàng:</span>
+                            <span class="text-sm font-semibold text-stone-800" id="summary-guest">Chưa chọn</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-stone-200/40 pb-2.5">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-stone-400">Dịch vụ Spa:</span>
+                            <span class="text-sm font-semibold text-stone-800" id="summary-service">Chưa chọn</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-stone-400">Thời gian:</span>
+                            <span class="text-sm font-semibold text-stone-800" id="summary-time">Chưa chọn</span>
+                        </div>
+                    </div>
+
+                    <!-- Billing Calculation -->
+                    <div class="space-y-3 mb-5 bg-[#faf8f5]/80 rounded-xl p-4 border border-stone-200/40 shadow-inner">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-stone-500">Giá dịch vụ (Gốc):</span>
+                            <span class="font-semibold text-stone-700" id="calc-base">0đ</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-stone-500">Phí dịch vụ & VAT (10%):</span>
+                            <span class="font-semibold text-stone-700" id="calc-tax">0đ</span>
+                        </div>
+                        <div class="flex justify-between items-center border-t border-stone-200/40 pt-3 text-sm font-bold text-[#2b3327]">
+                            <span>Tổng ghi nợ Folio:</span>
+                            <span id="calc-total">0đ</span>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="mb-5">
+                        <label for="note" class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">Chỉ dẫn trị liệu / Ghi chú (Tùy chọn)</label>
+                        <textarea id="note" name="note" rows="2"
+                                  class="w-full bg-[#faf8f5]/40 border border-stone-200 rounded-xl p-3 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-[#3a4536] focus:border-[#3a4536] transition-all resize-none"
+                                  placeholder="Vd: Khách bị dị ứng tinh dầu, yêu cầu chuyên viên nữ..."></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="submitBtn"
+                            class="w-full bg-[#3a4536] hover:bg-[#2b3327] text-[#d2c5af] py-3.5 rounded-xl font-bold tracking-widest text-xs uppercase transition-all duration-300 shadow-md hover:shadow-lg active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-md" disabled>
+                        <span class="material-symbols-outlined text-[16px]">credit_card</span>
+                        Xác nhận & Ghi nợ vào Folio
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        // State management
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        document.getElementById('bookingDate').value = todayStr;
+        document.getElementById('bookingDate').min = todayStr;
+
+        let checkedInBookings = [];
+        let selectedBooking = null;
+        let selectedDate = todayStr;
+        let selectedTime = null;
+        let serviceDuration = 60;
+        let activeTimeTab = 'morning';
+
+        // Fetch Checked-in Guests once on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Highlight Sidebar active link
+            const receptionLink = document.querySelector('aside a[href*="/receptionist/booking-spa"]');
+            if (receptionLink) {
+                receptionLink.classList.remove('text-[#d2c5af]/70');
+                receptionLink.classList.add('text-[#d2c5af]', 'bg-[#3a4536]/80', 'border-l-4', 'border-[#d2c5af]');
+                const indicator = receptionLink.querySelector('div');
+                if (indicator) {
+                    indicator.classList.remove('h-0', 'opacity-0');
+                    indicator.classList.add('h-[60%]', 'opacity-100', 'bg-[#d2c5af]');
+                }
+                const icon = receptionLink.querySelector('span.material-symbols-outlined');
+                if (icon) icon.classList.remove('opacity-60');
             }
-        } catch (err) {
-            console.error("Connection error loading bookings", err);
-        }
-    });
 
-    // Autocomplete Guest Search Logic
-    const guestSearchInput = document.getElementById('guestSearch');
-    const autocompleteResults = document.getElementById('autocompleteResults');
-    const bookingIdHidden = document.getElementById('bookingId');
-    const summaryGuest = document.getElementById('summary-guest');
+            try {
+                const res = await fetch('/receptionist/booking-spa/checked-in-bookings');
+                if (res.ok) {
+                    checkedInBookings = await res.json();
+                } else {
+                    console.error("Failed to load active bookings");
+                }
+            } catch (err) {
+                console.error("Connection error loading bookings", err);
+            }
+        });
 
-    guestSearchInput.addEventListener('input', () => {
-        const query = guestSearchInput.value.trim().toLowerCase();
-        autocompleteResults.innerHTML = '';
-        
-        if (!query) {
-            autocompleteResults.classList.add('hidden');
-            return;
-        }
+        // Autocomplete Guest Search Logic
+        const guestSearchInput = document.getElementById('guestSearch');
+        const autocompleteResults = document.getElementById('autocompleteResults');
+        const bookingIdHidden = document.getElementById('bookingId');
+        const summaryGuest = document.getElementById('summary-guest');
 
-        const matches = checkedInBookings.filter(b => 
-            (b.guestName && b.guestName.toLowerCase().includes(query)) ||
-            (b.villaCode && b.villaCode.toLowerCase().includes(query))
-        );
+        guestSearchInput.addEventListener('input', () => {
+            const query = guestSearchInput.value.trim().toLowerCase();
+            autocompleteResults.innerHTML = '';
 
-        if (matches.length === 0) {
-            autocompleteResults.innerHTML = '<div class="p-3 text-sm text-outline-variant italic">Không tìm thấy khách Checked-In nào phù hợp</div>';
-            autocompleteResults.classList.remove('hidden');
-            return;
-        }
-
-        matches.forEach(match => {
-            const item = document.createElement('div');
-            item.className = 'p-3 text-sm cursor-pointer autocomplete-item transition-colors font-body-md';
-            item.innerText = `${match.guestName} - Villa ${match.villaCode || 'Chưa xếp'}`;
-            item.addEventListener('click', () => {
-                guestSearchInput.value = `${match.guestName} - Villa ${match.villaCode || 'Chưa xếp'}`;
-                bookingIdHidden.value = match.bookingId;
-                selectedBooking = match;
-                summaryGuest.innerText = match.guestName;
+            if (!query) {
                 autocompleteResults.classList.add('hidden');
-                
-                triggerAvailabilityUpdate();
-            });
-            autocompleteResults.appendChild(item);
-        });
-
-        autocompleteResults.classList.remove('hidden');
-    });
-
-    // Close autocomplete on click outside
-    document.addEventListener('click', (e) => {
-        if (e.target !== guestSearchInput && e.target !== autocompleteResults) {
-            autocompleteResults.classList.add('hidden');
-        }
-    });
-
-    // Service dropdown logic
-    const serviceSelect = document.getElementById('serviceId');
-    const summaryService = document.getElementById('summary-service');
-    const calcBase = document.getElementById('calc-base');
-    const calcTax = document.getElementById('calc-tax');
-    const calcTotal = document.getElementById('calc-total');
-
-    serviceSelect.addEventListener('change', () => {
-        const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
-        if (!selectedOption.value) return;
-
-        const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
-        serviceDuration = parseInt(selectedOption.getAttribute('data-duration')) || 60;
-        const name = selectedOption.getAttribute('data-name');
-
-        summaryService.innerText = `${name} (${serviceDuration}m)`;
-        
-        // Calculations
-        const tax = price * 0.1;
-        const total = price + tax;
-
-        calcBase.innerText = price.toLocaleString('vi-VN') + 'đ';
-        calcTax.innerText = tax.toLocaleString('vi-VN') + 'đ';
-        calcTotal.innerText = total.toLocaleString('vi-VN') + 'đ';
-
-        triggerAvailabilityUpdate();
-    });
-
-    // Date picker logic
-    const dateInput = document.getElementById('bookingDate');
-    dateInput.addEventListener('change', () => {
-        selectedDate = dateInput.value;
-        triggerAvailabilityUpdate();
-    });
-
-    function triggerAvailabilityUpdate() {
-        if (bookingIdHidden.value && serviceSelect.value && selectedDate) {
-            fetchAvailableSlots(selectedDate);
-        } else {
-            resetTimeSlotsView("Vui lòng chọn khách hàng, dịch vụ và ngày để xem khung giờ trống.");
-        }
-    }
-
-    function resetTimeSlotsView(message) {
-        document.getElementById('time-slots-loading').innerText = message;
-        document.getElementById('time-slots-loading').classList.remove('hidden');
-        document.getElementById('time-slots-morning').innerHTML = '';
-        document.getElementById('time-slots-afternoon').innerHTML = '';
-        document.getElementById('time-slots-evening').innerHTML = '';
-        document.getElementById('submitBtn').disabled = true;
-    }
-
-    // Time tabs management
-    function switchTimeTab(tab) {
-        activeTimeTab = tab;
-        ['morning', 'afternoon', 'evening'].forEach(t => {
-            const btn = document.getElementById(`tab-${t}`);
-            const grid = document.getElementById(`time-slots-${t}`);
-            if (t === tab) {
-                btn.classList.add('bg-white', 'shadow-sm', 'text-primary');
-                btn.classList.remove('text-outline-variant', 'hover:text-primary');
-                grid.classList.remove('hidden');
-            } else {
-                btn.classList.remove('bg-white', 'shadow-sm', 'text-primary');
-                btn.classList.add('text-outline-variant', 'hover:text-primary');
-                grid.classList.add('hidden');
+                return;
             }
-        });
-    }
 
-    // Fetch slots from API
-    async function fetchAvailableSlots(dateStr) {
-        const loadingText = document.getElementById('time-slots-loading');
-        loadingText.innerText = 'Đang truy vấn tài nguyên trống...';
-        loadingText.classList.remove('hidden');
-        
-        document.getElementById('time-slots-morning').innerHTML = '';
-        document.getElementById('time-slots-afternoon').innerHTML = '';
-        document.getElementById('time-slots-evening').innerHTML = '';
+            const matches = checkedInBookings.filter(b =>
+                (b.guestName && b.guestName.toLowerCase().includes(query)) ||
+                (b.villaCode && b.villaCode.toLowerCase().includes(query))
+            );
 
-        try {
-            const bookingId = bookingIdHidden.value;
-            const res = await fetch(`/guest/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}&bookingId=${bookingId}`);
-            if (!res.ok) throw new Error("Connection failed");
-            
-            const availableTimes = await res.json();
-            loadingText.classList.add('hidden');
+            if (matches.length === 0) {
+                autocompleteResults.innerHTML = '<div class="p-3 text-xs text-stone-400 italic font-sans">Không tìm thấy khách Checked-In nào phù hợp</div>';
+                autocompleteResults.classList.remove('hidden');
+                return;
+            }
 
-            const allTimesMorning = ["09:00", "10:00", "11:00", "12:00"];
-            const allTimesAfternoon = ["14:00", "15:00", "16:00", "17:00", "18:00"];
-            const allTimesEvening = ["19:00", "20:00", "21:00"];
-
-            const renderGroup = (times, containerId, label) => {
-                const container = document.getElementById(containerId);
-                times.forEach(time => {
-                    const isAvailable = availableTimes.includes(time);
-                    const btn = document.createElement('button');
-                    btn.type = 'button';
-                    
-                    if (isAvailable) {
-                        btn.className = 'flex flex-col items-center justify-center py-4 border border-outline-variant rounded-xl transition-all hover:bg-secondary-container/20 group';
-                        btn.innerHTML = `
-                            <span class="font-headline-sm text-headline-sm text-primary group-hover:text-secondary">${time}</span>
-                            <span class="font-label-md text-xs text-outline">${label}</span>
-                        `;
-                        btn.addEventListener('click', () => selectTime(btn, time));
-                    } else {
-                        btn.className = 'flex flex-col items-center justify-center py-4 border border-outline-variant rounded-xl opacity-35 cursor-not-allowed bg-surface-container-low';
-                        btn.innerHTML = `
-                            <span class="font-headline-sm text-headline-sm text-outline">${time}</span>
-                            <span class="font-label-md text-xs text-outline">Hết chỗ</span>
-                        `;
-                    }
-                    container.appendChild(btn);
+            matches.forEach(match => {
+                const item = document.createElement('div');
+                item.className = 'p-3 text-sm cursor-pointer autocomplete-item transition-colors font-sans rounded-lg mx-1 my-0.5';
+                item.innerText = `${match.guestName} - Villa ${match.villaCode || 'Chưa xếp'}`;
+                item.addEventListener('click', () => {
+                    guestSearchInput.value = `${match.guestName} - Villa ${match.villaCode || 'Chưa xếp'}`;
+                    bookingIdHidden.value = match.bookingId;
+                    selectedBooking = match;
+                    summaryGuest.innerText = match.guestName;
+                    autocompleteResults.classList.add('hidden');
+                    triggerAvailabilityUpdate();
                 });
-            };
+                autocompleteResults.appendChild(item);
+            });
 
-            renderGroup(allTimesMorning, 'time-slots-morning', 'Sáng');
-            renderGroup(allTimesAfternoon, 'time-slots-afternoon', 'Chiều');
-            renderGroup(allTimesEvening, 'time-slots-evening', 'Tối');
+            autocompleteResults.classList.remove('hidden');
+        });
 
-            // Select initial time
-            selectedTime = null;
-            document.getElementById('startTime').value = '';
-            document.getElementById('summary-time').innerText = 'Chưa chọn';
-            document.getElementById('submitBtn').disabled = true;
-
-        } catch (err) {
-            loadingText.innerText = 'Có lỗi xảy ra khi tải khung giờ trống. Vui lòng thử lại.';
-            loadingText.classList.remove('hidden');
-        }
-    }
-
-    function selectTime(btn, time) {
-        document.querySelectorAll('#time-slots-container button').forEach(b => {
-            b.classList.remove('time-slot-active');
-            const txt = b.querySelector('span:first-child');
-            if (txt && !b.classList.contains('opacity-35')) {
-                txt.classList.remove('text-secondary');
-                txt.classList.add('text-primary');
+        document.addEventListener('click', (e) => {
+            if (e.target !== guestSearchInput && e.target !== autocompleteResults) {
+                autocompleteResults.classList.add('hidden');
             }
         });
 
-        btn.classList.add('time-slot-active');
-        btn.querySelector('span:first-child').classList.remove('text-primary');
-        btn.querySelector('span:first-child').classList.add('text-secondary');
+        // Service dropdown logic
+        const serviceSelect = document.getElementById('serviceId');
+        const summaryService = document.getElementById('summary-service');
+        const calcBase = document.getElementById('calc-base');
+        const calcTax = document.getElementById('calc-tax');
+        const calcTotal = document.getElementById('calc-total');
 
-        selectedTime = time;
-        const formattedDateTime = `${selectedDate}T${selectedTime}:00`;
-        document.getElementById('startTime').value = formattedDateTime;
-        document.getElementById('summary-time').innerText = `${selectedDate} ${selectedTime}`;
-        
-        // Enable submit button
-        document.getElementById('submitBtn').disabled = false;
-    }
-</script>
+        serviceSelect.addEventListener('change', () => {
+            const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+            if (!selectedOption.value) return;
+
+            const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+            serviceDuration = parseInt(selectedOption.getAttribute('data-duration')) || 60;
+            const name = selectedOption.getAttribute('data-name');
+
+            summaryService.innerText = `${name} (${serviceDuration}m)`;
+
+            const tax = price * 0.1;
+            const total = price + tax;
+
+            calcBase.innerText = price.toLocaleString('vi-VN') + 'đ';
+            calcTax.innerText = tax.toLocaleString('vi-VN') + 'đ';
+            calcTotal.innerText = total.toLocaleString('vi-VN') + 'đ';
+
+            triggerAvailabilityUpdate();
+        });
+
+        // Date picker logic
+        const dateInput = document.getElementById('bookingDate');
+        dateInput.addEventListener('change', () => {
+            selectedDate = dateInput.value;
+            triggerAvailabilityUpdate();
+        });
+
+        function triggerAvailabilityUpdate() {
+            if (bookingIdHidden.value && serviceSelect.value && selectedDate) {
+                fetchAvailableSlots(selectedDate);
+            } else {
+                resetTimeSlotsView("Vui lòng chọn khách hàng, dịch vụ và ngày để xem khung giờ trống.");
+            }
+        }
+
+        function resetTimeSlotsView(message) {
+            document.getElementById('time-slots-loading').innerText = message;
+            document.getElementById('time-slots-loading').classList.remove('hidden');
+            document.getElementById('time-slots-morning').innerHTML = '';
+            document.getElementById('time-slots-afternoon').innerHTML = '';
+            document.getElementById('time-slots-evening').innerHTML = '';
+            document.getElementById('submitBtn').disabled = true;
+        }
+
+        // Time tabs management
+        function switchTimeTab(tab) {
+            activeTimeTab = tab;
+            ['morning', 'afternoon', 'evening'].forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const grid = document.getElementById(`time-slots-${t}`);
+                if (t === tab) {
+                    btn.className = 'flex-1 py-2 text-xs font-bold tracking-wider uppercase rounded-lg transition-all bg-[#3a4536] text-[#d2c5af] shadow-md';
+                    grid.classList.remove('hidden');
+                } else {
+                    btn.className = 'flex-1 py-2 text-xs font-semibold tracking-wider uppercase rounded-lg transition-all text-stone-400 hover:text-[#3a4536]';
+                    grid.classList.add('hidden');
+                }
+            });
+        }
+
+        // Fetch slots from API
+        async function fetchAvailableSlots(dateStr) {
+            const loadingText = document.getElementById('time-slots-loading');
+            loadingText.innerText = 'Đang truy vấn tài nguyên trống...';
+            loadingText.classList.remove('hidden');
+
+            document.getElementById('time-slots-morning').innerHTML = '';
+            document.getElementById('time-slots-afternoon').innerHTML = '';
+            document.getElementById('time-slots-evening').innerHTML = '';
+
+            try {
+                const bookingId = bookingIdHidden.value;
+                const res = await fetch(`/receptionist/booking-spa/available-slots?date=${dateStr}&duration=${serviceDuration}&bookingId=${bookingId}`);
+                if (!res.ok) throw new Error("Connection failed");
+
+                const availableTimes = await res.json();
+                loadingText.classList.add('hidden');
+
+                const allTimesMorning = ["09:00", "10:00", "11:00", "12:00"];
+                const allTimesAfternoon = ["14:00", "15:00", "16:00", "17:00", "18:00"];
+                const allTimesEvening = ["19:00", "20:00", "21:00"];
+
+                const renderGroup = (times, containerId, label) => {
+                    const container = document.getElementById(containerId);
+                    times.forEach(time => {
+                        const isAvailable = availableTimes.includes(time);
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+
+                        if (isAvailable) {
+                            btn.className = 'flex flex-col items-center justify-center py-3.5 border border-stone-200/60 rounded-xl transition-all hover:border-[#3a4536]/40 hover:bg-[#3a4536]/5 group bg-white/60';
+                            btn.innerHTML = `
+                                <span class="font-sans text-lg font-bold text-[#2b3327] group-hover:text-[#3a4536]">${time}</span>
+                                <span class="font-sans text-[10px] uppercase tracking-wider text-stone-400 font-semibold">${label}</span>
+                            `;
+                            btn.addEventListener('click', () => selectTime(btn, time));
+                        } else {
+                            btn.className = 'flex flex-col items-center justify-center py-3.5 border border-stone-200/40 rounded-xl opacity-25 cursor-not-allowed bg-stone-100/50';
+                            btn.innerHTML = `
+                                <span class="font-sans text-lg font-bold text-stone-400">${time}</span>
+                                <span class="font-sans text-[10px] uppercase tracking-wider text-stone-400 font-semibold">Hết chỗ</span>
+                            `;
+                        }
+                        container.appendChild(btn);
+                    });
+                };
+
+                renderGroup(allTimesMorning, 'time-slots-morning', 'Sáng');
+                renderGroup(allTimesAfternoon, 'time-slots-afternoon', 'Chiều');
+                renderGroup(allTimesEvening, 'time-slots-evening', 'Tối');
+
+                selectedTime = null;
+                document.getElementById('startTime').value = '';
+                document.getElementById('summary-time').innerText = 'Chưa chọn';
+                document.getElementById('submitBtn').disabled = true;
+
+            } catch (err) {
+                loadingText.innerText = 'Có lỗi xảy ra khi tải khung giờ trống. Vui lòng thử lại.';
+                loadingText.classList.remove('hidden');
+            }
+        }
+
+        function selectTime(btn, time) {
+            document.querySelectorAll('#time-slots-container button').forEach(b => {
+                b.classList.remove('time-slot-active');
+                if (!b.classList.contains('opacity-25')) {
+                    b.className = 'flex flex-col items-center justify-center py-3.5 border border-stone-200/60 rounded-xl transition-all hover:border-[#3a4536]/40 hover:bg-[#3a4536]/5 group bg-white/60';
+                }
+            });
+
+            btn.classList.add('time-slot-active');
+            btn.className = 'flex flex-col items-center justify-center py-3.5 border rounded-xl transition-all shadow-md time-slot-active';
+
+            selectedTime = time;
+            const formattedDateTime = `${selectedDate}T${selectedTime}:00`;
+            document.getElementById('startTime').value = formattedDateTime;
+            document.getElementById('summary-time').innerText = `${selectedDate} ${selectedTime}`;
+            document.getElementById('submitBtn').disabled = false;
+        }
+    </script>
 </body>
 </html>

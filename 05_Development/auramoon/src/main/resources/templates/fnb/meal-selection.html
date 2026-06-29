@@ -21,13 +21,20 @@
             corePlugins: { preflight: false }
         }
     </script>
+    <style>
+        @media (min-width: 768px) {
+            aside.md\:flex {
+                display: flex !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
 <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 
     <!-- Header -->
-    <header class="header-container md:ml-64"
+    <header class="header-container md:ml-[280px]"
         style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 24px;">
         <div>
             <h1>Thực đơn dinh dưỡng cá nhân</h1>
@@ -45,7 +52,7 @@
     </header>
 
     <!-- Main Container -->
-    <main class="main-content md:ml-64">
+    <main class="main-content md:ml-[280px]">
 
         <!-- Left Column: Menu Items -->
         <section aria-label="Danh sách thực đơn">
@@ -185,6 +192,23 @@
 
     <!-- Scripts -->
     <script src="/js/fnb/meal-selection.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Highlight Sidebar active link for Meal Selection
+            const mealSelectionLink = document.querySelector('aside a[href="/fnb/meal-selection"]');
+            if (mealSelectionLink) {
+                mealSelectionLink.classList.remove('text-[#d2c5af]/70');
+                mealSelectionLink.classList.add('text-[#d2c5af]', 'bg-[#3a4536]/80', 'border-l-4', 'border-[#d2c5af]');
+                const indicator = mealSelectionLink.querySelector('div');
+                if (indicator) {
+                    indicator.classList.remove('h-0', 'opacity-0');
+                    indicator.classList.add('h-[60%]', 'opacity-100', 'bg-[#d2c5af]');
+                }
+                const icon = mealSelectionLink.querySelector('span.material-symbols-outlined');
+                if (icon) icon.classList.remove('opacity-60');
+            }
+        });
+    </script>
 </body>
 
 </html>

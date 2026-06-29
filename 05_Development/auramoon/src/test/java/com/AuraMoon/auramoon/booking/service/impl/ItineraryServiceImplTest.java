@@ -3,6 +3,9 @@ package com.AuraMoon.auramoon.booking.service.impl;
 import com.AuraMoon.auramoon.auth.entity.User;
 import com.AuraMoon.auramoon.auth.repository.UserRepository;
 import com.AuraMoon.auramoon.booking.dto.ItineraryTimelineDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import com.AuraMoon.auramoon.booking.entity.Booking;
 import com.AuraMoon.auramoon.booking.entity.RetreatPackage;
 import com.AuraMoon.auramoon.booking.repository.BookingRepository;
@@ -243,9 +246,9 @@ class ItineraryServiceImplTest {
         java.util.List<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> dtos = dtoPage.getContent();
 
         // Assert
-        assertNotNull(dtos);
-        assertEquals(1, dtos.size());
-        com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO dto = dtos.get(0);
+        assertNotNull(bookingsPage);
+        assertEquals(1, bookingsPage.getTotalElements());
+        com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO dto = bookingsPage.getContent().get(0);
         assertEquals(101, dto.getBookingId());
         assertEquals("Gói Tĩnh Dưỡng Cuối Tuần", dto.getPackageName());
         assertEquals("CHECKED_OUT", dto.getStatus());

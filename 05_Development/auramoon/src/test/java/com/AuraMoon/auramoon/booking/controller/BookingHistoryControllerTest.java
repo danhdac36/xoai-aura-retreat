@@ -15,8 +15,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import static org.mockito.ArgumentMatchers.*;
+import org.springframework.data.domain.PageRequest;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -50,7 +51,8 @@ public class BookingHistoryControllerTest {
     @DisplayName("BKG-TC-001: Guest xem lịch sử đặt phòng của chính mình")
     public void BKG_TC_001_GuestViewsOwnHistory() throws Exception {
         // Arrange
-        Mockito.when(itineraryService.getBookingHistory(eq(1), any(), anyInt(), anyInt())).thenReturn(new PageImpl<>(Collections.emptyList()));
+        Page<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> mockPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 5), 0);
+        Mockito.when(itineraryService.getBookingHistory(1, null, 0, 5)).thenReturn(mockPage);
 
         // Act & Assert
         mockMvc.perform(get("/booking/history")

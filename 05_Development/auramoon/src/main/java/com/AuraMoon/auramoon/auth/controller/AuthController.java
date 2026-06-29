@@ -33,7 +33,8 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public String showRegisterForm(Model model) {
+    public String showRegisterForm(HttpServletRequest request, Model model) {
+        request.getSession(true);
         model.addAttribute("registerDto", new UserRegistrationDto());
         return "auth/registration"; // Maps to registration.html
     }

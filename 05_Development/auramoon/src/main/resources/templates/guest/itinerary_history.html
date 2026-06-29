@@ -19,6 +19,16 @@
             <p class="text-on-surface-variant font-body-lg">Những hành trình chữa lành và tái tạo năng lượng của khách hàng.</p>
         </div>
 
+        <!-- Alert Warning if no active booking found -->
+        <div th:if="${param.error != null and param.error[0] == 'no_booking'}" 
+             class="mb-6 p-5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm flex items-center gap-3 animate-fade-in-up">
+            <span class="material-symbols-outlined text-[24px] text-amber-600">warning</span>
+            <div>
+                <p class="font-semibold mb-0.5">Bạn không có lịch trình hoạt động nào hiện tại</p>
+                <p class="text-xs text-amber-700">Tất cả các gói nghỉ dưỡng của bạn đã hoàn thành (Checked Out) hoặc đã hủy. Bạn có thể chọn xem chi tiết hành trình cũ trong lịch sử đặt phòng bên dưới.</p>
+            </div>
+        </div>
+
         <div class="flex justify-end mb-8">
             <form th:action="@{/booking/history}" method="get" class="flex items-center gap-2">
                 <input type="hidden" name="guestId" th:value="${targetGuestId}" th:if="${targetGuestId != null}"/>
