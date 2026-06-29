@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.UUID;
 
 @Service
@@ -79,9 +80,6 @@ public class AuthServiceImpl implements IAuthService {
     public User createGoogleUser(String email, String fullName) {
         User user = userRepository.findByEmail(email);
         if (user != null) {
-            if (user.getRole() != null) {
-                user.getRole().getRoleName(); // Force lazy load proxy while session is active
-            }
             return user;
         }
 
@@ -97,11 +95,7 @@ public class AuthServiceImpl implements IAuthService {
         newUser.setIsDelete(false);
         newUser.setVerifyToken(null);
 
-        User savedUser = userRepository.save(newUser);
-        if (savedUser.getRole() != null) {
-            savedUser.getRole().getRoleName(); // Force lazy load proxy while session is active
-        }
-        return savedUser;
+        return userRepository.save(newUser);
     }
 
     private void sendVerificationEmail(String email, String token) {
@@ -122,6 +116,53 @@ public class AuthServiceImpl implements IAuthService {
             System.out.println("Link kích hoạt dự phòng: http://localhost:8080/auth/verify-email?token=" + token);
 
             throw new IllegalStateException("Gửi email xác thực thất bại!", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("Email không tồn tại trong hệ thống, vui lòng kiểm tra lại.");
+        }
+
+        String newPassword = generateRandomString(6);
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        sendResetPasswordEmail(email, newPassword);
+    }
+
+    private String generateRandomString(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
+    private void sendResetPasswordEmail(String email, String newPassword) {
+        if (mailSender == null) {
+            System.out.println("[WARNING] JavaMailSender chưa được cấu hình. Mật khẩu mới dự phòng cho " + email + ": " + newPassword);
+            return;
+        }
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("[Xoai Aura Retreat] Khôi phục mật khẩu tài khoản");
+            message.setText("Chào bạn,\n\n" +
+                    "Yêu cầu khôi phục mật khẩu của bạn đã được xử lý.\n" +
+                    "Mật khẩu mới của bạn là: " + newPassword + "\n\n" +
+                    "Lưu ý: Mật khẩu này được sinh tự động và có độ bảo mật thấp. Bạn vui lòng đăng nhập và đổi lại mật khẩu cá nhân an toàn hơn ngay lập tức tại mục quản lý tài khoản.\n\n" +
+                    "Trân trọng,\n" +
+                    "Ban quản trị Xoai Aura Retreat.");
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("Gửi mail khôi phục mật khẩu thất bại: " + e.getMessage());
+            throw new IllegalStateException("Đã xảy ra sự cố khi gửi email khôi phục. Vui lòng thử lại sau.", e);
         }
     }
 }

@@ -77,6 +77,27 @@ public class AuthController {
         return "auth/verify-result";
     }
 
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordForm() {
+        return "auth/forgot-password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@RequestParam("email") String email, Model model) {
+        try {
+            authService.resetPassword(email);
+            return "redirect:/auth/login?resetSuccess=true";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("email", email);
+            return "auth/forgot-password";
+        } catch (Exception e) {
+            model.addAttribute("error", "Đã xảy ra sự cố khi gửi email khôi phục. Vui lòng thử lại sau.");
+            model.addAttribute("email", email);
+            return "auth/forgot-password";
+        }
+    }
+
     @PostMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
