@@ -79,7 +79,7 @@ public class HousekeepingServiceTest {
     @DisplayName("UC28-TC-001: getDirtyAndCleaningVillas returns only DIRTY and CLEANING villas")
     void getDirtyAndCleaningVillas_ReturnsCorrectList() {
         // Arrange
-        when(villaRepository.findByCleaningStatusInAndIsDeleteFalse(Arrays.asList("DIRTY", "CLEANING")))
+        when(villaRepository.findHousekeepingVillas(Arrays.asList("DIRTY", "CLEANING"), "MAINTENANCE"))
                 .thenReturn(Arrays.asList(dirtyVilla, cleaningVilla));
 
         // Act
@@ -93,7 +93,7 @@ public class HousekeepingServiceTest {
         assertFalse(result.stream().anyMatch(v -> "V-001".equals(v.getVillaCode())));
 
         verify(villaRepository, times(1))
-                .findByCleaningStatusInAndIsDeleteFalse(Arrays.asList("DIRTY", "CLEANING"));
+                .findHousekeepingVillas(Arrays.asList("DIRTY", "CLEANING"), "MAINTENANCE");
     }
 
     // ========================================================================
@@ -238,7 +238,7 @@ public class HousekeepingServiceTest {
     @DisplayName("UC28-TC-008: getDirtyAndCleaningVillas returns empty list when all villas clean")
     void getDirtyAndCleaningVillas_ReturnsEmptyList_WhenAllClean() {
         // Arrange
-        when(villaRepository.findByCleaningStatusInAndIsDeleteFalse(Arrays.asList("DIRTY", "CLEANING")))
+        when(villaRepository.findHousekeepingVillas(Arrays.asList("DIRTY", "CLEANING"), "MAINTENANCE"))
                 .thenReturn(Collections.emptyList());
 
         // Act

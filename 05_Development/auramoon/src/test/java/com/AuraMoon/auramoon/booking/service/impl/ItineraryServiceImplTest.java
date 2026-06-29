@@ -238,11 +238,12 @@ class ItineraryServiceImplTest {
                 .retreatPackage(retreatPackage)
                 .build();
 
-        when(bookingRepository.findByGuestId(eq(guestId), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(Collections.singletonList(booking1)));
+        when(bookingRepository.findByGuestId(eq(guestId), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(new org.springframework.data.domain.PageImpl<>(Collections.singletonList(booking1)));
 
         // Act
-        Page<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> bookingsPage = itineraryService.getBookingHistory(guestId, "ALL", 0, 5);
+        org.springframework.data.domain.Page<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> dtoPage = itineraryService.getBookingHistory(guestId, null, 0, 10);
+        java.util.List<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> dtos = dtoPage.getContent();
 
         // Assert
         assertNotNull(bookingsPage);

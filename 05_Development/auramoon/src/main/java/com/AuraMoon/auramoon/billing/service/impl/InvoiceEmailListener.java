@@ -43,7 +43,7 @@ public class InvoiceEmailListener {
 
         try {
             byte[] pdfContent = pdfGeneratorService.generateConsolidatedInvoice(event.getFolioId());
-            emailNotificationService.sendInvoiceEmail(event.getGuestEmail(), pdfContent);
+            emailNotificationService.sendInvoiceEmail(event.getGuestEmail(), event.getFolioId(), pdfContent);
             logEvent("EMAIL_INVOICE", "SUCCESS", event.getBookingId());
         } catch (Exception e) {
             log.error("MSG-23: SMTP / Email dispatch error for Booking ID: {}", event.getBookingId(), e);

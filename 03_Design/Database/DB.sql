@@ -109,6 +109,7 @@ CREATE TABLE VILLA (
     limit_person INT,
     villa_status VARCHAR(20) CHECK (villa_status IN ('AVAILABLE', 'OCCUPIED', 'MAINTENANCE')),
     cleaning_status VARCHAR(10) CHECK (cleaning_status IN ('CLEAN', 'DIRTY', 'CLEANING')),
+    maintenance_note NVARCHAR(500),
     is_delete BIT DEFAULT 0,
     CONSTRAINT FK_VILLA_TYPE FOREIGN KEY (villa_type) REFERENCES VILLA_TYPE(type_id)
 );
@@ -139,14 +140,14 @@ CREATE TABLE BOOKING (
     total_guests INT,
     create_at DATETIME DEFAULT GETDATE(),
     update_at DATETIME DEFAULT GETDATE(),
-    requested_villa_type_id INT,
     booking_status VARCHAR(20) CHECK (booking_status IN ('PENDING', 'CONFIRMED', 'CHECKED_IN', 'CHECKED_OUT', 'CANCELLED')),
     payment_status VARCHAR(20) CHECK (payment_status IN ('UNPAID', 'PARTIAL', 'PAID', 'REFUNDED')),
+    requested_villa_type_id INT NULL,
     is_delete BIT DEFAULT 0,
     CONSTRAINT FK_BOOKING_GUEST FOREIGN KEY (guest_id) REFERENCES [USER](user_id),
     CONSTRAINT FK_BOOKING_PACKAGE FOREIGN KEY (package_id) REFERENCES RETREAT_PACKAGE(package_id),
     CONSTRAINT FK_BOOKING_VILLA FOREIGN KEY (assigned_villa_id) REFERENCES VILLA(villa_id),
-    CONSTRAINT FK_BOOKING_VILLA_TYPE FOREIGN KEY (requested_villa_type_id) REFERENCES VILLA_TYPE(type_id)
+    CONSTRAINT FK_BOOKING_VILLATYPE FOREIGN KEY (requested_villa_type_id) REFERENCES VILLA_TYPE(type_id);
 );
 
 -- 13. Table GUEST_FOLIO

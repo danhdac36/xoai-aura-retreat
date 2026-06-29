@@ -2,6 +2,8 @@ package com.AuraMoon.auramoon.auth.controller;
 
 import com.AuraMoon.auramoon.auth.dto.SensitiveProfileDto;
 import com.AuraMoon.auramoon.auth.dto.PersonalProfileDto;
+import com.AuraMoon.auramoon.auth.dto.MyAccountDto;
+import com.AuraMoon.auramoon.auth.dto.ChangePasswordDto;
 import com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse;
 import com.AuraMoon.auramoon.auth.service.IProfileService;
 import jakarta.annotation.Nullable;
@@ -22,7 +24,9 @@ public class ProfileController {
 
     @GetMapping("/health")
     public String viewHealthProfile(Model model, Authentication authentication,
-                                    @RequestParam(value = "success", required = false) String success) {
+                                    @RequestParam(value = "success", required = false) String success,
+                                    @RequestParam(value = "deleted", required = false) String deleted,
+                                    @RequestParam(value = "error", required = false) String paramError) {
         Integer userId = extractUserId(authentication);
         if (userId == null) return "redirect:/auth/login";
 
@@ -31,6 +35,12 @@ public class ProfileController {
 
         if ("true".equals(success)) {
             model.addAttribute("successMessage", "Hồ sơ sức khỏe & dinh dưỡng đã được lưu thành công!");
+        } else if ("true".equals(deleted)) {
+            model.addAttribute("successMessage", "Dữ liệu nhạy cảm đã được xóa thành công!");
+        }
+        
+        if ("true".equals(paramError)) {
+            model.addAttribute("error", "Đã xảy ra lỗi khi xóa dữ liệu. Vui lòng thử lại.");
         }
 
         return "auth/update-health-profile";
@@ -63,6 +73,18 @@ public class ProfileController {
         }
     }
 
+    @PostMapping("/health/delete")
+    public String deleteHealthProfile(Authentication authentication) {
+        try {
+            Integer userId = extractUserId(authentication);
+            if (userId == null) return "redirect:/auth/login";
+
+            profileService.deleteSensitiveProfile(userId);
+            return "redirect:/profile/health?deleted=true";
+        } catch (Exception e) {
+            return "redirect:/profile/health?error=true";
+        }
+    }
 
     private Integer extractUserId(Authentication authentication) {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetailsResponse) {
@@ -107,6 +129,54 @@ public class ProfileController {
         } catch (Exception e) {
             model.addAttribute("error", "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
             return "auth/personal-profile";
+        }
+    }
+
+    @GetMapping("/my-account")
+    public String viewMyAccount(Model model, Authentication authentication,
+                                @RequestParam(value = "success", required = false) String success) {
+        Integer userId = extractUserId(authentication);
+        if (userId == null) return "redirect:/auth/login";
+
+        MyAccountDto dto = profileService.getMyAccountInfo(userId);
+        model.addAttribute("myAccountDto", dto);
+        
+        if (!model.containsAttribute("changePasswordDto")) {
+            model.addAttribute("changePasswordDto", new ChangePasswordDto());
+        }
+
+        if ("true".equals(success)) {
+            model.addAttribute("successMessage", "Đổi mật khẩu thành công!");
+        }
+
+        return "auth/my-account";
+    }
+
+    @PostMapping("/change-password")
+    public String changePassword(@Valid @ModelAttribute("changePasswordDto") ChangePasswordDto dto,
+                                 BindingResult result, Model model, Authentication authentication) {
+        Integer userId = extractUserId(authentication);
+        if (userId == null) return "redirect:/auth/login";
+
+        if (result.hasErrors()) {
+            MyAccountDto accountDto = profileService.getMyAccountInfo(userId);
+            model.addAttribute("myAccountDto", accountDto);
+            return "auth/my-account";
+        }
+
+        try {
+            profileService.changePassword(userId, dto);
+            return "redirect:/profile/my-account?success=true";
+        } catch (IllegalArgumentException e) {
+            MyAccountDto accountDto = profileService.getMyAccountInfo(userId);
+            model.addAttribute("myAccountDto", accountDto);
+            model.addAttribute("error", e.getMessage());
+            return "auth/my-account";
+        } catch (Exception e) {
+            MyAccountDto accountDto = profileService.getMyAccountInfo(userId);
+            model.addAttribute("myAccountDto", accountDto);
+            model.addAttribute("error", "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
+            return "auth/my-account";
         }
     }
 }

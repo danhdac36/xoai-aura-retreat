@@ -2,6 +2,8 @@ package com.AuraMoon.auramoon.auth.config;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import org.springframework.beans.factory.annotation.Value;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
@@ -13,7 +15,7 @@ public class AesDataEncryptor implements AttributeConverter<String, String> {
     private static final String ALGORITHM = "AES/ECB/PKCS5Padding";
     private static String secretKey = "AuraMoonRetreatWellnessSystem206"; // exactly 32 bytes for AES-256
 
-    @org.springframework.beans.factory.annotation.Value("${app.encryption.key:AuraMoonRetreatWellnessSystem206}")
+    @Value("${app.encryption.key:AuraMoonRetreatWellnessSystem206}")
     public void setSecretKey(String key) {
         AesDataEncryptor.secretKey = key;
     }

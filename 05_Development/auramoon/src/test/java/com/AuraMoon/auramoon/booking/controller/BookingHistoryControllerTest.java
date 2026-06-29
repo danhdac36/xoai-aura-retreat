@@ -61,15 +61,14 @@ public class BookingHistoryControllerTest {
                 .andExpect(view().name("guest/itinerary_history"))
                 .andExpect(model().attributeExists("bookingsPage"));
 
-        Mockito.verify(itineraryService, Mockito.times(1)).getBookingHistory(1, null, 0, 5);
+        Mockito.verify(itineraryService, Mockito.times(1)).getBookingHistory(eq(1), any(), anyInt(), anyInt());
     }
 
     @Test
     @DisplayName("BKG-TC-002: Manager xem lịch sử đặt phòng của guest khác")
     public void BKG_TC_002_ManagerViewsGuestHistory() throws Exception {
         // Arrange
-        Page<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> mockPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 5), 0);
-        Mockito.when(itineraryService.getBookingHistory(2, null, 0, 5)).thenReturn(mockPage);
+        Mockito.when(itineraryService.getBookingHistory(eq(2), any(), anyInt(), anyInt())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
         // Act & Assert
         mockMvc.perform(get("/booking/history").param("guestId", "2")
@@ -78,15 +77,14 @@ public class BookingHistoryControllerTest {
                 .andExpect(view().name("guest/itinerary_history"))
                 .andExpect(model().attributeExists("bookingsPage"));
 
-        Mockito.verify(itineraryService, Mockito.times(1)).getBookingHistory(2, null, 0, 5);
+        Mockito.verify(itineraryService, Mockito.times(1)).getBookingHistory(eq(2), any(), anyInt(), anyInt());
     }
 
     @Test
     @DisplayName("BKG-TC-003: Guest cố gắng truy cập lịch sử của guest khác → bị bỏ qua guestId")
     public void BKG_TC_003_GuestAccessesAnotherGuestHistory_ShouldIgnoreGuestId() throws Exception {
         // Arrange
-        Page<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> mockPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 5), 0);
-        Mockito.when(itineraryService.getBookingHistory(1, null, 0, 5)).thenReturn(mockPage);
+        Mockito.when(itineraryService.getBookingHistory(eq(1), any(), anyInt(), anyInt())).thenReturn(new PageImpl<>(Collections.emptyList()));
 
         // Act & Assert - Guest tries to access guestId=2
         mockMvc.perform(get("/booking/history").param("guestId", "2")
@@ -96,7 +94,7 @@ public class BookingHistoryControllerTest {
                 .andExpect(model().attributeExists("bookingsPage"));
 
         // Verify that it ignores guestId=2 and uses guestId=1 from Principal
-        Mockito.verify(itineraryService, Mockito.times(1)).getBookingHistory(1, null, 0, 5);
-        Mockito.verify(itineraryService, Mockito.never()).getBookingHistory(2, null, 0, 5);
+        Mockito.verify(itineraryService, Mockito.times(1)).getBookingHistory(eq(1), any(), anyInt(), anyInt());
+        Mockito.verify(itineraryService, Mockito.never()).getBookingHistory(eq(2), any(), anyInt(), anyInt());
     }
 }

@@ -105,5 +105,63 @@
         </main>
     </div>
 
+    <!-- Generic AJAX Script for data-ajax elements -->
+    <script>
+        document.addEventListener('click', function(e) {
+            const a = e.target.closest('a[data-ajax="true"]');
+            if (a) {
+                e.preventDefault();
+                fetch(a.href, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(res => res.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const newContent = temp.querySelector('#main-content') || temp.firstElementChild;
+                    const oldContent = document.getElementById('main-content');
+                    if (oldContent && newContent) {
+                        oldContent.replaceWith(newContent);
+                    }
+                })
+                .catch(err => console.error(err));
+            }
+        });
+
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.hasAttribute('data-ajax')) {
+                e.preventDefault();
+                const formData = new FormData(form);
+                let url = form.action || window.location.href;
+                const method = (form.method || 'get').toUpperCase();
+                
+                const options = {
+                    method: method,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                };
+                
+                if (method === 'POST') {
+                    options.body = formData;
+                } else {
+                    const params = new URLSearchParams(formData);
+                    url = url.split('?')[0] + '?' + params.toString();
+                }
+                
+                fetch(url, options)
+                .then(res => res.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const newContent = temp.querySelector('#main-content') || temp.firstElementChild;
+                    const oldContent = document.getElementById('main-content');
+                    if (oldContent && newContent) {
+                        oldContent.replaceWith(newContent);
+                    }
+                })
+                .catch(err => console.error(err));
+            }
+        });
+    </script>
 </body>
 </html>

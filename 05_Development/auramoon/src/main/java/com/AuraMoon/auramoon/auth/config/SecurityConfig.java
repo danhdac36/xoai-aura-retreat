@@ -43,6 +43,7 @@ public class SecurityConfig {
         };
 
         private static final String[] GUEST_ENDPOINTS = {
+                        "/booking/itinerary/**",
                         "/guest/booking-spa/**",
                         "/fnb/meal-selection/**",
                         "/fnb/alacarte-order/**",
@@ -56,7 +57,9 @@ public class SecurityConfig {
         };
 
         private static final String[] ADMIN_ENDPOINTS = {
-                        "/admin/**"
+                        "/admin/**",
+                        "/manager/dashboard/**",
+                        "/manager/staff/**"
         };
 
         private static final String[] RECEPTIONIST_ENDPOINTS = {

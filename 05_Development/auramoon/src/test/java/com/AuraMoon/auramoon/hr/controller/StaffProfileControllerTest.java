@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 public class StaffProfileControllerTest {
 
     @Autowired
@@ -25,21 +25,30 @@ public class StaffProfileControllerTest {
     private IStaffProfileAggregator aggregator;
 
     @Test
-    @WithMockUser(roles = {"MANAGER", "ADMIN"})
     public void shouldRenderStaffProfileForManager() throws Exception {
         FullStaffProfileDTO mockProfile = new FullStaffProfileDTO();
-        when(aggregator.getAggregatedProfile(1L, 0, 5, null)).thenReturn(mockProfile);
+        mockProfile.setRecentActivitiesPage(org.springframework.data.domain.Page.empty());
+        when(aggregator.getAggregatedProfile(eq(1L), anyInt(), anyInt(), any())).thenReturn(mockProfile);
 
-        mockMvc.perform(get("/manager/staff/profile/1"))
+        com.AuraMoon.auramoon.auth.entity.User managerUser = com.AuraMoon.auramoon.auth.entity.User.builder()
+                .id(99).fullName("Manager").role(new com.AuraMoon.auramoon.auth.entity.Role(2, "MANAGER")).build();
+        com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse mockManagerDetails = new com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse(managerUser);
+
+        mockMvc.perform(get("/manager/staff/profile/1")
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(mockManagerDetails)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("manager/staff-profile"))
                 .andExpect(model().attributeExists("profile"));
     }
 
     @Test
-    @WithMockUser(roles = "RECEPTIONIST")
     public void shouldDenyAccessToReceptionist() throws Exception {
-        mockMvc.perform(get("/manager/staff/profile/1"))
+        com.AuraMoon.auramoon.auth.entity.User recUser = com.AuraMoon.auramoon.auth.entity.User.builder()
+                .id(99).fullName("Receptionist").role(new com.AuraMoon.auramoon.auth.entity.Role(3, "RECEPTIONIST")).build();
+        com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse mockRecDetails = new com.AuraMoon.auramoon.auth.dto.response.UserDetailsResponse(recUser);
+
+        mockMvc.perform(get("/manager/staff/profile/1")
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(mockRecDetails)))
                 .andExpect(status().isForbidden());
     }
 }
