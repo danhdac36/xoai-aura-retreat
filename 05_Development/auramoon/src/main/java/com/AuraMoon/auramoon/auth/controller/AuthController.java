@@ -22,12 +22,14 @@ public class AuthController {
     private IAuthService authService;
 
     @GetMapping("/login")
-    public String showLoginForm() {
+    public String showLoginForm(HttpServletRequest request) {
+        request.getSession(true);
         return "auth/login";
     }
 
     @GetMapping("/register")
-    public String showRegisterForm(Model model) {
+    public String showRegisterForm(HttpServletRequest request, Model model) {
+        request.getSession(true);
         model.addAttribute("registerDto", new UserRegistrationDto());
         return "auth/registration"; // Maps to registration.html
     }
@@ -71,7 +73,7 @@ public class AuthController {
         return "auth/verify-result";
     }
 
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {

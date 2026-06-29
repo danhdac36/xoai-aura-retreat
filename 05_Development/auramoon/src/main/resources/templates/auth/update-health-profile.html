@@ -127,11 +127,12 @@
     </style>
 </head>
 <body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 <!-- TopNavBar -->
-<nav class="w-full top-0 sticky z-50 bg-background dark:bg-on-background">
+<nav class="w-full md:w-[calc(100%-16rem)] md:ml-64 top-0 sticky z-50 bg-background dark:bg-on-background">
     
 </nav>
-<main class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg">
+<main class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-stack-lg md:ml-64">
     <!-- Hero Section -->
     <section class="mb-stack-lg animate-fade-in">
         <div class="relative w-full h-[200px] overflow-hidden rounded-xl mb-stack-md">

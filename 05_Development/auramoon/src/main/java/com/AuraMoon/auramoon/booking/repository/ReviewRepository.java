@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
     boolean existsByBookingId(Integer bookingId);
+    
+    java.util.List<Review> findByIsDeleteFalse();
 }

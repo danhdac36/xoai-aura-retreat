@@ -29,6 +29,10 @@ class DashboardIntegrationTest {
     @DisplayName("DASH-TC-INT-001: Full Dashboard Flow (E2E)")
     void testFullDashboardFlow() throws Exception {
         User mockUser = new User();
+        mockUser.setId(1);
+        mockUser.setEmail("manager@auramoon.com");
+        mockUser.setFullName("Manager Name");
+        mockUser.setStatus("ACTIVE");
         com.AuraMoon.auramoon.auth.entity.Role mockRole = new com.AuraMoon.auramoon.auth.entity.Role();
         mockRole.setRoleName("MANAGER");
         mockUser.setRole(mockRole);

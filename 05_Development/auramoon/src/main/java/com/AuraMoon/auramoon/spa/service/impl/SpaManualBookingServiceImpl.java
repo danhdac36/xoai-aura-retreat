@@ -17,6 +17,8 @@ import com.AuraMoon.auramoon.spa.repository.TreatmentRoomRepository;
 import com.AuraMoon.auramoon.spa.repository.TreatmentServiceRepository;
 import com.AuraMoon.auramoon.spa.service.BillingIntegrationService;
 import com.AuraMoon.auramoon.spa.service.SpaManualBookingService;
+import com.AuraMoon.auramoon.yoga.repository.YogaRegistrationRepository;
+import com.AuraMoon.auramoon.yoga.entity.YogaRegistration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,7 @@ public class SpaManualBookingServiceImpl implements SpaManualBookingService {
     private final TherapistRepository therapistRepository;
     private final ScheduleRepository scheduleRepository;
     private final BillingIntegrationService billingService;
+    private final YogaRegistrationRepository yogaRegistrationRepository;
 
     public SpaManualBookingServiceImpl(SpaBookingRepository bookingRepository,
             TreatmentBookingRepository treatmentBookingRepository,
@@ -40,7 +43,8 @@ public class SpaManualBookingServiceImpl implements SpaManualBookingService {
             TreatmentRoomRepository roomRepository,
             TherapistRepository therapistRepository,
             ScheduleRepository scheduleRepository,
-            BillingIntegrationService billingService) {
+            BillingIntegrationService billingService,
+            YogaRegistrationRepository yogaRegistrationRepository) {
         this.bookingRepository = bookingRepository;
         this.treatmentBookingRepository = treatmentBookingRepository;
         this.treatmentServiceRepository = treatmentServiceRepository;
@@ -48,6 +52,7 @@ public class SpaManualBookingServiceImpl implements SpaManualBookingService {
         this.therapistRepository = therapistRepository;
         this.scheduleRepository = scheduleRepository;
         this.billingService = billingService;
+        this.yogaRegistrationRepository = yogaRegistrationRepository;
     }
 
     @Override
@@ -78,10 +83,40 @@ public class SpaManualBookingServiceImpl implements SpaManualBookingService {
         LocalDateTime endTime = startTime
                 .plusMinutes(service.getDurationMinutes() != null ? service.getDurationMinutes() : 60);
 
+        // 4.1 Kiểm tra trùng lịch Yoga: Khách không thể vừa học Yoga vừa làm Spa cùng lúc
+        List<YogaRegistration> overlappingYoga = yogaRegistrationRepository
+                .findOverlappingRegistrations(booking.getId(), startTime, endTime);
+        if (!overlappingYoga.isEmpty()) {
+            YogaRegistration conflict = overlappingYoga.get(0);
+            String yogaTime = conflict.getSchedule().getStartTime().toLocalTime() + " - "
+                    + conflict.getSchedule().getEndTime().toLocalTime();
+            String yogaClass = conflict.getSchedule().getYogaClass().getClassName();
+            throw new SpaBusinessException("SPA-014",
+                    "Khách đã có lịch Yoga \"" + yogaClass + "\" từ " + yogaTime
+                            + " trùng với khung giờ Spa được chọn. Vui lòng chọn thời gian khác.");
+        }
+
         List<TreatmentRoom> availableRooms = roomRepository.findAvailableRoomsWithLock(startTime, endTime);
         if (availableRooms.isEmpty()) {
             throw new SpaBusinessException("SPA-010",
                     "Không tìm thấy Therapist hoặc Phòng điều trị khả dụng. Vui lòng chọn thời gian khác.");
+        }
+
+        // 3.5. Kiểm tra trùng lịch Spa dựa trên số lượng khách (totalGuests)
+        List<Schedule> existingSchedules = scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(booking.getId());
+        long overlappingCount = existingSchedules.stream()
+                .filter(s -> s.getStartTime().isBefore(endTime) && s.getEndTime().isAfter(startTime))
+                .count();
+
+        int maxAllowedOverlapping = (booking.getTotalGuests() != null) ? booking.getTotalGuests() : 1;
+        if (overlappingCount >= maxAllowedOverlapping) {
+            if (maxAllowedOverlapping <= 1) {
+                throw new SpaBusinessException("SPA-013",
+                        "Quý khách không thể đặt 2 ca spa cùng một thời điểm.");
+            } else {
+                throw new SpaBusinessException("SPA-013",
+                        "Số lượng ca spa trùng thời điểm vượt quá số lượng khách trong đơn đặt phòng (tối đa " + maxAllowedOverlapping + " người).");
+            }
         }
         TreatmentRoom selectedRoom = availableRooms.get(0);
 

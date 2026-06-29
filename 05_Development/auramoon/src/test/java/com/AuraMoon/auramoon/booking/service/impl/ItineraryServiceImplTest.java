@@ -3,6 +3,9 @@ package com.AuraMoon.auramoon.booking.service.impl;
 import com.AuraMoon.auramoon.auth.entity.User;
 import com.AuraMoon.auramoon.auth.repository.UserRepository;
 import com.AuraMoon.auramoon.booking.dto.ItineraryTimelineDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import com.AuraMoon.auramoon.booking.entity.Booking;
 import com.AuraMoon.auramoon.booking.entity.RetreatPackage;
 import com.AuraMoon.auramoon.booking.repository.BookingRepository;
@@ -214,5 +217,40 @@ class ItineraryServiceImplTest {
         assertEquals("Yoga: Hatha Yoga Class", yogaEvent.getEventName());
         assertEquals("Phòng tập A", yogaEvent.getLocation());
         assertTrue(yogaEvent.getDescription().contains("GV Học viên Yoga GV"));
+    }
+
+    @Test
+    @DisplayName("BKG-SVC-001 - Lấy danh sách lịch sử đặt phòng thành công")
+    void getBookingHistory_Success() {
+        // Arrange
+        Integer guestId = 1;
+        RetreatPackage retreatPackage = RetreatPackage.builder()
+                .packageName("Gói Tĩnh Dưỡng Cuối Tuần")
+                .price(java.math.BigDecimal.valueOf(5000000))
+                .build();
+
+        Booking booking1 = Booking.builder()
+                .id(101)
+                .guestId(guestId)
+                .checkinDate(LocalDateTime.of(2026, 5, 1, 14, 0))
+                .checkoutDate(LocalDateTime.of(2026, 5, 3, 12, 0))
+                .bookingStatus("CHECKED_OUT")
+                .retreatPackage(retreatPackage)
+                .build();
+
+        when(bookingRepository.findByGuestId(eq(guestId), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(booking1)));
+
+        // Act
+        Page<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> bookingsPage = itineraryService.getBookingHistory(guestId, "ALL", 0, 5);
+
+        // Assert
+        assertNotNull(bookingsPage);
+        assertEquals(1, bookingsPage.getTotalElements());
+        com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO dto = bookingsPage.getContent().get(0);
+        assertEquals(101, dto.getBookingId());
+        assertEquals("Gói Tĩnh Dưỡng Cuối Tuần", dto.getPackageName());
+        assertEquals("CHECKED_OUT", dto.getStatus());
+        assertEquals(5000000.0, dto.getTotalAmount());
     }
 }

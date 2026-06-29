@@ -101,6 +101,23 @@ public class SpaScheduleServiceImpl implements SpaScheduleService {
             }
         }
 
+        // 2.5. Kiểm tra trùng lịch Spa dựa trên số lượng khách (totalGuests)
+        List<Schedule> existingSchedules = scheduleRepository.findByTreatmentBookingBookingIdAndIsDeleteFalseOrderByStartTimeAsc(request.getBookingId());
+        long overlappingCount = existingSchedules.stream()
+                .filter(s -> s.getStartTime().isBefore(endTime) && s.getEndTime().isAfter(startTime))
+                .count();
+
+        int maxAllowedOverlapping = (guestBooking.getTotalGuests() != null) ? guestBooking.getTotalGuests() : 1;
+        if (overlappingCount >= maxAllowedOverlapping) {
+            if (maxAllowedOverlapping <= 1) {
+                throw new SpaBusinessException("SPA-013",
+                        "Quý khách không thể đặt 2 ca spa cùng một thời điểm.");
+            } else {
+                throw new SpaBusinessException("SPA-013",
+                        "Số lượng ca spa trùng thời điểm vượt quá số lượng khách trong đơn đặt phòng (tối đa " + maxAllowedOverlapping + " người).");
+            }
+        }
+
         // 3. Tìm Phòng và Chuyên viên rảnh bằng Pessimistic Lock (BR-04)
         List<TreatmentRoom> availableRooms = roomRepository.findAvailableRoomsWithLock(startTime, endTime);
         if (availableRooms.isEmpty()) {

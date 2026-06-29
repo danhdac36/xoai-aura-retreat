@@ -20,5 +20,6 @@ public class BookingResponseDTO {
     private String bookingStatus;
     private String paymentStatus;
     private String retreatPackageName;
+    private String requestedVillaTypeName;
     private String assignedVillaCode;
 }

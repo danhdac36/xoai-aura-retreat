@@ -16,7 +16,7 @@ public class Review {
     @Column(name = "review_id")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
 
@@ -26,4 +26,8 @@ public class Review {
     @Lob
     @Column(name = "comment")
     private String comment;
+
+    @Builder.Default
+    @Column(name = "is_delete", nullable = false, columnDefinition = "bit default 0")
+    private Boolean isDelete = false;
 }

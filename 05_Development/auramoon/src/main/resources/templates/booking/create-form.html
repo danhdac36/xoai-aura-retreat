@@ -30,44 +30,56 @@
     <th:block th:replace="~{fragments/tailwind-config :: tailwind-config}"></th:block>
 </head>
 
-<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans md:pl-64">
+<body class="bg-[#fbf9f8] text-[#1b1c1c] font-sans"
+    th:classappend="${#authorization.expression('isAuthenticated()')} ? 'md:pl-[280px]' : ''">
     <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
-    <main class="min-h-screen py-16 px-4 md:px-8 max-w-4xl mx-auto">
+    <main class="min-h-screen py-16 px-4 md:px-8 max-w-6xl mx-auto">
         <a th:href="@{/packages/{id}(id=${pkg.id})}"
-            class="inline-flex items-center gap-1.5 text-[#566342] hover:text-[#3f4b2c] font-medium transition-colors mb-8 group">
-            <span
-                class="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">arrow_back</span>
+            class="inline-flex items-center gap-1.5 text-on-surface-variant/70 hover:text-primary font-medium transition-colors mb-8 group">
+            <span class="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">arrow_back</span>
             <span>Quay lại chi tiết gói</span>
         </a>
 
-        <!-- Split 2-Column Checkout Layout -->
-        <div th:if="${hasActiveBooking}" class="bg-red-50 border-l-4 border-red-500 p-4 mb-8 rounded-r-lg shadow-sm">
+        <!-- Warning active booking -->
+        <div th:if="${hasActiveBooking}" class="bg-error/10 border-l-4 border-error p-4 mb-8 rounded-r-lg shadow-sm">
             <div class="flex">
                 <div class="flex-shrink-0">
-                    <span class="material-symbols-outlined text-red-500">warning</span>
+                    <span class="material-symbols-outlined text-error">warning</span>
                 </div>
                 <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800">Cảnh báo Đặt phòng</h3>
-                    <div class="mt-2 text-sm text-red-700">
-                        <p>Bạn đang có một Kỳ nghỉ chưa hoàn tất (Đang chờ thanh toán, Đã xác nhận hoặc Đang lưu trú). Hệ thống chỉ cho phép mỗi khách hàng tham gia 1 gói Retreat tại một thời điểm. Vui lòng hoàn thành kỳ nghỉ hiện tại hoặc hủy gói cũ trước khi đặt mới.</p>
+                    <h3 class="text-sm font-medium text-error">Cảnh báo Đặt phòng</h3>
+                    <div class="mt-2 text-sm text-error/80">
+                        <p>Bạn đang có một Kỳ nghỉ chưa hoàn tất (Đang chờ thanh toán, Đã xác nhận hoặc Đang lưu trú).
+                            Hệ thống chỉ cho phép mỗi khách hàng tham gia 1 gói Retreat tại một thời điểm. Vui lòng hoàn
+                            thành kỳ nghỉ hiện tại hoặc hủy gói cũ trước khi đặt mới.</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-
-            <!-- Left Column: Form Fields (2/3 width) -->
-            <div
-                class="lg:col-span-2 glass-card bg-white/70 backdrop-blur-md border border-white/20 p-8 md:p-10 rounded-2xl shadow-xl space-y-8">
-                <div>
-                    <span
-                        class="text-xs font-bold tracking-wider text-[#566342] bg-[#566342]/10 px-3 py-1 rounded-full w-fit uppercase block"
-                        th:text="${pkg.typePackage}">Loại gói</span>
-                    <h1 class="text-3xl font-serif font-bold text-gray-900 mt-3"
-                        th:text="'Đặt Kỳ Nghỉ: ' + ${pkg.packageName}">Tên gói</h1>
-                    <p class="text-sm text-gray-500 mt-2">Vui lòng điền thông tin lưu trú của bạn để bắt đầu hành trình
-                        phục hồi sức khỏe.</p>
+            
+            <!-- Left Column: Multi-step Form (2/3 width) -->
+            <div class="lg:col-span-2 glass-card bg-white/70 backdrop-blur-md border border-white/40 p-8 md:p-10 rounded-2xl shadow-xl space-y-8 relative overflow-hidden">
+                
+                <!-- Wizard Progress Bar -->
+                <div class="flex items-center justify-between mb-8 relative z-10">
+                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-gray-200 -z-10"></div>
+                    <div id="line-1" class="absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-0.5 bg-gray-200 -z-10 transition-colors duration-500"></div>
+                    <div id="line-2" class="absolute left-1/2 top-1/2 -translate-y-1/2 w-1/2 h-0.5 bg-gray-200 -z-10 transition-colors duration-500"></div>
+                    
+                    <div class="flex flex-col items-center gap-2 bg-white px-2">
+                        <div id="step-circle-1" class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-md transition-colors duration-300">1</div>
+                        <span id="step-text-1" class="text-[10px] uppercase tracking-widest font-bold text-primary transition-colors duration-300">Hành trình</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 bg-white px-2">
+                        <div id="step-circle-2" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm transition-colors duration-300">2</div>
+                        <span id="step-text-2" class="text-[10px] uppercase tracking-widest font-medium text-gray-400 transition-colors duration-300">Không gian</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 bg-white px-2">
+                        <div id="step-circle-3" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold text-sm transition-colors duration-300">3</div>
+                        <span id="step-text-3" class="text-[10px] uppercase tracking-widest font-medium text-gray-400 transition-colors duration-300">Hoàn tất</span>
+                    </div>
                 </div>
 
                 <form th:action="@{/booking/create}" method="post" th:object="${bookingRequest}"
@@ -76,144 +88,234 @@
                     <!-- Hidden inputs -->
                     <input type="hidden" name="retreatPackageId" th:value="${pkg.id}" />
 
-                    <!-- Booking Schedule Inputs -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Date input -->
-                        <div class="flex flex-col gap-2">
-                            <label for="checkinDate"
-                                class="text-xs font-bold text-gray-500 uppercase tracking-wider">Ngày nhận phòng
-                                (Check-in)</label>
-                            <div class="relative">
-                                <span
-                                    class="material-symbols-outlined absolute left-3 top-3 text-gray-400 text-xl pointer-events-none">calendar_today</span>
-                                <input type="datetime-local" id="checkinDate" name="checkinDate" required
-                                    th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd''T''HH:mm')}"
-                                    class="w-full bg-white border border-gray-200 pl-11 pr-4 py-2.5 rounded-xl focus:ring-[#566342]/20 focus:border-[#566342] text-sm" />
+                    <!-- STEP 1: DATE & GUESTS -->
+                    <div id="step-1" class="step-content transition-all duration-500 transform translate-x-0 opacity-100">
+                        <div class="mb-8">
+                            <span class="text-[10px] font-bold tracking-[0.2em] text-primary bg-primary/5 px-3 py-1 rounded-full uppercase" th:text="${pkg.typePackage}">Loại gói</span>
+                            <h1 class="text-3xl font-serif font-bold text-on-surface mt-4 mb-2">Chọn thời gian nghỉ dưỡng</h1>
+                            <p class="text-sm text-on-surface-variant/70">Bước đầu tiên để bắt đầu hành trình chữa lành của bạn.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="flex flex-col gap-2">
+                                <label for="checkinDate" class="text-[10px] font-bold text-on-surface-variant/70 uppercase tracking-widest">Ngày nhận phòng (Check-in)</label>
+                                <div class="relative group">
+                                    <span class="material-symbols-outlined absolute left-4 top-3.5 text-on-surface-variant/50 group-focus-within:text-primary transition-colors pointer-events-none">calendar_today</span>
+                                    <input type="datetime-local" id="checkinDate" name="checkinDate" required
+                                        th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd''T''HH:mm')}"
+                                        class="w-full bg-white/50 border border-outline-variant/30 pl-12 pr-4 py-3.5 rounded-xl focus:ring-1 focus:ring-primary/30 focus:border-primary text-sm transition-all shadow-sm" />
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label for="totalGuests" class="text-[10px] font-bold text-on-surface-variant/70 uppercase tracking-widest">Số lượng khách hàng</label>
+                                <div class="relative group">
+                                    <span class="material-symbols-outlined absolute left-4 top-3.5 text-on-surface-variant/50 group-focus-within:text-primary transition-colors pointer-events-none">group</span>
+                                    <input type="number" id="totalGuests" name="totalGuests" required min="1" max="10" value="1"
+                                        class="w-full bg-white/50 border border-outline-variant/30 pl-12 pr-4 py-3.5 rounded-xl focus:ring-1 focus:ring-primary/30 focus:border-primary text-sm transition-all shadow-sm" />
+                                </div>
+                                <span class="text-[10px] text-on-surface-variant/70 mt-1.5 block italic">* Gói trị liệu được thiết kế chuyên sâu cho 1 cá nhân. Khách đi kèm chỉ dùng chung lưu trú.</span>
                             </div>
                         </div>
-
-                        <!-- Total guests input -->
-                        <div class="flex flex-col gap-2">
-                            <label for="totalGuests" class="text-xs font-bold text-gray-500 uppercase tracking-wider">Số
-                                lượng khách hàng</label>
-                            <div class="relative">
-                                <span
-                                    class="material-symbols-outlined absolute left-3 top-3 text-gray-400 text-xl pointer-events-none">group</span>
-                                <input type="number" id="totalGuests" name="totalGuests" required min="1" max="10"
-                                    value="2"
-                                    class="w-full bg-white border border-gray-200 pl-11 pr-4 py-2.5 rounded-xl focus:ring-[#566342]/20 focus:border-[#566342] text-sm" />
-                            </div>
+                        <div class="mt-10 flex justify-end">
+                            <button type="button" onclick="nextStep(2)" class="bg-primary text-white px-8 py-3 rounded-xl hover:bg-primary/90 transition-colors shadow-md flex items-center gap-2 text-sm font-medium tracking-wide">
+                                Tiếp theo: Chọn Không gian <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Villa Selection -->
-                    <div class="flex flex-col gap-3">
-                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Chọn loại Villa lưu
-                            trú</label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- STEP 2: VILLA SELECTION -->
+                    <div id="step-2" class="step-content hidden transition-all duration-500 transform translate-x-10 opacity-0">
+                        <div class="mb-8">
+                            <h1 class="text-3xl font-serif font-bold text-on-surface mt-2 mb-2">Chọn không gian (Villa)</h1>
+                            <p class="text-sm text-on-surface-variant/70">Mỗi không gian mang một năng lượng riêng biệt cho hành trình của bạn.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                             <div th:each="vt : ${villaTypes}" class="relative">
-                                <input type="radio" name="villaTypeId" th:value="${vt.id}" th:id="'vt-' + ${vt.id}"
-                                    required th:data-price="${vt.pricePerDay}" class="peer hidden" />
-                                <label th:for="'vt-' + ${vt.id}"
-                                    class="flex gap-4 p-5 bg-white border border-gray-200 hover:border-[#566342]/40 rounded-2xl cursor-pointer transition-all duration-300 peer-checked:border-[#566342] peer-checked:bg-[#566342]/5 shadow-sm hover:shadow-md h-full select-none">
-                                    <div class="mt-1 flex-shrink-0">
-                                        <div
-                                            class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center bg-white transition-all duration-300 peer-checked:border-[#566342]">
-                                            <div
-                                                class="w-2.5 h-2.5 rounded-full bg-[#566342] scale-0 peer-checked:scale-100 transition-transform duration-300">
-                                            </div>
+                                <input type="radio" name="villaTypeId" th:value="${vt.id}" th:id="'vt-' + ${vt.id}" required th:data-price="${vt.pricePerDay}" class="peer hidden" />
+                                <label th:for="'vt-' + ${vt.id}" class="flex flex-col p-1 bg-white/50 border border-outline-variant/30 hover:border-primary/50 rounded-2xl cursor-pointer transition-all duration-300 peer-checked:border-primary peer-checked:bg-primary/5 shadow-sm hover:shadow-md h-full select-none overflow-hidden group">
+                                    <div class="w-full h-32 bg-gray-200 rounded-xl overflow-hidden relative">
+                                        <img th:src="@{${vt.image != null and !vt.image.isEmpty() ? vt.image : '/img/retreat-default.jpg'}}" alt="Villa" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                                        <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 shadow flex items-center justify-center opacity-0 group-hover:opacity-100 peer-checked:opacity-100 peer-checked:bg-primary transition-all">
+                                            <span class="material-symbols-outlined text-[14px] text-primary peer-checked:text-white">check</span>
                                         </div>
                                     </div>
-                                    <div class="flex-1">
-                                        <span class="font-serif font-bold text-base text-gray-900 block"
-                                            th:text="${vt.typeName}">Ocean View Villa</span>
-                                        <span class="text-xs text-gray-500 block mt-1">Không gian biệt lập với hồ bơi
-                                            riêng, ban công ngắm hoàng hôn lãng mạn.</span>
-                                        <span class="text-sm font-bold text-[#566342] mt-3 block"
-                                            th:text="'+ ' + ${#numbers.formatDecimal(vt.pricePerDay,0,'POINT',0,'COMMA')} + ' đ / ngày'">Phụ
-                                            thu</span>
+                                    <div class="p-4 flex-1 flex flex-col">
+                                        <span class="font-serif font-bold text-lg text-on-surface" th:text="${vt.typeName}">Ocean View Villa</span>
+                                        <span class="text-[12px] text-on-surface-variant/70 block mt-1 flex-1 leading-relaxed">Không gian tĩnh lặng, biệt lập hoàn toàn với thiên nhiên.</span>
+                                        <span class="text-[13px] font-bold text-primary mt-3 block" th:text="'+ ' + ${#numbers.formatDecimal(vt.pricePerDay,0,'POINT',0,'COMMA')} + ' đ / đêm'">Phụ thu</span>
+                                        <button type="button" th:onclick="openVillaModal(event, [[${vt.id}]], [[${vt.typeName}]], [[${vt.image != null ? vt.image : '/img/retreat-default.jpg'}]], [[${#numbers.formatDecimal(vt.pricePerDay,0,'POINT',0,'COMMA')} + ' đ / đêm']])" class="mt-4 flex items-center justify-center gap-1.5 w-full py-2.5 bg-primary/5 text-primary rounded-xl text-[12px] font-bold hover:bg-primary hover:text-white transition-colors relative z-10">
+                                            <span class="material-symbols-outlined text-[16px]">visibility</span> Khám phá không gian
+                                        </button>
                                     </div>
                                 </label>
                             </div>
                         </div>
+                        <div class="mt-10 flex justify-between">
+                            <button type="button" onclick="goToStep(1)" class="text-on-surface-variant hover:text-primary px-6 py-3 transition-colors flex items-center gap-2 text-sm font-medium">
+                                <span class="material-symbols-outlined text-[18px]">arrow_back</span> Quay lại
+                            </button>
+                            <button type="button" onclick="nextStep(3)" class="bg-primary text-white px-8 py-3 rounded-xl hover:bg-primary/90 transition-colors shadow-md flex items-center gap-2 text-sm font-medium tracking-wide">
+                                Tiếp theo: Xác nhận <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Privacy Consent Checkbox -->
-                    <div class="flex items-start gap-3 pt-2 border-t border-gray-100">
-                        <input type="checkbox" id="privacyConsent" name="privacyConsent" required
-                            class="mt-1 rounded border-gray-300 text-[#566342] focus:ring-[#566342]/20" />
-                        <label for="privacyConsent" class="text-xs text-gray-500 leading-relaxed select-none">
-                            Tôi đồng ý chia sẻ thông tin cá nhân (CCCD/Hộ chiếu) phục vụ cho việc khai báo lưu trú và chấp thuận các chính sách bảo mật của Aura Moon Retreat.
-                        </label>
+                    <!-- STEP 3: REVIEW & CHECKOUT -->
+                    <div id="step-3" class="step-content hidden transition-all duration-500 transform translate-x-10 opacity-0">
+                        <div class="mb-8">
+                            <h1 class="text-3xl font-serif font-bold text-on-surface mt-2 mb-2">Hoàn tất đặt chỗ</h1>
+                            <p class="text-sm text-on-surface-variant/70">Vui lòng kiểm tra lại thông tin trên Hóa đơn bên phải trước khi thanh toán cọc.</p>
+                        </div>
+                        
+                        <div class="bg-primary/5 border border-primary/20 rounded-2xl p-6 mb-8">
+                            <div class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-primary text-3xl">verified_user</span>
+                                <div>
+                                    <h4 class="font-semibold text-on-surface text-sm mb-1">Cam kết bảo mật & Chính sách</h4>
+                                    <p class="text-[12px] text-on-surface-variant/80 leading-relaxed mb-4">
+                                        Hệ thống Aura Retreat sử dụng mã hóa đầu cuối cho thông tin thẻ tín dụng và dữ liệu cá nhân. Bạn có thể hủy phòng miễn phí trước 14 ngày so với ngày nhận phòng dự kiến.
+                                    </p>
+                                    <div class="flex items-start gap-3 pt-4 border-t border-primary/10">
+                                        <input type="checkbox" id="privacyConsent" name="privacyConsent" required class="mt-0.5 rounded border-outline-variant/50 text-primary focus:ring-primary/20 w-4 h-4 cursor-pointer" />
+                                        <label for="privacyConsent" class="text-[13px] text-on-surface font-medium cursor-pointer select-none">
+                                            Tôi xác nhận đồng ý với Chính sách bảo mật và Điều khoản lưu trú của Aura Retreat.
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-10 flex justify-between">
+                            <button type="button" onclick="goToStep(2)" class="text-on-surface-variant hover:text-primary px-6 py-3 transition-colors flex items-center gap-2 text-sm font-medium">
+                                <span class="material-symbols-outlined text-[18px]">arrow_back</span> Đổi Villa
+                            </button>
+                            <button type="submit" form="bookingForm" th:disabled="${hasActiveBooking}" th:classappend="${hasActiveBooking} ? 'opacity-50 cursor-not-allowed hover:bg-primary' : 'hover:bg-primary/90 hover:shadow-lg'" class="bg-primary text-white px-8 py-3.5 rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2 text-sm font-medium tracking-wide w-full md:w-auto">
+                                Xác nhận & Thanh toán cọc <span class="material-symbols-outlined text-[20px]">credit_card</span>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
 
             <!-- Right Column: Sticky Invoice Card (1/3 width) -->
-            <div class="lg:col-span-1 lg:sticky lg:top-6 space-y-6">
-                <div class="bg-white border border-[#c8c7be]/60 p-6 rounded-2xl shadow-xl space-y-6">
-                    <div class="relative h-44 overflow-hidden rounded-xl">
+            <div class="lg:col-span-1 lg:sticky lg:top-28 space-y-6">
+                <div class="bg-white/90 backdrop-blur-md border border-white/60 p-6 rounded-2xl shadow-xl space-y-6 relative overflow-hidden">
+                    <!-- Decor pattern -->
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+                    
+                    <div class="relative h-32 overflow-hidden rounded-xl shadow-inner">
                         <img th:src="${pkg.typePackage == 'Stress Relief' || pkg.typePackage == 'Spa'} ? @{/img/spa-retreat.jpg} :
                                  (${pkg.typePackage == 'Weight Loss' || pkg.typePackage == 'Detox'} ? @{/img/detox-retreat.jpg} :
                                  (${pkg.typePackage == 'Yoga'} ? @{/img/yoga-retreat.jpg} :
-                                 @{/img/retreat-default.jpg}))" alt="Retreat Package"
-                            class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-[#566342]/10"></div>
-                    </div>
-
-                    <div class="border-b border-gray-100 pb-4">
-                        <span class="text-[10px] font-bold text-[#566342] uppercase tracking-wider block"
-                            th:text="${pkg.typePackage}">Loại Gói</span>
-                        <h2 class="font-serif font-bold text-xl text-gray-900 mt-1" th:text="${pkg.packageName}">Tên gói
-                        </h2>
-                        <span class="inline-flex items-center gap-1 text-xs text-gray-500 mt-2 font-medium">
-                            <span class="material-symbols-outlined text-sm">schedule</span>
-                            <span th:text="${pkg.durationDays} + ' Ngày'">3 Ngày</span>
-                        </span>
+                                 @{/img/retreat-default.jpg}))" alt="Retreat Package" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="absolute bottom-3 left-4 right-4">
+                            <span class="text-[9px] font-bold text-white/90 uppercase tracking-[0.2em] block mb-0.5" th:text="${pkg.typePackage}">Loại Gói</span>
+                            <h2 class="font-serif text-white font-bold text-lg leading-tight truncate" th:text="${pkg.packageName}">Tên gói</h2>
+                        </div>
                     </div>
 
                     <!-- Invoice Breakdown -->
-                    <div class="space-y-4 text-sm">
-                        <div class="flex justify-between text-gray-500">
-                            <span>Chi phí trị liệu cơ bản:</span>
-                            <span class="font-semibold text-gray-900"
-                                th:text="${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">15.000.000
-                                đ</span>
+                    <div class="space-y-4 text-[13px] pt-2">
+                        <div class="flex justify-between items-center text-on-surface-variant">
+                            <span class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-primary/70">schedule</span> Thời lượng:</span>
+                            <span class="font-semibold text-on-surface" th:text="${pkg.durationDays} + ' Ngày'">3 Ngày</span>
                         </div>
-                        <div class="flex justify-between text-gray-500">
-                            <span>Phụ thu Villa (<span id="surchargeDaysDisplay" th:text="${pkg.durationDays}">3</span>
-                                ngày):</span>
-                            <span id="surchargeDisplay" class="font-semibold text-gray-900">0 đ</span>
+                        <div class="w-full h-[1px] bg-dashed border-t border-outline-variant/20 my-2"></div>
+                        <div class="flex justify-between text-on-surface-variant">
+                            <span>Phí Retreat (Gốc):</span>
+                            <span class="font-semibold text-on-surface" th:text="${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">15.000.000 đ</span>
                         </div>
-                        <div class="flex justify-between text-gray-500 border-b border-gray-100 pb-4">
-                            <span>Ngày Check-out dự kiến:</span>
-                            <span id="checkoutDateDisplay" class="font-semibold text-gray-900">--/--/----</span>
+                        <div class="flex justify-between text-on-surface-variant">
+                            <span>Phụ thu Villa (<span id="surchargeDaysDisplay" th:text="${pkg.durationDays}">3</span> đêm):</span>
+                            <span id="surchargeDisplay" class="font-semibold text-on-surface">0 đ</span>
                         </div>
-                        <div class="flex justify-between text-lg font-bold text-[#566342] pt-2">
-                            <span>Tổng chi phí:</span>
-                            <span id="totalPriceDisplay"
-                                th:text="${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">15.000.000
-                                đ</span>
+                        <div class="flex justify-between text-on-surface-variant border-b border-outline-variant/20 pb-4">
+                            <span>Check-out dự kiến:</span>
+                            <span id="checkoutDateDisplay" class="font-semibold text-on-surface">--/--/----</span>
+                        </div>
+                        <div class="flex justify-between items-end pt-2">
+                            <span class="text-sm font-bold text-on-surface">Tổng chi phí:</span>
+                            <span id="totalPriceDisplay" class="text-xl font-bold text-primary" th:text="${#numbers.formatDecimal(pkg.price,0,'POINT',0,'COMMA')} + ' đ'">15.000.000 đ</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-primary/5 p-3 rounded-xl mt-2">
+                            <span class="text-[12px] font-medium text-primary">Tiền cọc yêu cầu (50%):</span>
+                            <span id="depositDisplay" class="text-[14px] font-bold text-primary">--</span>
                         </div>
                     </div>
 
-                    <!-- Action Button -->
-                    <button type="submit" form="bookingForm" th:disabled="${hasActiveBooking}"
-                        th:classappend="${hasActiveBooking} ? 'opacity-50 cursor-not-allowed hover:bg-[#566342]' : 'hover:bg-[#3f4b2c] shadow-[#566342]/10 hover:shadow-lg'"
-                        class="w-full py-3.5 bg-[#566342] text-white font-medium rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2 text-sm">
-                        Xác nhận & Thanh toán cọc <span class="material-symbols-outlined text-base">payments</span>
-                    </button>
-
-                    <!-- Safety Trust badges -->
-                    <p class="text-[10px] text-gray-400 text-center leading-relaxed">
-                        Giá đã bao gồm toàn bộ phí dịch vụ, các buổi tập luyện chánh niệm, bữa ăn organic và liệu trình
-                        spa tương thích.
+                    <p class="text-[10px] text-on-surface-variant/50 text-center leading-relaxed italic border-t border-outline-variant/10 pt-4">
+                        Giá đã bao gồm dịch vụ, các buổi tập chánh niệm, bữa ăn organic và liệu trình spa.
                     </p>
                 </div>
             </div>
-
         </div>
     </main>
+
+    <!-- UI Logic Script -->
+    <script>
+        function updateDeposit() {
+            const totalStr = document.getElementById('totalPriceDisplay').innerText.replace(/[^\d]/g, '');
+            if(totalStr) {
+                const total = parseInt(totalStr);
+                const deposit = total / 2;
+                document.getElementById('depositDisplay').innerText = new Intl.NumberFormat('vi-VN').format(deposit) + ' đ';
+            }
+        }
+
+        // Hook into the existing JS that updates total price
+        const observer = new MutationObserver(updateDeposit);
+        window.addEventListener('DOMContentLoaded', () => {
+            const target = document.getElementById('totalPriceDisplay');
+            if(target) {
+                observer.observe(target, { characterData: true, childList: true, subtree: true });
+                updateDeposit();
+            }
+        });
+
+        function goToStep(step) {
+            // Hide all
+            [1, 2, 3].forEach(s => {
+                const el = document.getElementById('step-' + s);
+                el.classList.add('hidden');
+                setTimeout(() => { el.classList.remove('translate-x-0', 'opacity-100'); el.classList.add('translate-x-10', 'opacity-0'); }, 10);
+                
+                // Reset dots
+                document.getElementById('step-circle-' + s).className = 'w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors duration-300 ' + (s === step ? 'bg-primary text-white shadow-md' : 'bg-gray-200 text-gray-500');
+                document.getElementById('step-text-' + s).className = 'text-[10px] uppercase tracking-widest transition-colors duration-300 ' + (s === step ? 'font-bold text-primary' : 'font-medium text-gray-400');
+            });
+            
+            // Show target
+            const target = document.getElementById('step-' + step);
+            target.classList.remove('hidden');
+            setTimeout(() => {
+                target.classList.remove('translate-x-10', 'opacity-0');
+                target.classList.add('translate-x-0', 'opacity-100');
+            }, 50);
+
+            // Update lines
+            document.getElementById('line-1').className = 'absolute left-0 top-1/2 -translate-y-1/2 w-1/2 h-0.5 -z-10 transition-colors duration-500 ' + (step >= 2 ? 'bg-primary' : 'bg-gray-200');
+            document.getElementById('line-2').className = 'absolute left-1/2 top-1/2 -translate-y-1/2 w-1/2 h-0.5 -z-10 transition-colors duration-500 ' + (step >= 3 ? 'bg-primary' : 'bg-gray-200');
+            
+            window.scrollTo({ top: 100, behavior: 'smooth' });
+        }
+
+        function nextStep(step) {
+            if (step === 2) {
+                if (!document.getElementById('checkinDate').value || !document.getElementById('totalGuests').value) {
+                    alert('Vui lòng điền Ngày nhận phòng và Số lượng khách.');
+                    return;
+                }
+            }
+            if (step === 3) {
+                const villaSelected = document.querySelector('input[name="villaTypeId"]:checked');
+                if (!villaSelected) {
+                    alert('Vui lòng chọn 1 loại Không gian Villa.');
+                    return;
+                }
+            }
+            goToStep(step);
+        }
+    </script>
     <script th:src="@{/js/booking/booking-form.js}"></script>
     <script>
         // Synchronize custom villa radio card selection animations
@@ -245,6 +347,113 @@
             });
         });
     </script>
+    <!-- Quick View Modal -->
+    <div id="quickViewModal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity opacity-0 duration-300" id="modalOverlay" onclick="closeVillaModal()"></div>
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="relative bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all duration-300 sm:my-8 sm:max-w-2xl w-full opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" id="modalContent">
+                <!-- Close Button -->
+                <button type="button" onclick="closeVillaModal()" class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-sm transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
+                </button>
+                
+                <!-- Image -->
+                <div class="w-full h-64 bg-gray-200 relative">
+                    <img id="modalImg" src="" alt="Villa Image" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                    <div class="absolute bottom-6 left-6 right-6">
+                        <span class="text-[10px] font-bold text-white/90 uppercase tracking-[0.2em] bg-white/20 backdrop-blur-md px-3 py-1 rounded-full mb-3 inline-block">Không gian lưu trú</span>
+                        <h3 id="modalName" class="text-3xl font-serif font-bold text-white mb-1 drop-shadow-md">Villa Name</h3>
+                        <p id="modalPrice" class="text-primary-light font-medium text-white/90">Price</p>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="p-8">
+                    <h4 class="text-[11px] font-bold text-primary uppercase tracking-[0.2em] mb-4">Trải nghiệm không gian</h4>
+                    <p class="text-[13px] text-on-surface-variant/80 leading-relaxed mb-6">
+                        Một nơi trú ẩn hoàn hảo để bạn tìm lại sự cân bằng. Được thiết kế với kiến trúc hòa mình vào thiên nhiên, Villa này mang đến sự riêng tư tuyệt đối. Từng chi tiết nhỏ từ ánh sáng tự nhiên, luồng gió đến chất liệu nội thất đều được chăm chút tỉ mỉ nhằm đánh thức các giác quan và hỗ trợ quá trình trị liệu chữa lành của bạn tại Xoài Aura.
+                    </p>
+                    
+                    <h4 class="text-[11px] font-bold text-primary uppercase tracking-[0.2em] mb-4 pt-4 border-t border-outline-variant/10">Tiện ích đặc quyền</h4>
+                    <div class="grid grid-cols-2 gap-y-4 gap-x-6 mb-8">
+                        <div class="flex items-center gap-3 text-[13px] text-on-surface-variant">
+                            <span class="material-symbols-outlined text-primary text-[20px] bg-primary/5 p-1.5 rounded-lg">bathtub</span> Bồn tắm thảo mộc
+                        </div>
+                        <div class="flex items-center gap-3 text-[13px] text-on-surface-variant">
+                            <span class="material-symbols-outlined text-primary text-[20px] bg-primary/5 p-1.5 rounded-lg">balcony</span> Ban công thiền định
+                        </div>
+                        <div class="flex items-center gap-3 text-[13px] text-on-surface-variant">
+                            <span class="material-symbols-outlined text-primary text-[20px] bg-primary/5 p-1.5 rounded-lg">ac_unit</span> Điều hòa không khí
+                        </div>
+                        <div class="flex items-center gap-3 text-[13px] text-on-surface-variant">
+                            <span class="material-symbols-outlined text-primary text-[20px] bg-primary/5 p-1.5 rounded-lg">room_service</span> Phục vụ tại phòng 24/7
+                        </div>
+                    </div>
+                    
+                    <!-- Action -->
+                    <div class="flex gap-4 pt-2">
+                        <button type="button" onclick="closeVillaModal()" class="flex-1 py-3.5 border border-outline-variant/30 text-on-surface hover:bg-surface transition-colors rounded-xl font-medium text-[13px]">
+                            Quay lại
+                        </button>
+                        <button type="button" id="modalSelectBtn" class="flex-1 py-3.5 bg-primary text-white hover:bg-primary/90 shadow-md hover:shadow-lg transition-all rounded-xl font-medium text-[13px] flex items-center justify-center gap-2">
+                            Chọn Không gian này <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function openVillaModal(e, id, name, img, price) {
+            if(e) { e.preventDefault(); e.stopPropagation(); }
+            
+            document.getElementById('modalImg').src = img;
+            document.getElementById('modalName').innerText = name;
+            document.getElementById('modalPrice').innerText = 'Phụ thu: ' + price;
+            
+            const btn = document.getElementById('modalSelectBtn');
+            btn.onclick = function() {
+                // Select the radio button
+                const radio = document.getElementById('vt-' + id);
+                if(radio) {
+                    radio.checked = true;
+                    // Trigger change event to update animations and invoice
+                    radio.dispatchEvent(new Event('change'));
+                }
+                closeVillaModal();
+            };
+            
+            const modal = document.getElementById('quickViewModal');
+            const overlay = document.getElementById('modalOverlay');
+            const content = document.getElementById('modalContent');
+            
+            modal.classList.remove('hidden');
+            // small delay to allow display block to apply before animating opacity
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                overlay.classList.add('opacity-100');
+                
+                content.classList.remove('opacity-0', 'translate-y-4', 'sm:scale-95');
+                content.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
+            }, 10);
+        }
+        
+        function closeVillaModal() {
+            const overlay = document.getElementById('modalOverlay');
+            const content = document.getElementById('modalContent');
+            
+            overlay.classList.remove('opacity-100');
+            overlay.classList.add('opacity-0');
+            
+            content.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
+            content.classList.add('opacity-0', 'translate-y-4', 'sm:scale-95');
+            
+            setTimeout(() => {
+                document.getElementById('quickViewModal').classList.add('hidden');
+            }, 300);
+        }
+    </script>
 </body>
-
 </html>

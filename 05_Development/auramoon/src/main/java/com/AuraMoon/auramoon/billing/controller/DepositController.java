@@ -35,10 +35,10 @@ public class DepositController {
         GuestFolio folio = guestFolioRepository.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException("GuestFolio not found for bookingId: " + bookingId));
 
-        // Thanh toán đặt cọc mặc định là 100% giá trị gói
+        // Thanh toán đặt cọc là 50% giá trị gói
         Payment payment = Payment.builder()
                 .guestFolio(folio)
-                .amount(folio.getTotalPackageAmount())
+                .amount(folio.getTotalPackageAmount().multiply(new java.math.BigDecimal("0.5")))
                 .paymentMethod(PaymentMethod.BANK_TRANSFER.name())
                 .paymentGateway(PaymentGateway.VNPAY.name())
                 .paymentDate(LocalDateTime.now())

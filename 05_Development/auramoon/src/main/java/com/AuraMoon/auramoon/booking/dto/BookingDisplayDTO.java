@@ -18,6 +18,7 @@ public class BookingDisplayDTO {
     private LocalDateTime checkinDate;
     private LocalDateTime checkoutDate;
     private String assignedVillaCode; // Mã phòng vật lý đã gán
+    private String requestedVillaTypeName;
     private String bookingStatus;
     private Boolean consentApproved;
     private String guestName;

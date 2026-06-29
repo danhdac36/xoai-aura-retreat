@@ -16,4 +16,5 @@ public class VillaDisplayDTO {
     private Integer limitPerson;
     private String villaStatus;
     private String cleaningStatus;
+    private String image;
 }

@@ -3,6 +3,7 @@ package com.AuraMoon.auramoon.spa.controller;
 import com.AuraMoon.auramoon.spa.dto.SpaScheduleRequest;
 import com.AuraMoon.auramoon.spa.dto.SpaScheduleResponse;
 import com.AuraMoon.auramoon.spa.service.SpaManualBookingService;
+import com.AuraMoon.auramoon.spa.service.SpaScheduleService;
 import com.AuraMoon.auramoon.spa.repository.SpaBookingRepository;
 import com.AuraMoon.auramoon.spa.repository.TreatmentServiceRepository;
 import com.AuraMoon.auramoon.spa.exception.SpaBusinessException;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -27,13 +29,16 @@ import java.util.Map;
 public class SpaReceptionistController {
 
     private final SpaManualBookingService spaManualBookingService;
+    private final SpaScheduleService spaScheduleService;
     private final SpaBookingRepository spaBookingRepository;
     private final TreatmentServiceRepository treatmentServiceRepository;
 
     public SpaReceptionistController(SpaManualBookingService spaManualBookingService,
+            SpaScheduleService spaScheduleService,
             SpaBookingRepository spaBookingRepository,
             TreatmentServiceRepository treatmentServiceRepository) {
         this.spaManualBookingService = spaManualBookingService;
+        this.spaScheduleService = spaScheduleService;
         this.spaBookingRepository = spaBookingRepository;
         this.treatmentServiceRepository = treatmentServiceRepository;
     }
@@ -48,6 +53,21 @@ public class SpaReceptionistController {
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> getCheckedInBookings() {
         return ResponseEntity.ok(spaBookingRepository.findCheckedInBookingsWithGuestDetails());
+    }
+
+    /**
+     * Endpoint available-slots dành riêng cho Receptionist (role RECEPTIONIST).
+     * Tái sử dụng cùng service logic với endpoint /guest/booking-spa/available-slots.
+     */
+    @GetMapping("/available-slots")
+    @ResponseBody
+    public ResponseEntity<List<String>> getAvailableSlots(
+            @RequestParam("date") String dateStr,
+            @RequestParam(value = "duration", defaultValue = "60") Integer duration,
+            @RequestParam(value = "bookingId", required = false) Integer bookingId) {
+        LocalDate date = LocalDate.parse(dateStr);
+        List<String> availableSlots = spaScheduleService.getAvailableTimeSlots(date, duration, bookingId);
+        return ResponseEntity.ok(availableSlots);
     }
 
     @PostMapping("/manual")

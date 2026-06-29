@@ -21,30 +21,41 @@ public class ItineraryController {
     }
 
     @GetMapping("/booking/itinerary")
-    public String showItinerary(@RequestParam(value = "guestId", required = false) Integer guestId, Model model, @AuthenticationPrincipal UserDetailsResponse currentUser) {
+    public String showItinerary(@RequestParam(value = "guestId", required = false) Integer guestId,
+                                @RequestParam(value = "bookingId", required = false) Integer bookingId,
+                                Model model, 
+                                @AuthenticationPrincipal UserDetailsResponse currentUser) {
         if (currentUser == null) {
             return "redirect:/auth/login";
         }
 
-        // Anti-IDOR: Chỉ Lễ tân/Admin mới được xem itinerary của khách khác. Khách chỉ xem của mình.
-        if (guestId == null) {
-            guestId = currentUser.getId();
-        } else {
-            String roleName = (currentUser.getAuthorities() != null && !currentUser.getAuthorities().isEmpty()) 
-                    ? currentUser.getAuthorities().iterator().next().getAuthority() : "";
-            if (!"ROLE_RECEPTIONIST".equalsIgnoreCase(roleName) && !"ROLE_ADMIN".equalsIgnoreCase(roleName)) {
-                // Phớt lờ guestId trên URL, ép buộc dùng ID của chính currentUser
-                guestId = currentUser.getId();
-            }
-        }
-
         try {
-            ItineraryTimelineDTO timeline = itineraryService.getTimelineForGuest(guestId);
+            ItineraryTimelineDTO timeline;
+            
+            if (bookingId != null) {
+                // Lấy timeline cho một booking cụ thể (từ Lịch sử)
+                timeline = itineraryService.getTimelineForBooking(bookingId);
+            } else {
+                // Lấy timeline hiện tại của guest (Anti-IDOR)
+                if (guestId == null) {
+                    guestId = currentUser.getId();
+                } else {
+                    String roleName = (currentUser.getAuthorities() != null && !currentUser.getAuthorities().isEmpty()) 
+                            ? currentUser.getAuthorities().iterator().next().getAuthority() : "";
+                    if (!"ROLE_RECEPTIONIST".equalsIgnoreCase(roleName) && 
+                        !"ROLE_ADMIN".equalsIgnoreCase(roleName) && 
+                        !"ROLE_MANAGER".equalsIgnoreCase(roleName)) {
+                        guestId = currentUser.getId();
+                    }
+                }
+                timeline = itineraryService.getTimelineForGuest(guestId);
+            }
+
             model.addAttribute("timeline", timeline);
             return "guest/itinerary";
         } catch (IllegalArgumentException e) {
-            // Chuẩn hóa Redirect theo EDS sang trang dashboard thực tế (/profile/home)
-            return "redirect:/profile/home?error=no_booking";
+            // Chuẩn hóa Redirect theo EDS sang trang lịch sử đặt lịch (/booking/history)
+            return "redirect:/booking/history?error=no_booking";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
             return "error";

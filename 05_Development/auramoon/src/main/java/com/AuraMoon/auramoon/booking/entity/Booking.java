@@ -36,6 +36,10 @@ public class Booking extends BaseEntity {
     @JoinColumn(name = "assigned_villa_id")
     private Villa assignedVilla;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requested_villa_type_id")
+    private VillaType requestedVillaType;
+
     @Column(name = "checkin_date")
     private LocalDateTime checkinDate;
 
@@ -50,4 +54,11 @@ public class Booking extends BaseEntity {
 
     @Column(name = "payment_status", length = 10)
     private String paymentStatus;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.guestId == null) {
+            this.guestId = 1;
+        }
+    }
 }

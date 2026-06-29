@@ -139,12 +139,14 @@ CREATE TABLE BOOKING (
     total_guests INT,
     create_at DATETIME DEFAULT GETDATE(),
     update_at DATETIME DEFAULT GETDATE(),
+    requested_villa_type_id INT,
     booking_status VARCHAR(20) CHECK (booking_status IN ('PENDING', 'CONFIRMED', 'CHECKED_IN', 'CHECKED_OUT', 'CANCELLED')),
     payment_status VARCHAR(20) CHECK (payment_status IN ('UNPAID', 'PARTIAL', 'PAID', 'REFUNDED')),
     is_delete BIT DEFAULT 0,
     CONSTRAINT FK_BOOKING_GUEST FOREIGN KEY (guest_id) REFERENCES [USER](user_id),
     CONSTRAINT FK_BOOKING_PACKAGE FOREIGN KEY (package_id) REFERENCES RETREAT_PACKAGE(package_id),
-    CONSTRAINT FK_BOOKING_VILLA FOREIGN KEY (assigned_villa_id) REFERENCES VILLA(villa_id)
+    CONSTRAINT FK_BOOKING_VILLA FOREIGN KEY (assigned_villa_id) REFERENCES VILLA(villa_id),
+    CONSTRAINT FK_BOOKING_VILLA_TYPE FOREIGN KEY (requested_villa_type_id) REFERENCES VILLA_TYPE(type_id)
 );
 
 -- 13. Table GUEST_FOLIO
@@ -195,6 +197,8 @@ CREATE TABLE MENU_ITEM (
     menu_item_id INT IDENTITY(1,1) PRIMARY KEY,
     item_name NVARCHAR(100) NOT NULL,
     price DECIMAL(18, 2),
+    image_url VARCHAR(255),
+    category VARCHAR(50),
     ingredient NVARCHAR(MAX),
     is_available BIT DEFAULT 1,
     image_url VARCHAR(255),
@@ -211,6 +215,7 @@ CREATE TABLE MEAL_ORDER (
     guest_id INT NOT NULL,
     ordered_at DATETIME DEFAULT GETDATE(),
     ordered_by INT,
+    serving_time VARCHAR(20),
     place_order VARCHAR(100),
     note NVARCHAR(MAX),
     order_status VARCHAR(20) CHECK (order_status IN ('PENDING', 'PREPARING', 'DELIVERED', 'CANCELLED')),
