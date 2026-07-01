@@ -43,7 +43,6 @@ public class RetreatPackageServiceImpl implements RetreatPackageService {
                 .typePackage(retreatPackage.getTypePackage())
                 .packageName(retreatPackage.getPackageName())
                 .durationDays(retreatPackage.getDurationDays())
-                .services(retreatPackage.getServices())
                 .description(retreatPackage.getDescription())
                 .price(retreatPackage.getPrice())
                 .build();

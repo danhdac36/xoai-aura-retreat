@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "RETREAT_PACKAGE")
@@ -32,9 +33,11 @@ public class RetreatPackage extends BaseEntity {
     @Column(name = "duration_days")
     private Integer durationDays;
 
-    @Lob
-    @Column(name = "services")
-    private String services;
+    @OneToMany(mappedBy = "retreatPackage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("dayNumber ASC")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<RetreatPackageItinerary> itineraries;
 
     @Lob
     @Column(name = "description")

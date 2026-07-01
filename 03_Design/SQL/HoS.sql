@@ -119,7 +119,6 @@ CREATE TABLE RETREAT_PACKAGE (
     type_package NVARCHAR(50),
     package_name NVARCHAR(50),
     duration_days INT,
-    services NVARCHAR(MAX),
     description NVARCHAR(MAX),
     is_active BIT DEFAULT 1,
     is_delete BIT DEFAULT 0,
@@ -127,6 +126,20 @@ CREATE TABLE RETREAT_PACKAGE (
     create_at DATETIME DEFAULT GETDATE(),
     update_at DATETIME DEFAULT GETDATE()
 );
+GO
+
+-- Table RETREAT_PACKAGE_ITINERARY
+CREATE TABLE RETREAT_PACKAGE_ITINERARY (
+    itinerary_id INT IDENTITY(1,1) PRIMARY KEY,
+    package_id INT NOT NULL,
+    day_number INT NOT NULL,
+    service_id INT,
+    meal_included BIT DEFAULT 0,
+    description NVARCHAR(255),
+    CONSTRAINT FK_ITIN_PKG FOREIGN KEY (package_id) REFERENCES RETREAT_PACKAGE(package_id),
+    CONSTRAINT FK_ITIN_SVC FOREIGN KEY (service_id) REFERENCES TREATMENT_SERVICE(service_id)
+);
+GO
 
 -- 12. Table BOOKING
 CREATE TABLE BOOKING (

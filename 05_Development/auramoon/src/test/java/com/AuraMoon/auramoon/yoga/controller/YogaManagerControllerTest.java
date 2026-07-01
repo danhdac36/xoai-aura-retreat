@@ -45,12 +45,18 @@ class YogaManagerControllerTest {
                 .durationMinutes(60)
                 .build();
         when(yogaManagerService.getAllActiveClasses()).thenReturn(Collections.singletonList(response));
+        when(yogaManagerService.getSchedulesByDate(any(LocalDate.class))).thenReturn(Collections.emptyList());
+        when(yogaManagerService.getAllActiveInstructors()).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/manager/yoga/classes"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("manager/yoga-classes"))
+                .andExpect(view().name("manager/yoga-management"))
                 .andExpect(model().attributeExists("classes"))
-                .andExpect(model().attributeExists("classRequest"));
+                .andExpect(model().attributeExists("schedules"))
+                .andExpect(model().attributeExists("instructors"))
+                .andExpect(model().attribute("activeTab", "classes"))
+                .andExpect(model().attributeExists("classRequest"))
+                .andExpect(model().attributeExists("scheduleRequest"));
     }
 
     @Test
@@ -124,10 +130,13 @@ class YogaManagerControllerTest {
 
         mockMvc.perform(get("/manager/yoga/schedules").param("date", "2026-06-28"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("manager/yoga-schedules"))
+                .andExpect(view().name("manager/yoga-management"))
                 .andExpect(model().attributeExists("schedules"))
                 .andExpect(model().attributeExists("classes"))
                 .andExpect(model().attributeExists("instructors"))
+                .andExpect(model().attribute("activeTab", "schedules"))
+                .andExpect(model().attributeExists("classRequest"))
+                .andExpect(model().attributeExists("scheduleRequest"))
                 .andExpect(model().attribute("selectedDate", LocalDate.parse("2026-06-28")));
     }
 

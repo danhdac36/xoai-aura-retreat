@@ -29,13 +29,14 @@ public class YogaManagerController {
     // --- YOGA CLASS VIEWS & FORMS ---
 
     @GetMapping("/classes")
-    public String showClassesPage(Model model) {
-        List<YogaClassResponse> classes = yogaManagerService.getAllActiveClasses();
-        model.addAttribute("classes", classes);
-        if (!model.containsAttribute("classRequest")) {
-            model.addAttribute("classRequest", new YogaClassRequest());
+    public String showClassesPage(
+            @RequestParam(name = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            Model model) {
+        if (date == null) {
+            date = LocalDate.now();
         }
-        return "manager/yoga-classes";
+        populateYogaManagementModel(model, date, "classes");
+        return "manager/yoga-management";
     }
 
     @PostMapping("/classes/create")
@@ -100,18 +101,27 @@ public class YogaManagerController {
         if (date == null) {
             date = LocalDate.now();
         }
-        List<YogaScheduleResponse> schedules = yogaManagerService.getSchedulesByDate(date);
+        populateYogaManagementModel(model, date, "schedules");
+        return "manager/yoga-management";
+    }
+
+    private void populateYogaManagementModel(Model model, LocalDate date, String activeTab) {
         List<YogaClassResponse> classes = yogaManagerService.getAllActiveClasses();
+        List<YogaScheduleResponse> schedules = yogaManagerService.getSchedulesByDate(date);
         List<YogaInstructor> instructors = yogaManagerService.getAllActiveInstructors();
 
-        model.addAttribute("schedules", schedules);
         model.addAttribute("classes", classes);
+        model.addAttribute("schedules", schedules);
         model.addAttribute("instructors", instructors);
         model.addAttribute("selectedDate", date);
+        model.addAttribute("activeTab", activeTab);
+
+        if (!model.containsAttribute("classRequest")) {
+            model.addAttribute("classRequest", new YogaClassRequest());
+        }
         if (!model.containsAttribute("scheduleRequest")) {
             model.addAttribute("scheduleRequest", new YogaScheduleRequest());
         }
-        return "manager/yoga-schedules";
     }
 
     @PostMapping("/schedules/create")
