@@ -42,7 +42,6 @@ public class RetreatPackageMasterServiceImpl implements RetreatPackageMasterServ
         existing.setTypePackage(retreatPackage.getTypePackage());
         existing.setPackageName(retreatPackage.getPackageName());
         existing.setDurationDays(retreatPackage.getDurationDays());
-        existing.setServices(retreatPackage.getServices());
         existing.setDescription(retreatPackage.getDescription());
         existing.setIsActive(retreatPackage.getIsActive());
         existing.setPrice(retreatPackage.getPrice());

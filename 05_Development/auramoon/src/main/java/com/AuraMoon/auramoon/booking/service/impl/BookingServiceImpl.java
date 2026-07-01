@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import com.AuraMoon.auramoon.booking.entity.RetreatPackageItinerary;
 
 @Service
 @RequiredArgsConstructor
@@ -163,26 +165,40 @@ public class BookingServiceImpl implements BookingService {
                 guestFolio.setStatus("OPEN");
                 guestFolioRepository.save(guestFolio);
 
-                // Auto create TreatmentBooking (Spa Ticket) for the guest with default active
-                // service
-                int durationDays = booking.getRetreatPackage().getDurationDays() != null
-                                ? booking.getRetreatPackage().getDurationDays()
-                                : 1;
+                // Auto create TreatmentBooking (Spa Ticket) for the guest based on package itinerary
+                List<RetreatPackageItinerary> itineraries = booking.getRetreatPackage().getItineraries();
+                if (itineraries != null && !itineraries.isEmpty()) {
+                        for (RetreatPackageItinerary itin : itineraries) {
+                                if (itin.getTreatmentService() != null) {
+                                        TreatmentBooking tb = new TreatmentBooking();
+                                        tb.setBookingId(bookingId);
+                                        tb.setTreatmentService(itin.getTreatmentService());
+                                        tb.setStatus("PENDING");
+                                        tb.setIsDelete(false);
+                                        treatmentBookingRepository.save(tb);
+                                }
+                        }
+                } else {
+                        // Fallback logic for old data / unit tests
+                        int durationDays = booking.getRetreatPackage().getDurationDays() != null
+                                        ? booking.getRetreatPackage().getDurationDays()
+                                        : 1;
 
-                treatmentServiceRepository.findAll().stream()
-                                .filter(s -> Boolean.TRUE.equals(s.getIsAvailable())
-                                                && Boolean.FALSE.equals(s.getIsDelete()))
-                                .findFirst()
-                                .ifPresent(service -> {
-                                        for (int i = 0; i < durationDays; i++) {
-                                                TreatmentBooking tb = new TreatmentBooking();
-                                                tb.setBookingId(bookingId);
-                                                tb.setTreatmentService(service);
-                                                tb.setStatus("PENDING");
-                                                tb.setIsDelete(false);
-                                                treatmentBookingRepository.save(tb);
-                                        }
-                                });
+                        treatmentServiceRepository.findAll().stream()
+                                        .filter(s -> Boolean.TRUE.equals(s.getIsAvailable())
+                                                        && Boolean.FALSE.equals(s.getIsDelete()))
+                                        .findFirst()
+                                        .ifPresent(service -> {
+                                                for (int i = 0; i < durationDays; i++) {
+                                                        TreatmentBooking tb = new TreatmentBooking();
+                                                        tb.setBookingId(bookingId);
+                                                        tb.setTreatmentService(service);
+                                                        tb.setStatus("PENDING");
+                                                        tb.setIsDelete(false);
+                                                        treatmentBookingRepository.save(tb);
+                                                }
+                                        });
+                }
         }
 
         @Override

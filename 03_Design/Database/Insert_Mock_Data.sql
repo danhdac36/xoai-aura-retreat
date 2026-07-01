@@ -70,10 +70,20 @@ INSERT INTO TREATMENT_ROOM (room_id, room_code, room_name, status, is_delete) VA
 SET IDENTITY_INSERT TREATMENT_ROOM OFF;
 
 SET IDENTITY_INSERT RETREAT_PACKAGE ON;
-INSERT INTO RETREAT_PACKAGE (package_id, type_package, package_name, duration_days, services, description, is_active, is_delete, price) VALUES
-(1, 'Wellness', N'Gói Trị Liệu Thư Giãn 3 Ngày', 3, 'TR001, TR002', N'Bao gồm 3 ngày nghỉ dưỡng, 2 liệu trình spa', 1, 0, 15000000),
-(2, 'Detox', N'Gói Thanh Lọc Cơ Thể 5 Ngày', 5, 'TR001, TR003', N'Thanh lọc cơ thể, ăn kiêng đặc biệt', 1, 0, 25000000);
+INSERT INTO RETREAT_PACKAGE (package_id, type_package, package_name, duration_days, description, is_active, is_delete, price) VALUES
+(1, 'Wellness', N'Gói Trị Liệu Thư Giãn 3 Ngày', 3, N'Bao gồm 3 ngày nghỉ dưỡng, 2 liệu trình spa', 1, 0, 15000000),
+(2, 'Detox', N'Gói Thanh Lọc Cơ Thể 5 Ngày', 5, N'Thanh lọc cơ thể, ăn kiêng đặc biệt', 1, 0, 25000000);
 SET IDENTITY_INSERT RETREAT_PACKAGE OFF;
+
+INSERT INTO RETREAT_PACKAGE_ITINERARY (package_id, day_number, service_id, meal_included, description) VALUES
+(1, 1, 1, 1, N'Massage Thái Toàn Thân (60p) + Buffet Trưa & Tối'),
+(1, 2, 2, 1, N'Chăm sóc da mặt chuyên sâu (90p) + Buffet Sáng, Trưa & Tối'),
+(1, 3, NULL, 1, N'Nghỉ ngơi thư giãn + Buffet Sáng & Trưa'),
+(2, 1, 1, 1, N'Massage Thái Toàn Thân + Thanh lọc cơ thể'),
+(2, 2, NULL, 1, N'Nghỉ ngơi & Thực đơn thanh lọc'),
+(2, 3, 3, 1, N'Bấm huyệt trị liệu + Thanh lọc cơ thể'),
+(2, 4, NULL, 1, N'Nghỉ ngơi & Thực đơn thanh lọc'),
+(2, 5, NULL, 1, N'Hoàn tất liệu trình');
 
 SET IDENTITY_INSERT MENU_ITEM ON;
 INSERT INTO MENU_ITEM (menu_item_id, item_name, price, ingredient, is_available, image_url) VALUES

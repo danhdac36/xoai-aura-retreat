@@ -179,18 +179,10 @@
             </li>
             <li sec:authorize="hasAnyRole('MANAGER', 'ADMIN')">
                 <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1"
-                   th:href="@{/manager/yoga/classes}">
-                    <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
-                    <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">fitness_center</span>
-                    <span class="text-[13px] tracking-wide font-medium">Yoga Classes</span>
-                </a>
-            </li>
-            <li sec:authorize="hasAnyRole('MANAGER', 'ADMIN')">
-                <a class="flex items-center px-6 py-3 text-[#d2c5af]/70 hover:text-[#d2c5af] transition-all duration-300 relative group hover:translate-x-1"
                    th:href="@{/manager/yoga/schedules}">
                     <div class="absolute left-0 top-1/2 -translate-y-1/2 h-0 w-[2px] bg-primary transition-all duration-300 opacity-0 rounded-r-full group-hover:h-[60%] group-hover:opacity-100"></div>
-                    <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">event_note</span>
-                    <span class="text-[13px] tracking-wide font-medium">Yoga Schedules</span>
+                    <span class="material-symbols-outlined mr-4 text-[18px] opacity-60 group-hover:opacity-100 transition-opacity duration-300">self_improvement</span>
+                    <span class="text-[13px] tracking-wide font-medium">Lớp &amp; Lịch học Yoga</span>
                 </a>
             </li>
             <li sec:authorize="hasAnyRole('MANAGER','ADMIN')">

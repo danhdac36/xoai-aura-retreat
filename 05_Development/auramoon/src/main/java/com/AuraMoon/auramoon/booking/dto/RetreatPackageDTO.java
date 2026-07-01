@@ -16,7 +16,6 @@ public class RetreatPackageDTO {
     private String typePackage;
     private String packageName;
     private Integer durationDays;
-    private String services;
     private String description;
     private BigDecimal price;
 }
