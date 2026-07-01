@@ -246,9 +246,9 @@ class ItineraryServiceImplTest {
         java.util.List<com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO> dtos = dtoPage.getContent();
 
         // Assert
-        assertNotNull(bookingsPage);
-        assertEquals(1, bookingsPage.getTotalElements());
-        com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO dto = bookingsPage.getContent().get(0);
+        assertNotNull(dtoPage);
+        assertEquals(1, dtoPage.getTotalElements());
+        com.AuraMoon.auramoon.booking.dto.BookingHistoryDTO dto = dtoPage.getContent().get(0);
         assertEquals(101, dto.getBookingId());
         assertEquals("Gói Tĩnh Dưỡng Cuối Tuần", dto.getPackageName());
         assertEquals("CHECKED_OUT", dto.getStatus());
