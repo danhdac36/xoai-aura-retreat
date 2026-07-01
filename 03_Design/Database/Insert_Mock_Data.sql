@@ -75,15 +75,25 @@ INSERT INTO RETREAT_PACKAGE (package_id, type_package, package_name, duration_da
 (2, 'Detox', N'Gói Thanh Lọc Cơ Thể 5 Ngày', 5, N'Thanh lọc cơ thể, ăn kiêng đặc biệt', 1, 0, 25000000);
 SET IDENTITY_INSERT RETREAT_PACKAGE OFF;
 
-INSERT INTO RETREAT_PACKAGE_ITINERARY (package_id, day_number, service_id, meal_included, description) VALUES
-(1, 1, 1, 1, N'Massage Thái Toàn Thân (60p) + Buffet Trưa & Tối'),
-(1, 2, 2, 1, N'Chăm sóc da mặt chuyên sâu (90p) + Buffet Sáng, Trưa & Tối'),
-(1, 3, NULL, 1, N'Nghỉ ngơi thư giãn + Buffet Sáng & Trưa'),
-(2, 1, 1, 1, N'Massage Thái Toàn Thân + Thanh lọc cơ thể'),
-(2, 2, NULL, 1, N'Nghỉ ngơi & Thực đơn thanh lọc'),
-(2, 3, 3, 1, N'Bấm huyệt trị liệu + Thanh lọc cơ thể'),
-(2, 4, NULL, 1, N'Nghỉ ngơi & Thực đơn thanh lọc'),
-(2, 5, NULL, 1, N'Hoàn tất liệu trình');
+INSERT INTO RETREAT_PACKAGE_ITINERARY (package_id, day_number, activity_name, service_code, location, description) VALUES
+-- Gói 1: 3 Ngày
+(1, 1, N'Nhận phòng (Check-in)', NULL, N'Sảnh Lễ tân', N'Làm thủ tục nhận phòng Villa và thưởng thức trà chào mừng.'),
+(1, 1, N'Tư vấn sức khỏe & Thiết lập lộ trình', NULL, N'Aura Spa', N'Gặp gỡ chuyên gia trị liệu đo chỉ số sinh học và tư vấn.'),
+(1, 1, N'Bữa tối Dinh dưỡng hữu cơ', NULL, N'Nhà hàng Thực dưỡng', N'Thực đơn nhẹ nhàng, thanh đạm phục hồi cơ thể.'),
+(1, 2, N'Bữa sáng Dinh dưỡng', NULL, N'Nhà hàng Thực dưỡng', N'Thực đơn sinh tố xanh và ngũ cốc nguyên cám.'),
+(1, 2, N'Lớp Yoga buổi sáng', NULL, N'Phòng tập Yoga', N'Lớp Yoga khởi động khớp và đánh thức năng lượng.'),
+(1, 2, N'Bữa trưa Thanh nhẹ', NULL, N'Nhà hàng Thực dưỡng', N'Bữa ăn lành mạnh cân bằng đạm và dưỡng chất thực vật.'),
+(1, 2, N'Trị liệu: Massage Thái Toàn Thân', 'TR001', N'Aura Spa', N'Liệu trình massage tinh dầu thảo dược và bấm huyệt.'),
+(1, 2, N'Bữa tối nhẹ nhàng', NULL, N'Nhà hàng Thực dưỡng', N'Bữa ăn thanh đạm trước khi đi ngủ.'),
+(1, 3, N'Bữa sáng Tạm biệt', NULL, N'Nhà hàng Thực dưỡng', N'Thực đơn trà thảo mộc cùng bánh ngũ cốc organic.'),
+(1, 3, N'Trị liệu: Chăm sóc da mặt chuyên sâu', 'TR002', N'Aura Spa', N'Nuôi dưỡng làn da và thư giãn gân cốt.'),
+(1, 3, N'Trả phòng (Check-out)', NULL, N'Sảnh Lễ tân', N'Làm thủ tục check out phòng và kết thúc kỳ nghỉ dưỡng.'),
+-- Gói 2: 5 Ngày
+(2, 1, N'Massage Thái Toàn Thân', 'TR001', N'Aura Spa', N'Liệu trình Massage Thái thư giãn phục hồi cơ thể.'),
+(2, 2, N'Nghỉ ngơi & Thực đơn thanh lọc', NULL, N'Nhà hàng Thực dưỡng', N'Bữa ăn dinh dưỡng thanh lọc nhẹ nhàng.'),
+(2, 3, N'Bấm huyệt trị liệu', 'TR003', N'Aura Spa', N'Bấm huyệt điều hòa khí huyết giảm mệt mỏi.'),
+(2, 4, N'Nghỉ ngơi & Thực đơn thanh lọc', NULL, N'Nhà hàng Thực dưỡng', N'Bữa ăn dinh dưỡng thanh lọc nhẹ nhàng.'),
+(2, 5, N'Hoàn tất liệu trình', NULL, N'Sảnh Lễ tân', N'Tư vấn sau liệu trình và làm thủ tục check-out.');
 
 SET IDENTITY_INSERT MENU_ITEM ON;
 INSERT INTO MENU_ITEM (menu_item_id, item_name, price, ingredient, is_available, image_url) VALUES

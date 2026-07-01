@@ -63,15 +63,17 @@
                             <span class="font-body-md text-on-surface-variant pb-2" th:text="'/ ' + ${pkg.durationDays} + ' Ngày'">/ 3 Đêm</span>
                         </div>
                         <ul class="space-y-6 font-body-md text-on-surface mb-10">
-                            <!-- Loop through services -->
-                            <li th:if="${pkg.services != null && !pkg.services.isEmpty()}" th:each="service, stat : ${#strings.arraySplit(pkg.services, ',')}" class="flex items-start gap-4">
-                                <span class="material-symbols-outlined text-primary mt-1" th:text="${stat.index % 4 == 0 ? 'self_improvement' : (stat.index % 4 == 1 ? 'spa' : (stat.index % 4 == 2 ? 'restaurant' : 'villa'))}">self_improvement</span>
+                            <!-- Loop through itineraries -->
+                            <li th:if="${pkg.itineraries != null && !pkg.itineraries.isEmpty()}" th:each="itin : ${pkg.itineraries}" class="flex items-start gap-4">
+                                <span class="material-symbols-outlined text-primary mt-1" th:text="${itin.serviceCode != null ? 'spa' : (itin.activityName != null && #strings.contains(itin.activityName, 'Ăn') || #strings.contains(itin.activityName, 'Bữa') ? 'restaurant' : (itin.activityName != null && #strings.contains(itin.activityName, 'Yoga') ? 'self_improvement' : 'villa'))}">spa</span>
                                 <div>
-                                    <strong class="block font-medium mb-1" th:text="${#strings.trim(service)}">Dịch vụ</strong>
+                                    <span class="text-xs font-semibold text-secondary/70 uppercase block" th:text="'Ngày ' + ${itin.dayNumber}">Ngày 1</span>
+                                    <strong class="block font-medium mb-1" th:text="${itin.activityName != null ? itin.activityName : itin.description}">Dịch vụ</strong>
+                                    <span class="text-on-surface-variant text-sm block" th:if="${itin.activityName != null}" th:text="${itin.description}">Mô tả</span>
                                 </div>
                             </li>
-                            <!-- Fallback if no services -->
-                            <li th:if="${pkg.services == null || pkg.services.isEmpty()}" class="flex items-start gap-4">
+                            <!-- Fallback if no itineraries -->
+                            <li th:if="${pkg.itineraries == null || pkg.itineraries.isEmpty()}" class="flex items-start gap-4">
                                 <span class="material-symbols-outlined text-primary mt-1">spa</span>
                                 <div>
                                     <strong class="block font-medium mb-1">Dịch vụ chuẩn 5 sao</strong>

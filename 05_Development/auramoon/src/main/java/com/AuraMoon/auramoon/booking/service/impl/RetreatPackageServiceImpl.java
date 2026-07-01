@@ -4,6 +4,7 @@ import com.AuraMoon.auramoon.booking.dto.RetreatPackageDTO;
 import com.AuraMoon.auramoon.booking.entity.RetreatPackage;
 import com.AuraMoon.auramoon.booking.repository.RetreatPackageRepository;
 import com.AuraMoon.auramoon.booking.service.RetreatPackageService;
+import com.AuraMoon.auramoon.booking.dto.RetreatPackageItineraryDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,17 @@ public class RetreatPackageServiceImpl implements RetreatPackageService {
     }
 
     private RetreatPackageDTO convertToDTO(RetreatPackage retreatPackage) {
+        List<RetreatPackageItineraryDTO> itineraryDTOs = retreatPackage.getItineraries() != null ?
+                retreatPackage.getItineraries().stream()
+                        .map(i -> RetreatPackageItineraryDTO.builder()
+                                .dayNumber(i.getDayNumber())
+                                .activityName(i.getActivityName())
+                                .serviceCode(i.getServiceCode())
+                                .location(i.getLocation())
+                                .description(i.getDescription())
+                                .build())
+                        .collect(Collectors.toList()) : null;
+
         return RetreatPackageDTO.builder()
                 .id(retreatPackage.getId())
                 .typePackage(retreatPackage.getTypePackage())
@@ -45,6 +57,7 @@ public class RetreatPackageServiceImpl implements RetreatPackageService {
                 .durationDays(retreatPackage.getDurationDays())
                 .description(retreatPackage.getDescription())
                 .price(retreatPackage.getPrice())
+                .itineraries(itineraryDTOs)
                 .build();
     }
 

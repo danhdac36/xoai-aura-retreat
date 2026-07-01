@@ -131,14 +131,14 @@ GO
 
 -- Table RETREAT_PACKAGE_ITINERARY
 CREATE TABLE RETREAT_PACKAGE_ITINERARY (
-    itinerary_id INT IDENTITY(1,1) PRIMARY KEY,
+    itinerary_template_id INT IDENTITY(1,1) PRIMARY KEY,
     package_id INT NOT NULL,
     day_number INT NOT NULL,
-    service_id INT,
-    meal_included BIT DEFAULT 0,
+    activity_name NVARCHAR(100),
+    service_code VARCHAR(10),
+    location NVARCHAR(100),
     description NVARCHAR(255),
-    CONSTRAINT FK_ITIN_PKG FOREIGN KEY (package_id) REFERENCES RETREAT_PACKAGE(package_id),
-    CONSTRAINT FK_ITIN_SVC FOREIGN KEY (service_id) REFERENCES TREATMENT_SERVICE(service_id)
+    CONSTRAINT FK_ITIN_PKG FOREIGN KEY (package_id) REFERENCES RETREAT_PACKAGE(package_id)
 );
 GO
 
