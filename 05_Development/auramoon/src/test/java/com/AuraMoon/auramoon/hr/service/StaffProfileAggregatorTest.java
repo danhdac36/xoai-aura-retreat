@@ -44,9 +44,6 @@ public class StaffProfileAggregatorTest {
     @Mock
     private com.AuraMoon.auramoon.booking.repository.BookingRepository bookingRepository;
 
-    @Mock
-    private com.AuraMoon.auramoon.spa.repository.ScheduleRepository scheduleRepository;
-
     @InjectMocks
     private StaffProfileAggregator aggregator;
 
