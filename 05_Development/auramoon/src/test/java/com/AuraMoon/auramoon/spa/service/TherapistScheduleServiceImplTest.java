@@ -19,6 +19,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.AuraMoon.auramoon.booking.repository.BookingRepository;
+import com.AuraMoon.auramoon.spa.repository.PhysicalHealthProfileRepository;
+import com.AuraMoon.auramoon.auth.repository.UserRepository;
+
 @ExtendWith(MockitoExtension.class)
 class TherapistScheduleServiceImplTest {
 
@@ -27,6 +31,15 @@ class TherapistScheduleServiceImplTest {
 
     @Mock
     private TreatmentBookingRepository treatmentBookingRepository;
+
+    @Mock
+    private BookingRepository bookingRepository;
+
+    @Mock
+    private PhysicalHealthProfileRepository physicalHealthProfileRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private TherapistScheduleServiceImpl therapistScheduleService;
@@ -110,8 +123,8 @@ class TherapistScheduleServiceImplTest {
     }
 
     @Test
-    @DisplayName("Hoàn tác thành công từ trạng thái Ongoing về Scheduled (Hủy Vào ca)")
-    void updateSessionStatus_ongoingToScheduled_updatesStatusSuccessfully() {
+    @DisplayName("Lỗi khi hoàn tác từ trạng thái Ongoing về Scheduled (Hủy Vào ca)")
+    void updateSessionStatus_ongoingToScheduled_throwsSpaBusinessException() {
         // Arrange
         Integer scheduleId = 4;
         String therapistCode = "T002";
@@ -127,17 +140,17 @@ class TherapistScheduleServiceImplTest {
 
         when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
 
-        // Act
-        therapistScheduleService.updateSessionStatus(scheduleId, therapistCode, newStatus);
-
-        // Assert
-        assertEquals("Scheduled", booking.getStatus());
-        verify(treatmentBookingRepository, times(1)).save(booking);
+        // Act & Assert
+        SpaBusinessException exception = assertThrows(SpaBusinessException.class, () -> 
+            therapistScheduleService.updateSessionStatus(scheduleId, therapistCode, newStatus)
+        );
+        assertEquals("SPA-015", exception.getErrorCode());
+        verify(treatmentBookingRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Hoàn tác thành công từ trạng thái Completed về Ongoing (Hủy Hoàn thành)")
-    void updateSessionStatus_completedToOngoing_updatesStatusSuccessfully() {
+    @DisplayName("Lỗi khi hoàn tác từ trạng thái Completed về Ongoing (Hủy Hoàn thành)")
+    void updateSessionStatus_completedToOngoing_throwsSpaBusinessException() {
         // Arrange
         Integer scheduleId = 5;
         String therapistCode = "T002";
@@ -153,17 +166,17 @@ class TherapistScheduleServiceImplTest {
 
         when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
 
-        // Act
-        therapistScheduleService.updateSessionStatus(scheduleId, therapistCode, newStatus);
-
-        // Assert
-        assertEquals("Ongoing", booking.getStatus());
-        verify(treatmentBookingRepository, times(1)).save(booking);
+        // Act & Assert
+        SpaBusinessException exception = assertThrows(SpaBusinessException.class, () -> 
+            therapistScheduleService.updateSessionStatus(scheduleId, therapistCode, newStatus)
+        );
+        assertEquals("SPA-015", exception.getErrorCode());
+        verify(treatmentBookingRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Hoàn tác thành công từ trạng thái No-Show về Scheduled (Hủy Vắng mặt)")
-    void updateSessionStatus_noShowToScheduled_updatesStatusSuccessfully() {
+    @DisplayName("Lỗi khi hoàn tác từ trạng thái No-Show về Scheduled (Hủy Vắng mặt)")
+    void updateSessionStatus_noShowToScheduled_throwsSpaBusinessException() {
         // Arrange
         Integer scheduleId = 6;
         String therapistCode = "T002";
@@ -179,12 +192,12 @@ class TherapistScheduleServiceImplTest {
 
         when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
 
-        // Act
-        therapistScheduleService.updateSessionStatus(scheduleId, therapistCode, newStatus);
-
-        // Assert
-        assertEquals("Scheduled", booking.getStatus());
-        verify(treatmentBookingRepository, times(1)).save(booking);
+        // Act & Assert
+        SpaBusinessException exception = assertThrows(SpaBusinessException.class, () -> 
+            therapistScheduleService.updateSessionStatus(scheduleId, therapistCode, newStatus)
+        );
+        assertEquals("SPA-015", exception.getErrorCode());
+        verify(treatmentBookingRepository, never()).save(any());
     }
 
     @Test

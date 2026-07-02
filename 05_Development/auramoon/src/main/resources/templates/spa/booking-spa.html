@@ -379,9 +379,8 @@
 
         document.getElementById('summary-date').innerText = `${todayReal.getDate()} Tháng ${todayReal.getMonth() + 1}, ${todayReal.getFullYear()}`;
 
-        // Fetch active package data on load
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Highlight Sidebar active link for Spa Booking
+        // Highlight Sidebar active link for Spa Booking on load
+        document.addEventListener('DOMContentLoaded', () => {
             const spaBookingLink = document.querySelector('aside a[href="/guest/booking-spa"]');
             if (spaBookingLink) {
                 spaBookingLink.classList.remove('text-[#d2c5af]/70');
@@ -394,9 +393,16 @@
                 const icon = spaBookingLink.querySelector('span.material-symbols-outlined');
                 if (icon) icon.classList.remove('opacity-60');
             }
+            loadActivePackage(selectedDate);
+        });
 
+        async function loadActivePackage(dateStr) {
             try {
-                const res = await fetch('/guest/booking-spa/active-package');
+                // Clear duration text if it exists
+                const durationSpans = document.getElementById('summary-time-val').parentNode.querySelectorAll('span.text-stone-400');
+                durationSpans.forEach(s => s.remove());
+
+                const res = await fetch(`/guest/booking-spa/active-package?date=${dateStr}`);
                 const data = await res.json();
                 
                 if (res.ok) {
@@ -409,46 +415,66 @@
                     
                     // Set service image if available
                     if (data.imageUrl && data.imageUrl.trim() !== '') {
-                        document.getElementById('ui-service-image').src = data.imageUrl;
+                        const imgEl = document.getElementById('ui-service-image');
+                        if (imgEl) imgEl.src = data.imageUrl;
                     }
                     
-                    // Update summary
-                    document.getElementById('summary-time-val').innerText = selectedTime;
-                    const durationText = document.createElement('span');
-                    durationText.className = 'text-stone-400 font-normal ml-1 text-xs';
-                    durationText.innerText = `(${data.durationMinutes} phút)`;
-                    document.getElementById('summary-time-val').parentNode.appendChild(durationText);
+                    // Update summary duration
+                    if (selectedTime !== "Chưa chọn") {
+                        const durationText = document.createElement('span');
+                        durationText.className = 'text-stone-400 font-normal ml-1 text-xs';
+                        durationText.innerText = `(${data.durationMinutes} phút)`;
+                        document.getElementById('summary-time-val').parentNode.appendChild(durationText);
+                    }
                     
-                    // Fetch available slots for today
-                    fetchAvailableSlots(selectedDate);
+                    // Enable/Disable submit button base on already scheduled state
+                    const submitBtn = document.getElementById('submitBtn');
+                    if (data.isAlreadyScheduled) {
+                        submitBtn.disabled = true;
+                        submitBtn.classList.remove('bg-secondary', 'hover:scale-[0.99]');
+                        submitBtn.classList.add('bg-stone-200', 'text-stone-400', 'cursor-not-allowed');
+                        submitBtn.innerText = "Đã đặt lịch";
+                    } else {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.add('bg-secondary', 'hover:scale-[0.99]');
+                        submitBtn.classList.remove('bg-stone-200', 'text-stone-400', 'cursor-not-allowed');
+                        submitBtn.innerText = "Xác nhận đặt lịch";
+                    }
+
+                    // Fetch available slots
+                    fetchAvailableSlots(dateStr);
                 } else {
                     currentBookingId = null;
-                    document.getElementById('ui-service-name').innerText = "Chưa có dữ liệu";
-                    document.getElementById('ui-service-price').innerText = data.error || "Bạn chưa thực hiện đặt trước.";
+                    document.getElementById('ui-service-name').innerText = "Không có liệu trình";
+                    document.getElementById('ui-service-price').innerText = data.error || "Không có liệu trình cho ngày này.";
                     document.getElementById('summary-time-val').innerText = "Chưa xác định";
 
                     // Display friendly warning message under Chọn giờ
                     document.getElementById('time-slots-loading').innerHTML = `
                         <div class="flex flex-col items-center gap-2 text-stone-500 text-center px-4 py-8">
                             <span class="material-symbols-outlined text-stone-400 text-3xl">info</span>
-                            <p class="text-xs font-semibold uppercase tracking-wider text-stone-400">Không thể tải khung giờ</p>
-                            <p class="text-xs text-stone-500 font-medium">${data.error || "Vui lòng Check-In tại quầy lễ tân."}</p>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-stone-400">Không có lịch Spa</p>
+                            <p class="text-xs text-stone-500 font-medium">${data.error || "Vui lòng chọn ngày khác."}</p>
                         </div>
                     `;
                     document.getElementById('time-slots-loading').classList.remove('hidden');
+                    document.getElementById('time-slots-morning').innerHTML = '';
+                    document.getElementById('time-slots-afternoon').innerHTML = '';
+                    document.getElementById('time-slots-evening').innerHTML = '';
 
                     // Disable submit button
                     const submitBtn = document.getElementById('submitBtn');
                     submitBtn.disabled = true;
                     submitBtn.classList.remove('bg-secondary', 'hover:scale-[0.99]');
                     submitBtn.classList.add('bg-stone-200', 'text-stone-400', 'cursor-not-allowed');
+                    submitBtn.innerText = "Xác nhận đặt lịch";
                 }
             } catch (error) {
                 console.error("Failed to load active package", error);
                 document.getElementById('ui-service-name').innerText = "Lỗi kết nối máy chủ";
                 document.getElementById('ui-service-price').innerText = "Không thể tải dịch vụ";
             }
-        });
+        }
 
         // Minimalist Date Picker Logic
         let displayDate = new Date();
@@ -497,7 +523,7 @@
                         renderCalendar();
                         document.getElementById('summary-date').innerText = `${i} Tháng ${month + 1}, ${year}`;
                         
-                        fetchAvailableSlots(selectedDate);
+                        loadActivePackage(selectedDate);
                     });
                 }
                 

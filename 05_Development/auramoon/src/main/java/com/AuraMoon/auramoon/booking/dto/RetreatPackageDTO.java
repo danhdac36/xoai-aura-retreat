@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,4 +19,5 @@ public class RetreatPackageDTO {
     private Integer durationDays;
     private String description;
     private BigDecimal price;
+    private List<RetreatPackageItineraryDTO> itineraries;
 }

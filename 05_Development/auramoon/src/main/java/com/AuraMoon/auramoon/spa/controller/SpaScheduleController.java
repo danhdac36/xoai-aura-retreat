@@ -51,49 +51,116 @@ public class SpaScheduleController {
 
     @GetMapping("/active-package")
     @ResponseBody
-    public ResponseEntity<?> getActivePackage(@AuthenticationPrincipal UserDetailsResponse userDetails) {
+    public ResponseEntity<?> getActivePackage(
+            @RequestParam(value = "date", required = false) String dateStr,
+            @AuthenticationPrincipal UserDetailsResponse userDetails) {
         Integer userId = userDetails.getId();
 
-        List<TreatmentBooking> unscheduledBookings = treatmentBookingRepository.findUnscheduledBookingsByGuestId(userId);
+        // 1. Find the guest's Checked-In Booking
+        List<Booking> activeBookings = bookingRepository.findAll().stream()
+                .filter(b -> b.getGuestId().equals(userId) &&
+                        ("CHECKED_IN".equalsIgnoreCase(b.getBookingStatus())
+                        || "Checked-In".equalsIgnoreCase(b.getBookingStatus())
+                        || "CHECKED-IN".equalsIgnoreCase(b.getBookingStatus())))
+                .toList();
 
-        // 1. Tìm TreatmentBooking thuộc các Booking đang Checked-In
-        Optional<TreatmentBooking> checkedInBooking = unscheduledBookings.stream()
-                .filter(tb -> {
-                    Booking b = bookingRepository.findById(tb.getBookingId()).orElse(null);
-                    return b != null && ("CHECKED_IN".equalsIgnoreCase(b.getBookingStatus())
-                            || "Checked-In".equalsIgnoreCase(b.getBookingStatus())
-                            || "CHECKED-IN".equalsIgnoreCase(b.getBookingStatus()));
-                })
+        if (activeBookings.isEmpty()) {
+            boolean hasUpcomingBooking = bookingRepository.findAll().stream()
+                    .anyMatch(b -> b.getGuestId().equals(userId) &&
+                            ("CONFIRMED".equalsIgnoreCase(b.getBookingStatus())
+                            || "PENDING".equalsIgnoreCase(b.getBookingStatus())));
+            if (hasUpcomingBooking) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Bạn chỉ được phép đặt lịch Spa sau khi đã thực hiện Check-In tại quầy lễ tân."));
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Bạn chưa thực hiện đặt trước"));
+        }
+
+        Booking booking = activeBookings.get(0);
+        com.AuraMoon.auramoon.booking.entity.RetreatPackage pkg = booking.getRetreatPackage();
+        if (pkg == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Booking của bạn không đi kèm gói nghỉ dưỡng."));
+        }
+
+        // 2. Determine target date and day number of stay
+        LocalDate targetDate = LocalDate.now();
+        if (dateStr != null && !dateStr.trim().isEmpty()) {
+            try {
+                targetDate = LocalDate.parse(dateStr);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Định dạng ngày gửi lên không hợp lệ."));
+            }
+        }
+
+        LocalDate checkin = booking.getCheckinDate().toLocalDate();
+        long dayNumber = java.time.temporal.ChronoUnit.DAYS.between(checkin, targetDate) + 1;
+
+        if (dayNumber < 1 || dayNumber > pkg.getDurationDays()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Ngày trị liệu được chọn (" + targetDate + ") nằm ngoài thời gian kỳ nghỉ của bạn (Ngày thứ " + dayNumber + " của gói " + pkg.getDurationDays() + " ngày)."));
+        }
+
+        // 3. Find Spa activity in package itinerary for this day
+        List<com.AuraMoon.auramoon.booking.entity.RetreatPackageItinerary> itineraries = pkg.getItineraries();
+        com.AuraMoon.auramoon.booking.entity.RetreatPackageItinerary dayItin = null;
+        if (itineraries != null) {
+            dayItin = itineraries.stream()
+                    .filter(i -> i.getDayNumber().equals((int) dayNumber) && i.getServiceCode() != null && !i.getServiceCode().trim().isEmpty())
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        if (dayItin == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Không có dịch vụ Spa nào được thiết kế cho ngày thứ " + dayNumber + " (" + targetDate.toString() + ") trong gói của bạn."));
+        }
+
+        // 4. Find corresponding TreatmentBooking
+        String serviceCode = dayItin.getServiceCode().trim();
+        List<TreatmentBooking> tbList = treatmentBookingRepository.findByBookingId(booking.getId());
+        Optional<TreatmentBooking> unscheduledSpa = tbList.stream()
+                .filter(tb -> tb.getTreatmentService() != null
+                        && serviceCode.equalsIgnoreCase(tb.getTreatmentService().getTreatmentCode())
+                        && "PENDING".equalsIgnoreCase(tb.getStatus())
+                        && Boolean.FALSE.equals(tb.getIsDelete()))
                 .findFirst();
 
-        if (checkedInBooking.isPresent()) {
-            TreatmentBooking booking = checkedInBooking.get();
-            Map<String, Object> activePackage = new HashMap<>();
-            activePackage.put("bookingId", booking.getBookingId());
-            activePackage.put("serviceId", booking.getTreatmentService().getId());
-            activePackage.put("serviceName", booking.getTreatmentService().getServiceName());
-            activePackage.put("durationMinutes", booking.getTreatmentService().getDurationMinutes());
-            activePackage.put("priceInfo", "Đã bao gồm trong Gói Retreat");
-            return ResponseEntity.ok(activePackage);
+        if (unscheduledSpa.isEmpty()) {
+            Optional<TreatmentBooking> scheduledSpa = tbList.stream()
+                    .filter(tb -> tb.getTreatmentService() != null
+                            && serviceCode.equalsIgnoreCase(tb.getTreatmentService().getTreatmentCode())
+                            && !"PENDING".equalsIgnoreCase(tb.getStatus())
+                            && Boolean.FALSE.equals(tb.getIsDelete()))
+                    .findFirst();
+
+            if (scheduledSpa.isPresent()) {
+                TreatmentBooking tb = scheduledSpa.get();
+                Map<String, Object> activePackage = new HashMap<>();
+                activePackage.put("bookingId", booking.getId());
+                activePackage.put("serviceId", tb.getTreatmentService().getId());
+                activePackage.put("serviceName", tb.getTreatmentService().getServiceName());
+                activePackage.put("durationMinutes", tb.getTreatmentService().getDurationMinutes());
+                activePackage.put("priceInfo", "Đã bao gồm trong Gói Retreat (Đã đặt lịch thành công)");
+                activePackage.put("isAlreadyScheduled", true);
+                return ResponseEntity.ok(activePackage);
+            }
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Không tìm thấy vé trị liệu Spa khả dụng cho ngày thứ " + dayNumber + " (Dịch vụ: " + serviceCode + ")."));
         }
 
-        // 2. Nếu không có booking Checked-In, kiểm tra xem có booking sắp tới nào (CONFIRMED hoặc PENDING)
-        boolean hasUpcomingBooking = unscheduledBookings.stream()
-                .anyMatch(tb -> {
-                    Booking b = bookingRepository.findById(tb.getBookingId()).orElse(null);
-                    return b != null && ("CONFIRMED".equalsIgnoreCase(b.getBookingStatus())
-                            || "PENDING".equalsIgnoreCase(b.getBookingStatus()));
-                });
-
-        if (hasUpcomingBooking) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("error",
-                            "Bạn chỉ được phép đặt lịch Spa sau khi đã thực hiện Check-In tại quầy lễ tân."));
-        }
-
-        // 3. Không tìm thấy bất kỳ gói booking nào khả dụng
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error", "Bạn chưa thực hiện đặt trước"));
+        TreatmentBooking tBooking = unscheduledSpa.get();
+        Map<String, Object> activePackage = new HashMap<>();
+        activePackage.put("bookingId", tBooking.getBookingId());
+        activePackage.put("serviceId", tBooking.getTreatmentService().getId());
+        activePackage.put("serviceName", tBooking.getTreatmentService().getServiceName());
+        activePackage.put("durationMinutes", tBooking.getTreatmentService().getDurationMinutes());
+        activePackage.put("priceInfo", "Đã bao gồm trong Gói Retreat");
+        activePackage.put("isAlreadyScheduled", false);
+        return ResponseEntity.ok(activePackage);
     }
 
     @GetMapping("/available-slots")

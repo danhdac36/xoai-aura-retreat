@@ -14,6 +14,7 @@ import com.AuraMoon.auramoon.spa.entity.TreatmentBooking;
 public interface TreatmentBookingRepository extends JpaRepository<TreatmentBooking, Integer> {
 
     List<TreatmentBooking> findByBookingIdAndTreatmentService_Id(Integer bookingId, Integer serviceId);
+    List<TreatmentBooking> findByBookingId(Integer bookingId);
 
     @Query(value = "SELECT tb.* FROM TREATMENT_BOOKING tb " +
             "JOIN BOOKING b ON tb.booking_id = b.booking_id " +

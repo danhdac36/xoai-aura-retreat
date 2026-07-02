@@ -1,6 +1,5 @@
 package com.AuraMoon.auramoon.booking.entity;
 
-import com.AuraMoon.auramoon.spa.entity.TreatmentService;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +13,7 @@ public class RetreatPackageItinerary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "itinerary_id")
+    @Column(name = "itinerary_template_id")
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,13 +25,14 @@ public class RetreatPackageItinerary {
     @Column(name = "day_number", nullable = false)
     private Integer dayNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id")
-    private TreatmentService treatmentService;
+    @Column(name = "activity_name", length = 100)
+    private String activityName;
 
-    @Column(name = "meal_included")
-    @Builder.Default
-    private Boolean mealIncluded = false;
+    @Column(name = "service_code", length = 10)
+    private String serviceCode;
+
+    @Column(name = "location", length = 100)
+    private String location;
 
     @Column(name = "description", length = 255)
     private String description;

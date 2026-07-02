@@ -169,13 +169,16 @@ public class BookingServiceImpl implements BookingService {
                 List<RetreatPackageItinerary> itineraries = booking.getRetreatPackage().getItineraries();
                 if (itineraries != null && !itineraries.isEmpty()) {
                         for (RetreatPackageItinerary itin : itineraries) {
-                                if (itin.getTreatmentService() != null) {
-                                        TreatmentBooking tb = new TreatmentBooking();
-                                        tb.setBookingId(bookingId);
-                                        tb.setTreatmentService(itin.getTreatmentService());
-                                        tb.setStatus("PENDING");
-                                        tb.setIsDelete(false);
-                                        treatmentBookingRepository.save(tb);
+                                if (itin.getServiceCode() != null && !itin.getServiceCode().trim().isEmpty()) {
+                                        treatmentServiceRepository.findByTreatmentCode(itin.getServiceCode().trim())
+                                                .ifPresent(service -> {
+                                                        TreatmentBooking tb = new TreatmentBooking();
+                                                        tb.setBookingId(bookingId);
+                                                        tb.setTreatmentService(service);
+                                                        tb.setStatus("PENDING");
+                                                        tb.setIsDelete(false);
+                                                        treatmentBookingRepository.save(tb);
+                                                });
                                 }
                         }
                 } else {
