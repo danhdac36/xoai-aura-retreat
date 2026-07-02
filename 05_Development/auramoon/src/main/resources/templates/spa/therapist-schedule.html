@@ -100,6 +100,19 @@
     </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
+
+        @keyframes strongHeartBeat {
+            0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(239, 68, 68, 0)); }
+            20% { transform: scale(1.35); filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8)); }
+            40% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(239, 68, 68, 0)); }
+            60% { transform: scale(1.35); filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8)); }
+            80% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(239, 68, 68, 0)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(239, 68, 68, 0)); }
+        }
+        .animate-heart-beat {
+            display: inline-block;
+            animation: strongHeartBeat 1.2s infinite ease-in-out;
+        }
         
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -306,20 +319,35 @@
                             <!-- Service & Room Column -->
                             <td class="py-4 px-5 align-middle text-center border-y border-stone-200/40 bg-white/60 group-hover:bg-[#faf8f5] transition-colors duration-300">
                                 <h3 class="font-serif text-base text-[#2b3327] font-semibold mb-0.5" th:text="${schedule.serviceName}">Tên Dịch Vụ</h3>
-                                <div class="flex items-center justify-center gap-1 text-stone-500 text-xs font-medium">
+                                <div class="flex items-center justify-center gap-1.5 text-stone-500 text-xs font-medium mt-0.5">
                                     <span class="material-symbols-outlined text-[15px] text-stone-400">room</span>
                                     <span th:text="${schedule.roomName}">Tên Phòng</span>
                                 </div>
                             </td>
                             <!-- Notes Column -->
                             <td class="py-4 px-5 align-middle text-center border-y border-stone-200/40 bg-white/60 group-hover:bg-[#faf8f5] transition-colors duration-300">
-                                <div class="flex justify-center" th:if="${schedule.note != null and !schedule.note.isEmpty()}">
-                                    <div class="text-stone-600 italic bg-[#faf8f5] px-3.5 py-2 rounded-xl border border-stone-200/40 text-xs inline-block text-left max-w-xs shadow-sm">
-                                        <span th:text="${schedule.note}">Ghi chú...</span>
+                                <div class="flex items-center justify-center gap-2 flex-wrap">
+                                    <!-- Booking Note -->
+                                    <div th:if="${schedule.note != null and !schedule.note.isEmpty()}">
+                                        <div class="text-stone-600 italic bg-[#faf8f5] px-3.5 py-2 rounded-xl border border-stone-200/40 text-xs inline-block text-left max-w-xs shadow-sm">
+                                            <span th:text="${schedule.note}">Ghi chú...</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="text-stone-300 italic text-xs text-center" th:if="${schedule.note == null or schedule.note.isEmpty()}">
-                                    --
+                                    <div class="text-stone-300 italic text-xs text-center" th:if="${(schedule.note == null or schedule.note.isEmpty()) and (schedule.medicalConditions == null and schedule.injuries == null)}">
+                                        --
+                                    </div>
+
+                                    <!-- Blinking Heart Icon for Physical Health Warning -->
+                                    <button th:if="${schedule.medicalConditions != null or schedule.injuries != null}"
+                                            type="button"
+                                            th:data-guest-name="${schedule.guestName}"
+                                            th:data-medical="${schedule.medicalConditions}"
+                                            th:data-injuries="${schedule.injuries}"
+                                            onclick="showHealthModal(this)"
+                                            class="inline-flex items-center justify-center p-2 rounded-xl bg-rose-50 border border-rose-200/60 text-rose-600 hover:bg-rose-100 transition-all active:scale-95 cursor-pointer relative group shadow-sm"
+                                            title="Bấm để xem lưu ý sức khỏe vật lý">
+                                        <span class="material-symbols-outlined text-rose-500 text-[20px] font-bold animate-heart-beat fill-current">favorite</span>
+                                    </button>
                                 </div>
                             </td>
                             <!-- Status & Actions Column -->
@@ -374,43 +402,8 @@
                                                 <input type="hidden" name="status" value="Completed" />
                                                 <input type="hidden" name="date" th:value="${#temporals.format(selectedDate, 'yyyy-MM-dd')}" />
                                                 <button type="submit"
-                                                        class="bg-[#3a4536] text-[#d2c5af] px-4 py-2 rounded-xl font-sans text-[10px] font-bold uppercase tracking-wider hover:bg-[#2b3327] transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-1.5 active:scale-95">
+                                                         class="bg-[#3a4536] text-[#d2c5af] px-4 py-2 rounded-xl font-sans text-[10px] font-bold uppercase tracking-wider hover:bg-[#2b3327] transition-all duration-300 shadow-sm hover:shadow-md flex items-center gap-1.5 active:scale-95">
                                                     <span class="material-symbols-outlined text-[14px]">check</span> Hoàn thành
-                                                </button>
-                                            </form>
-                                            <form th:action="@{/therapist/schedules/update-status}" method="post" class="m-0">
-                                                <input type="hidden" name="scheduleId" th:value="${schedule.scheduleId}" />
-                                                <input type="hidden" name="status" value="Scheduled" />
-                                                <input type="hidden" name="date" th:value="${#temporals.format(selectedDate, 'yyyy-MM-dd')}" />
-                                                <button type="submit"
-                                                        class="bg-white text-stone-600 border border-stone-200 px-4 py-2 rounded-xl font-sans text-[10px] font-bold uppercase tracking-wider hover:bg-stone-50 transition-all duration-300 shadow-sm flex items-center gap-1.5 active:scale-95">
-                                                    <span class="material-symbols-outlined text-[14px]">undo</span> Hủy Vào ca
-                                                </button>
-                                            </form>
-                                        </div>
-
-                                        <!-- Completed Actions -->
-                                        <div th:if="${schedule.status == 'Completed'}" class="flex gap-2">
-                                            <form th:action="@{/therapist/schedules/update-status}" method="post" class="m-0">
-                                                <input type="hidden" name="scheduleId" th:value="${schedule.scheduleId}" />
-                                                <input type="hidden" name="status" value="Ongoing" />
-                                                <input type="hidden" name="date" th:value="${#temporals.format(selectedDate, 'yyyy-MM-dd')}" />
-                                                <button type="submit"
-                                                        class="bg-white text-stone-600 border border-stone-200 px-4 py-2 rounded-xl font-sans text-[10px] font-bold uppercase tracking-wider hover:bg-stone-50 transition-all duration-300 shadow-sm flex items-center gap-1.5 active:scale-95">
-                                                    <span class="material-symbols-outlined text-[14px]">undo</span> Hủy Hoàn thành
-                                                </button>
-                                            </form>
-                                        </div>
-
-                                        <!-- No-Show Actions -->
-                                        <div th:if="${schedule.status == 'No-Show'}" class="flex gap-2">
-                                            <form th:action="@{/therapist/schedules/update-status}" method="post" class="m-0">
-                                                <input type="hidden" name="scheduleId" th:value="${schedule.scheduleId}" />
-                                                <input type="hidden" name="status" value="Scheduled" />
-                                                <input type="hidden" name="date" th:value="${#temporals.format(selectedDate, 'yyyy-MM-dd')}" />
-                                                <button type="submit"
-                                                        class="bg-white text-stone-600 border border-stone-200 px-4 py-2 rounded-xl font-sans text-[10px] font-bold uppercase tracking-wider hover:bg-stone-50 transition-all duration-300 shadow-sm flex items-center gap-1.5 active:scale-95">
-                                                    <span class="material-symbols-outlined text-[14px]">undo</span> Hủy Vắng mặt
                                                 </button>
                                             </form>
                                         </div>
@@ -511,6 +504,70 @@
                 container.appendChild(button);
             }
         });
+
+        function showHealthModal(buttonEl) {
+            const guestName = buttonEl.getAttribute('data-guest-name') || 'Khách ẩn danh';
+            const medical = buttonEl.getAttribute('data-medical') || '';
+            const injuries = buttonEl.getAttribute('data-injuries') || '';
+
+            document.getElementById('modalGuestName').innerText = guestName;
+            document.getElementById('modalMedical').innerText = medical.trim() !== '' ? medical : 'Không ghi nhận bệnh lý nào.';
+            document.getElementById('modalInjuries').innerText = injuries.trim() !== '' ? injuries : 'Không ghi nhận chấn thương nào.';
+
+            const modal = document.getElementById('healthModal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeHealthModal() {
+            const modal = document.getElementById('healthModal');
+            modal.classList.add('hidden');
+        }
     </script>
+
+    <!-- Physical Health Profile Modal -->
+    <div id="healthModal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onclick="closeHealthModal()"></div>
+        <!-- Modal Content -->
+        <div class="bg-white rounded-2xl w-full max-w-md p-6 relative z-10 shadow-2xl border border-stone-200 animate-fade-in-up">
+            <div class="flex items-center justify-between pb-4 border-b border-stone-100">
+                <div class="flex items-center gap-2 text-[#3a4536]">
+                    <span class="material-symbols-outlined text-[24px] font-bold">medical_services</span>
+                    <h3 class="font-serif text-lg font-bold uppercase tracking-wide">Sức Khỏe Vật Lý</h3>
+                </div>
+                <button type="button" onclick="closeHealthModal()" class="text-stone-400 hover:text-stone-600 transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
+                </button>
+            </div>
+            
+            <div class="mt-4 space-y-4">
+                <div>
+                    <span class="text-[10px] text-stone-400 font-bold uppercase tracking-wider block">Khách hàng</span>
+                    <p id="modalGuestName" class="text-sm font-semibold text-[#2b3327] mt-0.5">Khách ẩn danh</p>
+                </div>
+                
+                <div class="bg-stone-50/50 p-3 rounded-xl border border-stone-100">
+                    <span class="text-[10px] text-amber-700 font-bold uppercase tracking-wider block flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[12px]">clinical_notes</span> Bệnh lý nền
+                    </span>
+                    <p id="modalMedical" class="text-xs text-stone-600 font-medium mt-1 leading-relaxed whitespace-pre-line">Không ghi nhận bệnh lý nào.</p>
+                </div>
+
+                <div class="bg-stone-50/50 p-3 rounded-xl border border-stone-100">
+                    <span class="text-[10px] text-rose-700 font-bold uppercase tracking-wider block flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[12px]">personal_injury</span> Chấn thương
+                    </span>
+                    <p id="modalInjuries" class="text-xs text-stone-600 font-medium mt-1 leading-relaxed whitespace-pre-line">Không ghi nhận chấn thương nào.</p>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button type="button" onclick="closeHealthModal()" 
+                        class="bg-[#3a4536] text-[#d2c5af] px-5 py-2.5 rounded-xl font-sans text-xs font-bold uppercase tracking-wider hover:bg-[#2b3327] transition-all duration-300 shadow-sm active:scale-95">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

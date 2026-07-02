@@ -19,4 +19,7 @@ public class TherapistScheduleDto {
     private String roomName;
     private String note;
     private String status;
+    private String guestName;
+    private String medicalConditions;
+    private String injuries;
 }
