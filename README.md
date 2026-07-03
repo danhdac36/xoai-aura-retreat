@@ -1,4 +1,5 @@
 Xoai Aura Retreat - Full-Stack Wellness Resort & Spa Management System
+
 📌 Project Context & Overview
 Course: Software Development Project (SWP391)  
 Major: Software Engineering (SE) - Java Full-Stack specialization
